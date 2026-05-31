@@ -27,3 +27,18 @@ jobs:
 
       - name: Lint and format
         run: bun run check
+
+  bench-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Benchmark smoke (10k)
+        run: bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts --scale=10k --json

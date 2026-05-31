@@ -1,10 +1,11 @@
-import type { StorageAdapter } from "@melon/db";
+import type { QueryExecutionDebug, StorageAdapter } from "@melon/db";
 import { createSqliteAdapterFromDriver } from "./adapter-core.ts";
 import { createBunDriver } from "./drivers/bun.ts";
 
 export interface SqliteAdapterOptions {
 	filename: string;
 	debug?: boolean;
+	onQueryDebug?: (debug: QueryExecutionDebug) => void;
 }
 
 /**
@@ -15,6 +16,6 @@ export function createSqliteAdapter(
 ): StorageAdapter {
 	return createSqliteAdapterFromDriver(
 		() => createBunDriver({ filename: options.filename }),
-		{ debug: options.debug },
+		{ debug: options.debug, onQueryDebug: options.onQueryDebug },
 	);
 }

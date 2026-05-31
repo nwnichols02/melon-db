@@ -12,6 +12,7 @@
     "dev:rn": "bun run --filter playground-rn start",
     "ios:rn": "bun run --filter playground-rn ios",
     "bench": "bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts",
+    "bench:full": "bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts --scale=all",
     "typecheck:apps": "bun run --filter playground-rn typecheck",
     "melon-prisma": "bun run packages/melon-db-prisma/src/bin/melon-prisma.ts"
   },

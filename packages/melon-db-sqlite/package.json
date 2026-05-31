@@ -4,7 +4,8 @@
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts",
-		"./expo": "./src/expo.ts"
+		"./expo": "./src/expo.ts",
+		"./node": "./src/node.ts"
 	},
 	"scripts": {
 		"test": "bun test",
@@ -15,9 +16,13 @@
 		"@melon/db": "workspace:*"
 	},
 	"peerDependencies": {
+		"better-sqlite3": ">=11.0.0",
 		"expo-sqlite": ">=15.0.0"
 	},
 	"peerDependenciesMeta": {
+		"better-sqlite3": {
+			"optional": true
+		},
 		"expo-sqlite": {
 			"optional": true
 		}

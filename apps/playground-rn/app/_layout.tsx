@@ -1,11 +1,11 @@
+import { getDatabase } from "@/db/bootstrap";
+import type { taskSchema } from "@/db/schema";
 import type { MelonDatabase } from "@melon/db";
 import { MelonDbProvider } from "@melon/db-react";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { getDatabase } from "@/db/bootstrap";
-import { taskSchema } from "@/db/schema";
 
 /**
  * Root layout: bootstraps Melon DB then provides it to the app tree.

@@ -23,6 +23,8 @@ import { compileQuery } from "./sql/compile-query.ts";
 
 export interface SqliteAdapterCoreOptions {
 	debug?: boolean;
+	/** Called when debug is true after find/count/write SQL. */
+	onQueryDebug?: (debug: QueryExecutionDebug) => void;
 }
 
 /**
@@ -32,9 +34,17 @@ export function createSqliteAdapterFromDriver(
 	driverFactory: () => Promise<SqliteDriver>,
 	options: SqliteAdapterCoreOptions = {},
 ): StorageAdapter {
+	const { debug = false, onQueryDebug } = options;
 	let driver: SqliteDriver | null = null;
 	let schema: MelonSchema | null = null;
 	let lastQueryDebug: QueryExecutionDebug | undefined;
+
+	function emitDebug(debugInfo: QueryExecutionDebug): void {
+		lastQueryDebug = debugInfo;
+		if (debug && onQueryDebug) {
+			onQueryDebug(debugInfo);
+		}
+	}
 
 	function requireDriver(): SqliteDriver {
 		if (!driver) {
@@ -61,15 +71,8 @@ export function createSqliteAdapterFromDriver(
 		const s = requireSchema();
 
 		if (operation.type === "batch") {
-			await sqlite.exec("BEGIN");
-			try {
-				for (const op of operation.operations) {
-					await writeOperation(op);
-				}
-				await sqlite.exec("COMMIT");
-			} catch (error) {
-				await sqlite.exec("ROLLBACK");
-				throw error;
+			for (const op of operation.operations) {
+				await writeOperation(op);
 			}
 			return;
 		}
@@ -82,6 +85,7 @@ export function createSqliteAdapterFromDriver(
 			const cols = keys.map((k) => `"${k}"`).join(", ");
 			const placeholders = keys.map(() => "?").join(", ");
 			const sql = `INSERT INTO ${table} (${cols}) VALUES (${placeholders})`;
+			emitDebug({ sql, params: keys.map((k) => operation.values[k]) });
 			await sqlite.run(sql, toSqlParams(keys.map((k) => operation.values[k])));
 			return;
 		}
@@ -90,18 +94,18 @@ export function createSqliteAdapterFromDriver(
 			const keys = Object.keys(operation.values);
 			const setClause = keys.map((k) => `"${k}" = ?`).join(", ");
 			const sql = `UPDATE ${table} SET ${setClause} WHERE "${meta.primaryKey}" = ?`;
-			await sqlite.run(
-				sql,
-				toSqlParams([
-					...keys.map((k) => operation.values[k]),
-					operation.primaryKey,
-				]),
-			);
+			const params = [
+				...keys.map((k) => operation.values[k]),
+				operation.primaryKey,
+			];
+			emitDebug({ sql, params });
+			await sqlite.run(sql, toSqlParams(params));
 			return;
 		}
 
 		if (operation.type === "delete") {
 			const sql = `DELETE FROM ${table} WHERE "${meta.primaryKey}" = ?`;
+			emitDebug({ sql, params: [operation.id] });
 			await sqlite.run(sql, toSqlParams([operation.id]));
 		}
 	}
@@ -162,7 +166,7 @@ export function createSqliteAdapterFromDriver(
 		async find(query: PreparedQuery): Promise<AdapterFindResult> {
 			const sqlite = requireDriver();
 			const compiled = compileQuery(query);
-			lastQueryDebug = { sql: compiled.sql, params: compiled.params };
+			emitDebug({ sql: compiled.sql, params: compiled.params });
 			const rows = await sqlite.queryAll(
 				compiled.sql,
 				toSqlParams(compiled.params),
@@ -176,7 +180,7 @@ export function createSqliteAdapterFromDriver(
 				...query,
 				ast: { ...query.ast, mode: "count" },
 			});
-			lastQueryDebug = { sql: compiled.sql, params: compiled.params };
+			emitDebug({ sql: compiled.sql, params: compiled.params });
 			const row = await sqlite.queryFirst(
 				compiled.sql,
 				toSqlParams(compiled.params),

@@ -90,19 +90,23 @@ See [`packages/melon-db-sqlite/README.md`](packages/melon-db-sqlite/README.md) f
 
 ## Completed vs roadmap
 
-| Done | Deferred (Phase 10+) |
+| Done | Deferred (Phase 11+) |
 |------|----------|
 | Core engine M0–M2 | Custom JSI/TurboModule SQLite |
 | SQLite SQL compiler + Bun adapter | `@melon/sync` |
 | Expo SQLite adapter (`@melon/db-sqlite/expo`) | `@melon/db-codemods` |
-| `apps/playground-rn` | Docs site |
-| Query / Mango / Prisma surfaces | EAS Build CI |
+| Optional Node driver (`@melon/db-sqlite/node`) | Docs site |
+| `apps/playground-rn` | EAS Build CI |
+| Query / Mango / Prisma surfaces | WatermelonDB benchmark comparison |
 | React hooks (`useFindMany`, `useMangoQuery`) | |
 | Schema migrations | |
 | Prisma schema import + codegen CLI | |
 | belongsTo relation includes | |
 | Devtools bridge + SQL snapshots | |
-| CI (test, typecheck, biome) | |
+| SQL predicate test coverage + debug flag | |
+| Benchmark harness (10k/50k/100k) + CI smoke | |
+| Adapter stress tests (rollback, write queue) | |
+| CI (test, typecheck, biome, bench-smoke) | |
 
 ## Development
 

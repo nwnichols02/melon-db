@@ -7,11 +7,36 @@ import { createBunDriver } from "../src/drivers/bun.ts";
 import type { ExpoSqliteDatabase } from "../src/drivers/expo.ts";
 import { createExpoSqliteAdapter } from "../src/expo.ts";
 
+async function isBetterSqlite3Available(): Promise<boolean> {
+	try {
+		const BetterSqlite3 = (await import("better-sqlite3")).default as new (
+			filename: string,
+		) => { close(): void };
+		const db = new BetterSqlite3(":memory:");
+		db.close();
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 describe("createSqliteAdapterFromDriver", () => {
 	test("passes shared CRUD vectors via bun driver factory", async () => {
 		await runAdapterCrudVectors(() =>
 			createSqliteAdapterFromDriver(() =>
 				createBunDriver({ filename: ":memory:" }),
+			),
+		);
+	});
+
+	test("passes shared CRUD vectors via better-sqlite3 when installed", async () => {
+		if (!(await isBetterSqlite3Available())) {
+			return;
+		}
+		const { createNodeDriver } = await import("../src/drivers/node.ts");
+		await runAdapterCrudVectors(() =>
+			createSqliteAdapterFromDriver(() =>
+				createNodeDriver({ filename: ":memory:" }),
 			),
 		);
 	});
