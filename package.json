@@ -1,11 +1,17 @@
 {
-  "name": "melon",
-  "module": "index.ts",
+  "name": "melon-monorepo",
+  "private": true,
   "type": "module",
-  "devDependencies": {
-    "@types/bun": "latest"
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "test": "bun run --filter './packages/*' test",
+    "typecheck": "bun run --filter './packages/*' typecheck",
+    "build": "bun run --filter './packages/*' build",
+    "check": "bunx biome check packages"
   },
-  "peerDependencies": {
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/bun": "latest",
     "typescript": "^5"
   }
 }

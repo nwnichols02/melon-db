@@ -1,0 +1,19 @@
+{
+  "name": "@melon/db-prisma",
+  "version": "0.0.0-alpha",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "bunx tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@melon/db": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5"
+  }
+}

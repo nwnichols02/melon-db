@@ -1,0 +1,215 @@
+---
+alwaysApply: true
+---
+PRD: @melon/db-query – fluent query builder
+1. Scope
+@melon/db-query provides the first-party, type-safe, fluent query API that compiles to the QueryAst defined in @melon/db. It has no knowledge of SQLite or React.
+
+2. Goals
+Offer a modern, composable query DSL that’s easy to use in services, hooks, and tests.
+
+Become the canonical in-repo query API, with Mango/Prisma as alternate syntaxes compiled to the same AST.
+
+Preserve the spirit of WatermelonDB’s query descriptions (filter, sort, etc.), but in a TypeScript-first builder.
+
+3. Non-goals
+No direct DB IO; it should only return QueryAst.
+
+No concern for sync or backend querying (local-only semantics).
+
+Not required to preserve every WatermelonDB query helper 1:1; focus on common patterns.
+
+4. Functional requirements
+Provide a QueryBuilder<RecordShape> with:
+
+where(field, op, value)
+
+and(group => ...)
+
+or(group => ...)
+
+orderBy(field, direction?)
+
+limit(n)
+
+skip(n)
+
+include(relation, config?)
+
+toAst(mode?: 'many' | 'one' | 'count'): QueryAst
+
+Provide a QueryFactory:
+
+from<RecordShape>(collection: string): QueryBuilder<RecordShape>
+
+TS generics should:
+
+Restrict field params to keys of RecordShape.
+
+Restrict relation names where possible.
+
+Provide utilities:
+
+byId, byForeignKey, openTasks() style reusable builders.
+
+5. Non-functional requirements
+Type safety: Good inference for fields and relations.
+
+Composability: Builders are cheap, immutable, and can be shared.
+
+Testability: Query building can be unit-tested against AST output.
+
+6. Milestones
+M0 – API design (1 week)
+
+Write an RFC with sample usage:
+
+simple filter, sort, limit
+
+nested AND/OR
+
+includes
+
+Map common WatermelonDB query usage to this API so migration is straightforward.
+
+M1 – Implementation (2–3 weeks)
+
+Implement builder data structure and methods.
+
+Implement toAst (no adapter/SQL).
+
+Unit tests:
+
+Basic predicates → AST
+
+Nested boolean groups
+
+Order/limit/skip
+
+M2 – Integration with @melon/db (1 week)
+
+Wire builder into MelonCollection.query convenience overloads:
+
+collection.query(builder => builder.where(...))
+
+Add examples in docs and playground.
+
+PRD: @melon/db-react – React bindings
+1. Scope
+@melon/db-react provides React bindings for MelonDatabase and queries:
+
+Context provider to inject a MelonDatabase.
+
+Hooks to read from collections and run queries.
+
+Hooks to run writes in a safe, Watermelon-like “writer” context.
+
+It plays a similar role to WatermelonDB’s “database passed into React components” patterns and Prisma’s React Native reactive hooks.
+
+2. Goals
+Make it trivial to plug @melon/db into React Native and React.
+
+Provide a hooks-first API:
+
+useDatabase
+
+useCollection
+
+useQuery
+
+useWriter
+
+Combine reactive subscriptions from the adapter with React renders.
+
+3. Non-goals
+No schema or adapter logic (those live in @melon/db / @melon/db-sqlite).
+
+No devtools UI (bridge only, or keep devtools in its own package).
+
+No direct sync control (sync hooks belong in @melon/sync).
+
+4. Functional requirements
+<MelonDbProvider db={MelonDatabase}>:
+
+Uses React context.
+
+Optionally takes DevtoolsBridge for debug.
+
+Hooks:
+
+useDatabase<Schema>() => MelonDatabase<Schema>
+
+useCollection<T>(name) => MelonCollection<T>
+
+useQuery<T>(astOrPrepared, options?) => T[]
+
+useQueryCount(astOrPrepared) => number
+
+useFindMany<T>(collection, builderOrArgs):
+
+Works with fluent builder or Prisma-like args.
+
+useMangoQuery<T>(collection, mangoQuery):
+
+On top of @melon/db-query-mango.
+
+useWriter() => (fn) => Promise<T>:
+
+Wraps db.write with stable identity for components.
+
+Reactivity:
+
+Uses MelonQueryHandle.observe under the hood.
+
+Unsubscribes on unmount.
+
+Error handling:
+
+Hooks should expose errors via React state or throw for error boundaries.
+
+WatermelonDB patterns for passing Database to components and subscribing to changes should be possible to replicate cleanly here.
+
+5. Non-functional requirements
+Performance: Minimal re-renders; consider selectors or select option for useQuery.
+
+Ergonomics: API should feel natural to modern RN devs used to TanStack Query / Prisma hooks.
+
+Compatibility: Works in RN and web React.
+
+6. Milestones
+M0 – Hook surface RFC (1 week)
+
+Define final signatures, including options object for useQuery (enabled/select).
+
+Decide whether useFindMany wraps fluent builder or Prisma args, or both.
+
+M1 – Provider + basic hooks (2–3 weeks)
+
+Implement MelonDbProvider, useDatabase, useCollection, useWriter.
+
+Implement useQuery for PreparedQuery only (no builders yet).
+
+Add example: simple list screen in apps/playground-rn.
+
+M2 – Higher-level hooks + integration (2–3 weeks)
+
+Implement useFindMany, useMangoQuery.
+
+Add memoization/select logic.
+
+Example: filtered list, searching, etc.
+
+Suggested order from here
+Given you’re starting with @melon/db + @melon/db-sqlite:
+
+Implement @melon/db M0/M1 (with an in-memory adapter).
+
+Implement @melon/db-sqlite SQL generator + Node adapter.
+
+Implement @melon/db-query (so you can author nice queries).
+
+Implement @melon/db-react (so you can dogfood this in RN).
+
+Then tackle Mango (@melon/db-query-mango) and/or Prisma (@melon/db-prisma).
+
+Which one would you like to PRD next: Mango query package or Prisma integration package?

@@ -1,0 +1,253 @@
+---
+alwaysApply: true
+---
+For Prisma, you want a PRD that treats it as a schema+client ergonomics layer on top of @melon/db, not as your storage engine. Prisma’s own messaging emphasizes type-safe schema, migrations, and client ergonomics, with Early Access support for React Native/Expo and reactive queries via hooks. We’ll use those strengths without tying your runtime to Prisma’s engine.
+
+Here’s a focused PRD for @melon/db-prisma.
+
+PRD: @melon/db-prisma – Prisma schema & client layer
+1. Scope
+@melon/db-prisma provides:
+
+Prisma-schema-based model definitions for @melon/db.
+
+Type-safe client facades that feel Prisma-like but execute on MelonDatabase.
+
+Optional generated hooks mimicking Prisma RN’s useFindMany/useFindFirst semantics.
+
+It does not run Prisma’s engine or talk to remote databases; it is a local adapter over @melon/db.
+
+2. Goals
+Let teams reuse Prisma-style schemas and mental models while building local-first RN apps.
+
+Provide a generated TS client with familiar methods (findMany, findFirst, count, create, update, delete) that internally build QueryAst and call MelonCollection.
+
+Optionally provide hook facades such as useFindMany and useFindFirst similar to Prisma’s RN reactive queries extension.
+
+Integrate smoothly in a Bun workspaces setup: schema and generated client live under packages/melon-db-prisma, consumed by apps/packages via workspaces.
+
+3. Non-goals
+No remote DB or Prisma engine used at runtime inside the app; your local DB is still @melon/db + @melon/db-sqlite.
+
+No attempt to support every Prisma feature; focus on the subset that maps cleanly to local execution and your AST.
+
+No schema migration management inside this package for now; that’s handled by your own migration tooling.
+
+4. Functional requirements
+4.1 Prisma schema import
+Feature: Import a Prisma schema file and convert it into DatabaseSchemaDefinition and metadata usable by @melon/db.
+
+Prisma guides show using prisma init --datasource-provider sqlite and editing schema.prisma with models, then generating a client. We reuse that schema file but generate MelonSchema metadata instead of a Prisma engine.
+
+Requirements:
+
+Accept a Prisma schema file string or path.
+
+Parse:
+
+model names → collection names.
+
+Scalar fields → FieldDefinition with kind, nullable, default.
+
+Relations (@relation, @id, @unique) → RelationDefinition and indexes.
+
+Map datasource provider = "sqlite" as a first-class case, but don’t rely on it operationally (your adapter is independent).
+
+Produce:
+
+DatabaseSchemaDefinition (for @melon/db).
+
+Optional metadata for codegen (field type maps, relation info).
+
+Deliverables:
+
+PrismaSchemaImporter.importSchema(prismaSchema: string): Promise<DatabaseSchemaDefinition>.
+
+4.2 Code generation: client & types
+Prisma’s main advantages are type-safe clients and IDE support.
+
+Requirements:
+
+Generate TS types:
+
+Model interfaces that reflect Prisma models.
+
+Input types for create/update/where/orderBy.
+
+Generate PrismaLikeClient:
+
+For each model: a PrismaModelClient with methods:
+
+findMany(args?)
+
+findFirst(args?)
+
+count(args?)
+
+create({ data })
+
+update({ where, data })
+
+delete({ where })
+
+These methods compile their args into QueryAst and use MelonCollection under the hood.
+
+Optional generated hooks (in cooperation with @melon/db-react):
+
+useFindMany, useFindFirst, etc., similar to the Early Access RN extension: “reactive queries, using React hooks to streamline data fetching in RN/Expo.”
+
+Expose a CLI driven by Bun/Prisma guidelines:
+
+bunx --bun melon-prisma import – import schema.prisma → internal JSON schema.
+
+bunx --bun melon-prisma generate – generate client and types.
+
+Use Prisma + Bun patterns as reference for how to structure CLI commands in a workspace.
+
+Deliverables:
+
+PrismaCodeGenerator.generate(schema: DatabaseSchemaDefinition, options): Promise<void>
+
+Generated PrismaLikeClient types in a designated output folder inside the package.
+
+4.3 Prisma-style query objects → AST
+Prisma RN examples show findMany({ where, orderBy, take, skip }) and reactive hooks like useFindMany.
+
+Requirements:
+
+Define a subset of Prisma query args:
+
+PrismaFindManyArgs with:
+
+where (simple equality, comparisons, in, contains).
+
+orderBy (single or array).
+
+skip / take.
+
+select (fields).
+
+include (simple nested includes; may be limited in v1).
+
+Implement a PrismaQueryCompiler that:
+
+Validates args against schema.
+
+Produces QueryAst and PreparedQuery with source: 'prisma'.
+
+Map Prisma-like operators into your AST operators:
+
+equals, not, in, lt, lte, gt, gte, contains, etc.
+
+Deliverables:
+
+PrismaQueryCompiler extends QueryCompiler<PrismaFindManyArgs>.
+
+4.4 Client runtime: binding to MelonDatabase
+Requirements:
+
+createPrismaLikeClient(db: MelonDatabase): PrismaLikeClient:
+
+For each collection/model name in db.schema:
+
+Create a PrismaModelClient bound to that collection.
+
+findMany:
+
+Use PrismaQueryCompiler → QueryAst → MelonCollection.query(ast).fetch().
+
+create, update, delete:
+
+Use db.write and MelonCollection mutation methods.
+
+Ensure that PrismaModelClient methods are usable both:
+
+In non-React contexts (service code).
+
+In React hooks via usePrismaClient or useFindMany.
+
+This is analogous to how Prisma uses a generated client bound to a Prisma schema, but here the engine is MelonDatabase instead of Prisma.
+
+4.5 Optional: reactive hooks
+Prisma RN and Expo examples show reactive queries built around hooks (useFindMany, useFindFirst, etc.).
+
+Requirements (v1 or v1.x):
+
+Integrate with @melon/db-react:
+
+useFindMany(model, args):
+
+Under the hood, compile args → QueryAst.
+
+Use MelonCollection.query(ast).observe() to subscribe.
+
+Similar useFindFirst, useFindUnique, or minimal subset.
+
+Mirror naming from Prisma RN extension where it makes sense (useFindMany, useFindFirst).
+
+5. Non-functional requirements
+Type safety: TS inference similar to Prisma where feasible: client.user.findMany() returns User[] with correct field types.
+
+DX: CLI commands and generated files fit nicely into Bun workspaces.
+
+Isolation: No direct dependence on Prisma engine packages at runtime in the app; schema parsing and codegen can depend on Prisma tooling as devDependencies.
+
+6. Milestones
+M0 – Design & compatibility (1–2 weeks)
+Decide on supported Prisma schema subset:
+
+SQLite, scalar types, relations.
+
+Decide on supported where/orderBy operators.
+
+Draft schema mapping and args → AST mapping.
+
+Exit: Design doc mapping Prisma schema + queries → DatabaseSchemaDefinition + QueryAst.
+
+M1 – Schema import alpha (2–3 weeks)
+Implement PrismaSchemaImporter.importSchema.
+
+Point it at a small Prisma schema (SQLite-based quickstart).
+
+Generate DatabaseSchemaDefinition.
+
+Add tests to ensure fields/relations/indexes are mapped correctly.
+
+Exit: You can take a schema.prisma and produce a valid schema for @melon/db.
+
+M2 – Query compiler + runtime beta (3–4 weeks)
+Implement PrismaQueryCompiler for findMany subset.
+
+Implement createPrismaLikeClient(db).
+
+Wire findMany, findFirst, count, create, update, delete to MelonDatabase.
+
+Exit: In a Node test, you can:
+
+Create MelonDatabase (using in-memory or SQLite adapter).
+
+Create PrismaLikeClient.
+
+Run client.user.findMany({ where: { status: 'OPEN' } }) and get correct rows.
+
+M3 – Codegen & Bun CLI (2–3 weeks)
+Implement CLI commands using Bun/Prisma patterns:
+
+bunx --bun melon-prisma import
+
+bunx --bun melon-prisma generate
+
+Generate types and client stubs into a generated folder.
+
+Ensure this fits inside a Bun workspace as in Prisma’s Bun workspaces guide.
+
+Exit: bunx --bun melon-prisma generate runs in your workspace and produces a typed local client.
+
+M4 – Optional hooks & docs (2–3 weeks)
+Implement useFindMany / useFindFirst wrappers on top of @melon/db-react.
+
+Document:
+
+“I know Prisma, how do I use @melon/db-prisma?”
+
+“Differences between Prisma engine and melon local client.”
