@@ -4,7 +4,9 @@
 	"main": "expo-router/entry",
 	"scripts": {
 		"start": "EXPO_OFFLINE=1 expo start",
+		"start:clear": "EXPO_OFFLINE=1 expo start --clear",
 		"ios": "EXPO_OFFLINE=1 expo start --ios",
+		"ios:clear": "EXPO_OFFLINE=1 expo start --ios --clear",
 		"typecheck": "bunx tsc -p tsconfig.json --noEmit"
 	},
 	"dependencies": {

@@ -16,6 +16,7 @@
     "dev:docs": "bun run --filter docs dev",
     "build:docs": "bun run --filter docs build",
     "ios:rn": "bun run --filter playground-rn ios",
+    "ios:rn:clear": "bun run --filter playground-rn ios:clear",
     "bench": "bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts",
     "bench:full": "bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts --scale=all",
     "melon-codemod": "bun run packages/melon-db-codemods/src/bin/melon-codemod.ts",
