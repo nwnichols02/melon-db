@@ -1,8 +1,8 @@
 # @melon/db-sqlite
 
-SQLite `StorageAdapter` for Bun/Node using `bun:sqlite`. Compiles `QueryAst` to parameterized SQL.
+SQLite `StorageAdapter` implementations that compile `QueryAst` to parameterized SQL.
 
-## Usage
+## Bun / Node
 
 ```ts
 import { createDatabase, createMelonSchema } from '@melon/db';
@@ -12,6 +12,30 @@ const db = createDatabase({
   schema,
   adapter: createSqliteAdapter({ filename: 'app.db' }), // or ':memory:'
 });
+```
+
+## React Native / Expo
+
+Use the `./expo` export with `expo-sqlite` (peer dependency):
+
+```ts
+import { createDatabase } from '@melon/db';
+import { createExpoSqliteAdapter } from '@melon/db-sqlite/expo';
+import * as SQLite from 'expo-sqlite';
+
+const expoDb = await SQLite.openDatabaseAsync('app.db');
+const db = createDatabase({
+  schema,
+  adapter: createExpoSqliteAdapter({ database: expoDb }),
+});
+```
+
+The Expo driver shares the same SQL compiler and adapter core as the Bun driver via a `SqliteDriver` interface. Reactivity uses the engine `ChangeEmitter` (not native SQLite triggers).
+
+## Architecture
+
+```
+QueryAst → compileQuery → SqliteDriver (Bun or Expo) → SQLite
 ```
 
 ## Benchmarks (informal baselines)
@@ -33,5 +57,5 @@ Numbers vary by hardware; not enforced in CI.
 
 ## Deferred
 
-- React Native JSI/TurboModule adapter (M2)
+- Custom JSI/TurboModule adapter (beyond expo-sqlite)
 - `observeQuery` via native change notifications

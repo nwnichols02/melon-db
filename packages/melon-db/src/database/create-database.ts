@@ -1,4 +1,5 @@
 import type { AdapterChangeSet, AdapterWriteOperation } from "../adapter.ts";
+import { emitWriteChanges } from "../change/emit-write-change.ts";
 import { ChangeEmitter } from "../change/emitter.ts";
 import { MelonError, MelonErrorCode } from "../errors.ts";
 import { createCollection } from "./collection.ts";
@@ -23,10 +24,6 @@ export function createDatabase<
 	const writeQueue = new WriteQueue();
 	let insideWrite = false;
 	let initialized = false;
-
-	if ("setEmitter" in adapter && typeof adapter.setEmitter === "function") {
-		(adapter as { setEmitter: (e: ChangeEmitter) => void }).setEmitter(emitter);
-	}
 
 	async function ensureInitialized(): Promise<void> {
 		if (!initialized) {
@@ -63,7 +60,9 @@ export function createDatabase<
 					code: MelonErrorCode.WRITE_OUTSIDE_TRANSACTION,
 				});
 			}
-			await adapter.write({ type: "batch", operations });
+			const batchOp = { type: "batch" as const, operations };
+			await adapter.write(batchOp);
+			emitWriteChanges(emitter, schema, batchOp);
 		},
 	};
 

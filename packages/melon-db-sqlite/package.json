@@ -3,7 +3,8 @@
 	"version": "0.0.0-alpha",
 	"type": "module",
 	"exports": {
-		".": "./src/index.ts"
+		".": "./src/index.ts",
+		"./expo": "./src/expo.ts"
 	},
 	"scripts": {
 		"test": "bun test",
@@ -12,6 +13,14 @@
 	},
 	"dependencies": {
 		"@melon/db": "workspace:*"
+	},
+	"peerDependencies": {
+		"expo-sqlite": ">=15.0.0"
+	},
+	"peerDependenciesMeta": {
+		"expo-sqlite": {
+			"optional": true
+		}
 	},
 	"devDependencies": {
 		"@melon/db-devtools": "workspace:*",

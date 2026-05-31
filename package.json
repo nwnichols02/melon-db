@@ -5,11 +5,13 @@
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "test": "bun run --filter './packages/*' test",
-    "typecheck": "bun run --filter './packages/*' typecheck",
+    "typecheck": "bun run --filter './packages/*' typecheck && bun run typecheck:apps",
     "build": "bun run --filter './packages/*' build",
     "check": "bunx biome check packages",
     "demo": "bun run --filter playground-node demo",
-    "bench": "bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts"
+    "dev:rn": "bun run --filter playground-rn start",
+    "bench": "bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts",
+    "typecheck:apps": "bun run --filter playground-rn typecheck"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

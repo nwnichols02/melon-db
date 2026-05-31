@@ -5,7 +5,6 @@ import type {
 	StorageAdapter,
 } from "../../adapter.ts";
 import type { PreparedQuery } from "../../ast.ts";
-import type { ChangeEmitter, CollectionChange } from "../../change/emitter.ts";
 import { MelonError, MelonErrorCode } from "../../errors.ts";
 import { evaluateQuery } from "../../query/evaluate.ts";
 import type { MelonSchema } from "../../schema.ts";
@@ -18,22 +17,14 @@ function nextId(): string {
 	return `local_${idCounter}`;
 }
 
-export interface InMemoryAdapterOptions {
-	emitter?: ChangeEmitter;
-}
-
 /**
  * Creates an in-memory StorageAdapter for tests and local development.
  */
-export function createInMemoryAdapter(
-	options: InMemoryAdapterOptions = {},
-): StorageAdapter & {
+export function createInMemoryAdapter(): StorageAdapter & {
 	getData(): InMemoryData;
-	setEmitter(emitter: ChangeEmitter): void;
 } {
 	let schema: MelonSchema | null = null;
 	let data: InMemoryData = new Map();
-	let emitter = options.emitter;
 
 	function requireSchema(): MelonSchema {
 		if (!schema) {
@@ -44,34 +35,14 @@ export function createInMemoryAdapter(
 		return schema;
 	}
 
-	function emitChange(change: CollectionChange): void {
-		emitter?.emit(change);
-	}
-
-	function applyWrite(op: AdapterWriteOperation): CollectionChange | null {
+	function applyWrite(op: AdapterWriteOperation): void {
 		const s = requireSchema();
 
 		if (op.type === "batch") {
-			const merged: CollectionChange = {
-				collection: "",
-				created: [],
-				updated: [],
-				deleted: [],
-			};
 			for (const child of op.operations) {
-				const change = applyWrite(child);
-				if (change) {
-					merged.collection = change.collection;
-					merged.created.push(...change.created);
-					merged.updated.push(...change.updated);
-					merged.deleted.push(...change.deleted);
-				}
+				applyWrite(child);
 			}
-			if (merged.collection) {
-				emitChange(merged);
-				return merged;
-			}
-			return null;
+			return;
 		}
 
 		const store = data.get(op.collection);
@@ -88,14 +59,7 @@ export function createInMemoryAdapter(
 			const id = (op.values[pk] as string | number | undefined) ?? nextId();
 			const record = { ...op.values, [pk]: id };
 			store.set(id, record);
-			const change: CollectionChange = {
-				collection: op.collection,
-				created: [id],
-				updated: [],
-				deleted: [],
-			};
-			emitChange(change);
-			return change;
+			return;
 		}
 
 		if (op.type === "update") {
@@ -107,14 +71,7 @@ export function createInMemoryAdapter(
 			}
 			const record = { ...existing, ...op.values, [pk]: op.primaryKey };
 			store.set(op.primaryKey, record);
-			const change: CollectionChange = {
-				collection: op.collection,
-				created: [],
-				updated: [op.primaryKey],
-				deleted: [],
-			};
-			emitChange(change);
-			return change;
+			return;
 		}
 
 		if (op.type === "delete") {
@@ -124,22 +81,11 @@ export function createInMemoryAdapter(
 				});
 			}
 			store.delete(op.id);
-			const change: CollectionChange = {
-				collection: op.collection,
-				created: [],
-				updated: [],
-				deleted: [op.id],
-			};
-			emitChange(change);
-			return change;
 		}
-
-		return null;
 	}
 
 	const adapter: StorageAdapter & {
 		getData(): InMemoryData;
-		setEmitter(emitter: ChangeEmitter): void;
 	} = {
 		name: "in-memory",
 		capabilities: {
@@ -206,10 +152,6 @@ export function createInMemoryAdapter(
 
 		getData(): InMemoryData {
 			return data;
-		},
-
-		setEmitter(e: ChangeEmitter): void {
-			emitter = e;
 		},
 	};
 

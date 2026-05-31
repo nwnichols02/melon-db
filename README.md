@@ -7,7 +7,7 @@ Next-generation offline-first local database for React Native and TypeScript (Wa
 | Package | Description |
 |---------|-------------|
 | `@melon/db` | Core schema, AST, adapter contract, runtime engine |
-| `@melon/db-sqlite` | SQLite adapter (Bun `bun:sqlite`) |
+| `@melon/db-sqlite` | SQLite adapter (Bun `bun:sqlite` + Expo export) |
 | `@melon/db-query` | Fluent query builder |
 | `@melon/db-query-mango` | Mango-style query compiler |
 | `@melon/db-prisma` | Prisma-like local client facade |
@@ -49,13 +49,21 @@ await db.write(async (tx) => {
 const tasks = await db.collection('tasks').findMany();
 ```
 
-### SQLite + fluent query
+### SQLite + fluent query (Bun/Node)
 
 ```bash
 bun run demo
 ```
 
 See [`apps/playground-node/src/demo.ts`](apps/playground-node/src/demo.ts).
+
+### React Native / Expo playground
+
+```bash
+bun run dev:rn
+```
+
+Open the app in iOS Simulator or Android emulator. See [`apps/playground-rn/README.md`](apps/playground-rn/README.md).
 
 ### Benchmarks
 
@@ -70,17 +78,19 @@ See [`packages/melon-db-sqlite/README.md`](packages/melon-db-sqlite/README.md) f
 - All mutations must run inside `db.write()`.
 - No automatic schema migrations.
 - No relation includes in queries (v1).
-- SQLite adapter targets Bun/Node only (not React Native yet).
+- Native SQLite `observeQuery` triggers not implemented (engine change emitter used instead).
 
 ## Completed vs roadmap
 
 | Done | Deferred |
 |------|----------|
-| Core engine M0–M2 | RN JSI SQLite adapter |
-| SQLite SQL compiler + Bun adapter | `apps/playground-rn` |
-| Query / Mango / Prisma surfaces | `@melon/sync` |
-| React hooks | `@melon/db-codemods` |
-| Devtools bridge + SQL snapshots | Docs site |
+| Core engine M0–M2 | Custom JSI/TurboModule SQLite |
+| SQLite SQL compiler + Bun adapter | `@melon/sync` |
+| Expo SQLite adapter (`@melon/db-sqlite/expo`) | `@melon/db-codemods` |
+| `apps/playground-rn` | Docs site |
+| Query / Mango / Prisma surfaces | Prisma schema import / codegen CLI |
+| React hooks | EAS Build CI |
+| Devtools bridge + SQL snapshots | |
 | CI (test, typecheck, biome) | |
 
 ## Development

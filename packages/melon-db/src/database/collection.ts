@@ -1,5 +1,9 @@
 import type { AdapterWriteOperation, StorageAdapter } from "../adapter.ts";
 import type { QueryAst } from "../ast.ts";
+import {
+	emitInsertChange,
+	emitWriteChanges,
+} from "../change/emit-write-change.ts";
 import type { ChangeEmitter } from "../change/emitter.ts";
 import type { DevtoolsBridge } from "../devtools.ts";
 import { MelonError, MelonErrorCode } from "../errors.ts";
@@ -112,8 +116,18 @@ export function createCollection<RecordShape = Record<string, unknown>>(
 			const inserted = id !== undefined ? await this.findById(id) : null;
 			if (!inserted) {
 				const rows = await this.findMany();
-				return rows[rows.length - 1] as RecordShape;
+				const record = rows[rows.length - 1] as RecordShape;
+				const resolvedId = (record as Record<string, unknown>)[pk] as
+					| string
+					| number;
+				emitInsertChange(emitter, name, resolvedId);
+				return record;
 			}
+			emitInsertChange(
+				emitter,
+				name,
+				(inserted as Record<string, unknown>)[pk] as string | number,
+			);
 			return inserted;
 		},
 
@@ -130,6 +144,7 @@ export function createCollection<RecordShape = Record<string, unknown>>(
 			};
 			devtools?.emitWrite(op);
 			await adapter.write(op);
+			emitWriteChanges(emitter, schema, op);
 			const record = await this.findById(id);
 			if (!record) {
 				throw new MelonError(`Record "${id}" not found after update`, {
@@ -149,6 +164,7 @@ export function createCollection<RecordShape = Record<string, unknown>>(
 			};
 			devtools?.emitWrite(op);
 			await adapter.write(op);
+			emitWriteChanges(emitter, schema, op);
 		},
 	};
 }
