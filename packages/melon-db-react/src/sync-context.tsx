@@ -78,12 +78,15 @@ function MelonSyncProviderInner({
 	}, [checkpointStore]);
 
 	const sync = useCallback(async (): Promise<SynchronizeResult> => {
+		const onSyncEvent = db.devtools?.emitSync?.bind(db.devtools);
+
 		try {
 			const result = await synchronize({
 				db,
 				pullChanges,
 				pushChanges,
 				checkpointStore,
+				onSyncEvent,
 				onStatusChange: (nextStatus) => {
 					if (!mountedRef.current) {
 						return;

@@ -140,6 +140,7 @@ export function createDatabase<
 	return {
 		schema,
 		adapter,
+		devtools,
 
 		collection,
 

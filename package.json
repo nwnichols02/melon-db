@@ -13,11 +13,13 @@
     "demo:sync:http": "bun run --filter playground-node sync-http-demo",
     "sync-server": "bun run packages/melon-sync-server/src/bin/sync-server.ts",
     "dev:rn": "bun run --filter playground-rn start",
+    "dev:docs": "bun run --filter docs dev",
+    "build:docs": "bun run --filter docs build",
     "ios:rn": "bun run --filter playground-rn ios",
     "bench": "bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts",
     "bench:full": "bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts --scale=all",
     "melon-codemod": "bun run packages/melon-db-codemods/src/bin/melon-codemod.ts",
-    "typecheck:apps": "bun run --filter playground-rn typecheck",
+    "typecheck:apps": "bun run --filter playground-rn typecheck && bun run --filter docs typecheck",
     "melon-prisma": "bun run packages/melon-db-prisma/src/bin/melon-prisma.ts"
   },
   "devDependencies": {

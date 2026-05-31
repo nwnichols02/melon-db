@@ -9,6 +9,7 @@
 	},
 	"dependencies": {
 		"@melon/db": "workspace:*",
+		"@melon/db-devtools": "workspace:*",
 		"@melon/db-query": "workspace:*",
 		"@melon/db-react": "workspace:*",
 		"@melon/db-sqlite": "workspace:*",

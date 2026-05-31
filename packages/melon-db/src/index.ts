@@ -49,9 +49,12 @@ export { prepareQuery } from "./query/prepare.ts";
 export { evaluateQuery } from "./query/evaluate.ts";
 export { loadIncludes } from "./query/load-includes.ts";
 
-import type { DevtoolsBridge, QueryDebugSnapshot } from "./devtools.ts";
-
-export type { DevtoolsBridge, QueryDebugSnapshot };
+export type {
+	DevtoolsBridge,
+	QueryDebugSnapshot,
+	SyncDebugSnapshot,
+} from "./devtools.ts";
+export { SyncDebugPhase } from "./devtools.ts";
 
 export type {
 	ApplyRemoteChangesOptions,

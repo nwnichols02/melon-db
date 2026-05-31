@@ -25,6 +25,9 @@ jobs:
       - name: Typecheck
         run: bun run typecheck
 
+      - name: Docs typecheck
+        run: bun run --filter docs typecheck
+
       - name: Lint and format
         run: bun run check
 

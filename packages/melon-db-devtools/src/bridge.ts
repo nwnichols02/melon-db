@@ -1,4 +1,8 @@
-import type { DevtoolsBridge, QueryDebugSnapshot } from "@melon/db";
+import type {
+	DevtoolsBridge,
+	QueryDebugSnapshot,
+	SyncDebugSnapshot,
+} from "@melon/db";
 import type { AdapterWriteOperation } from "@melon/db";
 
 export interface DevtoolsEventLog {
@@ -6,6 +10,7 @@ export interface DevtoolsEventLog {
 	writes: AdapterWriteOperation[];
 	subscriptions: Array<{ collection: string; active: boolean }>;
 	errors: Array<Error & { code?: string }>;
+	sync: SyncDebugSnapshot[];
 }
 
 /**
@@ -19,6 +24,7 @@ export function createMemoryDevtoolsBridge(): DevtoolsBridge & {
 		writes: [],
 		subscriptions: [],
 		errors: [],
+		sync: [],
 	};
 
 	return {

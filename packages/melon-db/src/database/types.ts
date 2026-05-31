@@ -57,6 +57,7 @@ export type CollectionRecord = Record<string, unknown>;
 export interface MelonDatabase<Schema extends MelonSchema = MelonSchema> {
 	readonly schema: Schema;
 	readonly adapter: StorageAdapter;
+	readonly devtools?: DevtoolsBridge;
 	collection<Name extends keyof Schema["collections"] & string>(
 		name: Name,
 	): MelonCollection<CollectionRecord>;

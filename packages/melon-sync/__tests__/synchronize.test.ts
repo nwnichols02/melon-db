@@ -165,4 +165,79 @@ describe("synchronize", () => {
 		expect(server.getRecord("1")?.title).toBe("Retry me");
 		expect(await checkpoint.getLastPulledAt()).not.toBeNull();
 	});
+
+	test("onSyncEvent receives pull apply push complete sequence on success", async () => {
+		const server = new MockSyncServer();
+		const db = createDatabase({
+			schema: syncSchema,
+			adapter: createInMemoryAdapter(),
+			sync: {},
+		});
+		const phases: string[] = [];
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Sync event",
+				status: "open",
+			});
+		});
+
+		await synchronize({
+			db,
+			pullChanges: (args) => server.pullChanges(args),
+			pushChanges: (args) => server.pushChanges(args),
+			checkpointStore: createMemoryCheckpointStore(),
+			onSyncEvent: (snapshot) => {
+				phases.push(snapshot.phase);
+			},
+		});
+
+		expect(phases).toEqual(["pull", "apply", "push", "checkpoint", "complete"]);
+	});
+
+	test("failed push emits failed event with retryable flag", async () => {
+		const server = new MockSyncServer();
+		const db = createDatabase({
+			schema: syncSchema,
+			adapter: createInMemoryAdapter(),
+			sync: {},
+		});
+		const failedEvents: Array<{
+			phase: string;
+			retryable?: boolean;
+		}> = [];
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Fail push",
+				status: "open",
+			});
+		});
+
+		try {
+			await synchronize({
+				db,
+				pullChanges: (args) => server.pullChanges(args),
+				pushChanges: async () => {
+					throw new Error("network down");
+				},
+				checkpointStore: createMemoryCheckpointStore(),
+				onSyncEvent: (snapshot) => {
+					if (snapshot.phase === "failed") {
+						failedEvents.push({
+							phase: snapshot.phase,
+							retryable: snapshot.error?.retryable,
+						});
+					}
+				},
+			});
+		} catch {
+			// expected
+		}
+
+		expect(failedEvents).toHaveLength(1);
+		expect(failedEvents[0]?.retryable).toBe(true);
+	});
 });

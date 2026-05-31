@@ -12,7 +12,7 @@ Next-generation offline-first local database for React Native and TypeScript (Wa
 | `@melon/db-query-mango` | Mango-style query compiler |
 | `@melon/db-prisma` | Prisma-like local client facade |
 | `@melon/db-react` | React hooks and provider |
-| `@melon/db-devtools` | Devtools event bridge (query/SQL snapshots) |
+| `@melon/db-devtools` | Devtools event bridge + React inspector panel |
 | `@melon/db-testkit` | Test helpers, fixtures, `withTestDatabase` |
 | `@melon/db-codemods` | WatermelonDB migration codemods and query translator |
 | `@melon/sync` | Watermelon-compatible pull/push sync orchestrator |
@@ -84,6 +84,28 @@ bun run bench
 
 See [`packages/melon-db-sqlite/README.md`](packages/melon-db-sqlite/README.md) for informal baseline notes.
 
+### Documentation site
+
+```bash
+bun run dev:docs
+```
+
+Open http://localhost:3000 for guides and live in-browser playgrounds. See [`apps/docs/README.md`](apps/docs/README.md).
+
+### Devtools
+
+Wire the reactive bridge and inspector panel:
+
+```ts
+import { createReactiveDevtoolsBridge } from '@melon/db-devtools';
+import { MelonDevtoolsProvider, MelonDevtoolsPanel } from '@melon/db-devtools/react';
+
+const devtools = createReactiveDevtoolsBridge();
+const db = createDatabase({ schema, adapter, devtools });
+```
+
+See [`packages/melon-db-devtools/README.md`](packages/melon-db-devtools/README.md).
+
 ### Migrating from WatermelonDB
 
 Use the compatibility matrix and CLI codemods in [`@melon/db-codemods`](packages/melon-db-codemods/README.md):
@@ -128,19 +150,21 @@ await synchronize({
 
 ## Completed vs roadmap
 
-| Done | Deferred (Phase 14+) |
+| Done | Deferred (Phase 15+) |
 |------|----------|
 | Core engine M0–M2 | Custom JSI/TurboModule SQLite |
 | SQLite SQL compiler + Bun adapter | Postgres reference backend |
-| Expo SQLite adapter (`@melon/db-sqlite/expo`) | Docs site |
-| Optional Node driver (`@melon/db-sqlite/node`) | EAS Build CI |
-| `apps/playground-rn` + sync demo | WatermelonDB benchmark comparison |
-| Query / Mango / Prisma surfaces | Model/schema codemods, `Q.on` joins |
-| React hooks (`useFindMany`, `useMangoQuery`, `useSync`) | Devtools UI panel |
-| Schema migrations | Migration-aware sync, retry queue |
-| Prisma schema import + codegen CLI | Full conflict policy matrix |
+| Expo SQLite adapter (`@melon/db-sqlite/expo`) | EAS Build CI |
+| Optional Node driver (`@melon/db-sqlite/node`) | WatermelonDB benchmark comparison |
+| `apps/playground-rn` + sync demo | Model/schema codemods, `Q.on` joins |
+| Query / Mango / Prisma surfaces | Migration-aware sync, retry queue |
+| React hooks (`useFindMany`, `useMangoQuery`, `useSync`) | Full conflict policy matrix |
+| Schema migrations | |
+| Prisma schema import + codegen CLI | |
 | belongsTo relation includes | |
-| Devtools bridge + SQL snapshots | |
+| Reactive devtools bridge + sync event logging | |
+| Devtools React inspector panel (web + RN dev overlay) | |
+| `apps/docs` site with live playgrounds | |
 | SQL predicate test coverage + debug flag | |
 | Benchmark harness (10k/50k/100k) + CI smoke | |
 | Adapter stress tests (rollback, write queue) | |
@@ -148,7 +172,7 @@ await synchronize({
 | `@melon/sync` (outbox + orchestrator) | |
 | Persistent SQLite checkpoints | |
 | `@melon/sync-server` (HTTP reference backend) | |
-| CI (test, typecheck, biome, bench-smoke) | |
+| CI (test, typecheck, biome, bench-smoke, docs typecheck) | |
 
 ## Development
 

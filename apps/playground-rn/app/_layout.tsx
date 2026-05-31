@@ -1,7 +1,11 @@
-import { getDatabase } from "@/db/bootstrap";
+import { getDatabase, devtoolsBridge } from "@/db/bootstrap";
 import type { taskSchema } from "@/db/schema";
 import { createHttpSyncBackend } from "@/sync/client";
 import type { MelonDatabase } from "@melon/db";
+import {
+	MelonDevtoolsPanel,
+	MelonDevtoolsProvider,
+} from "@melon/db-devtools/react";
 import { MelonDbProvider, MelonSyncProvider } from "@melon/db-react";
 import { Stack } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
@@ -44,9 +48,18 @@ export default function RootLayout(): React.ReactElement {
 					pullChanges={syncBackend.pullChanges}
 					pushChanges={syncBackend.pushChanges}
 				>
-					<Stack>
-						<Stack.Screen name="index" options={{ title: "Open Tasks" }} />
-					</Stack>
+					{__DEV__ ? (
+						<MelonDevtoolsProvider bridge={devtoolsBridge}>
+							<Stack>
+								<Stack.Screen name="index" options={{ title: "Open Tasks" }} />
+							</Stack>
+							<MelonDevtoolsPanel />
+						</MelonDevtoolsProvider>
+					) : (
+						<Stack>
+							<Stack.Screen name="index" options={{ title: "Open Tasks" }} />
+						</Stack>
+					)}
 				</MelonSyncProvider>
 			</MelonDbProvider>
 		</SafeAreaProvider>

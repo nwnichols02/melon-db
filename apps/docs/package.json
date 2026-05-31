@@ -1,0 +1,26 @@
+{
+	"name": "docs",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "bun --hot src/server.ts",
+		"build": "bun build ./index.html --outdir ./dist --minify",
+		"typecheck": "bunx tsc -p tsconfig.json --noEmit"
+	},
+	"dependencies": {
+		"@melon/db": "workspace:*",
+		"@melon/db-devtools": "workspace:*",
+		"@melon/db-query": "workspace:*",
+		"@melon/db-react": "workspace:*",
+		"@melon/sync": "workspace:*",
+		"@melon/sync-server": "workspace:*"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@types/react": "~19.1.10",
+		"@types/react-dom": "~19.1.10",
+		"react": "19.1.0",
+		"react-dom": "19.1.0",
+		"typescript": "^5"
+	}
+}

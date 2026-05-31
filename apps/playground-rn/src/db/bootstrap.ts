@@ -1,8 +1,11 @@
 import { createDatabase, type MelonDatabase } from "@melon/db";
+import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
 import type { SQLiteDatabase } from "expo-sqlite";
 import { createExpoSqliteAdapter } from "@melon/db-sqlite/expo";
 import * as SQLite from "expo-sqlite";
 import { type Task, taskSchema } from "./schema";
+
+export const devtoolsBridge = createReactiveDevtoolsBridge();
 
 let databasePromise: Promise<MelonDatabase<typeof taskSchema>> | null = null;
 
@@ -25,6 +28,7 @@ async function bootstrap(): Promise<MelonDatabase<typeof taskSchema>> {
 	const db = createDatabase({
 		schema: taskSchema,
 		adapter: createExpoSqliteAdapter({ database: expoDb }),
+		devtools: devtoolsBridge,
 		sync: {},
 	});
 

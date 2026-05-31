@@ -1,5 +1,5 @@
-import type { MelonDatabase, SyncChanges } from "@melon/db";
-import { MelonErrorCode } from "@melon/db";
+import type { MelonDatabase, SyncChanges, SyncDebugSnapshot } from "@melon/db";
+import { MelonErrorCode, SyncDebugPhase } from "@melon/db";
 import type { CheckpointStore } from "./checkpoint.ts";
 import { createMemoryCheckpointStore } from "./checkpoint.ts";
 import { SyncError, SyncErrorCode } from "./errors.ts";
@@ -13,6 +13,7 @@ export interface SynchronizeArgs {
 	pushChanges: (args: PushArgs) => Promise<void>;
 	checkpointStore?: CheckpointStore;
 	onStatusChange?: (status: SyncStatus) => void;
+	onSyncEvent?: (snapshot: SyncDebugSnapshot) => void;
 }
 
 export interface SynchronizeResult {
@@ -31,6 +32,20 @@ function hasChanges(changes: SyncChanges): boolean {
 		}
 	}
 	return false;
+}
+
+function summarizeChanges(
+	changes: SyncChanges,
+): SyncDebugSnapshot["changesSummary"] {
+	const summary: NonNullable<SyncDebugSnapshot["changesSummary"]> = {};
+	for (const [collection, changeSet] of Object.entries(changes)) {
+		summary[collection] = {
+			created: changeSet.created.length,
+			updated: changeSet.updated.length,
+			deleted: changeSet.deleted.length,
+		};
+	}
+	return summary;
 }
 
 function wrapError(
@@ -58,18 +73,34 @@ export async function synchronize(
 		pushChanges,
 		checkpointStore = createMemoryCheckpointStore(),
 		onStatusChange,
+		onSyncEvent,
 	} = args;
 
 	const emit = (status: SyncStatus): void => {
 		onStatusChange?.(status);
 	};
 
+	const emitSync = (
+		snapshot: Omit<SyncDebugSnapshot, "timestamp"> & { timestamp?: number },
+	): void => {
+		onSyncEvent?.({
+			...snapshot,
+			timestamp: snapshot.timestamp ?? Date.now(),
+		});
+	};
+
 	emit({ status: SyncStatusKind.Idle });
 
 	try {
 		const lastPulledAt = await checkpointStore.getLastPulledAt();
+		const syncStart = performance.now();
 
 		emit({ status: SyncStatusKind.Pulling });
+		emitSync({
+			phase: SyncDebugPhase.Pull,
+			lastPulledAt,
+		});
+
 		let pullResult: PullResult;
 		try {
 			pullResult = await pullChanges({
@@ -79,6 +110,12 @@ export async function synchronize(
 		} catch (error) {
 			throw wrapError("Pull failed", SyncErrorCode.SYNC_PULL_FAILED, error);
 		}
+
+		emitSync({
+			phase: SyncDebugPhase.Apply,
+			lastPulledAt,
+			changesSummary: summarizeChanges(pullResult.changes),
+		});
 
 		try {
 			await db.applyRemoteChanges(pullResult.changes);
@@ -105,6 +142,12 @@ export async function synchronize(
 		const localChanges = await db.getLocalChanges();
 
 		emit({ status: SyncStatusKind.Pushing });
+		emitSync({
+			phase: SyncDebugPhase.Push,
+			lastPulledAt,
+			changesSummary: summarizeChanges(localChanges),
+		});
+
 		if (hasChanges(localChanges)) {
 			try {
 				await pushChanges({
@@ -119,8 +162,19 @@ export async function synchronize(
 
 		await checkpointStore.setLastPulledAt(pullResult.timestamp);
 
+		emitSync({
+			phase: SyncDebugPhase.Checkpoint,
+			lastPulledAt: pullResult.timestamp,
+		});
+
 		const complete: SyncStatus = { status: SyncStatusKind.Complete };
 		emit(complete);
+		emitSync({
+			phase: SyncDebugPhase.Complete,
+			lastPulledAt: pullResult.timestamp,
+			durationMs: performance.now() - syncStart,
+		});
+
 		return {
 			status: complete,
 			lastPulledAt: pullResult.timestamp,
@@ -135,6 +189,15 @@ export async function synchronize(
 			error: syncError,
 		};
 		emit(failed);
+		emitSync({
+			phase: SyncDebugPhase.Failed,
+			lastPulledAt: null,
+			error: {
+				code: syncError.code,
+				message: syncError.message,
+				retryable: syncError.retryable,
+			},
+		});
 		throw syncError;
 	}
 }
