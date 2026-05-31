@@ -2,11 +2,12 @@ import { createQueryFactory } from "@melon/db-query";
 import { useQuery, useSync, useWriter } from "@melon/db-react";
 import { SyncStatusKind } from "@melon/sync";
 import { FlashList } from "@shopify/flash-list";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AddTaskForm } from "@/components/add-task-form";
 import { TaskRow } from "@/components/task-row";
+import { createTaskId } from "@/db/create-task-id";
 import { type Task, taskSchema } from "@/db/schema";
 
 /**
@@ -15,7 +16,6 @@ import { type Task, taskSchema } from "@/db/schema";
 export default function TasksScreen(): React.ReactElement {
 	const write = useWriter();
 	const { sync, status, isSyncing, error } = useSync();
-	const [nextId, setNextId] = useState(100);
 
 	const openTasksQuery = useMemo(
 		() =>
@@ -31,11 +31,9 @@ export default function TasksScreen(): React.ReactElement {
 
 	const handleAdd = useCallback(
 		async (title: string) => {
-			const id = String(nextId);
-			setNextId((value) => value + 1);
 			await write(async (tx) => {
 				await tx.collection("tasks").insert({
-					id,
+					id: createTaskId(),
 					title,
 					status: "open",
 					priority: 1,
@@ -43,7 +41,7 @@ export default function TasksScreen(): React.ReactElement {
 				});
 			});
 		},
-		[write, nextId],
+		[write],
 	);
 
 	const handleComplete = useCallback(

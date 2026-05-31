@@ -7,6 +7,16 @@ function recordKey(collection: string, recordId: string | number): string {
 	return `${collection}:${String(recordId)}`;
 }
 
+function mapOutboxRow(row: Record<string, unknown>): SyncOutboxEntry {
+	return {
+		id: String(row.id),
+		collection: String(row.collection),
+		recordId: String(row.record_id),
+		operation: String(row.operation) as SyncOutboxEntry["operation"],
+		timestamp: Number(row.timestamp),
+	};
+}
+
 /**
  * Creates a SQLite-backed sync outbox store.
  */
@@ -19,13 +29,21 @@ export function createSqliteSyncOutboxStore(
 				`SELECT "id", "collection", "record_id", "operation", "timestamp" FROM "${SYNC_OUTBOX_TABLE}"`,
 				[],
 			);
-			return rows.map((row) => ({
-				id: String(row.id),
-				collection: String(row.collection),
-				recordId: String(row.record_id),
-				operation: String(row.operation) as SyncOutboxEntry["operation"],
-				timestamp: Number(row.timestamp),
-			}));
+			return rows.map((row) => mapOutboxRow(row));
+		},
+
+		async findByRecord(
+			collection: string,
+			recordId: string | number,
+		): Promise<SyncOutboxEntry | null> {
+			const row = await driver.queryFirst(
+				`SELECT "id", "collection", "record_id", "operation", "timestamp" FROM "${SYNC_OUTBOX_TABLE}" WHERE "collection" = ? AND "record_id" = ? LIMIT 1`,
+				toSqlParams([collection, String(recordId)]),
+			);
+			if (!row) {
+				return null;
+			}
+			return mapOutboxRow(row);
 		},
 
 		async upsert(entry: SyncOutboxEntry): Promise<void> {

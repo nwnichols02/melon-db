@@ -23,6 +23,17 @@ export function createMemorySyncOutboxStore(): SyncOutboxStore {
 			return [...entries.values()];
 		},
 
+		async findByRecord(
+			collection: string,
+			recordId: string | number,
+		): Promise<SyncOutboxEntry | null> {
+			const existingId = byRecord.get(recordKey(collection, recordId));
+			if (!existingId) {
+				return null;
+			}
+			return entries.get(existingId) ?? null;
+		},
+
 		async upsert(entry: SyncOutboxEntry): Promise<void> {
 			const key = recordKey(entry.collection, entry.recordId);
 			const existingId = byRecord.get(key);

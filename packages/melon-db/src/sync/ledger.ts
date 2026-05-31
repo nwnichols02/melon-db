@@ -74,11 +74,7 @@ export async function recordSyncOutboxWrite(
 	}
 
 	const { collection, recordId } = ids;
-	const existing = (await store.list()).find(
-		(entry) =>
-			entry.collection === collection &&
-			String(entry.recordId) === String(recordId),
-	);
+	const existing = await store.findByRecord(collection, recordId);
 
 	if (operation.type === "insert") {
 		const entry: SyncOutboxEntry = {

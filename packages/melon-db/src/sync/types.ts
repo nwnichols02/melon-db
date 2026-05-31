@@ -43,6 +43,10 @@ export interface SyncOutboxEntry {
 
 export interface SyncOutboxStore {
 	list(): Promise<SyncOutboxEntry[]>;
+	findByRecord(
+		collection: string,
+		recordId: string | number,
+	): Promise<SyncOutboxEntry | null>;
 	upsert(entry: SyncOutboxEntry): Promise<void>;
 	removeByRecord(collection: string, recordId: string | number): Promise<void>;
 	clear(collections?: string[]): Promise<void>;
