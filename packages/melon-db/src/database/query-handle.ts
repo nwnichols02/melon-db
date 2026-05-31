@@ -54,6 +54,7 @@ export function createQueryHandle<RecordShape = Record<string, unknown>>(
 		},
 
 		async fetchCount(): Promise<number> {
+			await ensureReady();
 			if (prepared.ast.mode === "count") {
 				const result = await adapter.count(prepared);
 				const queryDebug = adapter.getLastQueryDebug?.();
