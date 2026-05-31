@@ -1,0 +1,517 @@
+---
+alwaysApply: true
+---
+# `melon/db` package architecture and TypeScript interfaces
+
+## Overview
+This document defines a concrete package architecture and TypeScript-first interface proposal for `melon/db`, the storage and query layer of the next-generation WatermelonDB successor. The design follows WatermelonDB’s documented architecture, where `Database` owns an adapter and collections, the adapter bridges high-level reactive APIs to low-level database operations, and most logic is kept minimal and implemented as pure functions around query descriptions.[1][2]
+
+The proposal also incorporates two extensions from the previous PRD iteration: a Prisma-oriented schema and client layer, and an alternate open-source query language layer based on Mango-style selectors as documented by RxDB and CouchDB.[3][4][5] The result is a package family with one execution core, one internal query AST, and multiple query authoring surfaces that compile into the same runtime contracts.[6][7]
+
+## Architectural objectives
+- Preserve WatermelonDB’s database-agnostic adapter model.[2][6]
+- Preserve lazy, reactive, local-first query execution for large datasets.[1][8]
+- Standardize on a single internal query AST, because WatermelonDB already treats query descriptions as pure structures and adapters as translation layers.[1][6]
+- Allow Prisma-style and Mango-style query authoring without splitting the runtime engine.[3][4][7]
+- Keep interfaces functional, composable, and reusable for React and non-React usage.
+
+## Package map
+
+| Package | Purpose |
+|---|---|
+| `@melon/db` | Core storage runtime, AST, schema metadata, transactions, subscriptions, execution engine |
+| `@melon/db-sqlite` | SQLite adapter for React Native and Node-capable environments |
+| `@melon/db-react` | React hooks, provider bindings, selector subscriptions |
+| `@melon/db-query` | First-party fluent query builder and typed query helpers |
+| `@melon/db-query-mango` | Mango parser, validator, and AST compiler based on open selector-style queries.[4][5] |
+| `@melon/db-prisma` | Prisma schema import, code generation, Prisma-style local client facade, hook helpers.[3][9] |
+| `@melon/db-devtools` | AST inspector, SQL inspector, query planner views, subscription diagnostics |
+| `@melon/db-testkit` | In-memory adapter, fixtures, fake clock helpers, sync-less local test tools |
+| `@melon/db-codemods` | WatermelonDB migration helpers and query codemods.[6][1] |
+
+## Layered architecture
+
+### Layer 1: Schema and metadata
+This layer owns model declarations, fields, indexes, relations, migration metadata, and collection-level capabilities. WatermelonDB’s setup model already starts by defining schema before building models and database objects, so the new architecture keeps schema metadata as the first dependency in the stack.[10][1]
+
+### Layer 2: Internal query AST
+This layer defines the canonical representation of a query. WatermelonDB documents `QueryDescription` as a pure structure describing a query, and RxDB’s storage types similarly normalize Mango queries into a filled structure plus a prepared query plan.[1][7] `melon/db` should make this layer explicit and central.
+
+### Layer 3: Adapter interface
+This layer converts AST and mutation operations into low-level storage operations. WatermelonDB explicitly defines adapters as the translation layer between high-level APIs and the underlying database, and notes that supporting a new database means translating the query language to a database-specific query representation.[2][6]
+
+### Layer 4: Runtime engine
+This layer owns `Database`, `Collection`, `RecordHandle`, `QueryHandle`, transactions, subscriptions, and change notifications. It keeps high-level state thin, much like WatermelonDB’s architecture goal of minimal stateful objects and stateless pure logic around them.[1]
+
+### Layer 5: Authoring surfaces
+This layer includes the first-party `melon` fluent builder, Prisma-style client surface, Mango compiler surface, and React hooks. These are convenience layers over the same core contracts, not separate runtimes.[3][4][7]
+
+## Core type system
+
+### Primitive schema types
+```ts
+export type MelonScalar = 'string' | 'number' | 'boolean' | 'date' | 'json' | 'bytes';
+
+export type FieldDefinition = {
+  kind: MelonScalar;
+  nullable?: boolean;
+  indexed?: boolean;
+  default?: unknown;
+};
+
+export type RelationDefinition = {
+  kind: 'belongsTo' | 'hasMany';
+  target: string;
+  foreignKey: string;
+};
+
+export type CollectionSchemaDefinition = {
+  name: string;
+  fields: Record<string, FieldDefinition>;
+  relations?: Record<string, RelationDefinition>;
+  indexes?: string[][];
+  primaryKey?: string;
+  localOnly?: boolean;
+};
+
+export type DatabaseSchemaDefinition = {
+  version: number;
+  collections: Record<string, CollectionSchemaDefinition>;
+};
+```
+
+### Schema metadata interfaces
+```ts
+export interface MelonSchema<Collections extends Record<string, any> = Record<string, any>> {
+  readonly version: number;
+  readonly collections: Collections;
+  getCollection<Name extends keyof Collections & string>(name: Name): Collections[Name];
+}
+
+export interface CollectionMetadata<RecordShape = any> {
+  readonly name: string;
+  readonly primaryKey: keyof RecordShape & string;
+  readonly fields: Record<string, FieldDefinition>;
+  readonly relations: Record<string, RelationDefinition>;
+  readonly indexes: readonly string[][];
+}
+```
+
+## Internal query AST
+WatermelonDB’s `QueryDescription` and RxDB’s `PreparedQuery` both point toward a normalized, adapter-facing representation of queries.[1][7] `melon/db` should expose a strict AST that all query sources compile into.
+
+```ts
+export type QueryOperator =
+  | 'eq'
+  | 'neq'
+  | 'gt'
+  | 'gte'
+  | 'lt'
+  | 'lte'
+  | 'in'
+  | 'notIn'
+  | 'like'
+  | 'contains'
+  | 'isNull';
+
+export type QueryPredicate = {
+  field: string;
+  op: QueryOperator;
+  value?: unknown;
+};
+
+export type QueryBooleanNode =
+  | { type: 'predicate'; predicate: QueryPredicate }
+  | { type: 'and'; nodes: QueryBooleanNode[] }
+  | { type: 'or'; nodes: QueryBooleanNode[] }
+  | { type: 'not'; node: QueryBooleanNode };
+
+export type QuerySort = {
+  field: string;
+  direction: 'asc' | 'desc';
+};
+
+export type QuerySelect = {
+  fields?: string[];
+  include?: Record<string, QueryRelationInclude>;
+};
+
+export type QueryRelationInclude = {
+  relation: string;
+  where?: QueryBooleanNode;
+  orderBy?: QuerySort[];
+  limit?: number;
+};
+
+export type QueryAst = {
+  collection: string;
+  where?: QueryBooleanNode;
+  orderBy?: QuerySort[];
+  skip?: number;
+  limit?: number;
+  select?: QuerySelect;
+  mode: 'many' | 'one' | 'count';
+};
+
+export type QueryPlan = {
+  indexHint?: string[];
+  postFilter?: boolean;
+  stableSort: QuerySort[];
+};
+
+export type PreparedQuery = {
+  ast: QueryAst;
+  plan: QueryPlan;
+  source: 'melon' | 'prisma' | 'mango' | 'compat';
+};
+```
+
+## Query compiler interfaces
+```ts
+export interface QueryCompiler<Input> {
+  readonly source: 'melon' | 'prisma' | 'mango' | 'compat';
+  compile(input: Input, schema: MelonSchema): PreparedQuery;
+}
+
+export interface QueryValidator {
+  validate(query: QueryAst, schema: MelonSchema): void;
+}
+
+export interface QueryPlanner {
+  plan(query: QueryAst, schema: MelonSchema): QueryPlan;
+}
+```
+
+## Storage adapter contracts
+WatermelonDB documents the adapter as the bridge between reactive high-level objects and the low-level imperative storage world.[1][2] The new adapter contract should be explicit, typed, and decoupled from any one query syntax.
+
+```ts
+export type AdapterRecord = Record<string, unknown>;
+
+export type AdapterFindResult = {
+  rows: AdapterRecord[];
+};
+
+export type AdapterCountResult = {
+  count: number;
+};
+
+export type AdapterWriteOperation =
+  | { type: 'insert'; collection: string; values: AdapterRecord }
+  | { type: 'update'; collection: string; primaryKey: string; values: AdapterRecord }
+  | { type: 'delete'; collection: string; primaryKey: string; id: string | number }
+  | { type: 'batch'; operations: AdapterWriteOperation[] };
+
+export type AdapterChangeSet = {
+  collections: Record<
+    string,
+    {
+      created: Array<string | number>;
+      updated: Array<string | number>;
+      deleted: Array<string | number>;
+    }
+  >;
+};
+
+export interface StorageAdapter {
+  readonly name: string;
+  readonly capabilities: {
+    transactions: boolean;
+    reactiveSubscriptions: boolean;
+    jsonFields: boolean;
+    joins: boolean;
+    partialSelect: boolean;
+  };
+
+  initialize(schema: MelonSchema): Promise<void>;
+  prepare(query: PreparedQuery): Promise<PreparedQuery>;
+  find(query: PreparedQuery): Promise<AdapterFindResult>;
+  count(query: PreparedQuery): Promise<AdapterCountResult>;
+  write(operation: AdapterWriteOperation): Promise<void>;
+  transaction<T>(fn: () => Promise<T>): Promise<T>;
+  getChangedCollections?(sinceVersion: number): Promise<AdapterChangeSet>;
+  observeQuery?(query: PreparedQuery, onChange: () => void): () => void;
+  close(): Promise<void>;
+}
+```
+
+## Runtime engine interfaces
+WatermelonDB’s root `Database` object owns the adapter and collections, and collections own record find/query/create operations.[1][11] `melon/db` should keep a similar shape but with more explicit typing and fewer class-heavy assumptions.
+
+```ts
+export interface MelonDatabase<Schema extends MelonSchema = MelonSchema> {
+  readonly schema: Schema;
+  readonly adapter: StorageAdapter;
+  collection<Name extends keyof Schema['collections'] & string>(name: Name): MelonCollection<Schema['collections'][Name]>;
+  read<T>(fn: (tx: ReadContext<Schema>) => Promise<T>): Promise<T>;
+  write<T>(fn: (tx: WriteContext<Schema>) => Promise<T>): Promise<T>;
+  observeCollections(names: string[], onChange: (changes: AdapterChangeSet) => void): () => void;
+  unsafeReset(): Promise<void>;
+}
+
+export interface MelonCollection<RecordShape = any> {
+  readonly name: string;
+  findById(id: string | number): Promise<RecordShape | null>;
+  findMany(query?: QueryAst): Promise<RecordShape[]>;
+  findFirst(query?: QueryAst): Promise<RecordShape | null>;
+  count(query?: QueryAst): Promise<number>;
+  query(query?: QueryAst): MelonQueryHandle<RecordShape>;
+  insert(data: InsertInput<RecordShape>): Promise<RecordShape>;
+  update(id: string | number, data: UpdateInput<RecordShape>): Promise<RecordShape>;
+  delete(id: string | number): Promise<void>;
+}
+
+export interface MelonQueryHandle<RecordShape = any> {
+  readonly prepared: PreparedQuery;
+  fetch(): Promise<RecordShape[]>;
+  fetchOne(): Promise<RecordShape | null>;
+  fetchCount(): Promise<number>;
+  observe(onValue: (rows: RecordShape[]) => void): () => void;
+}
+
+export interface ReadContext<Schema extends MelonSchema = MelonSchema> {
+  collection<Name extends keyof Schema['collections'] & string>(name: Name): MelonCollection<Schema['collections'][Name]>;
+}
+
+export interface WriteContext<Schema extends MelonSchema = MelonSchema> extends ReadContext<Schema> {
+  batch(operations: AdapterWriteOperation[]): Promise<void>;
+}
+
+export type InsertInput<T> = Partial<T>;
+export type UpdateInput<T> = Partial<T>;
+```
+
+## First-party fluent query builder
+WatermelonDB emphasizes pure functions around query descriptions, so the first-party query surface should be a composable builder that outputs AST rather than a mutable ORM chain.[1]
+
+```ts
+export interface QueryBuilder<RecordShape = any> {
+  where(field: keyof RecordShape & string, op: QueryOperator, value?: unknown): QueryBuilder<RecordShape>;
+  and(group: (q: QueryBuilder<RecordShape>) => QueryBuilder<RecordShape>): QueryBuilder<RecordShape>;
+  or(group: (q: QueryBuilder<RecordShape>) => QueryBuilder<RecordShape>): QueryBuilder<RecordShape>;
+  orderBy(field: keyof RecordShape & string, direction?: 'asc' | 'desc'): QueryBuilder<RecordShape>;
+  limit(value: number): QueryBuilder<RecordShape>;
+  skip(value: number): QueryBuilder<RecordShape>;
+  include(relation: keyof RecordShape & string, config?: Omit<QueryRelationInclude, 'relation'>): QueryBuilder<RecordShape>;
+  toAst(mode?: QueryAst['mode']): QueryAst;
+}
+
+export interface QueryFactory {
+  from<RecordShape>(collection: string): QueryBuilder<RecordShape>;
+}
+```
+
+### Example
+```ts
+const query = q
+  .from<Task>('tasks')
+  .where('status', 'eq', 'open')
+  .and(q => q.where('priority', 'gte', 2))
+  .orderBy('updatedAt', 'desc')
+  .limit(20)
+  .toAst('many');
+```
+
+## Prisma integration interfaces
+Prisma’s recent React Native messaging centers on typed client ergonomics and reactive hooks for local usage patterns.[3] `@melon/db-prisma` should provide compatibility at the schema and client facade layer, not replace the core engine.
+
+### Schema import interfaces
+```ts
+export interface PrismaSchemaImporter {
+  importSchema(prismaSchema: string): Promise<DatabaseSchemaDefinition>;
+}
+
+export interface PrismaCodegenOptions {
+  outputPath: string;
+  emitHooks?: boolean;
+  emitZod?: boolean;
+  clientModuleName?: string;
+}
+
+export interface PrismaCodeGenerator {
+  generate(schema: DatabaseSchemaDefinition, options: PrismaCodegenOptions): Promise<void>;
+}
+```
+
+### Prisma-style query object interfaces
+```ts
+export type PrismaWhereInput = Record<string, unknown>;
+
+export type PrismaOrderByInput = Record<string, 'asc' | 'desc'>;
+
+export type PrismaFindManyArgs = {
+  where?: PrismaWhereInput;
+  orderBy?: PrismaOrderByInput | PrismaOrderByInput[];
+  skip?: number;
+  take?: number;
+  select?: Record<string, boolean>;
+  include?: Record<string, boolean | PrismaFindManyArgs>;
+};
+
+export interface PrismaModelClient<RecordShape = any> {
+  findMany(args?: PrismaFindManyArgs): Promise<RecordShape[]>;
+  findFirst(args?: PrismaFindManyArgs): Promise<RecordShape | null>;
+  count(args?: Omit<PrismaFindManyArgs, 'select' | 'include'>): Promise<number>;
+  create(args: { data: InsertInput<RecordShape> }): Promise<RecordShape>;
+  update(args: { where: PrismaWhereInput; data: UpdateInput<RecordShape> }): Promise<RecordShape>;
+  delete(args: { where: PrismaWhereInput }): Promise<RecordShape | null>;
+  observeMany?(args?: PrismaFindManyArgs, onValue?: (rows: RecordShape[]) => void): () => void;
+}
+
+export interface PrismaLikeClient {
+  [model: string]: PrismaModelClient<any>;
+}
+```
+
+### Prisma translator
+```ts
+export interface PrismaQueryCompiler extends QueryCompiler<PrismaFindManyArgs> {
+  readonly source: 'prisma';
+}
+```
+
+## Mango query interfaces
+RxDB and CouchDB document Mango as a selector-based query language with `selector`, `sort`, `skip`, and `limit` style fields.[12][5] `melon/db` should support a well-scoped Mango subset that compiles into AST.
+
+```ts
+export type MangoSelector = Record<string, unknown>;
+
+export type MangoQuery = {
+  selector: MangoSelector;
+  sort?: Array<Record<string, 'asc' | 'desc'>>;
+  skip?: number;
+  limit?: number;
+  fields?: string[];
+};
+
+export interface MangoQueryCompiler extends QueryCompiler<MangoQuery> {
+  readonly source: 'mango';
+}
+
+export interface MangoNormalizer {
+  normalize(query: MangoQuery): MangoQuery;
+}
+```
+
+## React interfaces
+WatermelonDB’s current appeal includes fully observable data changes that re-render UI automatically, and Prisma’s React Native work similarly highlights reactive hooks.[8][3] The React layer should stay thin and source-agnostic.
+
+```ts
+export interface MelonDbProviderProps {
+  db: MelonDatabase;
+  children: React.ReactNode;
+}
+
+export interface UseQueryOptions<T> {
+  enabled?: boolean;
+  select?: (rows: T[]) => unknown;
+}
+
+export declare function MelonDbProvider(props: MelonDbProviderProps): JSX.Element;
+export declare function useDatabase<Schema extends MelonSchema = MelonSchema>(): MelonDatabase<Schema>;
+export declare function useCollection<T = any>(name: string): MelonCollection<T>;
+export declare function useQuery<T = any>(query: QueryAst | PreparedQuery, options?: UseQueryOptions<T>): T[];
+export declare function useQueryCount(query: QueryAst | PreparedQuery): number;
+export declare function useFindMany<T = any>(collection: string, args?: PrismaFindManyArgs): T[];
+export declare function useMangoQuery<T = any>(collection: string, query: MangoQuery): T[];
+export declare function useWriter(): <T>(fn: (tx: WriteContext) => Promise<T>) => Promise<T>;
+```
+
+## Devtools interfaces
+```ts
+export interface QueryDebugSnapshot {
+  source: PreparedQuery['source'];
+  input: unknown;
+  ast: QueryAst;
+  plan: QueryPlan;
+  sql?: string;
+  durationMs?: number;
+}
+
+export interface DevtoolsBridge {
+  emitQuery(snapshot: QueryDebugSnapshot): void;
+  emitWrite(operation: AdapterWriteOperation): void;
+  emitSubscription(event: { collection: string; active: boolean }): void;
+  emitError(error: Error & { code?: string }): void;
+}
+```
+
+## Factory APIs
+A practical package family needs a few stable construction points.
+
+```ts
+export interface CreateDatabaseOptions<Schema extends MelonSchema = MelonSchema> {
+  schema: Schema;
+  adapter: StorageAdapter;
+  devtools?: DevtoolsBridge;
+}
+
+export declare function createDatabase<Schema extends MelonSchema>(options: CreateDatabaseOptions<Schema>): MelonDatabase<Schema>;
+export declare function createSqliteAdapter(options: {
+  filename: string;
+  jsi?: boolean;
+  debug?: boolean;
+}): StorageAdapter;
+export declare function createQueryFactory(schema: MelonSchema): QueryFactory;
+export declare function createPrismaLikeClient(db: MelonDatabase): PrismaLikeClient;
+export declare function createMangoCompiler(): MangoQueryCompiler;
+```
+
+## Example assembly
+```ts
+import { createDatabase } from '@melon/db';
+import { createSqliteAdapter } from '@melon/db-sqlite';
+import { createPrismaLikeClient } from '@melon/db-prisma';
+
+const adapter = createSqliteAdapter({
+  filename: 'app.db',
+  jsi: true,
+});
+
+const db = createDatabase({
+  schema,
+  adapter,
+});
+
+const prisma = createPrismaLikeClient(db);
+
+const tasks = await prisma.task.findMany({
+  where: { status: 'open' },
+  orderBy: [{ updatedAt: 'desc' }],
+  take: 20,
+});
+```
+
+## Compatibility and migration layer
+WatermelonDB’s architecture already separates `Database`, `Collection`, `Model`, and `Query`, and it exposes transaction-like read/write coordination plus collection querying interfaces.[1][11] `melon/db-codemods` and compatibility shims should map these concepts rather than mirror them perfectly.
+
+### Compatibility interfaces
+```ts
+export interface WatermelonCompatQuery {
+  toAst(): QueryAst;
+}
+
+export interface WatermelonCompatAdapter {
+  queryDescriptionToAst(input: unknown): QueryAst;
+}
+```
+
+Migration guidance should include:
+- `database.get('tasks').query(...)` to `db.collection('tasks').query(...)` mappings.[11]
+- writer/action patterns to `db.write()` mappings, since WatermelonDB requires writes inside writers.[11]
+- adapter configuration guidance, since WatermelonDB’s own adapter model is the architectural predecessor here.[2][6]
+
+## Recommended implementation order
+1. Implement `@melon/db` core schema, AST, adapter, and runtime interfaces.
+2. Implement `@melon/db-sqlite` first, because WatermelonDB’s main performance story is tied to SQLite-backed local execution.[8][6]
+3. Implement `@melon/db-query` fluent builder next.
+4. Implement `@melon/db-react` hooks once observation contracts stabilize.
+5. Implement `@melon/db-query-mango` using a constrained Mango subset informed by RxDB/CouchDB semantics.[12][5]
+6. Implement `@melon/db-prisma` as schema import plus generated client facades, not a replacement runtime.[3][9]
+7. Add devtools and codemods once the core contracts stop moving.
+
+## Design decisions
+- The core runtime should stay independent of React, Prisma, and Mango so the engine remains reusable and testable.[1][2]
+- Query syntax is a product concern, not an adapter concern; adapters should only see prepared AST and write operations.[6][7]
+- Prisma compatibility should focus on schema and client ergonomics because that is where Prisma delivers the most developer value in this context.[9][3]
+- Mango is the best first alternate open query language because it is established, documented, serializable, and already used in reactive local DB ecosystems.[4][5][7]

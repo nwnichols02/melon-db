@@ -1,0 +1,338 @@
+---
+alwaysApply: true
+---
+Starting with @melon/db and @melon/db-sqlite is the right call: everything else is just sugar on top of these two.
+
+Below is a focused, implementation-ready PRD/RFC for those two packages only.
+
+@melon/db – core engine RFC
+1. Scope
+@melon/db is the core runtime for the “next WatermelonDB”:
+
+Schema + metadata
+
+Internal query AST
+
+Storage adapter interface
+
+Database/collection abstractions
+
+Transactions and subscriptions
+
+It is React-agnostic and storage-agnostic, like WatermelonDB’s Database + DatabaseAdapter + Collection objects, which separate reactive high-level objects from the low-level imperative database world.
+
+2. Goals
+Provide a database-agnostic core that can run on SQLite first, but can be adapted to other backends later.
+
+Preserve WatermelonDB-style lazy, local-first, reactive behavior: Database owns an adapter and collections; collections manage records and queries.
+
+Be fully TypeScript-first with strong types for schema, queries, adapters, and runtime.
+
+Keep the API functional and pure where possible; no decorators or heavy inheritance.
+
+3. Non-goals
+No React dependency or hooks here.
+
+No Prisma schema parsing, no Mango parsing; only the AST.
+
+No sync protocol or remote concepts; that goes into @melon/sync.
+
+4. Functional requirements
+4.1 Schema and metadata
+Define code-first schema types:
+
+DatabaseSchemaDefinition
+
+CollectionSchemaDefinition
+
+FieldDefinition
+
+RelationDefinition
+
+Provide a MelonSchema runtime object that:
+
+Exposes schema version and collection metadata.
+
+Validates basic invariants (unique collection names, valid relations).
+
+Support versioned schema for future migrations.
+
+This echoes WatermelonDB’s pattern of defining schema and model metadata up front before constructing the Database.
+
+4.2 Query AST
+Define a single internal query representation:
+
+QueryAst (collection, where, orderBy, limit, skip, select, mode).
+
+QueryBooleanNode (and/or/not + predicates).
+
+QueryPredicate (field, operator, value).
+
+QueryPlan and PreparedQuery (AST + planning hints).
+
+This AST is the only thing adapters receive for read operations.
+
+WatermelonDB already treats queries as descriptions (“QueryDescription”) which adapters translate into database-specific queries; we’re formalizing that as the AST.
+
+4.3 Storage adapter contract
+Define StorageAdapter interface:
+
+Lifecycle:
+
+initialize(schema: MelonSchema)
+
+close()
+
+Query:
+
+prepare(query: PreparedQuery) (optional optimization)
+
+find(query: PreparedQuery) => rows
+
+count(query: PreparedQuery) => count
+
+Writes:
+
+write(operation: AdapterWriteOperation) (insert/update/delete/batch)
+
+transaction(fn)
+
+Change tracking:
+
+getChangedCollections?(sinceVersion)
+
+observeQuery?(query, onChange) => unsubscribe
+
+WatermelonDB explicitly defines adapters as the translation layer between their query language and the database; this interface carries that forward but decouples from any specific syntax.
+
+4.4 Runtime engine
+createDatabase({ schema, adapter }) => MelonDatabase:
+
+Holds a MelonSchema + StorageAdapter.
+
+Manages collections and read/write coordination.
+
+MelonDatabase:
+
+collection(name) => MelonCollection.
+
+read(fn) and write(fn) with Watermelon-style guarantees that writers are serialized and readers run without concurrent writers.
+
+unsafeReset() for dev/test usage.
+
+MelonCollection:
+
+findById(id)
+
+findMany(queryAst?)
+
+findFirst(queryAst?)
+
+count(queryAst?)
+
+query(queryAst?) => MelonQueryHandle
+
+insert, update, delete
+
+MelonQueryHandle:
+
+fetch(), fetchOne(), fetchCount()
+
+observe(onValue) => unsubscribe using adapter’s observeQuery if available, otherwise a DB-level subscription.
+
+This aligns with WatermelonDB’s architecture: Database owns an adapter, Collections manage records, and there’s an explicit distinction between read and write actions.
+
+5. Non-functional requirements
+Performance: Must preserve Watermelon-style lazy, SQLite-backed queries for large datasets.
+
+Stability: Core types must be stable enough that query layers and sync can build on them.
+
+DX: Clean TS types for schema, collections, adapters.
+
+6. Implementation milestones
+M0 – Design & scaffolding (1–2 weeks)
+Finalize TS types for schema, AST, adapter, runtime.
+
+Create packages/melon-db with:
+
+src/schema.ts, src/ast.ts, src/adapter.ts, src/database.ts
+
+Initial unit test scaffolding.
+
+Validate design against WatermelonDB’s Architecture + DatabaseAdapters docs.
+
+Exit: Type-safe interfaces compiling, basic createDatabase signature in place.
+
+M1 – In-memory adapter & core behavior (2–3 weeks)
+Implement createInMemoryAdapter() inside @melon/db (or in testkit if you want to split later).
+
+Implement MelonDatabase and MelonCollection backed by in-memory adapter.
+
+Implement:
+
+read, write with serialized writers.
+
+query that wraps AST and calls adapter.find / count.
+
+Tests:
+
+Simple CRUD + query flows.
+
+Writer invariants (no writes outside write).
+
+Exit: End-to-end CRUD and query with in-memory adapter; no SQLite yet.
+
+M2 – Change notifications & subscriptions (2–3 weeks)
+Implement collection-level change tracking and observeQuery fallback (e.g., subscribe to table and recompute).
+
+Ensure the subscription model can map cleanly to React hooks later.
+
+Tests around observe semantics.
+
+Exit: Query handle can be observed and emits value changes consistently.
+
+@melon/db-sqlite – SQLite adapter RFC
+1. Scope
+@melon/db-sqlite provides a production StorageAdapter backed by SQLite:
+
+React Native (new architecture, JSI/TurboModule)
+
+Node (where possible) for tooling/tests
+
+It is the main way to realize WatermelonDB’s “lazy, SQLite, separate thread” performance characteristics.
+
+2. Goals
+Efficient translation of PreparedQuery → SQL statements.
+
+Support transactions and batched writes.
+
+Support reactive queries where platform allows (e.g., triggers + change notifications).
+
+Be identical in behavior across RN and Node where feasible.
+
+3. Non-goals
+No query building/parsing (AST is input).
+
+No schema migration planning (schema is in @melon/db).
+
+No sync; change tracking hooks are an optional interface for sync to consume later.
+
+4. Functional requirements
+4.1 SQL compilation
+Implement a compiler from QueryAst to parameterized SQL:
+
+mode: 'many' → SELECT ...
+
+mode: 'one' → SELECT ... LIMIT 1
+
+mode: 'count' → SELECT COUNT(*) ...
+
+Map predicates to SQL operators:
+
+eq, neq, gt, gte, lt, lte, in, notIn, like, isNull.
+
+Support orderBy, limit, skip with safe bounds.
+
+Log/debug SQL (in dev) for devtools integration.
+
+WatermelonDB currently depends on SQLite as the main engine and emphasizes lazy loading via SQLite queries, so we preserve that pattern.
+
+4.2 Adapter implementation
+Implement StorageAdapter for SQLite:
+
+initialize(schema) – create tables/indexes if needed.
+
+find, count – execute compiled SQL via SQLite binding.
+
+write – map insert/update/delete operations to SQL statements, using transactions where appropriate.
+
+transaction – wrap in SQLite transaction.
+
+Optionally support getChangedCollections for sync usage later (e.g., tracking last_modified rows as in Watermelon sync docs).
+
+4.3 RN new architecture support
+Provide a JSI/TurboModule-backed implementation for RN.
+
+Document RN version constraints and any limitations.
+
+Validate with a small RN app using new arch.
+
+4.4 Node support (optional but desirable)
+Implement a Node-only build using a Node SQLite binding.
+
+This can be used for migration tooling, test harnesses, and server-side scripts.
+
+5. Non-functional requirements
+Performance:
+
+Comparable to WatermelonDB for large local datasets (10k+ rows).
+
+Stability:
+
+Strong guarantees around transactional writes.
+
+DX:
+
+Clear error messages with SQL and AST context in dev.
+
+6. Implementation milestones
+M0 – SQL generator design (1–2 weeks)
+Design SQL target for the AST including:
+
+How boolean and/or/not map to WHERE clauses.
+
+Handling include / joins (can be v1-limited).
+
+Write a pure TS module that turns QueryAst into { sql, params }.
+
+Unit tests over AST → SQL mapping.
+
+Exit: SQL generator tested independently of SQLite.
+
+M1 – Node SQLite adapter (2–3 weeks)
+Integrate a Node SQLite binding.
+
+Implement StorageAdapter methods for Node.
+
+Implement initialize(schema) to create tables/indexes from DatabaseSchemaDefinition.
+
+Implement find, count, write, transaction.
+
+Exit: In apps/playground-node or tests, you can use @melon/db + @melon/db-sqlite for CRUD and queries.
+
+M2 – RN new architecture adapter (3–4 weeks)
+Wrap SQLite in a JSI/TurboModule module for RN.
+
+Implement the same StorageAdapter interface using native calls.
+
+Validate with a minimal RN example app (no sync, just CRUD).
+
+Document setup steps.
+
+Exit: RN example app using MelonDatabase with SQLite adapter works on device.
+
+M3 – Observability & perf (2–3 weeks)
+Add timing info, basic profiling hooks (for devtools).
+
+Benchmark:
+
+Insert 10k / 50k / 100k records.
+
+Query latency for typical flows.
+
+Compare with a baseline (WatermelonDB where possible).
+
+Coordination between the two
+To keep you moving efficiently:
+
+Do @melon/db M0/M1 first using the in-memory adapter.
+
+Then implement @melon/db-sqlite M0/M1:
+
+SQL generator and Node adapter can use the same tests as in-memory, just with different adapters.
+
+Once both are stable:
+
+Wire RN new-arch integration and the first playground app.
+
+Only after that, start @melon/db-query and @melon/db-react.

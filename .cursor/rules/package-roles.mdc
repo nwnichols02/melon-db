@@ -1,0 +1,324 @@
+---
+alwaysApply: true
+---
+You’re at the point where each package needs its own mini‑PRD: scope, goals, non‑goals, and milestones that hang off the overall product. I’ll outline those next.
+
+Below I’ll keep them concise but concrete so you can implement or RFC them package by package.
+
+1. @melon/db – core engine
+Scope
+Schema/model metadata.
+
+Internal query AST and planning.
+
+Storage adapter contract.
+
+MelonDatabase / MelonCollection / query handles.
+
+Transactions, read/write coordination, subscriptions.
+
+WatermelonDB’s Database + DatabaseAdapter + Collection responsibilities all live here, but with a single AST and TypeScript-first design.
+
+Goals
+Provide a database-agnostic core: adapters translate AST → storage operations.
+
+Preserve lazy, local-first, reactive behavior that WatermelonDB uses for large RN apps.
+
+Be fully TypeScript typed and React-agnostic.
+
+Non‑goals
+No direct React APIs.
+
+No Prisma/Mango parsing here (only AST types).
+
+No sync in this package.
+
+Requirements
+Schema: DatabaseSchemaDefinition, CollectionSchemaDefinition, relation metadata.
+
+AST: QueryAst, QueryBooleanNode, QueryPlan, PreparedQuery.
+
+Adapter: StorageAdapter with initialize, find, count, write, transaction, observeQuery?.
+
+Runtime: MelonDatabase, MelonCollection, MelonQueryHandle, read/write contexts.
+
+Observability: collection-level change signals.
+
+Milestones
+M0 – Core design (1–2 weeks)
+
+Finalize schema types, AST shape, adapter interface.
+
+Validate against WatermelonDB adapter docs and architecture.
+
+M1 – In-memory adapter + engine alpha (2–3 weeks)
+
+Implement MelonDatabase, MelonCollection, in-memory StorageAdapter.
+
+CRUD and basic queries via AST.
+
+Unit tests and simple benchmarks.
+
+M2 – SQLite adapter integration contract (2 weeks)
+
+Finalize hooks for @melon/db-sqlite (e.g., SQL generation inputs).
+
+Stabilize AST for v1.
+
+2. @melon/db-sqlite – SQLite adapter
+Scope
+Production StorageAdapter implementation for SQLite on RN (JSI / new arch) and Node.
+
+WatermelonDB’s main performance story is “lazy, SQLite-backed, separate thread,” so this package is critical.
+
+Goals
+Provide a performant SQLite adapter that consumes PreparedQuery and write ops.
+
+Support RN new architecture integration pattern.
+
+Support basic observability (query timing, change subscriptions).
+
+Non‑goals
+No query parsing.
+
+No schema migration planner (schema comes from @melon/db).
+
+Requirements
+createSqliteAdapter({ filename, jsi, debug }): StorageAdapter.
+
+Compile QueryAst → SQL (SELECT, COUNT, JOIN) with safe parameterization.
+
+Implement transaction and observeQuery to support reactive queries and writer semantics.
+
+Support RN new arch: JSI/TurboModule, documented setup.
+
+Milestones
+M0 – SQL generator (2–3 weeks)
+
+Map AST filter/sort/limit → SQL subset.
+
+Tests covering simple and compound queries.
+
+M1 – RN/Node adapter alpha (3–4 weeks)
+
+Implement adapter methods, backed by SQLite.
+
+Basic RN new-arch binding with one demo app.
+
+M2 – Perf & stability (3 weeks)
+
+Benchmarks on realistic datasets.
+
+Stress tests for transactions and subscriptions.
+
+3. @melon/db-query – fluent query builder
+Scope
+Type-safe fluent query builder → QueryAst.
+
+Utilities for common patterns (whereEq, byId, byForeignKey).
+
+Goals
+Be the canonical in-repo query surface.
+
+Keep APIs functional and composable (pure builders, no side effects).
+
+Non‑goals
+No direct DB access; returns AST only.
+
+No schema import (schema comes from @melon/db).
+
+Requirements
+QueryBuilder<Record> with where, and, or, orderBy, limit, skip, include, toAst.
+
+createQueryFactory(schema: MelonSchema): QueryFactory.
+
+Good TS inference for field names and relations.
+
+Milestones
+M0 – API RFC (1 week)
+
+Lock down builder ergonomics.
+
+Compare to current WatermelonDB query ergonomics for migration friendliness.
+
+M1 – Builder implementation (2–3 weeks)
+
+Implement builder + tests for AST output.
+
+Docs with examples.
+
+4. @melon/db-query-mango – Mango query language
+Scope
+Mango-style JSON query language parser/validator → AST.
+
+Support a well-defined subset of Mango (RxDB/CouchDB style).
+
+Goals
+Provide a serializable query DSL for configs, tests, devtools.
+
+Align semantics with Mango/RxDB for familiarity, but with explicit support matrix.
+
+Non‑goals
+Full CouchDB Mango parity in v1.
+
+Network/remote execution (local-only).
+
+Requirements
+MangoQuery { selector, sort, skip, limit, fields? }.
+
+MangoQueryCompiler → PreparedQuery.
+
+Clear error messages for unsupported operators.
+
+Docs mapping Mango → supported AST.
+
+Milestones
+M0 – Supported subset design (1 week)
+
+Decide operators: equality, comparisons, and/or, sort, skip/limit.
+
+M1 – Parser/compiler alpha (2–3 weeks)
+
+Implement normalization + compilation to AST.
+
+Tests using sample RxDB-like queries.
+
+5. @melon/db-prisma – Prisma schema & client
+Scope
+Prisma schema import → DatabaseSchemaDefinition.
+
+Codegen for TS types and Prisma-like local client facades.
+
+Goals
+Let teams reuse Prisma-like schemas and client ergonomics locally.
+
+Integrate smoothly with Bun workspaces (Prisma + Bun is already documented).
+
+Non‑goals
+Running full Prisma engine in RN; this is a compatibility layer, not a full Prisma runtime.
+
+Remote DB management (handled separately if desired).
+
+Requirements
+PrismaSchemaImporter.importSchema(prismaSchema: string): DatabaseSchemaDefinition.
+
+Codegen CLI: generate TS types, PrismaLikeClient, and optional hooks.
+
+createPrismaLikeClient(db: MelonDatabase): PrismaLikeClient.
+
+Milestones
+M0 – Schema + Bun/Prisma integration design (1–2 weeks)
+
+Leverage Prisma + Bun guidance for monorepos.
+
+Decide subset of Prisma schema to support.
+
+M1 – Import + codegen alpha (3–4 weeks)
+
+Parse schema → DatabaseSchemaDefinition.
+
+Generate type-safe clients and basic queries mapping to AST.
+
+6. @melon/db-react – React bindings
+Scope
+React context + hooks around MelonDatabase and PreparedQuery.
+
+Ergonomics similar to WatermelonDB’s provider/hooks and Prisma’s RN reactive queries.
+
+Goals
+Minimal overhead; just wire subscriptions to React.
+
+Hooks-first API (useDatabase, useCollection, useQuery, useWriter).
+
+Non‑goals
+No schema or adapter logic.
+
+No devtools UI here (that’s in devtools).
+
+Requirements
+<MelonDbProvider db> using React context (like WatermelonDB’s DatabaseProvider).
+
+Hooks as sketched earlier.
+
+Good SSR behavior for docs/web (if needed).
+
+Milestones
+M0 – Hook API design (1 week)
+
+Nail the surface inspired by WatermelonDB hooks and Prisma RN docs.
+
+M1 – Implementation + example (2–3 weeks)
+
+Use in apps/playground-rn.
+
+Document patterns.
+
+7. @melon/db-devtools – devtools
+Scope
+Bridge to capture AST, SQL, timings, errors.
+
+Optional UI panel (web and possibly RN).
+
+Goals
+Make multi-surface queries debuggable (fluent, Prisma, Mango).
+
+Zero-cost when disabled.
+
+Non‑goals
+No core logic or adapters.
+
+Requirements
+DevtoolsBridge interface and a simple default implementation.
+
+Overlay/panel integrated into apps/playground-*.
+
+Milestones
+M0 – Debug event design (1 week)
+
+M1 – Bridge + minimal panel (2–3 weeks)
+
+8. @melon/db-testkit – test utilities
+Scope
+In-memory adapter.
+
+Helpers for creating and tearing down test databases.
+
+Goals
+Make it easy to test without RN/native SQLite.
+
+Encourage pure, deterministic tests.
+
+Non‑goals
+No heavy mocking of React; this is DB-level.
+
+Requirements
+createInMemoryAdapter().
+
+withTestDatabase(schema, fn) helper.
+
+Milestones
+M0 – In-memory adapter (1–2 weeks)
+
+M1 – Helpers and examples (1–2 weeks)
+
+9. @melon/db-codemods – migration
+Scope
+Codemods and compatibility helpers to move from WatermelonDB.
+
+Goals
+Lower migration friction.
+
+Focus on common patterns first.
+
+Non‑goals
+100% automated migration for every edge case.
+
+Requirements
+CLI codemods for database.get().query() & writer patterns.
+
+Mapping Watermelon query descriptors → new AST.
+
+Milestones
+M0 – Compatibility matrix (1–2 weeks)
+
+M1 – Codemods for top 3–5 patterns (2–3 weeks)

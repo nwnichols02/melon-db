@@ -1,0 +1,158 @@
+---
+alwaysApply: true
+---
+You can keep the folder layout we just defined and wire it up with Bun’s native workspaces and scripts.
+
+Root workspace config (Bun)
+Bun treats workspaces via the workspaces field in the root package.json, very similar to npm/yarn.
+
+text
+// package.json (root)
+{
+  "name": "melon-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "install": "bun install",
+    "dev": "bun run --filter './apps/*' dev",
+    "build": "bun run --filter './packages/*' build",
+    "test": "bun run --filter './packages/*' test",
+    "lint": "bun run --filter './packages/*' lint",
+    "typecheck": "bun run --filter './packages/*' typecheck"
+  },
+  "devDependencies": {
+    "bun-types": "latest",
+    "typescript": "latest",
+    "turbo": "latest"
+  }
+}
+workspaces matches Bun’s monorepo docs.
+
+The bun run --filter pattern is from the Bun docs and monorepo examples; it will run the script in each workspace that implements it.
+
+From the root, you’ll run:
+
+bash
+bun install       # installs all workspace deps
+bun run dev       # runs dev where defined (e.g. apps/*)
+Workspace dependency wiring
+In each package, use the "workspace:*" version syntax so Bun treats them as local links.
+
+Example for @melon/db-react:
+
+text
+// packages/melon-db-react/package.json
+{
+  "name": "@melon/db-react",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "test": "bun test",
+    "lint": "bunx eslint src --ext .ts,.tsx",
+    "typecheck": "bunx tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@melon/db": "workspace:*",
+    "react": "^18.0.0"
+  },
+  "devDependencies": {
+    "bun-types": "latest",
+    "typescript": "latest"
+  }
+}
+Example for @melon/db-sqlite:
+
+text
+// packages/melon-db-sqlite/package.json
+{
+  "name": "@melon/db-sqlite",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "test": "bun test",
+    "lint": "bunx eslint src --ext .ts",
+    "typecheck": "bunx tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@melon/db": "workspace:*"
+  },
+  "devDependencies": {
+    "bun-types": "latest",
+    "typescript": "latest"
+  }
+}
+This follows Bun’s documented "workspace:*" pattern for linking local packages.
+
+Example app wired to packages
+For apps/playground-rn:
+
+text
+// apps/playground-rn/package.json
+{
+  "name": "playground-rn",
+  "private": true,
+  "scripts": {
+    "dev": "bun run expo start",         // or `bun run react-native start`
+    "build": "bun run expo build",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@melon/db": "workspace:*",
+    "@melon/db-sqlite": "workspace:*",
+    "@melon/db-react": "workspace:*",
+    "react": "18.x",
+    "react-native": "0.7x.x"
+  },
+  "devDependencies": {
+    "bun-types": "latest",
+    "typescript": "latest"
+  }
+}
+From the root, bun run dev will discover dev under apps/playground-rn thanks to --filter.
+
+Optional: Turborepo + Bun
+If you want build/test orchestration, you can still use Turborepo with Bun as the runner, like the examples combining Turborepo and Bun workspaces.
+
+Example turbo.json:
+
+text
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "test": {
+      "dependsOn": ["build"]
+    },
+    "lint": {},
+    "typecheck": {}
+  }
+}
+Then in root package.json:
+
+text
+"scripts": {
+  "turbo": "turbo",
+  "build": "turbo run build --filter=...",
+  "test": "turbo run test",
+  "lint": "turbo run lint",
+  "typecheck": "turbo run typecheck"
+}
+You still install everything with bun install; Turborepo just coordinates tasks.
+
+Summary of boundaries with Bun
+Root: workspaces: ["apps/*", "packages/*"] and bun install per Bun’s docs.
+
+Each package: name, version, scripts, and "@melon/*": "workspace:*" dependencies.
+
+You’ll generally run bun run --filter from root to spawn dev/build/test across workspaces.

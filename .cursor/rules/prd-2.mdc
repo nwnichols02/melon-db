@@ -1,0 +1,282 @@
+---
+alwaysApply: true
+---
+# PRD Iteration 2: `melon/db` with Prisma support and alternate query language strategy
+
+## Overview
+This document extends the original PRD for the next-generation WatermelonDB successor by focusing specifically on the `melon/db` package and two strategic additions: a Prisma-backed developer experience and an alternate open-source query language option for the local query engine.[1][2][3] The goal is to preserve WatermelonDB’s database-agnostic architecture while making `melon/db` more attractive to TypeScript-heavy teams that want strong schema tooling, better code generation, and a more ergonomic querying surface.[2][3]
+
+WatermelonDB’s adapter design already separates high-level APIs from underlying databases and explicitly calls out the need to translate WatermelonDB’s query language into database-specific queries.[2] That means the right product direction for `melon/db` is not to hard-code a single query DSL forever, but to define a stable query contract with multiple front-end syntaxes and multiple back-end compilation targets.[2]
+
+## Product objective
+`melon/db` should become a storage and query engine that supports three layers of abstraction:
+- a native `melon` query API optimized for offline-first local execution,
+- an optional Prisma-inspired typed developer layer for schema and client ergonomics, and
+- at least one alternate open-source query language that can compile into the same internal query AST for portability and extensibility.[2][3][4]
+
+This approach aligns with WatermelonDB’s original architecture, which is database-agnostic and adapter-driven, while also reflecting the current market pull toward Prisma-style type safety and reactive query ergonomics in React Native.[2][3] Prisma’s React Native and Expo work is still Early Access, but it demonstrates clear demand for typed client APIs plus reactive hooks in local app development.[3][5]
+
+## Why Prisma support belongs in `melon/db`
+Prisma is relevant here not because it should replace the local database core, but because it offers two important ideas that `melon/db` can leverage: schema-first typing and excellent generated client ergonomics.[1][3] Prisma’s own positioning highlights strong type safety, migrations, IDE integration, and now reactive queries for React Native and Expo, which overlap with the goals of the new library.[3][1]
+
+However, Prisma on React Native is still in Early Access, and its current announcement focuses on introducing reactive queries into a Prisma-based client model rather than on becoming a WatermelonDB replacement.[3][5] For that reason, the PRD should treat Prisma as an integration and authoring strategy for `melon/db`, not as the sole runtime foundation.[3]
+
+## Why an alternate open-source query language is needed
+WatermelonDB’s adapter docs explicitly note that new database support requires “some way to convert WatermelonDB's query language into queries specific for your database.”[2] That is a strong signal that the query language boundary is a product seam, and it can be redesigned to support multiple user-facing syntaxes that compile to the same internal AST.[2]
+
+Among open-source options, RxDB’s Mango-style query language is a strong candidate because it is already documented, expressive, JSON-serializable, and designed for client-side databases with reactive query workflows.[4] RxDB uses a MongoDB-like Mango query syntax for `find`, `findOne`, and `count`, which makes it familiar, portable, and relatively easy to encode, validate, persist, or transmit.[4]
+
+## Recommendation
+The recommended direction for `melon/db` is:
+- keep a first-party `melon` query builder as the canonical API,
+- add a Prisma-compatible schema/codegen layer for type-safe model generation and optionally Prisma-like client ergonomics, and
+- add Mango query support as the first alternate open-source query language, compiled into the same internal query AST.[2][4][3]
+
+This gives the product a clean long-term architecture: one storage core, one internal AST, and multiple authoring experiences.[2] It also fits your preference for reusable, configurable, pure-function-oriented APIs because the AST compiler boundary becomes the reusable contract instead of any one surface syntax.
+
+## Scope of this PRD iteration
+This iteration defines requirements for these `melon/db` sub-capabilities:
+1. Prisma schema and codegen support.
+2. Prisma-inspired client ergonomics for local DB usage.
+3. Mango query language support as an alternate open-source query DSL.
+4. Internal query AST and compiler interfaces.
+5. Compatibility strategy with existing WatermelonDB query behavior.[2]
+
+## Product goals
+- Preserve WatermelonDB’s adapter-friendly and database-agnostic architecture in `melon/db`.[2]
+- Introduce a type-safe schema workflow that can match or exceed the appeal of Prisma for local-first React Native developers.[3][1]
+- Support a serializable, open query language that is not proprietary to `melon/db`.[4]
+- Avoid locking the library into one query syntax forever by standardizing on an internal AST.
+- Make query authoring composable, functional, and reusable.
+
+## Non-goals
+- `melon/db` will not attempt to run the entire existing Prisma engine unchanged as its only storage runtime in v1, especially since Prisma’s React Native support is still Early Access.[3][5]
+- `melon/db` will not expose every WatermelonDB query primitive and every alternate query language feature one-to-one at launch.[2]
+- `melon/db` will not prioritize remote database querying; like WatermelonDB and RxDB local patterns, the query system is primarily for local data execution.[2][6]
+
+## User personas
+- Teams coming from WatermelonDB who want a better query layer without losing local-first and adapter-driven architecture.[2]
+- Teams familiar with Prisma who want similar schema and type ergonomics in a mobile-local database.[3][1]
+- Teams that want a serializable query format for devtools, persistence, replay, testing, and policy enforcement.[4]
+- Teams building reusable data hooks and headless services around a stable internal query representation.
+
+## Design principles
+- **AST-first architecture**: all query surfaces compile into one internal representation.
+- **Typed at the edge**: authoring APIs should infer types from schema and query shape.
+- **Serializable when useful**: alternate query languages should be JSON-safe where practical.[4]
+- **Local execution first**: query semantics should be optimized for local SQLite-backed execution.
+- **Composable and pure**: query building should be side-effect free until executed.
+
+## Capability 1: Prisma schema support
+Prisma’s current value comes largely from its schema language, migration flow, generated client, and type-safe IDE experience.[1][3] `melon/db` should support a Prisma-adjacent schema workflow so users can define models once and generate local types, migrations, and query bindings.
+
+### Functional requirements
+- Support importing from a Prisma schema or a Prisma-like schema definition into `melon/db` model metadata.
+- Generate TypeScript types, collection metadata, and local migration definitions from schema input.
+- Support SQLite as the main local target, since both WatermelonDB’s main native engine and Prisma quickstarts prominently support SQLite-based workflows.[2][1]
+- Generate query helper types and relation types from schema models.
+- Generate metadata needed by sync packages later, such as field maps and deletion semantics.
+
+### Options
+| Option | Description | Recommendation |
+|---|---|---|
+| Prisma schema importer | Read Prisma schema files and convert them into `melon/db` metadata | Recommended for adoption acceleration.[1] |
+| Prisma-inspired schema DSL | Build a native DSL that feels familiar to Prisma users but is optimized for local execution | Recommended as the long-term primary API. |
+| Full Prisma runtime dependency | Depend directly on Prisma runtime for all local DB access | Not recommended for v1 because React Native support is still Early Access.[3][5] |
+
+## Capability 2: Prisma-inspired client ergonomics
+Prisma’s React Native announcement highlights reactive queries integrated through hooks, such as `useFindMany`, that automatically update UI when data changes.[3] That pattern overlaps strongly with WatermelonDB’s reactive local model and should influence `melon/db` APIs even if Prisma itself is not the underlying engine.[7][3]
+
+### Functional requirements
+- Support generated client facades such as `db.user.findMany`, `db.user.findFirst`, `db.user.count`, `db.user.create`, and `db.user.update` mapped to local execution.
+- Support generated hook facades such as `db.user.useFindMany` or a flatter hook API such as `useFindMany(db.user, query)` inspired by Prisma’s Early Access direction.[3]
+- Ensure reactive subscriptions remain local-first and do not require a server runtime.
+- Support pure-function query inputs that can be reused across hooks, services, and tests.
+- Support tree-shakeable generated clients by collection or module.
+
+### Acceptance criteria
+- A developer can define a model once and receive typed client methods for reads, writes, and reactive queries.
+- Hook-based queries re-render when underlying local rows change, similar to the reactive behavior Prisma is introducing for React Native and Expo.[3]
+- Generated clients remain thin wrappers around the `melon/db` execution engine rather than separate runtimes.
+
+## Capability 3: Alternate query language support via Mango
+RxDB documents a MongoDB-like Mango Query Syntax as the main query interface for local collections, including `find`, `findOne`, and `count` operations.[4] Mango is a strong candidate for `melon/db` because it is open, documented, JSON-native, and already familiar to client-side database developers.[4]
+
+### Why Mango is a good fit
+- It is serializable as JSON, which makes it useful for devtools, persisted queries, test fixtures, and policy layers.[4]
+- It has a familiar selector-based structure that many engineers already understand from MongoDB-like systems.[4]
+- It maps well to an internal AST with selectors, sort clauses, limits, and counts.
+- It can coexist with a more fluent TypeScript query builder.
+
+### Functional requirements
+- Support Mango-style selectors for local collection queries.[4]
+- Support `find`, `findOne`, and `count` style operations as a minimum v1 scope.[4]
+- Validate unsupported features early and provide actionable compiler errors.
+- Compile Mango queries into the internal AST before SQLite encoding.
+- Document which Mango operators are supported in v1 and which are intentionally excluded.
+
+### Initial supported Mango subset
+- Equality and inequality operators
+- Comparison operators
+- Boolean composition (`and`, `or`, `not`-style semantics where feasible)
+- Sort
+- Limit/offset
+- Count
+- Field selection metadata for planning, even if full partial document retrieval is not exposed initially
+
+## Capability 4: Internal query AST
+WatermelonDB’s adapter design effectively requires an intermediate translation step between high-level query APIs and database-specific execution.[2] `melon/db` should formalize this with a public or semi-public internal AST contract.
+
+### AST requirements
+- Represent collection/table target.
+- Represent filters, comparisons, boolean groups, sort, pagination, count, and relation joins.
+- Support static analysis for index planning and unsupported query detection.
+- Be serializable for debug tooling and optional caching.
+- Be execution-target agnostic so it can compile to SQLite first and other adapters later.[2]
+
+### Compiler pipeline
+1. User-facing query source, such as fluent `melon` builder, Prisma-inspired query object, or Mango query JSON.[4][3]
+2. Parser or translator into internal AST.
+3. AST validation against schema metadata.
+4. Adapter-specific encoder, such as SQLite SQL generation or future alternate adapter encoding.[2]
+5. Execution engine and reactive subscription planner.
+
+## Capability 5: WatermelonDB query compatibility
+WatermelonDB already has an existing query language that gets encoded per adapter, particularly for SQLite and LokiJS implementations.[2] `melon/db` should offer a migration path that preserves core query semantics where possible while moving teams to the new AST-first architecture.
+
+### Functional requirements
+- Provide a compatibility shim for common WatermelonDB query patterns.
+- Publish a parity matrix covering existing query operators and their new equivalents.
+- Support automated codemods for common Watermelon query calls where practical.
+- Preserve lazy execution and reactive updates during migration.[7][2]
+
+## Developer experience requirements
+- CLI to import or generate schema metadata from Prisma-style models.[1]
+- Generated TS clients for local collections.
+- AST inspection tools for debugging query translation.
+- Devtools to show: source query, compiled AST, generated SQL, and live subscription status.
+- Recipe docs comparing `melon` fluent queries, Mango queries, and Prisma-style query objects side by side.
+
+## Architecture proposal
+
+### Package additions
+| Package | Responsibility |
+|---|---|
+| `@melon/db` | Storage core, AST, execution engine, subscriptions |
+| `@melon/db-query-melon` | First-party fluent query builder |
+| `@melon/db-query-mango` | Mango parser and compiler to AST |
+| `@melon/db-prisma` | Prisma schema import, codegen, Prisma-inspired client layer |
+| `@melon/db-devtools` | Query inspection, AST views, SQL inspection |
+
+### Boundary rules
+- Storage execution depends only on AST and adapter interfaces.
+- Prisma integration cannot bypass the AST.
+- Mango integration cannot bypass schema validation.
+- Generated clients are wrappers, not alternative runtimes.
+- Sync packages consume schema metadata and local change APIs, not query-surface-specific details.
+
+## User stories
+- As a Prisma user, a Prisma-style schema should generate a local client API for `melon/db` without losing offline-first behavior.[1][3]
+- As a WatermelonDB user, existing query-heavy code should have a documented migration path.[2]
+- As a platform engineer, query APIs should compile to one AST so adapters and devtools stay reusable.
+- As a product engineer, JSON-based Mango queries should be reusable in tests, persisted views, and configuration-driven screens.[4]
+
+## Acceptance criteria
+- A schema can be imported from Prisma format or authored in a native Prisma-inspired DSL.[1]
+- Generated clients expose typed CRUD and reactive reads inspired by Prisma’s React Native direction.[3]
+- Mango queries compile successfully into AST and execute on the SQLite adapter for the supported subset.[4][2]
+- Watermelon-style queries can be mapped through a compatibility layer for core use cases.[2]
+- Devtools can display the original query source, compiled AST, and final SQL.[2]
+
+## Risks and mitigations
+
+| Risk | Impact | Mitigation |
+|---|---|---|
+| Prisma branding or compatibility expectations become misleading | Users may assume full Prisma runtime parity | Position `@melon/db-prisma` as schema/codegen and ergonomic compatibility, not runtime identity.[3] |
+| Mango support balloons in scope | Delivery slows and edge-case support becomes expensive | Launch a documented subset and expand based on usage.[4] |
+| Multiple query surfaces fragment the product | Harder docs and maintenance | Enforce a single AST and common execution model. |
+| WatermelonDB parity becomes too costly | Migration work delays innovation | Prioritize high-frequency query patterns and codemod the common path.[2] |
+| SQLite encoding cannot support some advanced query semantics cleanly | Inconsistent feature behavior | Validate unsupported constructs at compile time and document limits clearly.[2] |
+
+## Milestones
+
+### Milestone A: Query architecture RFCs (2-3 weeks)
+Scope:
+- Define internal AST.
+- Define compiler boundaries.
+- Define supported Prisma import model and Mango subset.
+- Define Watermelon compatibility surface.[2][4][3]
+
+Deliverables:
+- AST RFC
+- Query surface RFC
+- Schema/codegen RFC
+- Compatibility matrix draft
+
+Exit criteria:
+- Approved AST contract
+- Approved v1 query surface decisions
+
+### Milestone B: Prisma schema and codegen alpha (4-6 weeks)
+Scope:
+- Build Prisma schema importer or compatible parser.
+- Generate model metadata, TS types, and local client stubs.[1]
+- Prove local SQLite execution path.
+
+Deliverables:
+- `@melon/db-prisma` alpha
+- Codegen CLI
+- Example app with generated local client
+
+Exit criteria:
+- Schema import works on sample models.
+- Generated types compile cleanly.
+- CRUD queries execute locally through `melon/db`.
+
+### Milestone C: Mango compiler alpha (3-5 weeks)
+Scope:
+- Implement Mango parser and AST compiler for the supported subset.[4]
+- Add validation and error messages.
+- Add SQLite encoding tests.
+
+Deliverables:
+- `@melon/db-query-mango` alpha
+- Operator compatibility docs
+- Parser test suite
+
+Exit criteria:
+- Supported Mango queries run end to end on SQLite.
+- Unsupported operators fail with useful diagnostics.
+
+### Milestone D: Unified client ergonomics beta (4-6 weeks)
+Scope:
+- Expose fluent `melon` builder, generated Prisma-style client, and Mango entry point on one runtime.
+- Add React hooks and reactive query subscriptions inspired by Prisma’s RN approach and WatermelonDB’s reactive local model.[3][7]
+- Build devtools query inspector.
+
+Deliverables:
+- Unified beta API
+- Hooks package integration
+- Devtools AST/SQL inspector
+
+Exit criteria:
+- Three query surfaces compile into one engine.
+- Reactive local queries work consistently across supported surfaces.[3][7]
+
+### Milestone E: Migration and documentation release candidate (3-4 weeks)
+Scope:
+- Publish query parity matrix against WatermelonDB.[2]
+- Publish side-by-side docs: fluent vs Prisma-style vs Mango.[4][3]
+- Ship codemods for common WatermelonDB query patterns.
+
+Deliverables:
+- Migration docs
+- Query cookbook
+- Codemods
+
+Exit criteria:
+- WatermelonDB users can map common query patterns into the new system.[2]
+- Docs clearly explain when to use each query surface.
+
+## Suggested direction for implementation
+The strongest implementation strategy is to make the fluent `melon` query builder the canonical API, then layer Prisma and Mango on top as compilers and generated facades rather than as competing execution engines.[2][4][3] That gives `melon/db` a stable internal core, makes adapters reusable, and supports your goal of configurable, reusable, simple abstractions without over-coupling the system to one ecosystem.

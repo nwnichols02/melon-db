@@ -1,0 +1,395 @@
+---
+alwaysApply: true
+---
+
+# PRD: Next-generation WatermelonDB successor
+
+## Overview
+This product defines a modern successor to WatermelonDB for React Native and adjacent TypeScript applications, preserving the parts that made WatermelonDB compelling—offline-first local storage, lazy queries, reactive data flows, relational modeling, and optional synchronization—while modernizing architecture, developer experience, and maintainability.[1][2] The proposed system is intentionally split into two functional products: a storage/query engine and a sync engine, connected by explicit contracts so each part can be used independently or together.[2][3]
+
+The product is aimed at teams building complex React Native apps that need local-first performance, resilience when offline, and a cleaner API surface than the current ecosystem typically offers.[1][4] It should also support extensibility for enterprise sync strategies, multiple backend implementations, and better tooling for debugging and migration.[2][3]
+
+## Problem statement
+WatermelonDB remains valuable because it is optimized for building complex React Native apps with lazy, reactive, offline-first local data handling, but its current setup and ergonomics still reflect an older generation of React Native and JavaScript practices.[1][4] Current installation guidance still depends on decorator-era Babel configuration and native setup patterns that create friction for modern React Native teams, especially those standardizing on TypeScript, hooks, Expo-compatible tooling, and the new React Native architecture.[4]
+
+The current sync model is also powerful but intentionally low-level: teams must implement both frontend and backend synchronization themselves, follow the sync protocol correctly, and solve consistency, conflict, and observability concerns largely on their own.[2][3] A successor should keep backend flexibility while reducing integration burden through stronger abstractions, better defaults, clearer contracts, and documented recipes.[2][3]
+
+## Product vision
+The product should become the default local-first data layer for React Native teams that want WatermelonDB-class performance with a cleaner and more future-proof architecture.[1][4] It should offer a TypeScript-first, hooks-first developer experience, explicit support for React Native’s new architecture, pluggable sync behavior, and a modular design that lets teams adopt only the database layer, only the sync layer, or both together.[2][4][3]
+
+## Goals
+- Preserve WatermelonDB’s core strengths: large-scale local datasets, lazy loading, reactive queries, relational data modeling, transactional writes, and offline-first operation.[1][5]
+- Split the system into two reusable packages: one for query/storage and one for sync logic.[2][3]
+- Deliver first-class support for React Native’s new architecture through a JSI/TurboModule-oriented native design, replacing older bridge-heavy assumptions documented in current setup instructions.[4]
+- Make TypeScript the primary experience, with inferred schema types, typed queries, typed sync payloads, and typed error surfaces.[1]
+- Replace decorator- and HOC-centered ergonomics with modern, composable APIs built around functions, hooks, and reusable configuration objects.[1][4]
+- Improve operational quality through better error handling, diagnostics, docs, examples, and migration guidance.[2][3]
+
+## Non-goals
+- The first release will not aim to be a CRDT-first database or a collaborative conflict-free data system by default; instead, it will support configurable sync conflict strategies with deterministic behavior.[2][3]
+- The first release will not include a managed backend service; backend compatibility and reference implementations are in scope, but hosting is not.[2][3]
+- The first release will not attempt to be a universal ORM across every JavaScript runtime; React Native-first support is the priority, with web and Node support introduced where practical.[1][4]
+
+## Target users
+- React Native product teams building offline-first mobile apps with local persistence requirements.[1]
+- Teams migrating from WatermelonDB who want continuity in concepts but a more modern API and maintenance posture.[1][4]
+- Enterprise teams that need configurable synchronization strategies, backend flexibility, and stronger debugging support.[2][3]
+- TypeScript-heavy teams that value schema inference, reusable query builders, and functional APIs aligned with modern React patterns.[1]
+
+## Product principles
+- **Local-first by default**: the client-side database remains useful and responsive even when network connectivity is unavailable.[1][2]
+- **Modular by design**: storage/query concerns and sync concerns should evolve independently behind stable interfaces.[2][3]
+- **Type-safe by default**: schemas, records, relations, queries, and sync payloads should be typed without requiring extensive manual annotation.[1]
+- **Functional and composable**: APIs should prefer pure builders, explicit configuration, and reusable hooks over hidden decorators and inheritance-heavy patterns.[4]
+- **Operationally visible**: sync and database failures should produce actionable, classified diagnostics rather than opaque errors.[2][3]
+
+## Current WatermelonDB capabilities to preserve
+WatermelonDB positions itself as a reactive and asynchronous database for React Native and React web applications, optimized for complex apps and built around lazy loading rather than loading the full dataset into memory.[1] The docs also emphasize offline-first support, relational data handling, and synchronization with remote databases.[1][2]
+
+The successor must preserve the following functional capabilities:
+
+| Capability | Requirement |
+|---|---|
+| Offline-first local DB | The local database must continue working independently of network connectivity and act as the primary local source of truth for app interactions.[1][2] |
+| Lazy queries | Query evaluation must avoid loading entire tables into JavaScript memory, maintaining the performance profile that makes WatermelonDB attractive for large datasets.[1] |
+| Reactivity | Query and record subscriptions must update the UI automatically when underlying records change.[1] |
+| Relational modeling | The system must support schemas, models, fields, associations, children, and relation access patterns comparable to current WatermelonDB concepts.[1][6] |
+| Controlled writes | All mutations must occur through explicit write boundaries or transactions, preserving the safety model documented in WatermelonDB CRUD guidance.[5] |
+| Schema setup and migrations | The system must support declarative schema setup and versioned migrations, including migration-aware sync behavior.[6][2] |
+| Cross-platform story | The system should maintain a credible path for React Native first, with web and Node support where feasible, as current WatermelonDB documents support multiple runtime targets.[4][1] |
+| Sync compatibility | The system must support pull and push style synchronization against custom backends following a documented protocol.[2][3] |
+
+## New functional requirements
+
+### 1. Storage and query engine (`@nextmelon/db`)
+The storage package will own schema definition, adapters, query compilation and execution, transactions, records, relations, reactive subscriptions, and framework bindings.[1][5] It must be independently usable without the sync package.[2]
+
+Functional requirements:
+- Provide a TypeScript-native schema DSL that can infer record and relation types from schema definitions.
+- Support SQLite as the primary production adapter, since WatermelonDB’s performance model is rooted in SQLite-backed local storage for complex mobile apps.[1]
+- Expose explicit transactions/writers for creation, update, and deletion flows, preserving consistency guarantees documented by current CRUD rules.[5]
+- Offer lazy query builders, filtered and sorted collections, relation traversal, and observable subscriptions.
+- Support migrations with deterministic versioning and upgrade safety.
+- Include an in-memory adapter for unit tests and an adapter contract for future web or alternative storage backends.
+- Expose React bindings as optional adapters rather than forcing framework coupling.
+
+### 2. Sync engine (`@nextmelon/sync`)
+The sync package will own local change extraction, push/pull orchestration, conflict handling, retry behavior, checkpoints, migration-aware sync logic, and backend protocol contracts.[2][3] It must be independently versionable and optionally replaceable.[2]
+
+Functional requirements:
+- Support Watermelon-style `pullChanges` and `pushChanges` contracts to ease migration from existing apps and backend implementations.[2]
+- Support the changes object model with created, updated, and deleted records grouped by collection/table, following the existing backend protocol expectations documented by WatermelonDB.[3]
+- Support checkpoint-based incremental sync using a server timestamp or equivalent cursor.[3]
+- Support migration-aware sync behavior so schema upgrades and sync remain coordinated.[2]
+- Support pluggable conflict resolution policies, including server-wins, client-wins, last-write-wins, merge-by-field, and fully custom resolvers.
+- Provide queueing, retry, cancellation, network awareness hooks, and resumable sync sessions.
+- Provide sync status and diagnostics APIs consumable by React hooks and developer tools.
+
+### 3. React Native new architecture support
+The successor must explicitly target the modern React Native platform model instead of depending on legacy guidance that centers decorators and older native linking assumptions.[4] The native layer should be designed around JSI/TurboModule compatibility, minimize bridge serialization, and document compatibility with supported React Native versions.
+
+Functional requirements:
+- Ship native modules designed for the new architecture first.
+- Document supported RN versions and Expo compatibility boundaries.
+- Provide installation flows that avoid legacy decorator-era friction where possible.
+- Include benchmarks comparing legacy bridge-style access versus new architecture pathways.
+
+### 4. Full TypeScript support
+TypeScript support must be foundational rather than optional, including fully typed schema definitions, model APIs, query builders, sync payloads, hook return types, and structured errors.[1]
+
+Functional requirements:
+- Infer model and field types from schema declarations.
+- Infer relation types and query return shapes.
+- Generate or derive sync payload types from collection schemas.
+- Surface public APIs with stable exported types and strict generic contracts.
+- Maintain zero-`any` guarantees in public-facing package APIs where feasible.
+
+### 5. Modern API design
+The API should align with modern React and functional TypeScript patterns, replacing older decorator-centric setup and HOC-first patterns with composable primitives.[4][1]
+
+Functional requirements:
+- Provide hooks such as `useDatabase`, `useCollection`, `useQuery`, `useRecord`, `useWriter`, `useSync`, and `useSyncStatus`.
+- Provide pure query builders and configuration objects inspired by reusable, TanStack-like composability.
+- Offer framework-agnostic observers/subscriptions beneath React hooks.
+- Support headless usage for service layers and non-React environments.
+- Provide compatibility utilities for teams migrating from WatermelonDB’s existing usage patterns.
+
+### 6. Better error handling
+Current documentation focuses more on implementation mechanics than operational visibility, creating an opening for a better developer experience around failures.[2][3] The successor must classify errors consistently across the database and sync layers.
+
+Functional requirements:
+- Define typed error categories: schema errors, migration errors, adapter errors, sync protocol errors, conflict errors, serialization errors, and environmental errors.
+- Attach machine-readable codes and human-readable remediation guidance.
+- Preserve root-cause details for logging while returning safe messages to UI layers.
+- Support retryability metadata and severity metadata.
+- Provide development-only invariant checks and actionable warnings.
+
+### 7. Better documentation
+Current WatermelonDB docs cover setup, CRUD, sync concepts, and backend guidance, but the implementation burden remains high for teams adopting modern stacks.[1][2][3] The successor must treat documentation as a core product deliverable.
+
+Functional requirements:
+- Provide architecture docs for storage, sync, adapters, and React bindings.
+- Provide migration guides from WatermelonDB.
+- Provide recipes for Node/Postgres, Supabase/Postgres, REST backends, and offline conflict strategies.
+- Provide examples for React Native new architecture, Expo workflows, testing, and performance tuning.
+- Provide troubleshooting guides, error reference docs, and interactive examples.
+
+## Non-functional requirements
+
+| Category | Requirement |
+|---|---|
+| Performance | Cold start and common query paths must remain competitive with WatermelonDB’s positioning for large datasets and complex apps.[1] |
+| Reliability | Sync must be resumable and idempotent where the protocol allows, reducing data corruption risk during interrupted sessions.[2][3] |
+| Upgrade safety | Schema and package upgrades must include tested migration paths and rollback guidance.[6][2] |
+| Maintainability | Internal modules must be isolated behind contracts so storage, sync, React bindings, and adapters can be versioned independently. |
+| Observability | The product must expose sync state, failure categories, timing, and per-collection metrics for debugging and analytics. |
+| Compatibility | React Native is primary; web and Node compatibility must be documented explicitly as GA, beta, or experimental based on adapter maturity.[4] |
+| DX quality | Setup, examples, and docs must reduce the amount of custom boilerplate currently implied by WatermelonDB’s installation and sync setup guides.[4][2] |
+
+## Proposed architecture
+
+### Package map
+| Package | Responsibility |
+|---|---|
+| `@nextmelon/db` | Schema, adapters, query engine, transactions, records, relations, reactivity, framework bindings |
+| `@nextmelon/sqlite-adapter` | SQLite-native adapter optimized for React Native |
+| `@nextmelon/react` | Hooks, providers, subscription bindings, Suspense-friendly helpers |
+| `@nextmelon/sync` | Sync protocol, orchestration, conflict handling, queueing, diagnostics |
+| `@nextmelon/sync-server` | Backend helpers, protocol validators, reference server utilities |
+| `@nextmelon/devtools` | Query inspection, sync logs, performance views, diagnostics panels |
+| `@nextmelon/migrate` | Codemods, migration utilities, compatibility shims |
+
+### Architectural boundaries
+The database layer must expose a stable interface for querying collections, subscribing to record changes, executing transactions, enumerating changed records, and applying remote changes.[5][2] The sync layer must depend on that interface rather than internal implementation details, so storage and sync can evolve separately.[2][3]
+
+Key architectural rules:
+- No sync-specific concerns leak into query execution APIs.
+- No adapter-specific concerns leak into public React APIs.
+- Sync protocols are expressed as pure TypeScript contracts where possible.
+- Conflict resolution is pluggable and versioned.
+- Public APIs should be tree-shakeable and package-scoped.
+
+## Detailed requirements by domain
+
+### Schema and models
+- Code-first schema declarations with collection names, field types, indexes, constraints, and relation metadata.
+- Optional code generation for derived TS types.
+- Explicit schema versioning and migration manifests.[6]
+- Validation for unsupported migrations before app startup completes.
+
+### Query engine
+- Pure query builder functions with typed filters, ordering, paging, relation loading hints, and projection support.
+- Lazy materialization of result sets to preserve WatermelonDB’s large-dataset strengths.[1]
+- Observable query results and record-level subscriptions.
+- Batched notifications to avoid excessive UI recomputation.
+
+### Transactions and mutation model
+- All writes occur in explicit transaction scopes or writer helpers, preserving current WatermelonDB consistency rules.[5]
+- Nested write coordination must be deterministic.
+- Bulk writes and batch updates must be available for sync application and local import flows.
+- Mutation APIs must be usable from hooks and headless services.
+
+### Sync protocol
+- Pull returns collection-grouped `created`, `updated`, and `deleted` changes and a new checkpoint/timestamp, consistent with current documented patterns.[2][3]
+- Push submits local changes grouped by collection with schema-aligned field payloads.[2][3]
+- Protocol validators must detect malformed change sets early.
+- Per-collection and per-record conflict hooks must be supported.
+- Sync state machine must expose idle, pulling, pushing, merging, retrying, paused, failed, and complete states.
+
+### Backend interoperability
+WatermelonDB’s backend guidance recommends timestamp-based change tracking such as `last_modified` fields and consistent ordering to implement pull correctness.[3] The successor should preserve compatibility with that general model while adding official backend helpers.
+
+Required backend assets:
+- Reference Node/Postgres implementation.
+- Supabase/Postgres integration example, since community adoption already exists around that pattern.[7]
+- REST protocol example.
+- SQL migration templates for `last_modified` and tombstone/deletion tracking patterns.[3]
+
+### React bindings
+- Hooks-first API with selectors and memo-friendly subscriptions.
+- Suspense-compatible optional APIs for consumers who want concurrent rendering ergonomics.
+- Provider-free low-level hooks where reasonable to reduce boilerplate.
+- Support for pure components and reusable headless abstractions.
+
+### Error handling and observability
+- Structured error classes with categories and error codes.
+- Hook-friendly error states and retry actions.
+- Devtools event stream for query timings, transaction timings, sync attempts, conflict resolutions, and failures.
+- Optional user-defined logging adapters.
+
+### Documentation and examples
+- A “Why this exists” guide mapping current WatermelonDB concepts to the new packages.[1][2]
+- “Start here” guide for local-only apps.
+- “Add sync later” guide showing how the modular split works.
+- Backend recipes and diagrams for protocol flows.[2][3]
+- Migration guide with side-by-side API examples from current WatermelonDB.
+
+## User stories
+- As a React Native engineer, the product should let local CRUD and reactive reads work offline without extra network setup.[1][5]
+- As a TypeScript user, collection schemas should infer query and mutation types automatically.
+- As a platform engineer, the sync engine should be configurable without rewriting the local database layer.[2][3]
+- As a maintainer, the codebase should be split into testable, versioned modules with clear responsibilities.
+- As an enterprise team, conflicts and retries should be observable and policy-driven instead of ad hoc.[3]
+
+## Acceptance criteria
+
+### v1 product acceptance
+- A sample React Native app can define schemas, execute CRUD operations, observe records, and persist data locally with no sync package installed.[5][6]
+- The same app can add `@nextmelon/sync` later without changing storage internals.
+- Watermelon-style pull/push backend contracts can be used through compatibility APIs.[2][3]
+- Public APIs are fully typed and documented.
+- React Native new architecture support is documented and validated in CI.
+- At least one migration guide from existing WatermelonDB patterns is published.
+- Error codes, troubleshooting docs, and devtools diagnostics are available.
+
+### Performance acceptance
+- Large collection reads remain lazy and avoid loading all records into JS memory, preserving the current performance model.[1]
+- Common subscription-driven UI flows remain responsive under realistic local datasets.
+- Sync of moderate change sets completes reliably after process interruption or network loss.[2][3]
+
+## Risks and mitigations
+
+| Risk | Impact | Mitigation |
+|---|---|---|
+| Recreating WatermelonDB internals too closely | Modernization may stall behind compatibility burdens | Define a compatibility layer rather than preserving every internal pattern exactly. |
+| New architecture native work is more complex than expected | Delivery delays on RN support | Build a thin vertical slice early and benchmark before locking public APIs. |
+| Sync becomes too opinionated | Limits adoption for custom backends | Keep protocol adapters and conflict resolvers pluggable.[2][3] |
+| Type inference becomes brittle | Poor developer experience | Use generated metadata and extensive TS test suites. |
+| Migration friction from current WatermelonDB apps | Adoption slows | Ship codemods, compatibility wrappers, and detailed migration examples.[4] |
+
+## Milestones
+
+### Milestone 0: Discovery and requirements (3-4 weeks)
+Scope:
+- Audit WatermelonDB docs, API surface, sync model, installation pain points, and ecosystem usage patterns.[1][2][4][3]
+- Produce a compatibility matrix of “preserve,” “modernize,” “replace,” and “defer.”
+- Interview target users: existing WatermelonDB users, Expo users, and React Native new-architecture teams.
+- Draft architectural RFCs for package boundaries and public interfaces.
+
+Deliverables:
+- Requirements inventory
+- Compatibility matrix
+- Architecture RFCs
+- Initial benchmark plan
+
+Exit criteria:
+- Clear scope for v1 and post-v1
+- Approved package boundaries
+- Approved performance and DX goals
+
+### Milestone 1: Core storage engine alpha (6-8 weeks)
+Scope:
+- Implement schema DSL, base model layer, transaction/writer engine, query builder primitives, subscriptions, and in-memory adapter.
+- Implement initial SQLite adapter skeleton.
+- Publish internal benchmarks for local CRUD and query laziness.
+
+Deliverables:
+- `@nextmelon/db` alpha
+- In-memory adapter
+- SQLite adapter prototype
+- Core tests and benchmark harness
+
+Exit criteria:
+- Local CRUD works end-to-end in example app.[5][6]
+- Reactive subscriptions function correctly.
+- Lazy query behavior is demonstrable.[1]
+
+### Milestone 2: React Native platform integration beta (4-6 weeks)
+Scope:
+- Complete React Native native integration targeting the new architecture.
+- Build `@nextmelon/react` hooks and providers.
+- Validate setup on current supported React Native versions and document installation.
+
+Deliverables:
+- RN native module integration
+- Hooks package beta
+- Installation docs
+- CI matrix for supported RN versions
+
+Exit criteria:
+- Example RN app works on supported platforms.
+- Setup is materially simpler than legacy WatermelonDB setup guidance.[4]
+- New architecture support is documented and tested.
+
+### Milestone 3: Sync engine beta (6-8 weeks)
+Scope:
+- Implement change extraction interface, pull/push orchestrator, checkpoints, retries, conflict policies, and sync state reporting.
+- Ship Watermelon-compatible sync mode first for migration ease.[2][3]
+- Build reference backend helpers and protocol validators.
+
+Deliverables:
+- `@nextmelon/sync` beta
+- Sync compatibility layer
+- Reference Node/Postgres backend
+- Sync test harness and failure injection suite
+
+Exit criteria:
+- Pull and push flows work against reference backend.[2][3]
+- Retry and recovery work after interruption.
+- Conflict policies are pluggable and documented.
+
+### Milestone 4: Migration, docs, and devtools release candidate (4-6 weeks)
+Scope:
+- Build migration guides, codemods, and compatibility shims.
+- Build devtools for sync status, query inspection, and errors.
+- Write architecture, troubleshooting, and recipe docs.
+
+Deliverables:
+- `@nextmelon/migrate`
+- `@nextmelon/devtools`
+- Documentation site content
+- Example apps and recipes
+
+Exit criteria:
+- Existing WatermelonDB users can follow a documented migration path.[4]
+- Troubleshooting docs cover setup, schema, sync, and migration failures.[2][3]
+- Devtools surface actionable diagnostics.
+
+### Milestone 5: v1 general availability (2-3 weeks)
+Scope:
+- Stabilize APIs, close critical bugs, complete docs QA, and finalize versioning and support policy.
+- Run production-like soak tests and finalize public roadmap.
+
+Deliverables:
+- v1.0 packages
+- Versioning and support policy
+- GA docs and examples
+- Post-v1 roadmap
+
+Exit criteria:
+- Public API freeze for v1.
+- Benchmarks and migration docs published.
+- Release candidate issues resolved.
+
+## Suggested timeline
+
+| Milestone | Duration | Cumulative timeline |
+|---|---:|---:|
+| Discovery and requirements | 3-4 weeks | 1 month |
+| Core storage engine alpha | 6-8 weeks | 2.5-3 months |
+| React Native integration beta | 4-6 weeks | 4-4.5 months |
+| Sync engine beta | 6-8 weeks | 5.5-6.5 months |
+| Migration, docs, devtools RC | 4-6 weeks | 7-8 months |
+| GA stabilization | 2-3 weeks | 7.5-8.5 months |
+
+## Success metrics
+
+| Metric | Target direction |
+|---|---|
+| Time to first local CRUD app | Lower than current WatermelonDB setup friction documented in installation/setup guides.[4][6] |
+| Time to first sync integration | Lower than current custom integration burden implied by sync docs.[2][3] |
+| Cold start performance at large local datasets | Equal to or better than WatermelonDB’s large-data positioning.[1] |
+| Type coverage | Public APIs fully typed with stable inference |
+| Migration success rate | High success across pilot migrations from WatermelonDB |
+| Sync reliability | High completion and recovery success under network interruption.[3] |
+| Documentation effectiveness | High task completion for setup, CRUD, sync, and migration guides |
+
+## Open questions
+- Which parts of existing WatermelonDB API compatibility are essential for adoption versus not worth preserving?
+- Should the first web adapter target IndexedDB, SQLite via WASM, or remain experimental?
+- Should sync checkpoints use timestamps only for v1, or support opaque cursors from day one?
+- Which reference backend should be treated as the canonical example: Node/Postgres or Supabase/Postgres?[7][3]
+- Should code generation be required for optimal typing, or optional for teams preferring pure code-first inference?
+
+## Recommended next step
+The immediate next step is to turn this PRD into an implementation program with RFCs for schema design, adapter contracts, sync protocol contracts, and React hook ergonomics. That work should begin with a compatibility matrix against current WatermelonDB setup, CRUD, and sync expectations so the successor preserves the right behaviors while modernizing the right abstractions.[4][5][2]
