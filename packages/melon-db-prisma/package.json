@@ -13,6 +13,7 @@
 		"@melon/db": "workspace:*"
 	},
 	"devDependencies": {
+		"@prisma/internals": "^7.8.0",
 		"@types/bun": "latest",
 		"typescript": "^5"
 	}

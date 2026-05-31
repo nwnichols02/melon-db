@@ -5,8 +5,14 @@ import type {
 	WriteContext,
 } from "@melon/db";
 import { prepareQuery } from "@melon/db";
-import { useCallback, useEffect, useState } from "react";
+import { compilePrismaQuery } from "@melon/db-prisma";
+import type { PrismaFindManyArgs } from "@melon/db-prisma";
+import { createMangoCompiler } from "@melon/db-query-mango";
+import type { MangoQuery } from "@melon/db-query-mango";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDatabase } from "./context.tsx";
+
+const mangoCompiler = createMangoCompiler();
 
 export interface UseQueryOptions<T> {
 	enabled?: boolean;
@@ -81,4 +87,53 @@ export function useQueryCount(query: QueryAst | PreparedQuery): number {
 	}, [db, query]);
 
 	return count;
+}
+
+/**
+ * Reactive Prisma-style findMany hook.
+ */
+export function useFindMany<T = Record<string, unknown>>(
+	collection: string,
+	args?: PrismaFindManyArgs,
+	options?: UseQueryOptions<T>,
+): T[] {
+	const db = useDatabase();
+	const prepared = useMemo(
+		() => compilePrismaQuery(collection, args, db.schema),
+		[db.schema, collection, args],
+	);
+	return useQuery<T>(prepared, options);
+}
+
+/**
+ * Reactive Prisma-style findFirst hook.
+ */
+export function useFindFirst<T = Record<string, unknown>>(
+	collection: string,
+	args?: PrismaFindManyArgs,
+	options?: UseQueryOptions<T>,
+): T | null {
+	const db = useDatabase();
+	const prepared = useMemo(
+		() => compilePrismaQuery(collection, args, db.schema, "one"),
+		[db.schema, collection, args],
+	);
+	const rows = useQuery<T>(prepared, options);
+	return rows[0] ?? null;
+}
+
+/**
+ * Reactive Mango-style query hook.
+ */
+export function useMangoQuery<T = Record<string, unknown>>(
+	collection: string,
+	query: MangoQuery,
+	options?: UseQueryOptions<T>,
+): T[] {
+	const db = useDatabase();
+	const prepared = useMemo(
+		() => mangoCompiler.compile(query, collection, db.schema),
+		[db.schema, collection, query],
+	);
+	return useQuery<T>(prepared, options);
 }

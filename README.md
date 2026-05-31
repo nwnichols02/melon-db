@@ -65,6 +65,14 @@ bun run dev:rn
 
 Open the app in iOS Simulator or Android emulator. See [`apps/playground-rn/README.md`](apps/playground-rn/README.md).
 
+### Prisma schema import + codegen
+
+```bash
+bun run melon-prisma generate --schema=./schema.prisma --out=./generated/melon
+```
+
+See [`packages/melon-db-prisma/README.md`](packages/melon-db-prisma/README.md).
+
 ### Benchmarks
 
 ```bash
@@ -76,20 +84,23 @@ See [`packages/melon-db-sqlite/README.md`](packages/melon-db-sqlite/README.md) f
 ## v1 limitations
 
 - All mutations must run inside `db.write()`.
-- No automatic schema migrations.
-- No relation includes in queries (v1).
+- SQLite migrations support add-column and create-table only.
+- Relation includes support `belongsTo` only (no `hasMany` includes in queries).
 - Native SQLite `observeQuery` triggers not implemented (engine change emitter used instead).
 
 ## Completed vs roadmap
 
-| Done | Deferred |
+| Done | Deferred (Phase 10+) |
 |------|----------|
 | Core engine M0–M2 | Custom JSI/TurboModule SQLite |
 | SQLite SQL compiler + Bun adapter | `@melon/sync` |
 | Expo SQLite adapter (`@melon/db-sqlite/expo`) | `@melon/db-codemods` |
 | `apps/playground-rn` | Docs site |
-| Query / Mango / Prisma surfaces | Prisma schema import / codegen CLI |
-| React hooks | EAS Build CI |
+| Query / Mango / Prisma surfaces | EAS Build CI |
+| React hooks (`useFindMany`, `useMangoQuery`) | |
+| Schema migrations | |
+| Prisma schema import + codegen CLI | |
+| belongsTo relation includes | |
 | Devtools bridge + SQL snapshots | |
 | CI (test, typecheck, biome) | |
 

@@ -27,8 +27,17 @@ describe("createExpoSqliteAdapter", () => {
 				execCalls.push(source);
 			},
 
-			async getAllAsync<T>(): Promise<T[]> {
-				return [...rows.values()] as T[];
+			async getAllAsync<T>(
+				source: string,
+				...params: (string | number | null | boolean | Uint8Array)[]
+			): Promise<T[]> {
+				if (source.includes('"tasks"')) {
+					return [...rows.values()] as T[];
+				}
+				if (source.includes('"count"') || source.includes("COUNT(")) {
+					return [{ count: rows.size }] as T[];
+				}
+				return [] as T[];
 			},
 
 			async getFirstAsync<T>(): Promise<T | null> {
@@ -40,7 +49,7 @@ describe("createExpoSqliteAdapter", () => {
 				source: string,
 				...params: (string | number | null | boolean | Uint8Array)[]
 			): Promise<unknown> {
-				if (source.includes("INSERT INTO")) {
+				if (source.includes('INSERT INTO "tasks"')) {
 					rows.set(String(params[0]), {
 						id: params[0],
 						title: params[1],

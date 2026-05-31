@@ -35,3 +35,7 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Expo local state
 .expo/
+
+# Prisma codegen output
+**/__generated__/
+**/.tmp/

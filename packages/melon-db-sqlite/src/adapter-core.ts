@@ -2,13 +2,21 @@ import type {
 	AdapterCountResult,
 	AdapterFindResult,
 	AdapterWriteOperation,
+	InitializeOptions,
 	MelonSchema,
 	PreparedQuery,
 	QueryExecutionDebug,
 	StorageAdapter,
 } from "@melon/db";
 import { MelonError, MelonErrorCode } from "@melon/db";
+import {
+	ensureMetaTable,
+	getStoredSchemaVersion,
+	runMigrationsWithExecutor,
+} from "@melon/db";
+import { SCHEMA_VERSION_KEY } from "@melon/db";
 import type { SqliteDriver } from "./driver.ts";
+import { createSqliteMigrationExecutor } from "./migration-executor.ts";
 import { generateDdl } from "./schema-ddl.ts";
 import { toSqlParams } from "./sql/bindings.ts";
 import { compileQuery } from "./sql/compile-query.ts";
@@ -108,16 +116,42 @@ export function createSqliteAdapterFromDriver(
 			partialSelect: false,
 		},
 
-		async initialize(s: MelonSchema): Promise<void> {
+		async initialize(
+			s: MelonSchema,
+			options?: InitializeOptions,
+		): Promise<void> {
+			const isFirstInit = driver === null;
 			schema = s;
-			driver = await driverFactory();
-			await driver.exec("PRAGMA foreign_keys = ON");
-			await driver.exec("PRAGMA journal_mode = WAL");
-			for (const ddl of generateDdl(s)) {
-				await driver.exec(ddl);
+			if (isFirstInit) {
+				driver = await driverFactory();
+				await driver.exec("PRAGMA foreign_keys = ON");
+				await driver.exec("PRAGMA journal_mode = WAL");
 			}
-			if (options.debug) {
-				// reserved for future SQL logging
+
+			const sqlite = requireDriver();
+			const hooks = await ensureMetaTable(
+				(sql) => sqlite.exec(sql),
+				(sql, params) => sqlite.queryFirst(sql, toSqlParams(params ?? [])),
+				(sql, params) => sqlite.run(sql, toSqlParams(params ?? [])),
+			);
+
+			for (const ddl of generateDdl(s)) {
+				await sqlite.exec(ddl);
+			}
+
+			if (options?.migrations?.length) {
+				await runMigrationsWithExecutor(
+					s,
+					options.migrations,
+					hooks,
+					createSqliteMigrationExecutor(sqlite),
+				);
+				return;
+			}
+
+			const stored = await getStoredSchemaVersion(hooks);
+			if (stored === 0) {
+				await hooks.setMeta(SCHEMA_VERSION_KEY, String(s.version));
 			}
 		},
 

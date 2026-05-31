@@ -32,28 +32,52 @@ export function generateDdl(schema: MelonSchema): string[] {
 	for (const meta of Object.values(
 		schema.collections,
 	) as CollectionMetadata[]) {
-		const columns = Object.entries(meta.fields).map(([name, field]) => {
-			const sqlType = scalarToSql(field.kind);
-			const nullable = field.nullable ? "" : " NOT NULL";
-			return `${quoteIdent(name)} ${sqlType}${nullable}`;
-		});
-
-		if (!meta.fields[meta.primaryKey]) {
-			columns.unshift(`${quoteIdent(meta.primaryKey)} TEXT NOT NULL`);
-		}
-
-		statements.push(
-			`CREATE TABLE IF NOT EXISTS ${quoteIdent(meta.name)} (${columns.join(", ")}, PRIMARY KEY (${quoteIdent(meta.primaryKey)}))`,
-		);
-
-		for (const index of meta.indexes) {
-			const indexName = `${meta.name}_${index.join("_")}_idx`;
-			const cols = index.map(quoteIdent).join(", ");
-			statements.push(
-				`CREATE INDEX IF NOT EXISTS ${quoteIdent(indexName)} ON ${quoteIdent(meta.name)} (${cols})`,
-			);
-		}
+		statements.push(...generateCollectionDdl(meta));
 	}
 
 	return statements;
+}
+
+/**
+ * Generates DDL for a single collection and its indexes.
+ */
+export function generateCollectionDdl(meta: CollectionMetadata): string[] {
+	const statements: string[] = [];
+	const columns = Object.entries(meta.fields).map(([name, field]) => {
+		const sqlType = scalarToSql(field.kind);
+		const nullable = field.nullable ? "" : " NOT NULL";
+		return `${quoteIdent(name)} ${sqlType}${nullable}`;
+	});
+
+	if (!meta.fields[meta.primaryKey]) {
+		columns.unshift(`${quoteIdent(meta.primaryKey)} TEXT NOT NULL`);
+	}
+
+	statements.push(
+		`CREATE TABLE IF NOT EXISTS ${quoteIdent(meta.name)} (${columns.join(", ")}, PRIMARY KEY (${quoteIdent(meta.primaryKey)}))`,
+	);
+
+	for (const index of meta.indexes) {
+		const indexName = `${meta.name}_${index.join("_")}_idx`;
+		const cols = index.map(quoteIdent).join(", ");
+		statements.push(
+			`CREATE INDEX IF NOT EXISTS ${quoteIdent(indexName)} ON ${quoteIdent(meta.name)} (${cols})`,
+		);
+	}
+
+	return statements;
+}
+
+/**
+ * Generates ALTER TABLE ADD COLUMN statements for new fields.
+ */
+export function generateAddColumnDdl(
+	collection: string,
+	fields: Record<string, import("@melon/db").FieldDefinition>,
+): string[] {
+	return Object.entries(fields).map(([name, field]) => {
+		const sqlType = scalarToSql(field.kind);
+		const nullable = field.nullable ? "" : " NOT NULL";
+		return `ALTER TABLE ${quoteIdent(collection)} ADD COLUMN ${quoteIdent(name)} ${sqlType}${nullable}`;
+	});
 }

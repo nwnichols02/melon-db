@@ -2,10 +2,17 @@ import type {
 	AdapterCountResult,
 	AdapterFindResult,
 	AdapterWriteOperation,
+	InitializeOptions,
 	StorageAdapter,
 } from "../../adapter.ts";
 import type { PreparedQuery } from "../../ast.ts";
 import { MelonError, MelonErrorCode } from "../../errors.ts";
+import { createInMemoryMigrationExecutor } from "../../migrations/in-memory-executor.ts";
+import {
+	getStoredSchemaVersion,
+	runMigrationsWithExecutor,
+} from "../../migrations/runner.ts";
+import { SCHEMA_VERSION_KEY } from "../../migrations/types.ts";
 import { evaluateQuery } from "../../query/evaluate.ts";
 import type { MelonSchema } from "../../schema.ts";
 import { type InMemoryData, createEmptyStore } from "./store.ts";
@@ -25,6 +32,7 @@ export function createInMemoryAdapter(): StorageAdapter & {
 } {
 	let schema: MelonSchema | null = null;
 	let data: InMemoryData = new Map();
+	let metaStore = new Map<string, string>();
 
 	function requireSchema(): MelonSchema {
 		if (!schema) {
@@ -96,9 +104,40 @@ export function createInMemoryAdapter(): StorageAdapter & {
 			partialSelect: false,
 		},
 
-		async initialize(s: MelonSchema): Promise<void> {
+		async initialize(
+			s: MelonSchema,
+			options?: InitializeOptions,
+		): Promise<void> {
+			const isReinit = schema !== null;
 			schema = s;
-			data = createEmptyStore(s);
+			if (!isReinit) {
+				data = createEmptyStore(s);
+				metaStore = new Map();
+			}
+
+			const hooks = {
+				execSql: async (_sql: string): Promise<void> => {},
+				getMeta: async (key: string): Promise<string | null> =>
+					metaStore.get(key) ?? null,
+				setMeta: async (key: string, value: string): Promise<void> => {
+					metaStore.set(key, value);
+				},
+			};
+
+			if (options?.migrations?.length) {
+				await runMigrationsWithExecutor(
+					s,
+					options.migrations,
+					hooks,
+					createInMemoryMigrationExecutor(data, s),
+				);
+				return;
+			}
+
+			const stored = await getStoredSchemaVersion(hooks);
+			if (stored === 0) {
+				await hooks.setMeta(SCHEMA_VERSION_KEY, String(s.version));
+			}
 		},
 
 		async prepare(query: PreparedQuery): Promise<PreparedQuery> {
@@ -147,6 +186,7 @@ export function createInMemoryAdapter(): StorageAdapter & {
 
 		async close(): Promise<void> {
 			data = new Map();
+			metaStore = new Map();
 			schema = null;
 		},
 

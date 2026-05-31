@@ -14,7 +14,15 @@ export const taskSchemaDefinition: DatabaseSchemaDefinition = {
 				title: { kind: "string" },
 				status: { kind: "string", indexed: true },
 				priority: { kind: "number" },
+				projectId: { kind: "string", nullable: true },
 				updatedAt: { kind: "date" },
+			},
+			relations: {
+				project: {
+					kind: "belongsTo",
+					target: "projects",
+					foreignKey: "projectId",
+				},
 			},
 			indexes: [["status"], ["updatedAt"]],
 		},

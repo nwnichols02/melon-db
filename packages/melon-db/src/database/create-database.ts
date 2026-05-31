@@ -19,7 +19,7 @@ import { WriteQueue } from "./write-queue.ts";
 export function createDatabase<
 	Schema extends import("../schema.ts").MelonSchema,
 >(options: CreateDatabaseOptions<Schema>): MelonDatabase<Schema> {
-	const { schema, adapter, devtools } = options;
+	const { schema, adapter, devtools, migrations } = options;
 	const emitter = new ChangeEmitter();
 	const writeQueue = new WriteQueue();
 	let insideWrite = false;
@@ -27,7 +27,7 @@ export function createDatabase<
 
 	async function ensureInitialized(): Promise<void> {
 		if (!initialized) {
-			await adapter.initialize(schema);
+			await adapter.initialize(schema, { migrations });
 			initialized = true;
 		}
 	}

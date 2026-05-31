@@ -5,6 +5,7 @@ export const MelonErrorCode = {
 	RECORD_NOT_FOUND: "RECORD_NOT_FOUND",
 	ADAPTER_ERROR: "ADAPTER_ERROR",
 	NOT_INITIALIZED: "NOT_INITIALIZED",
+	MIGRATION_FAILED: "MIGRATION_FAILED",
 } as const;
 
 export type MelonErrorCode =

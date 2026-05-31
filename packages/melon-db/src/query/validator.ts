@@ -74,10 +74,26 @@ export function validateQuery(ast: QueryAst, schema: MelonSchema): void {
 	}
 
 	if (ast.select?.include && Object.keys(ast.select.include).length > 0) {
-		throw new MelonError("Relation includes are not supported in v1", {
-			code: MelonErrorCode.QUERY_INVALID,
-			remediation: "Remove select.include or wait for a future release.",
-		});
+		const meta = schema.getCollection(ast.collection);
+		for (const [relationName] of Object.entries(ast.select.include)) {
+			const relation = meta.relations[relationName];
+			if (!relation) {
+				throw new MelonError(
+					`Unknown relation "${relationName}" on collection "${ast.collection}"`,
+					{ code: MelonErrorCode.QUERY_INVALID },
+				);
+			}
+			if (relation.kind !== "belongsTo") {
+				throw new MelonError(
+					`Relation include "${relationName}" is not supported in v1 (belongsTo only)`,
+					{
+						code: MelonErrorCode.QUERY_INVALID,
+						remediation:
+							"Use belongsTo relations only, or fetch hasMany relations separately.",
+					},
+				);
+			}
+		}
 	}
 
 	if (ast.skip !== undefined && ast.skip < 0) {

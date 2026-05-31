@@ -68,4 +68,5 @@ export interface CreateDatabaseOptions<
 	schema: Schema;
 	adapter: StorageAdapter;
 	devtools?: DevtoolsBridge;
+	migrations?: import("../migrations/types.ts").Migration[];
 }

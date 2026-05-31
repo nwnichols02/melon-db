@@ -2,11 +2,14 @@ import type { StorageAdapter } from "../adapter.ts";
 import type { PreparedQuery } from "../ast.ts";
 import type { ChangeEmitter } from "../change/emitter.ts";
 import type { DevtoolsBridge } from "../devtools.ts";
+import { loadIncludes } from "../query/load-includes.ts";
+import type { MelonSchema } from "../schema.ts";
 import { observeQuery } from "./observe.ts";
 import type { MelonQueryHandle } from "./types.ts";
 
 export interface QueryHandleDeps {
 	adapter: StorageAdapter;
+	schema: MelonSchema;
 	emitter: ChangeEmitter;
 	devtools?: DevtoolsBridge;
 	ensureReady: () => Promise<void>;
@@ -19,7 +22,7 @@ export function createQueryHandle<RecordShape = Record<string, unknown>>(
 	deps: QueryHandleDeps,
 	prepared: PreparedQuery,
 ): MelonQueryHandle<RecordShape> {
-	const { adapter, emitter, devtools, ensureReady } = deps;
+	const { adapter, schema, emitter, devtools, ensureReady } = deps;
 
 	async function fetchRows(): Promise<RecordShape[]> {
 		await ensureReady();
@@ -34,7 +37,8 @@ export function createQueryHandle<RecordShape = Record<string, unknown>>(
 			sql: queryDebug?.sql,
 			durationMs: performance.now() - start,
 		});
-		return result.rows as RecordShape[];
+		const rows = await loadIncludes(result.rows, prepared.ast, schema, adapter);
+		return rows as RecordShape[];
 	}
 
 	return {

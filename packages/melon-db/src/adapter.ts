@@ -1,5 +1,10 @@
 import type { PreparedQuery } from "./ast.ts";
+import type { Migration } from "./migrations/types.ts";
 import type { MelonSchema } from "./schema.ts";
+
+export interface InitializeOptions {
+	migrations?: Migration[];
+}
 
 export type AdapterRecord = Record<string, unknown>;
 
@@ -55,7 +60,7 @@ export interface StorageAdapter {
 	readonly name: string;
 	readonly capabilities: StorageAdapterCapabilities;
 
-	initialize(schema: MelonSchema): Promise<void>;
+	initialize(schema: MelonSchema, options?: InitializeOptions): Promise<void>;
 	prepare?(query: PreparedQuery): Promise<PreparedQuery>;
 	find(query: PreparedQuery): Promise<AdapterFindResult>;
 	count(query: PreparedQuery): Promise<AdapterCountResult>;

@@ -8,5 +8,8 @@ export {
 	useCollection,
 	useWriter,
 	useQueryCount,
+	useFindMany,
+	useFindFirst,
+	useMangoQuery,
 	type UseQueryOptions,
 } from "./hooks.ts";

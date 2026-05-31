@@ -56,7 +56,7 @@ export function createCollection<RecordShape = Record<string, unknown>>(
 		const ast = query ?? defaultAst();
 		const prepared = prepareQuery({ ...ast, collection: name }, schema);
 		return createQueryHandle<RecordShape>(
-			{ adapter, emitter, devtools, ensureReady },
+			{ adapter, schema, emitter, devtools, ensureReady },
 			prepared,
 		);
 	}
