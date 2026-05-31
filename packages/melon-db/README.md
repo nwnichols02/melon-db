@@ -42,11 +42,35 @@ Schema version is stored in the `_melon_meta` table.
 
 `belongsTo` includes are supported via `select.include` on queries. `hasMany` includes are rejected at validate time.
 
+## Sync (Phase 12)
+
+Enable sync when creating the database:
+
+```ts
+const db = createDatabase({
+  schema,
+  adapter: createInMemoryAdapter(),
+  sync: {}, // respectLocalOnly defaults to true
+});
+```
+
+### APIs
+
+| Method | Description |
+|--------|-------------|
+| `getLocalChanges()` | Returns Watermelon-shaped `{ [collection]: { created, updated, deleted } }` from the internal outbox |
+| `applyRemoteChanges(changes)` | Applies remote pull payload (server-wins default); wraps `db.write()` |
+| `markLocalChangesPushed()` | Clears outbox after successful push |
+
+Local writes inside `db.write()` are tracked in an engine-managed outbox (`_melon_sync_outbox` table on SQLite). Collections with `localOnly: true` are excluded.
+
+Use `@melon/sync` for pull/push orchestration — see [`packages/melon-sync/README.md`](../melon-sync/README.md).
+
 ## v1 limitations
 
 - Writes must run inside `db.write()`.
 - SQLite migrations support add-column and create-table only (no drop/rename).
-- `getChangedCollections` is not implemented (reserved for `@melon/sync`).
+- Sync outbox coalesces create+delete to no-op; delete after push appears as `deleted`.
 
 ## Development
 

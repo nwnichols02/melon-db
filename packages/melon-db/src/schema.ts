@@ -41,6 +41,7 @@ export interface CollectionMetadata<RecordShape = Record<string, unknown>> {
 	readonly fields: Record<string, FieldDefinition>;
 	readonly relations: Record<string, RelationDefinition>;
 	readonly indexes: readonly string[][];
+	readonly localOnly?: boolean;
 }
 
 export interface MelonSchema<
@@ -108,6 +109,7 @@ export function createMelonSchema(def: DatabaseSchemaDefinition): MelonSchema {
 			fields: collection.fields,
 			relations: collection.relations ?? {},
 			indexes: collection.indexes ?? [],
+			localOnly: collection.localOnly,
 		};
 	}
 

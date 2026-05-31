@@ -7,6 +7,7 @@ import type {
 	PreparedQuery,
 	QueryExecutionDebug,
 	StorageAdapter,
+	SyncOutboxStore,
 } from "@melon/db";
 import { MelonError, MelonErrorCode } from "@melon/db";
 import {
@@ -20,6 +21,8 @@ import { createSqliteMigrationExecutor } from "./migration-executor.ts";
 import { generateDdl } from "./schema-ddl.ts";
 import { toSqlParams } from "./sql/bindings.ts";
 import { compileQuery } from "./sql/compile-query.ts";
+import { generateSyncOutboxDdl } from "./sync-outbox-ddl.ts";
+import { createSqliteSyncOutboxStore } from "./sync-outbox-store.ts";
 
 export interface SqliteAdapterCoreOptions {
 	debug?: boolean;
@@ -38,6 +41,7 @@ export function createSqliteAdapterFromDriver(
 	let driver: SqliteDriver | null = null;
 	let schema: MelonSchema | null = null;
 	let lastQueryDebug: QueryExecutionDebug | undefined;
+	let syncOutboxStore: SyncOutboxStore | undefined;
 
 	function emitDebug(debugInfo: QueryExecutionDebug): void {
 		lastQueryDebug = debugInfo;
@@ -120,6 +124,10 @@ export function createSqliteAdapterFromDriver(
 			partialSelect: false,
 		},
 
+		get syncOutbox() {
+			return syncOutboxStore;
+		},
+
 		async initialize(
 			s: MelonSchema,
 			options?: InitializeOptions,
@@ -141,6 +149,13 @@ export function createSqliteAdapterFromDriver(
 
 			for (const ddl of generateDdl(s)) {
 				await sqlite.exec(ddl);
+			}
+
+			if (options?.sync) {
+				for (const ddl of generateSyncOutboxDdl()) {
+					await sqlite.exec(ddl);
+				}
+				syncOutboxStore = createSqliteSyncOutboxStore(sqlite);
 			}
 
 			if (options?.migrations?.length) {
@@ -204,6 +219,7 @@ export function createSqliteAdapterFromDriver(
 			await driver?.close();
 			driver = null;
 			schema = null;
+			syncOutboxStore = undefined;
 			lastQueryDebug = undefined;
 		},
 	};

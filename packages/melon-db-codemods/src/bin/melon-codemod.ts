@@ -26,8 +26,12 @@ if (!path) {
 	);
 	console.error("");
 	console.error("Examples (from monorepo root):");
-	console.error("  bun run melon-codemod migrate-writes --path=apps/playground-rn/src --dry-run");
-	console.error("  bun run melon-codemod migrate-react --path=apps/playground-rn/app --dry-run");
+	console.error(
+		"  bun run melon-codemod migrate-writes --path=apps/playground-rn/src --dry-run",
+	);
+	console.error(
+		"  bun run melon-codemod migrate-react --path=apps/playground-rn/app --dry-run",
+	);
 	process.exit(1);
 }
 

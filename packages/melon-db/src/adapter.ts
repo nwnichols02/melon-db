@@ -1,9 +1,12 @@
 import type { PreparedQuery } from "./ast.ts";
 import type { Migration } from "./migrations/types.ts";
 import type { MelonSchema } from "./schema.ts";
+import type { SyncOutboxStore } from "./sync/types.ts";
 
 export interface InitializeOptions {
-	migrations?: Migration[];
+	migrations?: import("./migrations/types.ts").Migration[];
+	/** When true, adapters initialize sync outbox storage. */
+	sync?: boolean;
 }
 
 export type AdapterRecord = Record<string, unknown>;
@@ -59,6 +62,8 @@ export interface StorageAdapterCapabilities {
 export interface StorageAdapter {
 	readonly name: string;
 	readonly capabilities: StorageAdapterCapabilities;
+	/** Populated after initialize when sync is enabled. */
+	readonly syncOutbox?: SyncOutboxStore;
 
 	initialize(schema: MelonSchema, options?: InitializeOptions): Promise<void>;
 	prepare?(query: PreparedQuery): Promise<PreparedQuery>;

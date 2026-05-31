@@ -16,6 +16,7 @@
         "@melon/db": "workspace:*",
         "@melon/db-query": "workspace:*",
         "@melon/db-sqlite": "workspace:*",
+        "@melon/sync": "workspace:*",
       },
     },
     "apps/playground-rn": {
@@ -157,6 +158,18 @@
         "@melon/db": "workspace:*",
       },
       "devDependencies": {
+        "@types/bun": "latest",
+        "typescript": "^5",
+      },
+    },
+    "packages/melon-sync": {
+      "name": "@melon/sync",
+      "version": "0.0.0-alpha",
+      "dependencies": {
+        "@melon/db": "workspace:*",
+      },
+      "devDependencies": {
+        "@melon/db-testkit": "workspace:*",
         "@types/bun": "latest",
         "typescript": "^5",
       },
@@ -472,6 +485,8 @@
     "@melon/db-sqlite": ["@melon/db-sqlite@workspace:packages/melon-db-sqlite"],
 
     "@melon/db-testkit": ["@melon/db-testkit@workspace:packages/melon-db-testkit"],
+
+    "@melon/sync": ["@melon/sync@workspace:packages/melon-sync"],
 
     "@nodelib/fs.scandir": ["@nodelib/fs.scandir@2.1.5", "", { "dependencies": { "@nodelib/fs.stat": "2.0.5", "run-parallel": "^1.1.9" } }, "sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g=="],
 

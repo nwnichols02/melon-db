@@ -9,6 +9,7 @@
     "build": "bun run --filter './packages/*' build",
     "check": "bunx biome check packages",
     "demo": "bun run --filter playground-node demo",
+    "demo:sync": "bun run --filter playground-node sync-demo",
     "dev:rn": "bun run --filter playground-rn start",
     "ios:rn": "bun run --filter playground-rn ios",
     "bench": "bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts",

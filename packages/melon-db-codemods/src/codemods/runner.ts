@@ -31,8 +31,7 @@ export function resolveCodemodPath(targetPath: string): string {
 	const resolved = resolve(process.cwd(), targetPath);
 	if (!existsSync(resolved)) {
 		throw new Error(
-			`Path not found: ${targetPath} (resolved to ${resolved}). ` +
-				"In this monorepo, try --path=apps/playground-rn/src or --path=apps/playground-rn/app",
+			`Path not found: ${targetPath} (resolved to ${resolved}). In this monorepo, try --path=apps/playground-rn/src or --path=apps/playground-rn/app`,
 		);
 	}
 	return resolved;

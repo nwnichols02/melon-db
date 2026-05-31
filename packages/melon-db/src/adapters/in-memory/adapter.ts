@@ -15,6 +15,8 @@ import {
 import { SCHEMA_VERSION_KEY } from "../../migrations/types.ts";
 import { evaluateQuery } from "../../query/evaluate.ts";
 import type { MelonSchema } from "../../schema.ts";
+import { createMemorySyncOutboxStore } from "../../sync/outbox-store.ts";
+import type { SyncOutboxStore } from "../../sync/types.ts";
 import { type InMemoryData, createEmptyStore } from "./store.ts";
 
 let idCounter = 0;
@@ -33,6 +35,7 @@ export function createInMemoryAdapter(): StorageAdapter & {
 	let schema: MelonSchema | null = null;
 	let data: InMemoryData = new Map();
 	let metaStore = new Map<string, string>();
+	let syncOutboxStore: SyncOutboxStore | undefined;
 
 	function requireSchema(): MelonSchema {
 		if (!schema) {
@@ -104,6 +107,10 @@ export function createInMemoryAdapter(): StorageAdapter & {
 			partialSelect: false,
 		},
 
+		get syncOutbox() {
+			return syncOutboxStore;
+		},
+
 		async initialize(
 			s: MelonSchema,
 			options?: InitializeOptions,
@@ -131,13 +138,17 @@ export function createInMemoryAdapter(): StorageAdapter & {
 					hooks,
 					createInMemoryMigrationExecutor(data, s),
 				);
-				return;
+			} else {
+				const stored = await getStoredSchemaVersion(hooks);
+				if (stored === 0) {
+					await hooks.setMeta(SCHEMA_VERSION_KEY, String(s.version));
+				}
 			}
 
-			const stored = await getStoredSchemaVersion(hooks);
-			if (stored === 0) {
-				await hooks.setMeta(SCHEMA_VERSION_KEY, String(s.version));
+			if (options?.sync) {
+				syncOutboxStore = createMemorySyncOutboxStore();
 			}
+			return;
 		},
 
 		async prepare(query: PreparedQuery): Promise<PreparedQuery> {
@@ -187,6 +198,7 @@ export function createInMemoryAdapter(): StorageAdapter & {
 		async close(): Promise<void> {
 			data = new Map();
 			metaStore = new Map();
+			syncOutboxStore = undefined;
 			schema = null;
 		},
 

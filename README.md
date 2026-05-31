@@ -15,6 +15,7 @@ Next-generation offline-first local database for React Native and TypeScript (Wa
 | `@melon/db-devtools` | Devtools event bridge (query/SQL snapshots) |
 | `@melon/db-testkit` | Test helpers, fixtures, `withTestDatabase` |
 | `@melon/db-codemods` | WatermelonDB migration codemods and query translator |
+| `@melon/sync` | Watermelon-compatible pull/push sync orchestrator |
 
 ## Quick start
 
@@ -94,6 +95,27 @@ bun run melon-codemod migrate-react --path=./src
 
 The runtime query translator converts serializable Watermelon `Q` clauses to Melon `QueryAst` without a WatermelonDB dependency. Join queries (`Q.on`) and model decorator → schema codemods are manual / deferred — see the package README checklist.
 
+### Sync
+
+```bash
+bun run demo:sync
+```
+
+See [`packages/melon-sync/README.md`](packages/melon-sync/README.md) and [`apps/playground-node/src/sync-demo.ts`](apps/playground-node/src/sync-demo.ts).
+
+```ts
+import { synchronize, createMemoryCheckpointStore } from '@melon/sync';
+
+const db = createDatabase({ schema, adapter, sync: {} });
+
+await synchronize({
+  db,
+  pullChanges: async (args) => /* backend pull */,
+  pushChanges: async (args) => /* backend push */,
+  checkpointStore: createMemoryCheckpointStore(),
+});
+```
+
 ## v1 limitations
 
 - All mutations must run inside `db.write()`.
@@ -103,15 +125,15 @@ The runtime query translator converts serializable Watermelon `Q` clauses to Mel
 
 ## Completed vs roadmap
 
-| Done | Deferred (Phase 12+) |
+| Done | Deferred (Phase 13+) |
 |------|----------|
 | Core engine M0–M2 | Custom JSI/TurboModule SQLite |
-| SQLite SQL compiler + Bun adapter | `@melon/sync` |
+| SQLite SQL compiler + Bun adapter | `@melon/sync-server` (reference backend) |
 | Expo SQLite adapter (`@melon/db-sqlite/expo`) | Docs site |
 | Optional Node driver (`@melon/db-sqlite/node`) | EAS Build CI |
 | `apps/playground-rn` | WatermelonDB benchmark comparison |
 | Query / Mango / Prisma surfaces | Model/schema codemods, `Q.on` joins |
-| React hooks (`useFindMany`, `useMangoQuery`) | Devtools UI panel |
+| React hooks (`useFindMany`, `useMangoQuery`) | Devtools UI panel, `useSync` hooks |
 | Schema migrations | |
 | Prisma schema import + codegen CLI | |
 | belongsTo relation includes | |
@@ -120,6 +142,7 @@ The runtime query translator converts serializable Watermelon `Q` clauses to Mel
 | Benchmark harness (10k/50k/100k) + CI smoke | |
 | Adapter stress tests (rollback, write queue) | |
 | `@melon/db-codemods` (query translator + CLI) | |
+| `@melon/sync` (outbox + orchestrator + mock tests) | |
 | CI (test, typecheck, biome, bench-smoke) | |
 
 ## Development

@@ -19,6 +19,8 @@ export interface CollectionDeps {
 	emitter: ChangeEmitter;
 	devtools?: DevtoolsBridge;
 	isInsideWrite: () => boolean;
+	skipSyncOutbox?: () => boolean;
+	onSyncWrite?: (operation: AdapterWriteOperation) => Promise<void>;
 	ensureReady: () => Promise<void>;
 }
 
@@ -35,6 +37,8 @@ export function createCollection<RecordShape = Record<string, unknown>>(
 		emitter,
 		devtools,
 		isInsideWrite,
+		skipSyncOutbox,
+		onSyncWrite,
 		ensureReady,
 	} = deps;
 	const name = metadata.name;
@@ -50,6 +54,13 @@ export function createCollection<RecordShape = Record<string, unknown>>(
 
 	function defaultAst(mode: QueryAst["mode"] = "many"): QueryAst {
 		return { collection: name, mode };
+	}
+
+	async function notifySyncWrite(op: AdapterWriteOperation): Promise<void> {
+		if (skipSyncOutbox?.()) {
+			return;
+		}
+		await onSyncWrite?.(op);
 	}
 
 	function toHandle(query?: QueryAst) {
@@ -121,6 +132,11 @@ export function createCollection<RecordShape = Record<string, unknown>>(
 					| string
 					| number;
 				emitInsertChange(emitter, name, resolvedId);
+				await notifySyncWrite({
+					type: "insert",
+					collection: name,
+					values: record as Record<string, unknown>,
+				});
 				return record;
 			}
 			emitInsertChange(
@@ -128,6 +144,11 @@ export function createCollection<RecordShape = Record<string, unknown>>(
 				name,
 				(inserted as Record<string, unknown>)[pk] as string | number,
 			);
+			await notifySyncWrite({
+				type: "insert",
+				collection: name,
+				values: inserted as Record<string, unknown>,
+			});
 			return inserted;
 		},
 
@@ -145,6 +166,7 @@ export function createCollection<RecordShape = Record<string, unknown>>(
 			devtools?.emitWrite(op);
 			await adapter.write(op);
 			emitWriteChanges(emitter, schema, op);
+			await notifySyncWrite(op);
 			const record = await this.findById(id);
 			if (!record) {
 				throw new MelonError(`Record "${id}" not found after update`, {
@@ -165,6 +187,7 @@ export function createCollection<RecordShape = Record<string, unknown>>(
 			devtools?.emitWrite(op);
 			await adapter.write(op);
 			emitWriteChanges(emitter, schema, op);
+			await notifySyncWrite(op);
 		},
 	};
 }

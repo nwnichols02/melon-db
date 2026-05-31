@@ -48,7 +48,22 @@ export { prepareQuery } from "./query/prepare.ts";
 export { evaluateQuery } from "./query/evaluate.ts";
 export { loadIncludes } from "./query/load-includes.ts";
 
-export type { DevtoolsBridge, QueryDebugSnapshot } from "./devtools.ts";
+import type { DevtoolsBridge, QueryDebugSnapshot } from "./devtools.ts";
+
+export type { DevtoolsBridge, QueryDebugSnapshot };
+
+export type {
+	ApplyRemoteChangesOptions,
+	GetLocalChangesOptions,
+	SyncChanges,
+	SyncConfig,
+	SyncOutboxEntry,
+	SyncOutboxOperation,
+	SyncOutboxStore,
+	SyncRecord,
+} from "./sync/types.ts";
+export { createMemorySyncOutboxStore } from "./sync/outbox-store.ts";
+export { validateSyncChanges } from "./sync/get-local-changes.ts";
 
 export type {
 	InsertInput,

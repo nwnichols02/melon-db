@@ -41,7 +41,7 @@ WatermelonDB → Melon migration helpers: compatibility matrix, query translator
 - `Q.on` / join queries → belongsTo includes or app-level filtering
 - `withObservables` HOCs → `@melon/db-react` hooks (`useQuery`, `useFindMany`)
 - Complex `@writer` / `prepareCreate` batch flows → explicit `tx.batch([...])`
-- Sync setup → deferred to `@melon/sync` (Phase 12+)
+- Sync setup → see [`@melon/sync`](../melon-sync/README.md) (`synchronize()` + `createDatabase({ sync: {} })`)
 
 ## Runtime query translator
 

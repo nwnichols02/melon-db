@@ -6,6 +6,12 @@ import type {
 import type { PreparedQuery, QueryAst } from "../ast.ts";
 import type { DevtoolsBridge } from "../devtools.ts";
 import type { MelonSchema } from "../schema.ts";
+import type {
+	ApplyRemoteChangesOptions,
+	GetLocalChangesOptions,
+	SyncChanges,
+	SyncConfig,
+} from "../sync/types.ts";
 
 export type InsertInput<T> = Partial<T>;
 export type UpdateInput<T> = Partial<T>;
@@ -59,6 +65,12 @@ export interface MelonDatabase<Schema extends MelonSchema = MelonSchema> {
 		names: string[],
 		onChange: (changes: AdapterChangeSet) => void,
 	): () => void;
+	getLocalChanges(options?: GetLocalChangesOptions): Promise<SyncChanges>;
+	applyRemoteChanges(
+		changes: SyncChanges,
+		options?: ApplyRemoteChangesOptions,
+	): Promise<void>;
+	markLocalChangesPushed(collections?: string[]): Promise<void>;
 	unsafeReset(): Promise<void>;
 }
 
@@ -69,4 +81,5 @@ export interface CreateDatabaseOptions<
 	adapter: StorageAdapter;
 	devtools?: DevtoolsBridge;
 	migrations?: import("../migrations/types.ts").Migration[];
+	sync?: SyncConfig;
 }

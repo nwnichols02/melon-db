@@ -2,6 +2,17 @@ import type { AdapterChangeSet, AdapterWriteOperation } from "../adapter.ts";
 import { emitWriteChanges } from "../change/emit-write-change.ts";
 import { ChangeEmitter } from "../change/emitter.ts";
 import { MelonError, MelonErrorCode } from "../errors.ts";
+import { applyRemoteChangesInWrite } from "../sync/apply-remote-changes.ts";
+import { getLocalChangesFromOutbox } from "../sync/get-local-changes.ts";
+import { recordSyncOutboxWrite } from "../sync/ledger.ts";
+import { createMemorySyncOutboxStore } from "../sync/outbox-store.ts";
+import type {
+	ApplyRemoteChangesOptions,
+	GetLocalChangesOptions,
+	SyncChanges,
+	SyncConfig,
+	SyncOutboxStore,
+} from "../sync/types.ts";
 import { createCollection } from "./collection.ts";
 import type {
 	CollectionRecord,
@@ -13,27 +24,70 @@ import type {
 } from "./types.ts";
 import { WriteQueue } from "./write-queue.ts";
 
+function assertSyncEnabled(
+	syncEnabled: boolean,
+	syncOutbox: SyncOutboxStore | null,
+): SyncOutboxStore {
+	if (!syncEnabled || !syncOutbox) {
+		throw new MelonError("Sync is not enabled for this database", {
+			code: MelonErrorCode.SYNC_NOT_ENABLED,
+			remediation: "Pass sync: {} to createDatabase() to enable sync APIs.",
+		});
+	}
+	return syncOutbox;
+}
+
 /**
  * Creates a MelonDatabase instance wired to a storage adapter.
  */
 export function createDatabase<
 	Schema extends import("../schema.ts").MelonSchema,
 >(options: CreateDatabaseOptions<Schema>): MelonDatabase<Schema> {
-	const { schema, adapter, devtools, migrations } = options;
+	const { schema, adapter, devtools, migrations, sync: syncConfig } = options;
+	const syncEnabled = syncConfig !== undefined;
+	const resolvedSyncConfig: SyncConfig = {
+		respectLocalOnly: syncConfig?.respectLocalOnly ?? true,
+	};
 	const emitter = new ChangeEmitter();
 	const writeQueue = new WriteQueue();
 	let insideWrite = false;
+	let applyingRemote = false;
 	let initialized = false;
+	let syncOutbox: SyncOutboxStore | null = null;
 
 	async function ensureInitialized(): Promise<void> {
 		if (!initialized) {
-			await adapter.initialize(schema, { migrations });
+			await adapter.initialize(schema, {
+				migrations,
+				sync: syncEnabled,
+			});
+			if (syncEnabled) {
+				syncOutbox = adapter.syncOutbox ?? createMemorySyncOutboxStore();
+			}
 			initialized = true;
 		}
 	}
 
+	async function handleSyncWrite(
+		operation: AdapterWriteOperation,
+	): Promise<void> {
+		if (!syncEnabled || !syncOutbox || applyingRemote) {
+			return;
+		}
+		await recordSyncOutboxWrite(
+			syncOutbox,
+			schema,
+			resolvedSyncConfig,
+			operation,
+		);
+	}
+
 	function isInsideWrite(): boolean {
 		return insideWrite;
+	}
+
+	function skipSyncOutbox(): boolean {
+		return applyingRemote;
 	}
 
 	function collection<Name extends keyof Schema["collections"] & string>(
@@ -47,6 +101,8 @@ export function createDatabase<
 			emitter,
 			devtools,
 			isInsideWrite,
+			skipSyncOutbox,
+			onSyncWrite: handleSyncWrite,
 			ensureReady: ensureInitialized,
 		});
 	}
@@ -63,6 +119,7 @@ export function createDatabase<
 			const batchOp = { type: "batch" as const, operations };
 			await adapter.write(batchOp);
 			emitWriteChanges(emitter, schema, batchOp);
+			await handleSyncWrite(batchOp);
 		},
 	};
 
@@ -108,9 +165,56 @@ export function createDatabase<
 			});
 		},
 
+		async getLocalChanges(
+			options?: GetLocalChangesOptions,
+		): Promise<SyncChanges> {
+			await ensureInitialized();
+			const outbox = assertSyncEnabled(syncEnabled, syncOutbox);
+			return getLocalChangesFromOutbox(
+				outbox,
+				schema,
+				resolvedSyncConfig,
+				(name) => collection(name),
+				options,
+			);
+		},
+
+		async applyRemoteChanges(
+			changes: SyncChanges,
+			applyOptions?: ApplyRemoteChangesOptions,
+		): Promise<void> {
+			await ensureInitialized();
+			const outbox = assertSyncEnabled(syncEnabled, syncOutbox);
+			await writeQueue.run(async () => {
+				insideWrite = true;
+				applyingRemote = true;
+				try {
+					await adapter.transaction(async () => {
+						await applyRemoteChangesInWrite(
+							writeContext,
+							schema,
+							outbox,
+							changes,
+							applyOptions,
+						);
+					});
+				} finally {
+					applyingRemote = false;
+					insideWrite = false;
+				}
+			});
+		},
+
+		async markLocalChangesPushed(collections?: string[]): Promise<void> {
+			await ensureInitialized();
+			const outbox = assertSyncEnabled(syncEnabled, syncOutbox);
+			await outbox.clear(collections);
+		},
+
 		async unsafeReset(): Promise<void> {
 			await adapter.close();
 			initialized = false;
+			syncOutbox = null;
 			await ensureInitialized();
 		},
 	};
