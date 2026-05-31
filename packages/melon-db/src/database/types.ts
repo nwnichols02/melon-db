@@ -6,6 +6,7 @@ import type {
 import type { PreparedQuery, QueryAst } from "../ast.ts";
 import type { DevtoolsBridge } from "../devtools.ts";
 import type { MelonSchema } from "../schema.ts";
+import type { CheckpointStore } from "../sync/checkpoint.ts";
 import type {
 	ApplyRemoteChangesOptions,
 	GetLocalChangesOptions,
@@ -71,6 +72,7 @@ export interface MelonDatabase<Schema extends MelonSchema = MelonSchema> {
 		options?: ApplyRemoteChangesOptions,
 	): Promise<void>;
 	markLocalChangesPushed(collections?: string[]): Promise<void>;
+	createCheckpointStore(): CheckpointStore;
 	unsafeReset(): Promise<void>;
 }
 

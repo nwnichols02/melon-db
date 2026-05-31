@@ -1,5 +1,5 @@
 {
-	"name": "@melon/db-react",
+	"name": "@melon/sync-server",
 	"version": "0.0.0-alpha",
 	"type": "module",
 	"exports": {
@@ -11,18 +11,10 @@
 	},
 	"dependencies": {
 		"@melon/db": "workspace:*",
-		"@melon/db-prisma": "workspace:*",
-		"@melon/db-query-mango": "workspace:*",
 		"@melon/sync": "workspace:*"
 	},
-	"peerDependencies": {
-		"react": "^18.0.0 || ^19.0.0"
-	},
 	"devDependencies": {
-		"@melon/sync-server": "workspace:*",
 		"@types/bun": "latest",
-		"@types/react": "~19.1.10",
-		"react": "19.1.0",
 		"typescript": "^5"
 	}
 }

@@ -6,10 +6,12 @@
 		"@melon/db": "workspace:*",
 		"@melon/db-sqlite": "workspace:*",
 		"@melon/db-query": "workspace:*",
-		"@melon/sync": "workspace:*"
+		"@melon/sync": "workspace:*",
+		"@melon/sync-server": "workspace:*"
 	},
 	"scripts": {
 		"demo": "bun run src/demo.ts",
-		"sync-demo": "bun run src/sync-demo.ts"
+		"sync-demo": "bun run src/sync-demo.ts",
+		"sync-http-demo": "bun run src/sync-http-demo.ts"
 	}
 }

@@ -10,6 +10,8 @@
     "check": "bunx biome check packages",
     "demo": "bun run --filter playground-node demo",
     "demo:sync": "bun run --filter playground-node sync-demo",
+    "demo:sync:http": "bun run --filter playground-node sync-http-demo",
+    "sync-server": "bun run packages/melon-sync-server/src/bin/sync-server.ts",
     "dev:rn": "bun run --filter playground-rn start",
     "ios:rn": "bun run --filter playground-rn ios",
     "bench": "bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts",

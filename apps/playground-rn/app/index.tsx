@@ -1,8 +1,9 @@
 import { createQueryFactory } from "@melon/db-query";
-import { useQuery, useWriter } from "@melon/db-react";
+import { useQuery, useSync, useWriter } from "@melon/db-react";
+import { SyncStatusKind } from "@melon/sync";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AddTaskForm } from "@/components/add-task-form";
 import { TaskRow } from "@/components/task-row";
@@ -13,6 +14,7 @@ import { type Task, taskSchema } from "@/db/schema";
  */
 export default function TasksScreen(): React.ReactElement {
 	const write = useWriter();
+	const { sync, status, isSyncing, error } = useSync();
 	const [nextId, setNextId] = useState(100);
 
 	const openTasksQuery = useMemo(
@@ -56,8 +58,45 @@ export default function TasksScreen(): React.ReactElement {
 		[write],
 	);
 
+	const handleSync = useCallback(async () => {
+		try {
+			await sync();
+		} catch {
+			// Error surfaced via useSync().error
+		}
+	}, [sync]);
+
+	const statusLabel = useMemo(() => {
+		if (error) {
+			return `Failed: ${error.message}`;
+		}
+		switch (status.status) {
+			case SyncStatusKind.Pulling:
+			case SyncStatusKind.Pushing:
+				return "Syncing…";
+			case SyncStatusKind.Complete:
+				return "Synced";
+			case SyncStatusKind.Failed:
+				return "Failed";
+			default:
+				return "Idle";
+		}
+	}, [status.status, error]);
+
 	return (
 		<SafeAreaView style={styles.container} edges={["bottom"]}>
+			<View style={styles.syncBar}>
+				<Text style={styles.syncStatus}>{statusLabel}</Text>
+				<Pressable
+					disabled={isSyncing}
+					onPress={handleSync}
+					style={[styles.syncButton, isSyncing && styles.syncButtonDisabled]}
+				>
+					<Text style={styles.syncButtonText}>
+						{isSyncing ? "Syncing…" : "Sync now"}
+					</Text>
+				</Pressable>
+			</View>
 			<AddTaskForm onAdd={handleAdd} />
 			{tasks.length === 0 ? (
 				<View style={styles.empty}>
@@ -81,6 +120,35 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: "#fff",
+	},
+	syncBar: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		paddingHorizontal: 16,
+		paddingVertical: 10,
+		borderBottomWidth: StyleSheet.hairlineWidth,
+		borderBottomColor: "#ddd",
+	},
+	syncStatus: {
+		flex: 1,
+		fontSize: 13,
+		color: "#666",
+		marginRight: 12,
+	},
+	syncButton: {
+		backgroundColor: "#111",
+		paddingHorizontal: 14,
+		paddingVertical: 8,
+		borderRadius: 8,
+	},
+	syncButtonDisabled: {
+		opacity: 0.5,
+	},
+	syncButtonText: {
+		color: "#fff",
+		fontSize: 14,
+		fontWeight: "600",
 	},
 	empty: {
 		flex: 1,

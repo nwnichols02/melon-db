@@ -16,6 +16,7 @@ Next-generation offline-first local database for React Native and TypeScript (Wa
 | `@melon/db-testkit` | Test helpers, fixtures, `withTestDatabase` |
 | `@melon/db-codemods` | WatermelonDB migration codemods and query translator |
 | `@melon/sync` | Watermelon-compatible pull/push sync orchestrator |
+| `@melon/sync-server` | HTTP reference sync backend for dev and integration tests |
 
 ## Quick start
 
@@ -99,9 +100,11 @@ The runtime query translator converts serializable Watermelon `Q` clauses to Mel
 
 ```bash
 bun run demo:sync
+bun run demo:sync:http
+bun run sync-server
 ```
 
-See [`packages/melon-sync/README.md`](packages/melon-sync/README.md) and [`apps/playground-node/src/sync-demo.ts`](apps/playground-node/src/sync-demo.ts).
+See [`packages/melon-sync/README.md`](packages/melon-sync/README.md), [`packages/melon-sync-server/README.md`](packages/melon-sync-server/README.md), and [`apps/playground-node/src/sync-demo.ts`](apps/playground-node/src/sync-demo.ts).
 
 ```ts
 import { synchronize, createMemoryCheckpointStore } from '@melon/sync';
@@ -125,24 +128,26 @@ await synchronize({
 
 ## Completed vs roadmap
 
-| Done | Deferred (Phase 13+) |
+| Done | Deferred (Phase 14+) |
 |------|----------|
 | Core engine M0–M2 | Custom JSI/TurboModule SQLite |
-| SQLite SQL compiler + Bun adapter | `@melon/sync-server` (reference backend) |
+| SQLite SQL compiler + Bun adapter | Postgres reference backend |
 | Expo SQLite adapter (`@melon/db-sqlite/expo`) | Docs site |
 | Optional Node driver (`@melon/db-sqlite/node`) | EAS Build CI |
-| `apps/playground-rn` | WatermelonDB benchmark comparison |
+| `apps/playground-rn` + sync demo | WatermelonDB benchmark comparison |
 | Query / Mango / Prisma surfaces | Model/schema codemods, `Q.on` joins |
-| React hooks (`useFindMany`, `useMangoQuery`) | Devtools UI panel, `useSync` hooks |
-| Schema migrations | |
-| Prisma schema import + codegen CLI | |
+| React hooks (`useFindMany`, `useMangoQuery`, `useSync`) | Devtools UI panel |
+| Schema migrations | Migration-aware sync, retry queue |
+| Prisma schema import + codegen CLI | Full conflict policy matrix |
 | belongsTo relation includes | |
 | Devtools bridge + SQL snapshots | |
 | SQL predicate test coverage + debug flag | |
 | Benchmark harness (10k/50k/100k) + CI smoke | |
 | Adapter stress tests (rollback, write queue) | |
 | `@melon/db-codemods` (query translator + CLI) | |
-| `@melon/sync` (outbox + orchestrator + mock tests) | |
+| `@melon/sync` (outbox + orchestrator) | |
+| Persistent SQLite checkpoints | |
+| `@melon/sync-server` (HTTP reference backend) | |
 | CI (test, typecheck, biome, bench-smoke) | |
 
 ## Development

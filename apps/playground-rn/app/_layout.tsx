@@ -1,9 +1,10 @@
 import { getDatabase } from "@/db/bootstrap";
 import type { taskSchema } from "@/db/schema";
+import { createHttpSyncBackend } from "@/sync/client";
 import type { MelonDatabase } from "@melon/db";
-import { MelonDbProvider } from "@melon/db-react";
+import { MelonDbProvider, MelonSyncProvider } from "@melon/db-react";
 import { Stack } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -12,6 +13,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
  */
 export default function RootLayout(): React.ReactElement {
 	const [db, setDb] = useState<MelonDatabase<typeof taskSchema> | null>(null);
+	const syncBackend = useMemo(() => createHttpSyncBackend(), []);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -38,9 +40,14 @@ export default function RootLayout(): React.ReactElement {
 	return (
 		<SafeAreaProvider>
 			<MelonDbProvider db={db}>
-				<Stack>
-					<Stack.Screen name="index" options={{ title: "Open Tasks" }} />
-				</Stack>
+				<MelonSyncProvider
+					pullChanges={syncBackend.pullChanges}
+					pushChanges={syncBackend.pushChanges}
+				>
+					<Stack>
+						<Stack.Screen name="index" options={{ title: "Open Tasks" }} />
+					</Stack>
+				</MelonSyncProvider>
 			</MelonDbProvider>
 		</SafeAreaProvider>
 	);

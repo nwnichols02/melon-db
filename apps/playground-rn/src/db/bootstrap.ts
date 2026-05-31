@@ -25,6 +25,7 @@ async function bootstrap(): Promise<MelonDatabase<typeof taskSchema>> {
 	const db = createDatabase({
 		schema: taskSchema,
 		adapter: createExpoSqliteAdapter({ database: expoDb }),
+		sync: {},
 	});
 
 	const existing = await db.collection("tasks").count();

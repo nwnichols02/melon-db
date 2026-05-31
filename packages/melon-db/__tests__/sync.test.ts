@@ -232,4 +232,28 @@ describe("sync (sqlite)", () => {
 		const pulled = await db.collection("tasks").findById("2");
 		expect(pulled?.title).toBe("Pulled");
 	});
+
+	test("checkpoint persists across adapter re-open with same file", async () => {
+		const path = `/tmp/melon-sync-checkpoint-${Bun.randomUUIDv7()}.db`;
+		const adapter1 = createSqliteAdapter({ filename: path });
+		const db1 = createSyncDb(adapter1);
+		await db1.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Checkpoint",
+				status: "open",
+			});
+		});
+
+		const checkpoint = db1.createCheckpointStore();
+		await checkpoint.setLastPulledAt(999);
+		await adapter1.close();
+
+		const adapter2 = createSqliteAdapter({ filename: path });
+		const db2 = createSyncDb(adapter2);
+		await db2.collection("tasks").count();
+		const restored = db2.createCheckpointStore();
+		expect(await restored.getLastPulledAt()).toBe(999);
+		await adapter2.close();
+	});
 });

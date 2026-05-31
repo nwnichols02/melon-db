@@ -40,6 +40,7 @@ export type {
 	StorageAdapter,
 	QueryExecutionDebug,
 	InitializeOptions,
+	MetaStore,
 } from "./adapter.ts";
 
 export { validateQuery } from "./query/validator.ts";
@@ -62,6 +63,12 @@ export type {
 	SyncOutboxStore,
 	SyncRecord,
 } from "./sync/types.ts";
+export {
+	SYNC_LAST_PULLED_AT_KEY,
+	createMemoryCheckpointStore,
+	createMetaCheckpointStore,
+	type CheckpointStore,
+} from "./sync/checkpoint.ts";
 export { createMemorySyncOutboxStore } from "./sync/outbox-store.ts";
 export { validateSyncChanges } from "./sync/get-local-changes.ts";
 

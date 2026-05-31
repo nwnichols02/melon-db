@@ -4,6 +4,7 @@ import type {
 	AdapterWriteOperation,
 	InitializeOptions,
 	MelonSchema,
+	MetaStore,
 	PreparedQuery,
 	QueryExecutionDebug,
 	StorageAdapter,
@@ -42,6 +43,7 @@ export function createSqliteAdapterFromDriver(
 	let schema: MelonSchema | null = null;
 	let lastQueryDebug: QueryExecutionDebug | undefined;
 	let syncOutboxStore: SyncOutboxStore | undefined;
+	let metaStore: MetaStore | undefined;
 
 	function emitDebug(debugInfo: QueryExecutionDebug): void {
 		lastQueryDebug = debugInfo;
@@ -128,6 +130,10 @@ export function createSqliteAdapterFromDriver(
 			return syncOutboxStore;
 		},
 
+		get meta() {
+			return metaStore;
+		},
+
 		async initialize(
 			s: MelonSchema,
 			options?: InitializeOptions,
@@ -146,6 +152,7 @@ export function createSqliteAdapterFromDriver(
 				(sql, params) => sqlite.queryFirst(sql, toSqlParams(params ?? [])),
 				(sql, params) => sqlite.run(sql, toSqlParams(params ?? [])),
 			);
+			metaStore = hooks;
 
 			for (const ddl of generateDdl(s)) {
 				await sqlite.exec(ddl);
@@ -220,6 +227,7 @@ export function createSqliteAdapterFromDriver(
 			driver = null;
 			schema = null;
 			syncOutboxStore = undefined;
+			metaStore = undefined;
 			lastQueryDebug = undefined;
 		},
 	};

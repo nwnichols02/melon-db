@@ -3,6 +3,11 @@ import { emitWriteChanges } from "../change/emit-write-change.ts";
 import { ChangeEmitter } from "../change/emitter.ts";
 import { MelonError, MelonErrorCode } from "../errors.ts";
 import { applyRemoteChangesInWrite } from "../sync/apply-remote-changes.ts";
+import {
+	type CheckpointStore,
+	createMemoryCheckpointStore,
+	createMetaCheckpointStore,
+} from "../sync/checkpoint.ts";
 import { getLocalChangesFromOutbox } from "../sync/get-local-changes.ts";
 import { recordSyncOutboxWrite } from "../sync/ledger.ts";
 import { createMemorySyncOutboxStore } from "../sync/outbox-store.ts";
@@ -54,6 +59,14 @@ export function createDatabase<
 	let applyingRemote = false;
 	let initialized = false;
 	let syncOutbox: SyncOutboxStore | null = null;
+	let checkpointStoreCache: CheckpointStore | null = null;
+
+	function buildCheckpointStore(): CheckpointStore {
+		if (adapter.meta) {
+			return createMetaCheckpointStore(adapter.meta);
+		}
+		return createMemoryCheckpointStore();
+	}
 
 	async function ensureInitialized(): Promise<void> {
 		if (!initialized) {
@@ -63,6 +76,7 @@ export function createDatabase<
 			});
 			if (syncEnabled) {
 				syncOutbox = adapter.syncOutbox ?? createMemorySyncOutboxStore();
+				checkpointStoreCache = buildCheckpointStore();
 			}
 			initialized = true;
 		}
@@ -211,10 +225,24 @@ export function createDatabase<
 			await outbox.clear(collections);
 		},
 
+		createCheckpointStore(): CheckpointStore {
+			if (!syncEnabled) {
+				throw new MelonError("Sync is not enabled for this database", {
+					code: MelonErrorCode.SYNC_NOT_ENABLED,
+					remediation: "Pass sync: {} to createDatabase() to enable sync APIs.",
+				});
+			}
+			if (checkpointStoreCache) {
+				return checkpointStoreCache;
+			}
+			return buildCheckpointStore();
+		},
+
 		async unsafeReset(): Promise<void> {
 			await adapter.close();
 			initialized = false;
 			syncOutbox = null;
+			checkpointStoreCache = null;
 			await ensureInitialized();
 		},
 	};

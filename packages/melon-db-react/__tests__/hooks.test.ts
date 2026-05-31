@@ -7,6 +7,12 @@ import {
 } from "@melon/db";
 import { compilePrismaQuery } from "@melon/db-prisma";
 import { createMangoCompiler } from "@melon/db-query-mango";
+import {
+	SyncStatusKind,
+	createMemoryCheckpointStore,
+	synchronize,
+} from "@melon/sync";
+import { InMemorySyncStore } from "@melon/sync-server";
 
 const mangoCompiler = createMangoCompiler();
 
@@ -102,5 +108,98 @@ describe("db-react exports", () => {
 		await new Promise((r) => setTimeout(r, 15));
 		expect(updates.length).toBeGreaterThanOrEqual(2);
 		expect(updates.at(-1)).toBe(1);
+	});
+
+	test("useSync contract: pull/push cycle updates status", async () => {
+		const schema = createMelonSchema({
+			version: 1,
+			collections: {
+				tasks: {
+					name: "tasks",
+					primaryKey: "id",
+					fields: {
+						id: { kind: "string" },
+						title: { kind: "string" },
+						status: { kind: "string" },
+					},
+				},
+			},
+		});
+		const server = new InMemorySyncStore();
+		const db = createDatabase({
+			schema,
+			adapter: createInMemoryAdapter(),
+			sync: {},
+		});
+		const statuses: string[] = [];
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Hook sync",
+				status: "open",
+			});
+		});
+
+		await synchronize({
+			db,
+			pullChanges: (args) => server.pullChanges(args),
+			pushChanges: (args) => server.pushChanges(args),
+			checkpointStore: createMemoryCheckpointStore(),
+			onStatusChange: (status) => statuses.push(status.status),
+		});
+
+		expect(statuses).toContain(SyncStatusKind.Pulling);
+		expect(statuses).toContain(SyncStatusKind.Pushing);
+		expect(statuses).toContain(SyncStatusKind.Complete);
+		expect(server.getRecord("1")?.title).toBe("Hook sync");
+	});
+
+	test("useSync contract: push failure preserves checkpoint", async () => {
+		const schema = createMelonSchema({
+			version: 1,
+			collections: {
+				tasks: {
+					name: "tasks",
+					primaryKey: "id",
+					fields: {
+						id: { kind: "string" },
+						title: { kind: "string" },
+						status: { kind: "string" },
+					},
+				},
+			},
+		});
+		const server = new InMemorySyncStore();
+		const checkpoint = createMemoryCheckpointStore();
+		const db = createDatabase({
+			schema,
+			adapter: createInMemoryAdapter(),
+			sync: {},
+		});
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Fail push",
+				status: "open",
+			});
+		});
+
+		try {
+			await synchronize({
+				db,
+				pullChanges: (args) => server.pullChanges(args),
+				pushChanges: async () => {
+					throw new Error("network down");
+				},
+				checkpointStore: checkpoint,
+			});
+			expect.unreachable();
+		} catch {
+			// expected
+		}
+
+		expect(await checkpoint.getLastPulledAt()).toBeNull();
 	});
 });

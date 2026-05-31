@@ -12,6 +12,7 @@
 		"@melon/db-query": "workspace:*",
 		"@melon/db-react": "workspace:*",
 		"@melon/db-sqlite": "workspace:*",
+		"@melon/sync": "workspace:*",
 		"@shopify/flash-list": "2.0.2",
 		"babel-preset-expo": "~54.0.10",
 		"expo": "~54.0.5",

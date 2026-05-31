@@ -17,6 +17,7 @@
         "@melon/db-query": "workspace:*",
         "@melon/db-sqlite": "workspace:*",
         "@melon/sync": "workspace:*",
+        "@melon/sync-server": "workspace:*",
       },
     },
     "apps/playground-rn": {
@@ -26,6 +27,7 @@
         "@melon/db-query": "workspace:*",
         "@melon/db-react": "workspace:*",
         "@melon/db-sqlite": "workspace:*",
+        "@melon/sync": "workspace:*",
         "@shopify/flash-list": "2.0.2",
         "babel-preset-expo": "~54.0.10",
         "expo": "~54.0.5",
@@ -120,8 +122,10 @@
         "@melon/db": "workspace:*",
         "@melon/db-prisma": "workspace:*",
         "@melon/db-query-mango": "workspace:*",
+        "@melon/sync": "workspace:*",
       },
       "devDependencies": {
+        "@melon/sync-server": "workspace:*",
         "@types/bun": "latest",
         "@types/react": "~19.1.10",
         "react": "19.1.0",
@@ -170,6 +174,19 @@
       },
       "devDependencies": {
         "@melon/db-testkit": "workspace:*",
+        "@melon/sync-server": "workspace:*",
+        "@types/bun": "latest",
+        "typescript": "^5",
+      },
+    },
+    "packages/melon-sync-server": {
+      "name": "@melon/sync-server",
+      "version": "0.0.0-alpha",
+      "dependencies": {
+        "@melon/db": "workspace:*",
+        "@melon/sync": "workspace:*",
+      },
+      "devDependencies": {
         "@types/bun": "latest",
         "typescript": "^5",
       },
@@ -487,6 +504,8 @@
     "@melon/db-testkit": ["@melon/db-testkit@workspace:packages/melon-db-testkit"],
 
     "@melon/sync": ["@melon/sync@workspace:packages/melon-sync"],
+
+    "@melon/sync-server": ["@melon/sync-server@workspace:packages/melon-sync-server"],
 
     "@nodelib/fs.scandir": ["@nodelib/fs.scandir@2.1.5", "", { "dependencies": { "@nodelib/fs.stat": "2.0.5", "run-parallel": "^1.1.9" } }, "sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g=="],
 

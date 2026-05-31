@@ -1,7 +1,10 @@
 import type { PreparedQuery } from "./ast.ts";
 import type { Migration } from "./migrations/types.ts";
 import type { MelonSchema } from "./schema.ts";
+import type { MetaStore } from "./sync/checkpoint.ts";
 import type { SyncOutboxStore } from "./sync/types.ts";
+
+export type { MetaStore };
 
 export interface InitializeOptions {
 	migrations?: import("./migrations/types.ts").Migration[];
@@ -64,6 +67,8 @@ export interface StorageAdapter {
 	readonly capabilities: StorageAdapterCapabilities;
 	/** Populated after initialize when sync is enabled. */
 	readonly syncOutbox?: SyncOutboxStore;
+	/** Populated after initialize when adapter supports meta storage. */
+	readonly meta?: MetaStore;
 
 	initialize(schema: MelonSchema, options?: InitializeOptions): Promise<void>;
 	prepare?(query: PreparedQuery): Promise<PreparedQuery>;

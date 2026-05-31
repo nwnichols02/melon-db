@@ -20,13 +20,20 @@ Dependencies are aligned to **Expo SDK 54** via `bunx expo install --fix`. Core 
 
 ## Run
 
+Sync requires the reference server in a second terminal:
+
 ```bash
-# From repo root — starts Metro, then press i / a in the terminal
+# Terminal 1 — reference sync backend
+bun run sync-server
+
+# Terminal 2 — Expo app
 bun run dev:rn
 
 # Or open iOS Simulator directly
 bun run ios:rn
 ```
+
+Without the sync server, local CRUD still works; **Sync now** will show a failed status until the server is running.
 
 Scripts set `EXPO_OFFLINE=1` so Expo skips downloading a different Expo Go build when your simulator already has a compatible 54.x client. Metro and the app still run normally.
 
@@ -35,7 +42,8 @@ If you run `expo start --ios` manually and see **Install the recommended Expo Go
 ## What it demonstrates
 
 - `createExpoSqliteAdapter` from `@melon/db-sqlite/expo`
-- `MelonDbProvider`, `useQuery`, and `useWriter` from `@melon/db-react`
+- `MelonDbProvider`, `MelonSyncProvider`, `useQuery`, `useWriter`, and `useSync` from `@melon/db-react`
+- Manual sync against `@melon/sync-server` (`bun run sync-server`)
 - Fluent queries via `@melon/db-query`
 - Reactive task list (`FlashList`) that updates after add/complete actions
 
@@ -45,6 +53,15 @@ If you run `expo start --ios` manually and see **Install the recommended Expo Go
 2. Add a task via the form — it appears in the list without refresh.
 3. Tap **Done** on a task — it disappears from the open list.
 4. Restart the app — persisted tasks remain (Expo SQLite file on device).
+5. With `bun run sync-server` running, tap **Sync now** — status shows Synced; tasks sync to the reference server.
+6. On a second simulator/device, tap **Sync now** after server has data — pulled tasks appear locally.
+
+## Sync URLs
+
+| Platform | Server URL |
+|----------|------------|
+| iOS Simulator | `http://localhost:8787` |
+| Android emulator | `http://10.0.2.2:8787` |
 
 ## Configuration
 

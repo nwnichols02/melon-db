@@ -7,10 +7,14 @@ export type {
 	PushArgs,
 	SyncBackend,
 } from "./protocol.ts";
-export type { CheckpointStore } from "./checkpoint.ts";
-export { createMemoryCheckpointStore } from "./checkpoint.ts";
-export type { SyncStatus, SyncStatusKind } from "./state.ts";
-export { SyncStatusKind as SyncStatusKinds } from "./state.ts";
+export type { SyncStatus } from "./state.ts";
+export { SyncStatusKind, SyncStatusKind as SyncStatusKinds } from "./state.ts";
+export type { CheckpointStore, MetaStore } from "./checkpoint.ts";
+export {
+	createMetaCheckpointStore,
+	createMemoryCheckpointStore,
+	SYNC_LAST_PULLED_AT_KEY,
+} from "./checkpoint.ts";
 export {
 	synchronize,
 	type SynchronizeArgs,
