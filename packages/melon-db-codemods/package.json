@@ -1,0 +1,21 @@
+{
+	"name": "@melon/db-codemods",
+	"version": "0.0.0-alpha",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"test": "bun test",
+		"typecheck": "bunx tsc -p tsconfig.json --noEmit"
+	},
+	"dependencies": {
+		"@melon/db": "workspace:*",
+		"ts-morph": "^25.0.1"
+	},
+	"devDependencies": {
+		"@melon/db-testkit": "workspace:*",
+		"@types/bun": "latest",
+		"typescript": "^5"
+	}
+}

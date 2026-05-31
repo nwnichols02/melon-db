@@ -14,6 +14,7 @@ Next-generation offline-first local database for React Native and TypeScript (Wa
 | `@melon/db-react` | React hooks and provider |
 | `@melon/db-devtools` | Devtools event bridge (query/SQL snapshots) |
 | `@melon/db-testkit` | Test helpers, fixtures, `withTestDatabase` |
+| `@melon/db-codemods` | WatermelonDB migration codemods and query translator |
 
 ## Quick start
 
@@ -81,6 +82,18 @@ bun run bench
 
 See [`packages/melon-db-sqlite/README.md`](packages/melon-db-sqlite/README.md) for informal baseline notes.
 
+### Migrating from WatermelonDB
+
+Use the compatibility matrix and CLI codemods in [`@melon/db-codemods`](packages/melon-db-codemods/README.md):
+
+```bash
+bun run melon-codemod migrate-queries --path=./src
+bun run melon-codemod migrate-writes --path=./src
+bun run melon-codemod migrate-react --path=./src
+```
+
+The runtime query translator converts serializable Watermelon `Q` clauses to Melon `QueryAst` without a WatermelonDB dependency. Join queries (`Q.on`) and model decorator → schema codemods are manual / deferred — see the package README checklist.
+
 ## v1 limitations
 
 - All mutations must run inside `db.write()`.
@@ -90,15 +103,15 @@ See [`packages/melon-db-sqlite/README.md`](packages/melon-db-sqlite/README.md) f
 
 ## Completed vs roadmap
 
-| Done | Deferred (Phase 11+) |
+| Done | Deferred (Phase 12+) |
 |------|----------|
 | Core engine M0–M2 | Custom JSI/TurboModule SQLite |
 | SQLite SQL compiler + Bun adapter | `@melon/sync` |
-| Expo SQLite adapter (`@melon/db-sqlite/expo`) | `@melon/db-codemods` |
-| Optional Node driver (`@melon/db-sqlite/node`) | Docs site |
-| `apps/playground-rn` | EAS Build CI |
-| Query / Mango / Prisma surfaces | WatermelonDB benchmark comparison |
-| React hooks (`useFindMany`, `useMangoQuery`) | |
+| Expo SQLite adapter (`@melon/db-sqlite/expo`) | Docs site |
+| Optional Node driver (`@melon/db-sqlite/node`) | EAS Build CI |
+| `apps/playground-rn` | WatermelonDB benchmark comparison |
+| Query / Mango / Prisma surfaces | Model/schema codemods, `Q.on` joins |
+| React hooks (`useFindMany`, `useMangoQuery`) | Devtools UI panel |
 | Schema migrations | |
 | Prisma schema import + codegen CLI | |
 | belongsTo relation includes | |
@@ -106,6 +119,7 @@ See [`packages/melon-db-sqlite/README.md`](packages/melon-db-sqlite/README.md) f
 | SQL predicate test coverage + debug flag | |
 | Benchmark harness (10k/50k/100k) + CI smoke | |
 | Adapter stress tests (rollback, write queue) | |
+| `@melon/db-codemods` (query translator + CLI) | |
 | CI (test, typecheck, biome, bench-smoke) | |
 
 ## Development
