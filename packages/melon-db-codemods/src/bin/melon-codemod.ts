@@ -22,23 +22,31 @@ const sourceVar = readArg("source-var") ?? "database";
 
 if (!path) {
 	console.error(
-		"Usage: melon-codemod <migrate-queries|migrate-writes|migrate-react> --path=./src [--dry-run] [--db-var=db] [--source-var=database]",
+		"Usage: melon-codemod <migrate-queries|migrate-writes|migrate-react> --path=<dir> [--dry-run]",
 	);
+	console.error("");
+	console.error("Examples (from monorepo root):");
+	console.error("  bun run melon-codemod migrate-writes --path=apps/playground-rn/src --dry-run");
+	console.error("  bun run melon-codemod migrate-react --path=apps/playground-rn/app --dry-run");
 	process.exit(1);
 }
 
-const options = { path, dryRun, dbVar, sourceVar };
-
 let result: CodemodResult;
-if (command === "migrate-queries") {
-	result = migrateQueries(options);
-} else if (command === "migrate-writes") {
-	result = migrateWrites(options);
-} else if (command === "migrate-react") {
-	result = migrateReact(options);
-} else {
-	console.error(`Unknown command: ${command ?? "(none)"}`);
-	console.error("Commands: migrate-queries, migrate-writes, migrate-react");
+try {
+	const options = { path, dryRun, dbVar, sourceVar };
+	if (command === "migrate-queries") {
+		result = migrateQueries(options);
+	} else if (command === "migrate-writes") {
+		result = migrateWrites(options);
+	} else if (command === "migrate-react") {
+		result = migrateReact(options);
+	} else {
+		console.error(`Unknown command: ${command ?? "(none)"}`);
+		console.error("Commands: migrate-queries, migrate-writes, migrate-react");
+		process.exit(1);
+	}
+} catch (error) {
+	console.error(error instanceof Error ? error.message : String(error));
 	process.exit(1);
 }
 

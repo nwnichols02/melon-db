@@ -1,5 +1,5 @@
-import { readdirSync, statSync } from "node:fs";
-import { extname, join } from "node:path";
+import { existsSync, readdirSync, statSync } from "node:fs";
+import { extname, join, resolve } from "node:path";
 import { Project, type SourceFile } from "ts-morph";
 
 export const CODEMOD_IGNORE = "@melon-codemod-ignore";
@@ -25,15 +25,30 @@ export function shouldIgnoreFile(content: string): boolean {
 }
 
 /**
+ * Resolves and validates a codemod target path.
+ */
+export function resolveCodemodPath(targetPath: string): string {
+	const resolved = resolve(process.cwd(), targetPath);
+	if (!existsSync(resolved)) {
+		throw new Error(
+			`Path not found: ${targetPath} (resolved to ${resolved}). ` +
+				"In this monorepo, try --path=apps/playground-rn/src or --path=apps/playground-rn/app",
+		);
+	}
+	return resolved;
+}
+
+/**
  * Collects TypeScript source files from a path (file or directory).
  */
 export function collectSourceFiles(
 	project: Project,
 	targetPath: string,
 ): SourceFile[] {
-	const stat = statSync(targetPath);
+	const resolvedPath = resolveCodemodPath(targetPath);
+	const stat = statSync(resolvedPath);
 	if (stat.isFile()) {
-		return [project.addSourceFileAtPath(targetPath)];
+		return [project.addSourceFileAtPath(resolvedPath)];
 	}
 
 	const files: string[] = [];
@@ -51,7 +66,14 @@ export function collectSourceFiles(
 			}
 		}
 	}
-	walk(targetPath);
+	walk(resolvedPath);
+
+	if (files.length === 0) {
+		throw new Error(
+			`No .ts or .tsx files found under ${targetPath}. Check --path points at your app source directory.`,
+		);
+	}
+
 	return files.map((file) => project.addSourceFileAtPath(file));
 }
 
