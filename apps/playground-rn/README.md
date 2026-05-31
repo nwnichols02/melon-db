@@ -5,6 +5,7 @@ Expo app demonstrating `@melon/db` with the Expo SQLite adapter, fluent queries,
 ## Requirements
 
 - Bun (monorepo install from repo root)
+- **Expo SDK 54** (matches Expo Go 54.x on device/simulator)
 - Xcode (iOS Simulator) or Android Studio (emulator), or Expo Go on a device
 
 ## Setup
@@ -14,6 +15,8 @@ From the repo root:
 ```bash
 bun install
 ```
+
+Dependencies are aligned to **Expo SDK 54** via `bunx expo install --fix`. Core packages: `expo-asset`, `expo-constants`, `expo-linking`, and `react-native-gesture-handler`.
 
 ## Run
 

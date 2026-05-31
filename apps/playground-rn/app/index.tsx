@@ -67,7 +67,6 @@ export default function TasksScreen(): React.ReactElement {
 			) : (
 				<FlashList
 					data={tasks}
-					estimatedItemSize={72}
 					keyExtractor={(item) => item.id}
 					renderItem={({ item }) => (
 						<TaskRow onComplete={handleComplete} task={item} />
