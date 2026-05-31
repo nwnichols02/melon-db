@@ -83,11 +83,36 @@ Use `@melon/db-react`:
 
 ## Reference backend
 
+### In-memory (default)
+
 ```bash
 bun run sync-server
 ```
 
 The HTTP server exposes `POST /sync/pull` and `POST /sync/push`. Pull responses include `schemaVersion`.
+
+### Postgres (persistent)
+
+```bash
+bun run postgres:up
+bun run sync-server:postgres
+```
+
+Docker maps Postgres to **port 5433** so it does not conflict with a system Postgres on 5432.
+
+The Postgres backend uses Bun's native SQL client with:
+
+- `sync_meta` — monotonic server clock returned as pull `timestamp`
+- `sync_tasks` — reference collection with `server_created_at` / `server_updated_at`
+- `sync_tombstones` — deletion tracking for incremental pull
+
+SQL migration templates live in [`packages/melon-sync-server/sql/`](../../packages/melon-sync-server/sql/). Run the two-client demo:
+
+```bash
+bun run demo:sync:postgres
+```
+
+The browser **Sync playground** stays in-memory; production backends follow the same HTTP contract.
 
 ## Checkpoints
 

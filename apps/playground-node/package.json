@@ -12,6 +12,7 @@
 	"scripts": {
 		"demo": "bun run src/demo.ts",
 		"sync-demo": "bun run src/sync-demo.ts",
-		"sync-http-demo": "bun run src/sync-http-demo.ts"
+		"sync-http-demo": "bun run src/sync-http-demo.ts",
+		"sync-postgres-demo": "bun run src/sync-postgres-demo.ts"
 	}
 }

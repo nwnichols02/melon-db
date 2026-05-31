@@ -129,7 +129,7 @@ Use `@melon/db-react` for `MelonSyncProvider`, `useSync`, and `useSyncStatus`.
 
 ## v1 limitations
 
-- No Postgres reference backend (Phase 16)
+- See [`@melon/sync-server`](../melon-sync-server/README.md) for HTTP and Postgres reference backends
 - No merge-by-field conflict resolver
 - No background sync service
 

@@ -121,9 +121,12 @@ The runtime query translator converts serializable Watermelon `Q` clauses to Mel
 ### Sync
 
 ```bash
+bun run postgres:up          # Docker Postgres on localhost:5433
 bun run demo:sync
 bun run demo:sync:http
+bun run demo:sync:postgres
 bun run sync-server
+bun run sync-server:postgres
 ```
 
 See [`packages/melon-sync/README.md`](packages/melon-sync/README.md), [`packages/melon-sync-server/README.md`](packages/melon-sync-server/README.md), and [`apps/playground-node/src/sync-demo.ts`](apps/playground-node/src/sync-demo.ts).
@@ -150,15 +153,15 @@ await synchronize({
 
 ## Completed vs roadmap
 
-| Done | Deferred (Phase 16+) |
+| Done | Deferred (Phase 17+) |
 |------|----------|
 | Core engine M0–M2 | Custom JSI/TurboModule SQLite |
-| SQLite SQL compiler + Bun adapter | Postgres reference backend |
-| Expo SQLite adapter (`@melon/db-sqlite/expo`) | EAS Build CI |
-| Optional Node driver (`@melon/db-sqlite/node`) | WatermelonDB benchmark comparison |
-| `apps/playground-rn` + sync demo | Model/schema codemods, `Q.on` joins |
-| Query / Mango / Prisma surfaces | Merge-by-field conflict resolver |
-| React hooks (`useFindMany`, `useMangoQuery`, `useSync`) | Background sync service |
+| SQLite SQL compiler + Bun adapter | EAS Build CI |
+| Expo SQLite adapter (`@melon/db-sqlite/expo`) | WatermelonDB benchmark comparison |
+| Optional Node driver (`@melon/db-sqlite/node`) | Model/schema codemods, `Q.on` joins |
+| `apps/playground-rn` + sync demo | Merge-by-field conflict resolver |
+| Query / Mango / Prisma surfaces | Background sync service |
+| React hooks (`useFindMany`, `useMangoQuery`, `useSync`) | |
 | Schema migrations | |
 | Prisma schema import + codegen CLI | |
 | belongsTo relation includes | |
@@ -172,11 +175,12 @@ await synchronize({
 | `@melon/sync` (outbox + orchestrator) | |
 | Persistent SQLite checkpoints | |
 | `@melon/sync-server` (HTTP reference backend) | |
+| Postgres reference backend (`PostgresSyncStore` + SQL migrations) | |
 | Sync retry queue + cancellation | |
 | Network monitor hooks + auto-resume | |
 | Conflict policies (client-wins, last-write-wins) | |
 | Migration-aware sync coordination | |
-| CI (test, typecheck, biome, bench-smoke, docs typecheck) | |
+| CI (test, typecheck, biome, bench-smoke, docs typecheck, postgres-sync) | |
 
 ## Development
 

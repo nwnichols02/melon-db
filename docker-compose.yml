@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: melon
+      POSTGRES_PASSWORD: melon
+      POSTGRES_DB: melon_sync
+    ports:
+      - "5433:5432"
+    volumes:
+      - melon_sync_pg:/var/lib/postgresql/data
+
+volumes:
+  melon_sync_pg:

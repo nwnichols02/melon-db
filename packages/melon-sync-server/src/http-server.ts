@@ -1,5 +1,5 @@
+import type { SyncBackend } from "@melon/sync";
 import { SyncServerError, SyncServerErrorCode } from "./errors.ts";
-import type { InMemorySyncStore } from "./store.ts";
 import { InMemorySyncStore as StoreClass } from "./store.ts";
 import {
 	validatePullBody,
@@ -10,14 +10,13 @@ import {
 export interface CreateSyncHttpServerOptions {
 	port?: number;
 	hostname?: string;
-	store?: InMemorySyncStore;
-	collection?: string;
+	store?: SyncBackend;
 	maxSchemaVersion?: number;
 }
 
 export interface SyncHttpServer {
 	server: ReturnType<typeof Bun.serve>;
-	store: InMemorySyncStore;
+	store: SyncBackend;
 	url: string;
 	stop: () => void;
 }
@@ -63,9 +62,7 @@ export function createSyncHttpServer(
 	const port = options.port ?? 8787;
 	const hostname = options.hostname ?? "0.0.0.0";
 	const maxSchemaVersion = options.maxSchemaVersion ?? 1;
-	const store =
-		options.store ??
-		new StoreClass({ collection: options.collection ?? "tasks" });
+	const store = options.store ?? new StoreClass();
 
 	const server = Bun.serve({
 		hostname,

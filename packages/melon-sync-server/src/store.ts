@@ -1,5 +1,11 @@
 import type { SyncRecord } from "@melon/db";
 import type { PullArgs, PullResult, PushArgs, SyncBackend } from "@melon/sync";
+import { SyncServerError, SyncServerErrorCode } from "./errors.ts";
+import {
+	type CollectionSyncConfig,
+	DEFAULT_SYNC_SCHEMA,
+	findCollectionConfig,
+} from "./schema-config.ts";
 
 interface StoredRecord {
 	record: SyncRecord;
@@ -14,6 +20,7 @@ interface Tombstone {
 export interface InMemorySyncStoreOptions {
 	collection?: string;
 	primaryKey?: string;
+	schema?: readonly CollectionSyncConfig[];
 }
 
 /**
@@ -23,17 +30,33 @@ export class InMemorySyncStore implements SyncBackend {
 	private records = new Map<string, StoredRecord>();
 	private tombstones = new Map<string, Tombstone>();
 	private clock = 1;
+	private readonly schema: readonly CollectionSyncConfig[];
 	private readonly collection: string;
 	private readonly primaryKey: string;
 
 	constructor(options: InMemorySyncStoreOptions = {}) {
-		this.collection = options.collection ?? "tasks";
-		this.primaryKey = options.primaryKey ?? "id";
+		this.schema = options.schema ?? DEFAULT_SYNC_SCHEMA;
+		this.collection = options.collection ?? this.schema[0]?.name ?? "tasks";
+		this.primaryKey =
+			options.primaryKey ??
+			findCollectionConfig(this.schema, this.collection)?.primaryKey ??
+			"id";
 	}
 
 	private tick(): number {
 		this.clock += 1;
 		return this.clock;
+	}
+
+	private assertSupportedCollections(changes: PushArgs["changes"]): void {
+		for (const collectionName of Object.keys(changes)) {
+			if (!findCollectionConfig(this.schema, collectionName)) {
+				throw new SyncServerError(
+					`Unsupported collection "${collectionName}"`,
+					{ code: SyncServerErrorCode.UNSUPPORTED_COLLECTION },
+				);
+			}
+		}
 	}
 
 	async pullChanges(args: PullArgs): Promise<PullResult> {
@@ -69,6 +92,8 @@ export class InMemorySyncStore implements SyncBackend {
 	}
 
 	async pushChanges(args: PushArgs): Promise<void> {
+		this.assertSupportedCollections(args.changes);
+
 		const changeSet = args.changes[this.collection];
 		if (!changeSet) {
 			return;
