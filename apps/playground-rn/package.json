@@ -3,8 +3,8 @@
 	"private": true,
 	"main": "expo-router/entry",
 	"scripts": {
-		"start": "expo start",
-		"ios": "expo start --ios",
+		"start": "EXPO_OFFLINE=1 expo start",
+		"ios": "EXPO_OFFLINE=1 expo start --ios",
 		"typecheck": "bunx tsc -p tsconfig.json --noEmit"
 	},
 	"dependencies": {
@@ -13,6 +13,7 @@
 		"@melon/db-react": "workspace:*",
 		"@melon/db-sqlite": "workspace:*",
 		"@shopify/flash-list": "2.0.2",
+		"babel-preset-expo": "~54.0.10",
 		"expo": "~54.0.5",
 		"expo-asset": "~12.0.13",
 		"expo-constants": "~18.0.13",

@@ -21,10 +21,16 @@ Dependencies are aligned to **Expo SDK 54** via `bunx expo install --fix`. Core 
 ## Run
 
 ```bash
+# From repo root — starts Metro, then press i / a in the terminal
 bun run dev:rn
+
+# Or open iOS Simulator directly
+bun run ios:rn
 ```
 
-Then press `i` for iOS Simulator or `a` for Android emulator in the Expo CLI.
+Scripts set `EXPO_OFFLINE=1` so Expo skips downloading a different Expo Go build when your simulator already has a compatible 54.x client. Metro and the app still run normally.
+
+If you run `expo start --ios` manually and see **Install the recommended Expo Go version?**, choose **No** — Expo Go 54.0.5 works with this SDK 54 project. Choosing **Yes** can fail with `TypeError: fetch failed` when the CLI cannot reach Expo’s servers.
 
 ## What it demonstrates
 
