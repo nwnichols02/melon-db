@@ -1,10 +1,10 @@
 import { type ReactElement, useState } from "react";
 import { useMelonDevtools } from "./devtools-context.tsx";
-import { ErrorsTab } from "./tabs/errors-tab.tsx";
-import { QueriesTab } from "./tabs/queries-tab.tsx";
-import { SubscriptionsTab } from "./tabs/subscriptions-tab.tsx";
-import { SyncTab } from "./tabs/sync-tab.tsx";
-import { WritesTab } from "./tabs/writes-tab.tsx";
+import { ErrorsTab } from "./tabs/errors-tab";
+import { QueriesTab } from "./tabs/queries-tab";
+import { SubscriptionsTab } from "./tabs/subscriptions-tab";
+import { SyncTab } from "./tabs/sync-tab";
+import { WritesTab } from "./tabs/writes-tab";
 
 const TabKind = {
 	Queries: "queries",
