@@ -68,6 +68,7 @@ export type {
 } from "./sync/types.ts";
 export {
 	SYNC_LAST_PULLED_AT_KEY,
+	SYNC_LAST_SCHEMA_VERSION_KEY,
 	createMemoryCheckpointStore,
 	createMetaCheckpointStore,
 	type CheckpointStore,

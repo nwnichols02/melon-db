@@ -9,6 +9,7 @@ export {
 	type MelonSyncProviderProps,
 } from "./sync-context.tsx";
 export { useSync, useSyncStatus } from "./sync-hooks.ts";
+export { createFetchNetworkMonitor } from "./network-monitor.ts";
 export {
 	useQuery,
 	useCollection,

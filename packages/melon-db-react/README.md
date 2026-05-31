@@ -7,7 +7,7 @@ React hooks and provider for `@melon/db`.
 | Hook | Description |
 |------|-------------|
 | `MelonDbProvider` | Injects `MelonDatabase` via context |
-| `MelonSyncProvider` | Injects sync backend + checkpoint store |
+| `MelonSyncProvider` | Injects sync backend, retry policy, network monitor |
 | `useDatabase` | Access the database instance |
 | `useCollection` | Access a collection by name |
 | `useQuery` | Reactive query from AST or PreparedQuery |
@@ -16,8 +16,9 @@ React hooks and provider for `@melon/db`.
 | `useFindFirst` | Prisma-style reactive findFirst |
 | `useMangoQuery` | Mango-style reactive query |
 | `useWriter` | Stable `db.write` wrapper |
-| `useSync` | Run sync + expose status, error, lastPulledAt |
+| `useSync` | Run sync, cancel, retry count, paused state |
 | `useSyncStatus` | Current sync status only |
+| `createFetchNetworkMonitor` | Optional fetch-based network monitor |
 
 ## Example
 
@@ -29,16 +30,21 @@ import {
   useSync,
   useWriter,
 } from '@melon/db-react';
+import { DEFAULT_RETRY_POLICY } from '@melon/sync';
 
 function TaskList() {
   const tasks = useFindMany('tasks', { where: { status: 'open' } });
   const write = useWriter();
-  const { sync, status, isSyncing } = useSync();
+  const { sync, cancel, status, isSyncing, isPaused, retryCount } = useSync();
 
   return (
     <>
       <Button disabled={isSyncing} onPress={() => void sync()} title="Sync" />
-      <Text>{status.status}</Text>
+      <Button disabled={!isSyncing} onPress={cancel} title="Cancel" />
+      <Text>
+        {isPaused ? 'Paused (offline)' : status.status}
+        {retryCount > 0 ? ` retry ${retryCount}` : ''}
+      </Text>
       {tasks.map((task) => (
         <Text key={task.id}>{task.title}</Text>
       ))}
@@ -46,12 +52,16 @@ function TaskList() {
   );
 }
 
-export function App({ db, syncBackend }) {
+export function App({ db, syncBackend, networkMonitor }) {
   return (
     <MelonDbProvider db={db}>
       <MelonSyncProvider
         pullChanges={syncBackend.pullChanges}
         pushChanges={syncBackend.pushChanges}
+        retryPolicy={DEFAULT_RETRY_POLICY}
+        networkMonitor={networkMonitor}
+        autoSyncOnReconnect
+        conflictPolicy="last-write-wins"
       >
         <TaskList />
       </MelonSyncProvider>

@@ -1,9 +1,16 @@
-import type { MelonDatabase } from "@melon/db";
+import type {
+	ApplyRemoteChangesOptions,
+	MelonDatabase,
+	Migration,
+} from "@melon/db";
 import {
 	type CheckpointStore,
+	DEFAULT_RETRY_POLICY,
+	type NetworkMonitor,
 	type PullArgs,
 	type PullResult,
 	type PushArgs,
+	type RetryPolicy,
 	SyncError,
 	type SyncStatus,
 	SyncStatusKind,
@@ -29,7 +36,10 @@ export interface MelonSyncContextValue {
 	lastPulledAt: number | null;
 	error: SyncError | null;
 	isSyncing: boolean;
-	sync: () => Promise<SynchronizeResult>;
+	isPaused: boolean;
+	retryCount: number;
+	sync: (options?: { signal?: AbortSignal }) => Promise<SynchronizeResult>;
+	cancel: () => void;
 }
 
 const SyncContext = createContext<MelonSyncContextValue | null>(null);
@@ -38,6 +48,13 @@ export interface MelonSyncProviderProps {
 	pullChanges: (args: PullArgs) => Promise<PullResult>;
 	pushChanges: (args: PushArgs) => Promise<void>;
 	checkpointStore?: CheckpointStore;
+	retryPolicy?: RetryPolicy | false;
+	networkMonitor?: NetworkMonitor;
+	autoSyncOnReconnect?: boolean;
+	conflictPolicy?: ApplyRemoteChangesOptions["conflictPolicy"];
+	syncTimestampField?: string;
+	migrationSyncPolicy?: "strict" | "lenient";
+	migrations?: Migration[];
 	children: React.ReactNode;
 }
 
@@ -46,6 +63,13 @@ interface SyncProviderInnerProps {
 	pullChanges: (args: PullArgs) => Promise<PullResult>;
 	pushChanges: (args: PushArgs) => Promise<void>;
 	checkpointStore: CheckpointStore;
+	retryPolicy: RetryPolicy | false;
+	networkMonitor?: NetworkMonitor;
+	autoSyncOnReconnect: boolean;
+	conflictPolicy?: ApplyRemoteChangesOptions["conflictPolicy"];
+	syncTimestampField?: string;
+	migrationSyncPolicy?: "strict" | "lenient";
+	migrations?: Migration[];
 	children: React.ReactNode;
 }
 
@@ -54,6 +78,13 @@ function MelonSyncProviderInner({
 	pullChanges,
 	pushChanges,
 	checkpointStore,
+	retryPolicy,
+	networkMonitor,
+	autoSyncOnReconnect,
+	conflictPolicy,
+	syncTimestampField,
+	migrationSyncPolicy,
+	migrations,
 	children,
 }: SyncProviderInnerProps): React.ReactElement {
 	const [status, setStatus] = useState<SyncStatus>({
@@ -61,7 +92,10 @@ function MelonSyncProviderInner({
 	});
 	const [lastPulledAt, setLastPulledAt] = useState<number | null>(null);
 	const [error, setError] = useState<SyncError | null>(null);
+	const [retryCount, setRetryCount] = useState(0);
 	const mountedRef = useRef(true);
+	const abortRef = useRef<AbortController | null>(null);
+	const syncingRef = useRef(false);
 
 	useEffect(() => {
 		mountedRef.current = true;
@@ -77,46 +111,112 @@ function MelonSyncProviderInner({
 		};
 	}, [checkpointStore]);
 
-	const sync = useCallback(async (): Promise<SynchronizeResult> => {
-		const onSyncEvent = db.devtools?.emitSync?.bind(db.devtools);
+	const sync = useCallback(
+		async (options?: {
+			signal?: AbortSignal;
+		}): Promise<SynchronizeResult> => {
+			const onSyncEvent = db.devtools?.emitSync?.bind(db.devtools);
+			const controller = new AbortController();
+			abortRef.current = controller;
+			const signal = options?.signal ?? controller.signal;
 
-		try {
-			const result = await synchronize({
-				db,
-				pullChanges,
-				pushChanges,
-				checkpointStore,
-				onSyncEvent,
-				onStatusChange: (nextStatus) => {
-					if (!mountedRef.current) {
-						return;
-					}
-					setStatus(nextStatus);
-					if (nextStatus.status === SyncStatusKind.Failed) {
-						setError(nextStatus.error);
-					}
-				},
-			});
+			try {
+				syncingRef.current = true;
+				const result = await synchronize({
+					db,
+					pullChanges,
+					pushChanges,
+					checkpointStore,
+					retryPolicy,
+					signal,
+					networkMonitor,
+					conflictPolicy,
+					syncTimestampField,
+					migrationSyncPolicy,
+					migrations,
+					onSyncEvent,
+					onStatusChange: (nextStatus) => {
+						if (!mountedRef.current) {
+							return;
+						}
+						setStatus(nextStatus);
+						if (nextStatus.status === SyncStatusKind.Retrying) {
+							setRetryCount(nextStatus.attempt);
+						}
+						if (nextStatus.status === SyncStatusKind.Failed) {
+							setError(nextStatus.error);
+						}
+						if (nextStatus.status === SyncStatusKind.Complete) {
+							setRetryCount(0);
+						}
+					},
+				});
 
-			if (mountedRef.current) {
-				setStatus(result.status);
-				setLastPulledAt(result.lastPulledAt);
-				setError(null);
+				if (mountedRef.current) {
+					setStatus(result.status);
+					setLastPulledAt(result.lastPulledAt);
+					setError(null);
+					setRetryCount(0);
+				}
+				return result;
+			} catch (syncError) {
+				if (mountedRef.current && syncError instanceof SyncError) {
+					setStatus({ status: SyncStatusKind.Failed, error: syncError });
+					setError(syncError);
+				}
+				throw syncError;
+			} finally {
+				syncingRef.current = false;
+				if (abortRef.current === controller) {
+					abortRef.current = null;
+				}
 			}
-			return result;
-		} catch (syncError) {
-			if (mountedRef.current && syncError instanceof SyncError) {
-				setStatus({ status: SyncStatusKind.Failed, error: syncError });
-				setError(syncError);
-			}
-			throw syncError;
+		},
+		[
+			db,
+			pullChanges,
+			pushChanges,
+			checkpointStore,
+			retryPolicy,
+			networkMonitor,
+			conflictPolicy,
+			syncTimestampField,
+			migrationSyncPolicy,
+			migrations,
+		],
+	);
+
+	const cancel = useCallback((): void => {
+		abortRef.current?.abort();
+	}, []);
+
+	useEffect(() => {
+		if (!autoSyncOnReconnect || !networkMonitor) {
+			return;
 		}
-	}, [db, pullChanges, pushChanges, checkpointStore]);
+
+		let debounce: ReturnType<typeof setTimeout> | undefined;
+		return networkMonitor.subscribe((online) => {
+			if (!online || syncingRef.current) {
+				return;
+			}
+			clearTimeout(debounce);
+			debounce = setTimeout(() => {
+				void sync().catch(() => {});
+			}, 300);
+		});
+	}, [autoSyncOnReconnect, networkMonitor, sync]);
 
 	const isSyncing = useMemo(
 		() =>
 			status.status === SyncStatusKind.Pulling ||
-			status.status === SyncStatusKind.Pushing,
+			status.status === SyncStatusKind.Pushing ||
+			status.status === SyncStatusKind.Retrying,
+		[status.status],
+	);
+
+	const isPaused = useMemo(
+		() => status.status === SyncStatusKind.Paused,
 		[status.status],
 	);
 
@@ -129,7 +229,10 @@ function MelonSyncProviderInner({
 			lastPulledAt,
 			error,
 			isSyncing,
+			isPaused,
+			retryCount,
 			sync,
+			cancel,
 		}),
 		[
 			pullChanges,
@@ -139,7 +242,10 @@ function MelonSyncProviderInner({
 			lastPulledAt,
 			error,
 			isSyncing,
+			isPaused,
+			retryCount,
 			sync,
+			cancel,
 		],
 	);
 
@@ -153,6 +259,13 @@ export function MelonSyncProvider({
 	pullChanges,
 	pushChanges,
 	checkpointStore,
+	retryPolicy = DEFAULT_RETRY_POLICY,
+	networkMonitor,
+	autoSyncOnReconnect = false,
+	conflictPolicy,
+	syncTimestampField,
+	migrationSyncPolicy,
+	migrations,
 	children,
 }: MelonSyncProviderProps): React.ReactElement {
 	const db = useDatabase();
@@ -163,10 +276,17 @@ export function MelonSyncProvider({
 
 	return (
 		<MelonSyncProviderInner
+			autoSyncOnReconnect={autoSyncOnReconnect}
 			checkpointStore={resolvedCheckpointStore}
+			conflictPolicy={conflictPolicy}
 			db={db}
+			migrationSyncPolicy={migrationSyncPolicy}
+			migrations={migrations}
+			networkMonitor={networkMonitor}
 			pullChanges={pullChanges}
 			pushChanges={pushChanges}
+			retryPolicy={retryPolicy}
+			syncTimestampField={syncTimestampField}
 		>
 			{children}
 		</MelonSyncProviderInner>

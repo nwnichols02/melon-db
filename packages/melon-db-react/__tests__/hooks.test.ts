@@ -146,6 +146,7 @@ describe("db-react exports", () => {
 			pullChanges: (args) => server.pullChanges(args),
 			pushChanges: (args) => server.pushChanges(args),
 			checkpointStore: createMemoryCheckpointStore(),
+			retryPolicy: false,
 			onStatusChange: (status) => statuses.push(status.status),
 		});
 
@@ -194,6 +195,7 @@ describe("db-react exports", () => {
 					throw new Error("network down");
 				},
 				checkpointStore: checkpoint,
+				retryPolicy: false,
 			});
 			expect.unreachable();
 		} catch {
@@ -201,5 +203,86 @@ describe("db-react exports", () => {
 		}
 
 		expect(await checkpoint.getLastPulledAt()).toBeNull();
+	});
+
+	test("offline monitor contract surfaces paused status", async () => {
+		const schema = createMelonSchema({
+			version: 1,
+			collections: {
+				tasks: {
+					name: "tasks",
+					primaryKey: "id",
+					fields: { id: { kind: "string" }, title: { kind: "string" } },
+				},
+			},
+		});
+		const db = createDatabase({
+			schema,
+			adapter: createInMemoryAdapter(),
+			sync: {},
+		});
+		const { createMutableNetworkMonitor } = await import("@melon/sync");
+		const monitor = createMutableNetworkMonitor(false);
+		const statuses: string[] = [];
+
+		await expect(
+			synchronize({
+				db,
+				pullChanges: async () => ({
+					changes: {},
+					timestamp: 1,
+				}),
+				pushChanges: async () => {},
+				checkpointStore: createMemoryCheckpointStore(),
+				networkMonitor: monitor,
+				retryPolicy: false,
+				onStatusChange: (status) => statuses.push(status.status),
+			}),
+		).rejects.toMatchObject({ code: "SYNC_OFFLINE" });
+
+		expect(statuses).toContain(SyncStatusKind.Paused);
+	});
+
+	test("retry policy contract increments retrying status", async () => {
+		const schema = createMelonSchema({
+			version: 1,
+			collections: {
+				tasks: {
+					name: "tasks",
+					primaryKey: "id",
+					fields: { id: { kind: "string" }, title: { kind: "string" } },
+				},
+			},
+		});
+		const db = createDatabase({
+			schema,
+			adapter: createInMemoryAdapter(),
+			sync: {},
+		});
+		let calls = 0;
+		const statuses: string[] = [];
+
+		await synchronize({
+			db,
+			pullChanges: async () => {
+				calls += 1;
+				if (calls < 2) {
+					throw new Error("transient");
+				}
+				return { changes: {}, timestamp: 1 };
+			},
+			pushChanges: async () => {},
+			checkpointStore: createMemoryCheckpointStore(),
+			retryPolicy: {
+				maxAttempts: 2,
+				baseDelayMs: 1,
+				maxDelayMs: 2,
+				jitter: false,
+			},
+			onStatusChange: (status) => statuses.push(status.status),
+		});
+
+		expect(calls).toBe(2);
+		expect(statuses).toContain(SyncStatusKind.Retrying);
 	});
 });

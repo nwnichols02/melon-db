@@ -191,6 +191,137 @@ describe("sync (in-memory)", () => {
 			);
 		}
 	});
+
+	test("client-wins skips remote update when outbox has pending entry", async () => {
+		const db = createSyncDb();
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Local pending",
+				status: "open",
+			});
+		});
+
+		await db.applyRemoteChanges(
+			{
+				tasks: {
+					created: [],
+					updated: [{ id: "1", title: "Remote", status: "done" }],
+					deleted: [],
+				},
+			},
+			{ conflictPolicy: "client-wins" },
+		);
+
+		const task = await db.collection("tasks").findById("1");
+		expect(task?.title).toBe("Local pending");
+	});
+
+	test("last-write-wins applies newer remote timestamp", async () => {
+		const timestampSchema = createMelonSchema({
+			version: 1,
+			collections: {
+				tasks: {
+					name: "tasks",
+					primaryKey: "id",
+					fields: {
+						id: { kind: "string" },
+						title: { kind: "string" },
+						status: { kind: "string" },
+					},
+				},
+			},
+		});
+		const db = createDatabase({
+			schema: timestampSchema,
+			adapter: createInMemoryAdapter(),
+			sync: {},
+		});
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Local",
+				status: "open",
+				_updated_at: 100,
+			});
+		});
+		await db.markLocalChangesPushed();
+
+		await db.applyRemoteChanges(
+			{
+				tasks: {
+					created: [],
+					updated: [
+						{
+							id: "1",
+							title: "Remote newer",
+							status: "done",
+							_updated_at: 200,
+						},
+					],
+					deleted: [],
+				},
+			},
+			{ conflictPolicy: "last-write-wins" },
+		);
+
+		const task = await db.collection("tasks").findById("1");
+		expect(task?.title).toBe("Remote newer");
+	});
+
+	test("last-write-wins skips older remote timestamp", async () => {
+		const timestampSchema = createMelonSchema({
+			version: 1,
+			collections: {
+				tasks: {
+					name: "tasks",
+					primaryKey: "id",
+					fields: {
+						id: { kind: "string" },
+						title: { kind: "string" },
+						status: { kind: "string" },
+					},
+				},
+			},
+		});
+		const db = createDatabase({
+			schema: timestampSchema,
+			adapter: createInMemoryAdapter(),
+			sync: {},
+		});
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Local newer",
+				status: "open",
+				_updated_at: 300,
+			});
+		});
+		await db.markLocalChangesPushed();
+
+		await db.applyRemoteChanges(
+			{
+				tasks: {
+					created: [],
+					updated: [
+						{
+							id: "1",
+							title: "Remote older",
+							status: "done",
+							_updated_at: 100,
+						},
+					],
+					deleted: [],
+				},
+			},
+			{ conflictPolicy: "last-write-wins" },
+		);
+
+		const task = await db.collection("tasks").findById("1");
+		expect(task?.title).toBe("Local newer");
+	});
 });
 
 describe("sync (sqlite)", () => {

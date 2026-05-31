@@ -12,13 +12,33 @@ export function useSyncStatus(): SyncStatus {
  * Runs sync against the configured backend and exposes reactive status.
  */
 export function useSync(): {
-	sync: () => Promise<SynchronizeResult>;
+	sync: (options?: { signal?: AbortSignal }) => Promise<SynchronizeResult>;
+	cancel: () => void;
 	status: SyncStatus;
 	lastPulledAt: number | null;
 	isSyncing: boolean;
+	isPaused: boolean;
+	retryCount: number;
 	error: SyncError | null;
 } {
-	const { sync, status, lastPulledAt, isSyncing, error } =
-		useMelonSyncContext();
-	return { sync, status, lastPulledAt, isSyncing, error };
+	const {
+		sync,
+		cancel,
+		status,
+		lastPulledAt,
+		isSyncing,
+		isPaused,
+		retryCount,
+		error,
+	} = useMelonSyncContext();
+	return {
+		sync,
+		cancel,
+		status,
+		lastPulledAt,
+		isSyncing,
+		isPaused,
+		retryCount,
+		error,
+	};
 }

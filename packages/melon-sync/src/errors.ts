@@ -3,6 +3,9 @@ export const SyncErrorCode = {
 	SYNC_PUSH_FAILED: "SYNC_PUSH_FAILED",
 	SYNC_APPLY_FAILED: "SYNC_APPLY_FAILED",
 	SYNC_NOT_ENABLED: "SYNC_NOT_ENABLED",
+	SYNC_CANCELLED: "SYNC_CANCELLED",
+	SYNC_OFFLINE: "SYNC_OFFLINE",
+	SYNC_SCHEMA_MISMATCH: "SYNC_SCHEMA_MISMATCH",
 } as const;
 
 export type SyncErrorCode = (typeof SyncErrorCode)[keyof typeof SyncErrorCode];

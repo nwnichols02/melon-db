@@ -16,7 +16,19 @@ export {
 	createMetaCheckpointStore,
 	createMemoryCheckpointStore,
 	SYNC_LAST_PULLED_AT_KEY,
+	SYNC_LAST_SCHEMA_VERSION_KEY,
 } from "./checkpoint.ts";
+export { buildPullMigration } from "./migration-sync.ts";
+export type { NetworkMonitor } from "./network.ts";
+export {
+	createAlwaysOnlineMonitor,
+	createMutableNetworkMonitor,
+} from "./network.ts";
+export {
+	DEFAULT_RETRY_POLICY,
+	type RetryPolicy,
+	withRetry,
+} from "./retry.ts";
 export {
 	synchronize,
 	type SynchronizeArgs,

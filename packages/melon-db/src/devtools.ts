@@ -32,6 +32,8 @@ export interface SyncDebugSnapshot {
 	>;
 	error?: { code?: string; message: string; retryable?: boolean };
 	durationMs?: number;
+	retryPhase?: "pull" | "push";
+	attempt?: number;
 }
 
 export interface DevtoolsBridge {

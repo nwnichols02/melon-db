@@ -41,4 +41,18 @@ describe("createMetaCheckpointStore", () => {
 		});
 		expect(await store.getLastPulledAt()).toBeNull();
 	});
+
+	test("persists schema version via meta store", async () => {
+		const meta = new Map<string, string>();
+		const store = createMetaCheckpointStore({
+			async getMeta(key) {
+				return meta.get(key) ?? null;
+			},
+			async setMeta(key, value) {
+				meta.set(key, value);
+			},
+		});
+		await store.setLastSchemaVersion?.(2);
+		expect(await store.getLastSchemaVersion?.()).toBe(2);
+	});
 });

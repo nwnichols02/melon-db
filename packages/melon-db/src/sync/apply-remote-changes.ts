@@ -7,7 +7,79 @@ import type {
 	ApplyRemoteChangesOptions,
 	SyncChanges,
 	SyncOutboxStore,
+	SyncRecord,
 } from "./types.ts";
+
+const DEFAULT_TIMESTAMP_FIELD = "_updated_at";
+
+function readTimestamp(record: SyncRecord, field: string): number | null {
+	const value = record[field];
+	if (value instanceof Date) {
+		return value.getTime();
+	}
+	if (typeof value === "number" && Number.isFinite(value)) {
+		return value;
+	}
+	if (typeof value === "string") {
+		const parsed = Date.parse(value);
+		return Number.isFinite(parsed) ? parsed : null;
+	}
+	return null;
+}
+
+function resolveTimestampField(
+	local: SyncRecord | null,
+	remote: SyncRecord,
+	configured?: string,
+): string | null {
+	if (configured) {
+		return configured;
+	}
+	if (
+		DEFAULT_TIMESTAMP_FIELD in remote ||
+		(local && DEFAULT_TIMESTAMP_FIELD in local)
+	) {
+		return DEFAULT_TIMESTAMP_FIELD;
+	}
+	return null;
+}
+
+function shouldApplyRemote(
+	conflictPolicy: NonNullable<ApplyRemoteChangesOptions["conflictPolicy"]>,
+	options: {
+		hasOutboxEntry: boolean;
+		local: SyncRecord | null;
+		remote: SyncRecord;
+		syncTimestampField?: string;
+	},
+): boolean {
+	if (conflictPolicy === "skip-existing" && options.local) {
+		return false;
+	}
+	if (conflictPolicy === "client-wins" && options.hasOutboxEntry) {
+		return false;
+	}
+	if (conflictPolicy === "last-write-wins" && options.local) {
+		const field = resolveTimestampField(
+			options.local,
+			options.remote,
+			options.syncTimestampField,
+		);
+		if (!field) {
+			return true;
+		}
+		const localTs = readTimestamp(options.local, field);
+		const remoteTs = readTimestamp(options.remote, field);
+		if (localTs === null) {
+			return true;
+		}
+		if (remoteTs === null) {
+			return false;
+		}
+		return remoteTs >= localTs;
+	}
+	return true;
+}
 
 /**
  * Applies remote sync changes inside an active write transaction.
@@ -45,7 +117,18 @@ export async function applyRemoteChangesInWrite<Schema extends MelonSchema>(
 				);
 			}
 			const existing = await collection.findById(id as string | number);
-			if (existing && conflictPolicy === "skip-existing") {
+			const outboxEntry = await outbox.findByRecord(
+				collectionName,
+				id as string | number,
+			);
+			if (
+				!shouldApplyRemote(conflictPolicy, {
+					hasOutboxEntry: outboxEntry !== null,
+					local: existing,
+					remote: record,
+					syncTimestampField: options?.syncTimestampField,
+				})
+			) {
 				continue;
 			}
 			if (existing) {
@@ -69,7 +152,18 @@ export async function applyRemoteChangesInWrite<Schema extends MelonSchema>(
 				);
 			}
 			const existing = await collection.findById(id as string | number);
-			if (existing && conflictPolicy === "skip-existing") {
+			const outboxEntry = await outbox.findByRecord(
+				collectionName,
+				id as string | number,
+			);
+			if (
+				!shouldApplyRemote(conflictPolicy, {
+					hasOutboxEntry: outboxEntry !== null,
+					local: existing,
+					remote: record,
+					syncTimestampField: options?.syncTimestampField,
+				})
+			) {
 				continue;
 			}
 			if (existing) {

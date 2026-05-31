@@ -150,15 +150,15 @@ await synchronize({
 
 ## Completed vs roadmap
 
-| Done | Deferred (Phase 15+) |
+| Done | Deferred (Phase 16+) |
 |------|----------|
 | Core engine M0–M2 | Custom JSI/TurboModule SQLite |
 | SQLite SQL compiler + Bun adapter | Postgres reference backend |
 | Expo SQLite adapter (`@melon/db-sqlite/expo`) | EAS Build CI |
 | Optional Node driver (`@melon/db-sqlite/node`) | WatermelonDB benchmark comparison |
 | `apps/playground-rn` + sync demo | Model/schema codemods, `Q.on` joins |
-| Query / Mango / Prisma surfaces | Migration-aware sync, retry queue |
-| React hooks (`useFindMany`, `useMangoQuery`, `useSync`) | Full conflict policy matrix |
+| Query / Mango / Prisma surfaces | Merge-by-field conflict resolver |
+| React hooks (`useFindMany`, `useMangoQuery`, `useSync`) | Background sync service |
 | Schema migrations | |
 | Prisma schema import + codegen CLI | |
 | belongsTo relation includes | |
@@ -172,6 +172,10 @@ await synchronize({
 | `@melon/sync` (outbox + orchestrator) | |
 | Persistent SQLite checkpoints | |
 | `@melon/sync-server` (HTTP reference backend) | |
+| Sync retry queue + cancellation | |
+| Network monitor hooks + auto-resume | |
+| Conflict policies (client-wins, last-write-wins) | |
+| Migration-aware sync coordination | |
 | CI (test, typecheck, biome, bench-smoke, docs typecheck) | |
 
 ## Development

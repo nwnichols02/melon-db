@@ -6,7 +6,9 @@ import {
 } from "@melon/db";
 import { createMemoryCheckpointStore } from "../src/checkpoint.ts";
 import { SyncErrorCode } from "../src/errors.ts";
+import { createMutableNetworkMonitor } from "../src/network.ts";
 import { SyncStatusKind } from "../src/state.ts";
+import type { SynchronizeArgs } from "../src/synchronize.ts";
 import { synchronize } from "../src/synchronize.ts";
 import { MockSyncServer } from "./mock-backend.ts";
 
@@ -34,12 +36,14 @@ function createSyncClient(server: MockSyncServer) {
 
 	return {
 		db,
-		sync: () =>
+		sync: (extra?: Partial<SynchronizeArgs>) =>
 			synchronize({
 				db,
 				pullChanges: (args) => server.pullChanges(args),
 				pushChanges: (args) => server.pushChanges(args),
 				checkpointStore: createMemoryCheckpointStore(),
+				retryPolicy: false,
+				...extra,
 			}),
 	};
 }
@@ -73,11 +77,7 @@ describe("synchronize", () => {
 		const client = createSyncClient(server);
 
 		const statuses: string[] = [];
-		await synchronize({
-			db: client.db,
-			pullChanges: (args) => server.pullChanges(args),
-			pushChanges: (args) => server.pushChanges(args),
-			checkpointStore: createMemoryCheckpointStore(),
+		await client.sync({
 			onStatusChange: (status) => statuses.push(status.status),
 		});
 
@@ -109,6 +109,7 @@ describe("synchronize", () => {
 					throw new Error("network down");
 				},
 				checkpointStore: checkpoint,
+				retryPolicy: false,
 			});
 			expect.unreachable();
 		} catch (error) {
@@ -151,6 +152,7 @@ describe("synchronize", () => {
 					await server.pushChanges(args);
 				},
 				checkpointStore: checkpoint,
+				retryPolicy: false,
 			});
 
 		try {
@@ -188,6 +190,7 @@ describe("synchronize", () => {
 			pullChanges: (args) => server.pullChanges(args),
 			pushChanges: (args) => server.pushChanges(args),
 			checkpointStore: createMemoryCheckpointStore(),
+			retryPolicy: false,
 			onSyncEvent: (snapshot) => {
 				phases.push(snapshot.phase);
 			},
@@ -224,6 +227,7 @@ describe("synchronize", () => {
 					throw new Error("network down");
 				},
 				checkpointStore: createMemoryCheckpointStore(),
+				retryPolicy: false,
 				onSyncEvent: (snapshot) => {
 					if (snapshot.phase === "failed") {
 						failedEvents.push({
@@ -239,5 +243,84 @@ describe("synchronize", () => {
 
 		expect(failedEvents).toHaveLength(1);
 		expect(failedEvents[0]?.retryable).toBe(true);
+	});
+
+	test("pull retries succeed on third attempt with fast policy", async () => {
+		const server = new MockSyncServer();
+		const client = createSyncClient(server);
+		let pullCalls = 0;
+		const statuses: string[] = [];
+
+		await client.sync({
+			retryPolicy: {
+				maxAttempts: 3,
+				baseDelayMs: 1,
+				maxDelayMs: 2,
+				jitter: false,
+			},
+			pullChanges: async (args) => {
+				pullCalls += 1;
+				if (pullCalls < 3) {
+					throw new Error("transient pull");
+				}
+				return server.pullChanges(args);
+			},
+			onStatusChange: (status) => statuses.push(status.status),
+		});
+
+		expect(pullCalls).toBe(3);
+		expect(statuses).toContain(SyncStatusKind.Retrying);
+		expect(statuses).toContain(SyncStatusKind.Complete);
+	});
+
+	test("offline monitor emits paused and throws SYNC_OFFLINE", async () => {
+		const server = new MockSyncServer();
+		const client = createSyncClient(server);
+		const monitor = createMutableNetworkMonitor(false);
+		const statuses: string[] = [];
+
+		await expect(
+			client.sync({
+				networkMonitor: monitor,
+				onStatusChange: (status) => statuses.push(status.status),
+			}),
+		).rejects.toMatchObject({ code: SyncErrorCode.SYNC_OFFLINE });
+
+		expect(statuses).toContain(SyncStatusKind.Paused);
+	});
+
+	test("strict schema mismatch throws before apply", async () => {
+		const server = new MockSyncServer();
+		const client = createSyncClient(server);
+
+		await expect(
+			client.sync({
+				pullChanges: async (args) => ({
+					...(await server.pullChanges(args)),
+					schemaVersion: 0,
+				}),
+				migrationSyncPolicy: "strict",
+			}),
+		).rejects.toMatchObject({ code: SyncErrorCode.SYNC_SCHEMA_MISMATCH });
+	});
+
+	test("checkpoint stores schema version after successful sync", async () => {
+		const server = new MockSyncServer();
+		const checkpoint = createMemoryCheckpointStore();
+		const db = createDatabase({
+			schema: syncSchema,
+			adapter: createInMemoryAdapter(),
+			sync: {},
+		});
+
+		await synchronize({
+			db,
+			pullChanges: (args) => server.pullChanges(args),
+			pushChanges: (args) => server.pushChanges(args),
+			checkpointStore: checkpoint,
+			retryPolicy: false,
+		});
+
+		expect(await checkpoint.getLastSchemaVersion?.()).toBe(1);
 	});
 });

@@ -15,6 +15,7 @@ export interface PullArgs {
 export interface PullResult {
 	changes: SyncChanges;
 	timestamp: number;
+	schemaVersion?: number;
 }
 
 export interface PushArgs {

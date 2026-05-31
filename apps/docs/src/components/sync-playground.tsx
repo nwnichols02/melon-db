@@ -2,6 +2,7 @@ import {
 	createDatabase,
 	createInMemoryAdapter,
 	createMelonSchema,
+	type ApplyRemoteChangesOptions,
 } from "@melon/db";
 import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
 import {
@@ -47,6 +48,15 @@ const server = new InMemorySyncStore({
 	primaryKey: "id",
 });
 
+const CONFLICT_OPTIONS: Array<{
+	label: string;
+	value: ApplyRemoteChangesOptions["conflictPolicy"];
+}> = [
+	{ label: "Server wins", value: "server-wins" },
+	{ label: "Client wins", value: "client-wins" },
+	{ label: "Last write wins", value: "last-write-wins" },
+];
+
 /**
  * Two-client sync demo with devtools sync event logging.
  */
@@ -54,23 +64,48 @@ export function SyncPlayground(): ReactElement {
 	const checkpointA = useMemo(() => createMemoryCheckpointStore(), []);
 	const checkpointB = useMemo(() => createMemoryCheckpointStore(), []);
 	const [status, setStatus] = useState("Idle");
+	const [flakyNetwork, setFlakyNetwork] = useState(false);
+	const [conflictPolicy, setConflictPolicy] =
+		useState<ApplyRemoteChangesOptions["conflictPolicy"]>("server-wins");
+	const flakyRef = useMemo(() => ({ remainingFailures: 0 }), []);
 
 	const syncClient = useCallback(
-		async (label: "A" | "B", checkpoint: ReturnType<typeof createMemoryCheckpointStore>) => {
+		async (
+			label: "A" | "B",
+			checkpoint: ReturnType<typeof createMemoryCheckpointStore>,
+		) => {
 			setStatus(`Syncing client ${label}…`);
+			let pullCalls = 0;
 			await synchronize({
 				db,
 				checkpointStore: checkpoint,
-				pullChanges: (args: PullArgs) => server.pullChanges(args),
+				conflictPolicy,
+				retryPolicy: {
+					maxAttempts: 3,
+					baseDelayMs: 50,
+					maxDelayMs: 100,
+					jitter: false,
+				},
+				pullChanges: async (args: PullArgs): Promise<PullResult> => {
+					pullCalls += 1;
+					if (flakyNetwork && flakyRef.remainingFailures > 0) {
+						flakyRef.remainingFailures -= 1;
+						throw new Error("simulated flaky network");
+					}
+					return server.pullChanges(args);
+				},
 				pushChanges: (args: PushArgs) => server.pushChanges(args),
 				onSyncEvent: bridge.emitSync?.bind(bridge),
 			});
-			setStatus(`Client ${label} synced`);
+			setStatus(`Client ${label} synced (${pullCalls} pull attempt(s))`);
 		},
-		[],
+		[conflictPolicy, flakyNetwork, flakyRef],
 	);
 
 	const seedAndSync = useCallback(async () => {
+		if (flakyNetwork) {
+			flakyRef.remainingFailures = 2;
+		}
 		await db.write(async (tx) => {
 			await tx.collection("tasks").insert({
 				id: crypto.randomUUID(),
@@ -80,7 +115,7 @@ export function SyncPlayground(): ReactElement {
 		});
 		await syncClient("A", checkpointA);
 		await syncClient("B", checkpointB);
-	}, [checkpointA, checkpointB, syncClient]);
+	}, [checkpointA, checkpointB, syncClient, flakyNetwork, flakyRef]);
 
 	return (
 		<MelonDbProvider db={db}>
@@ -96,8 +131,36 @@ export function SyncPlayground(): ReactElement {
 					<h2 style={{ marginTop: 0 }}>Sync playground</h2>
 					<p style={{ color: "#666" }}>
 						Creates a local task, pushes to an in-memory reference server, then
-						pulls on a second checkpoint. Check the Sync tab in devtools.
+						pulls on a second checkpoint. Check the Sync tab in devtools for
+						retry events when flaky network is enabled.
 					</p>
+					<div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
+						<label style={{ display: "flex", alignItems: "center", gap: 6 }}>
+							<input
+								checked={flakyNetwork}
+								onChange={(event) => setFlakyNetwork(event.target.checked)}
+								type="checkbox"
+							/>
+							Flaky network (fail 2 pulls)
+						</label>
+						<label style={{ display: "flex", alignItems: "center", gap: 6 }}>
+							Conflict policy
+							<select
+								onChange={(event) =>
+									setConflictPolicy(
+										event.target.value as ApplyRemoteChangesOptions["conflictPolicy"],
+									)
+								}
+								value={conflictPolicy}
+							>
+								{CONFLICT_OPTIONS.map((option) => (
+									<option key={option.value} value={option.value}>
+										{option.label}
+									</option>
+								))}
+							</select>
+						</label>
+					</div>
 					<button
 						onClick={() => void seedAndSync()}
 						style={{

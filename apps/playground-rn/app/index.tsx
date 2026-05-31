@@ -2,20 +2,23 @@ import { createQueryFactory } from "@melon/db-query";
 import { useQuery, useSync, useWriter } from "@melon/db-react";
 import { SyncStatusKind } from "@melon/sync";
 import { FlashList } from "@shopify/flash-list";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AddTaskForm } from "@/components/add-task-form";
 import { TaskRow } from "@/components/task-row";
 import { createTaskId } from "@/db/create-task-id";
 import { type Task, taskSchema } from "@/db/schema";
+import { devNetworkMonitor } from "@/sync/network-monitor";
 
 /**
  * Task list screen backed by reactive Melon queries.
  */
 export default function TasksScreen(): React.ReactElement {
 	const write = useWriter();
-	const { sync, status, isSyncing, error } = useSync();
+	const { sync, status, isSyncing, isPaused, retryCount, error, cancel } =
+		useSync();
+	const [offlineSimulated, setOfflineSimulated] = useState(false);
 
 	const openTasksQuery = useMemo(
 		() =>
@@ -64,14 +67,47 @@ export default function TasksScreen(): React.ReactElement {
 		}
 	}, [sync]);
 
+	const handleToggleOffline = useCallback(() => {
+		setOfflineSimulated((current) => {
+			const next = !current;
+			devNetworkMonitor.setOnline(!next);
+			return next;
+		});
+	}, []);
+
+	const handleConflictDemo = useCallback(async () => {
+		await write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "conflict-demo",
+				title: "Local conflict version",
+				status: "open",
+				priority: 99,
+				updatedAt: new Date(),
+			});
+		});
+		try {
+			await sync();
+		} catch {
+			// surfaced via error state
+		}
+	}, [write, sync]);
+
 	const statusLabel = useMemo(() => {
 		if (error) {
 			return `Failed: ${error.message}`;
 		}
+		if (isPaused || offlineSimulated) {
+			return "Paused (offline)";
+		}
+		if (status.status === SyncStatusKind.Retrying) {
+			return `Retrying (${status.attempt}/3)…`;
+		}
 		switch (status.status) {
 			case SyncStatusKind.Pulling:
 			case SyncStatusKind.Pushing:
-				return "Syncing…";
+				return retryCount > 0
+					? `Syncing… (retry ${retryCount})`
+					: "Syncing…";
 			case SyncStatusKind.Complete:
 				return "Synced";
 			case SyncStatusKind.Failed:
@@ -79,7 +115,7 @@ export default function TasksScreen(): React.ReactElement {
 			default:
 				return "Idle";
 		}
-	}, [status.status, error]);
+	}, [status, error, isPaused, offlineSimulated, retryCount]);
 
 	return (
 		<SafeAreaView style={styles.container} edges={["bottom"]}>
@@ -94,6 +130,21 @@ export default function TasksScreen(): React.ReactElement {
 						{isSyncing ? "Syncing…" : "Sync now"}
 					</Text>
 				</Pressable>
+			</View>
+			<View style={styles.devControls}>
+				<Pressable onPress={handleToggleOffline} style={styles.devButton}>
+					<Text style={styles.devButtonText}>
+						{offlineSimulated ? "Go online" : "Simulate offline"}
+					</Text>
+				</Pressable>
+				<Pressable onPress={handleConflictDemo} style={styles.devButton}>
+					<Text style={styles.devButtonText}>Conflict demo</Text>
+				</Pressable>
+				{isSyncing ? (
+					<Pressable onPress={cancel} style={styles.devButton}>
+						<Text style={styles.devButtonText}>Cancel</Text>
+					</Pressable>
+				) : null}
 			</View>
 			<AddTaskForm onAdd={handleAdd} />
 			{tasks.length === 0 ? (
@@ -147,6 +198,25 @@ const styles = StyleSheet.create({
 		color: "#fff",
 		fontSize: 14,
 		fontWeight: "600",
+	},
+	devControls: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		gap: 8,
+		paddingHorizontal: 16,
+		paddingVertical: 8,
+		borderBottomWidth: StyleSheet.hairlineWidth,
+		borderBottomColor: "#eee",
+	},
+	devButton: {
+		backgroundColor: "#f3f3f3",
+		paddingHorizontal: 10,
+		paddingVertical: 6,
+		borderRadius: 6,
+	},
+	devButtonText: {
+		fontSize: 12,
+		color: "#333",
 	},
 	empty: {
 		flex: 1,

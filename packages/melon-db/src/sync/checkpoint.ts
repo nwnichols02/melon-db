@@ -1,6 +1,9 @@
 /** Meta key for persisted sync checkpoint in `_melon_meta`. */
 export const SYNC_LAST_PULLED_AT_KEY = "sync_last_pulled_at";
 
+/** Meta key for last synced schema version in `_melon_meta`. */
+export const SYNC_LAST_SCHEMA_VERSION_KEY = "sync_last_schema_version";
+
 /**
  * Key-value meta storage backed by adapter `_melon_meta` table.
  */
@@ -15,6 +18,8 @@ export interface MetaStore {
 export interface CheckpointStore {
 	getLastPulledAt(): Promise<number | null>;
 	setLastPulledAt(timestamp: number): Promise<void>;
+	getLastSchemaVersion?(): Promise<number | null>;
+	setLastSchemaVersion?(version: number): Promise<void>;
 }
 
 /**
@@ -22,6 +27,7 @@ export interface CheckpointStore {
  */
 export function createMemoryCheckpointStore(): CheckpointStore {
 	let lastPulledAt: number | null = null;
+	let lastSchemaVersion: number | null = null;
 
 	return {
 		async getLastPulledAt(): Promise<number | null> {
@@ -29,6 +35,12 @@ export function createMemoryCheckpointStore(): CheckpointStore {
 		},
 		async setLastPulledAt(timestamp: number): Promise<void> {
 			lastPulledAt = timestamp;
+		},
+		async getLastSchemaVersion(): Promise<number | null> {
+			return lastSchemaVersion;
+		},
+		async setLastSchemaVersion(version: number): Promise<void> {
+			lastSchemaVersion = version;
 		},
 	};
 }
@@ -48,6 +60,17 @@ export function createMetaCheckpointStore(meta: MetaStore): CheckpointStore {
 		},
 		async setLastPulledAt(timestamp: number): Promise<void> {
 			await meta.setMeta(SYNC_LAST_PULLED_AT_KEY, String(timestamp));
+		},
+		async getLastSchemaVersion(): Promise<number | null> {
+			const raw = await meta.getMeta(SYNC_LAST_SCHEMA_VERSION_KEY);
+			if (raw === null) {
+				return null;
+			}
+			const parsed = Number(raw);
+			return Number.isFinite(parsed) ? parsed : null;
+		},
+		async setLastSchemaVersion(version: number): Promise<void> {
+			await meta.setMeta(SYNC_LAST_SCHEMA_VERSION_KEY, String(version));
 		},
 	};
 }

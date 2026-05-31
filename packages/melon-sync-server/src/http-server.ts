@@ -12,6 +12,7 @@ export interface CreateSyncHttpServerOptions {
 	hostname?: string;
 	store?: InMemorySyncStore;
 	collection?: string;
+	maxSchemaVersion?: number;
 }
 
 export interface SyncHttpServer {
@@ -61,6 +62,7 @@ export function createSyncHttpServer(
 ): SyncHttpServer {
 	const port = options.port ?? 8787;
 	const hostname = options.hostname ?? "0.0.0.0";
+	const maxSchemaVersion = options.maxSchemaVersion ?? 1;
 	const store =
 		options.store ??
 		new StoreClass({ collection: options.collection ?? "tasks" });
@@ -78,10 +80,14 @@ export function createSyncHttpServer(
 			try {
 				if (request.method === "POST" && url.pathname === "/sync/pull") {
 					const body = await readJson(request);
-					const args = validatePullBody(body);
+					const args = validatePullBody(body, { maxSchemaVersion });
 					const result = await store.pullChanges(args);
 					const timestamp = validatePullResultTimestamp(result.timestamp);
-					return jsonResponse({ changes: result.changes, timestamp });
+					return jsonResponse({
+						changes: result.changes,
+						timestamp,
+						schemaVersion: maxSchemaVersion,
+					});
 				}
 
 				if (request.method === "POST" && url.pathname === "/sync/push") {

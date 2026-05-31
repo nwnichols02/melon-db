@@ -51,7 +51,10 @@ export function validateSyncChanges(changes: unknown): SyncChanges {
 /**
  * Validates pull request body.
  */
-export function validatePullBody(body: unknown): PullArgs {
+export function validatePullBody(
+	body: unknown,
+	options?: { maxSchemaVersion?: number },
+): PullArgs {
 	if (!isRecord(body)) {
 		throw new SyncServerError("Invalid pull payload", {
 			code: SyncServerErrorCode.INVALID_PAYLOAD,
@@ -75,7 +78,33 @@ export function validatePullBody(body: unknown): PullArgs {
 		});
 	}
 
-	return { lastPulledAt, schemaVersion };
+	if (
+		options?.maxSchemaVersion !== undefined &&
+		schemaVersion > options.maxSchemaVersion
+	) {
+		throw new SyncServerError(
+			`Client schema version ${schemaVersion} exceeds server max ${options.maxSchemaVersion}`,
+			{ code: SyncServerErrorCode.SCHEMA_VERSION_UNSUPPORTED },
+		);
+	}
+
+	const migration =
+		body.migration && isRecord(body.migration)
+			? {
+					from: Number(body.migration.from),
+					tables: Array.isArray(body.migration.tables)
+						? (body.migration.tables as string[])
+						: [],
+					columns: Array.isArray(body.migration.columns)
+						? (body.migration.columns as Array<{
+								table: string;
+								columns: string[];
+							}>)
+						: [],
+				}
+			: undefined;
+
+	return { lastPulledAt, schemaVersion, migration };
 }
 
 /**

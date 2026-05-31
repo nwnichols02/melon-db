@@ -8,7 +8,11 @@ Depends only on `@melon/db` — no React, SQLite, or query packages required.
 
 ```ts
 import { createDatabase, createInMemoryAdapter, createMelonSchema } from '@melon/db';
-import { createMemoryCheckpointStore, synchronize } from '@melon/sync';
+import {
+  createMemoryCheckpointStore,
+  DEFAULT_RETRY_POLICY,
+  synchronize,
+} from '@melon/sync';
 
 const schema = createMelonSchema({
   version: 1,
@@ -32,53 +36,86 @@ await synchronize({
   pullChanges: async (args) => /* backend pull */,
   pushChanges: async (args) => /* backend push */,
   checkpointStore: createMemoryCheckpointStore(),
+  retryPolicy: DEFAULT_RETRY_POLICY,
 });
 ```
+
+## Retry and cancellation
+
+```ts
+await synchronize({
+  db,
+  pullChanges,
+  pushChanges,
+  retryPolicy: DEFAULT_RETRY_POLICY, // maxAttempts: 3, exponential backoff
+  signal: abortController.signal,
+});
+```
+
+Set `retryPolicy: false` to disable automatic retries.
+
+## Network monitor
+
+```ts
+import { createMutableNetworkMonitor } from '@melon/sync';
+
+const monitor = createMutableNetworkMonitor(true);
+await synchronize({ db, pullChanges, pushChanges, networkMonitor: monitor });
+```
+
+When offline, sync emits `paused` and throws `SYNC_OFFLINE` (retryable).
+
+## Conflict policies
+
+Pass `conflictPolicy` to `synchronize()`:
+
+- `server-wins` (default)
+- `skip-existing`
+- `client-wins`
+- `last-write-wins` (optional `syncTimestampField`)
+
+## Migration-aware sync
+
+```ts
+await synchronize({
+  db,
+  pullChanges,
+  pushChanges,
+  migrations: dbMigrations,
+  migrationSyncPolicy: 'strict', // or 'lenient'
+});
+```
+
+Checkpoint store also persists `sync_last_schema_version` when using meta storage.
 
 ## Persistent checkpoints
 
 For SQLite-backed apps, use the meta-table checkpoint store:
 
 ```ts
-import { createMetaCheckpointStore, SYNC_LAST_PULLED_AT_KEY } from '@melon/sync';
-
-// After db is initialized with sync enabled:
 const checkpointStore = db.createCheckpointStore();
-// Uses adapter.meta (_melon_meta) when available, else in-memory fallback
 ```
 
-Or wire manually:
-
-```ts
-import { createMetaCheckpointStore } from '@melon/sync';
-
-const checkpointStore = createMetaCheckpointStore(adapter.meta!);
-```
-
-Checkpoint key: `sync_last_pulled_at` in `_melon_meta`.
+Keys in `_melon_meta`: `sync_last_pulled_at`, `sync_last_schema_version`.
 
 ## Protocol
 
-`@melon/sync` follows the WatermelonDB sync contract:
-
 | Step | Action |
 |------|--------|
-| Pull | `pullChanges({ lastPulledAt, schemaVersion })` → `{ changes, timestamp }` |
-| Apply | `db.applyRemoteChanges(changes)` (server-wins by default) |
-| Push | `pushChanges({ changes: await db.getLocalChanges(), lastPulledAt })` |
+| Pull | `pullChanges({ lastPulledAt, schemaVersion, migration? })` → `{ changes, timestamp, schemaVersion? }` |
+| Apply | `db.applyRemoteChanges(changes, { conflictPolicy })` |
+| Push | `pushChanges({ changes, lastPulledAt })` |
 | Ack | `db.markLocalChangesPushed()` |
-| Checkpoint | `checkpointStore.setLastPulledAt(timestamp)` |
+| Checkpoint | `setLastPulledAt` + `setLastSchemaVersion` |
 
 ## Sync status
 
-`synchronize()` emits status transitions via `onStatusChange`:
-
 - `idle` → `pulling` → `pushing` → `complete`
-- On failure: `failed` with a `SyncError` (checkpoint and outbox preserved for retry)
+- `retrying` with `{ phase, attempt }` on pull/push retries
+- `paused` when offline
+- `failed` with `SyncError` (checkpoint and outbox preserved)
 
 ## Reference HTTP backend
-
-Use `@melon/sync-server` for local dev and integration tests:
 
 ```bash
 bun run sync-server
@@ -86,24 +123,15 @@ bun run sync-server
 
 See [`packages/melon-sync-server/README.md`](../melon-sync-server/README.md).
 
-## Demos
-
-From the monorepo root:
-
-```bash
-bun run demo:sync        # in-process mock server
-bun run demo:sync:http   # HTTP reference server
-```
-
 ## React hooks
 
 Use `@melon/db-react` for `MelonSyncProvider`, `useSync`, and `useSyncStatus`.
 
 ## v1 limitations
 
-- Default conflict policy: server-wins on pull
-- No migration-aware sync (Phase 14)
-- No retry queue / network hooks (Phase 14)
+- No Postgres reference backend (Phase 16)
+- No merge-by-field conflict resolver
+- No background sync service
 
 ## Development
 

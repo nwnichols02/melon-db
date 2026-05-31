@@ -16,7 +16,13 @@ export interface GetLocalChangesOptions {
 
 export interface ApplyRemoteChangesOptions {
 	/** Default: server-wins — remote record replaces local on id collision. */
-	conflictPolicy?: "server-wins" | "skip-existing";
+	conflictPolicy?:
+		| "server-wins"
+		| "skip-existing"
+		| "client-wins"
+		| "last-write-wins";
+	/** Field used for last-write-wins; defaults to "_updated_at" when present. */
+	syncTimestampField?: string;
 }
 
 export interface SyncConfig {
