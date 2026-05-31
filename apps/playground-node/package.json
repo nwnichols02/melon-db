@@ -1,0 +1,13 @@
+{
+	"name": "playground-node",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"demo": "bun run src/demo.ts"
+	},
+	"dependencies": {
+		"@melon/db": "workspace:*",
+		"@melon/db-sqlite": "workspace:*",
+		"@melon/db-query": "workspace:*"
+	}
+}

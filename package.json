@@ -7,7 +7,9 @@
     "test": "bun run --filter './packages/*' test",
     "typecheck": "bun run --filter './packages/*' typecheck",
     "build": "bun run --filter './packages/*' build",
-    "check": "bunx biome check packages"
+    "check": "bunx biome check packages",
+    "demo": "bun run --filter playground-node demo",
+    "bench": "bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

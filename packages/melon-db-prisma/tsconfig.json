@@ -1,4 +1,4 @@
 {
-  "extends": "../../tooling/tsconfig.base.json",
-  "include": ["src/**/*", "__tests__/**/*"]
+	"extends": "../../tooling/tsconfig.base.json",
+	"include": ["src/**/*", "__tests__/**/*"]
 }

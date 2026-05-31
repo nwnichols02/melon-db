@@ -1,20 +1,21 @@
 {
-  "name": "@melon/db-sqlite",
-  "version": "0.0.0-alpha",
-  "type": "module",
-  "exports": {
-    ".": "./src/index.ts"
-  },
-  "scripts": {
-    "test": "bun test",
-    "typecheck": "bunx tsc -p tsconfig.json --noEmit",
-    "build": "bun build ./src/index.ts --outdir ./dist --target node"
-  },
-  "dependencies": {
-    "@melon/db": "workspace:*"
-  },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "typescript": "^5"
-  }
+	"name": "@melon/db-sqlite",
+	"version": "0.0.0-alpha",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	},
+	"scripts": {
+		"test": "bun test",
+		"typecheck": "bunx tsc -p tsconfig.json --noEmit",
+		"build": "bun build ./src/index.ts --outdir ./dist --target node"
+	},
+	"dependencies": {
+		"@melon/db": "workspace:*"
+	},
+	"devDependencies": {
+		"@melon/db-devtools": "workspace:*",
+		"@types/bun": "latest",
+		"typescript": "^5"
+	}
 }

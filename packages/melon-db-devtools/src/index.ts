@@ -1,5 +1,5 @@
 export {
-  createMemoryDevtoolsBridge,
-  createNoopDevtoolsBridge,
-  type DevtoolsEventLog,
-} from './bridge.ts';
+	createMemoryDevtoolsBridge,
+	createNoopDevtoolsBridge,
+	type DevtoolsEventLog,
+} from "./bridge.ts";

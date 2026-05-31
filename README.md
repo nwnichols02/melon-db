@@ -12,18 +12,19 @@ Next-generation offline-first local database for React Native and TypeScript (Wa
 | `@melon/db-query-mango` | Mango-style query compiler |
 | `@melon/db-prisma` | Prisma-like local client facade |
 | `@melon/db-react` | React hooks and provider |
-| `@melon/db-devtools` | Devtools event bridge |
-| `@melon/db-testkit` | Test helpers and in-memory utilities |
+| `@melon/db-devtools` | Devtools event bridge (query/SQL snapshots) |
+| `@melon/db-testkit` | Test helpers, fixtures, `withTestDatabase` |
 
-## Development
+## Quick start
 
 ```bash
 bun install
 bun test
 bun run typecheck
+bun run check
 ```
 
-## Example
+### In-memory
 
 ```ts
 import { createDatabase, createInMemoryAdapter, createMelonSchema } from '@melon/db';
@@ -47,3 +48,41 @@ await db.write(async (tx) => {
 
 const tasks = await db.collection('tasks').findMany();
 ```
+
+### SQLite + fluent query
+
+```bash
+bun run demo
+```
+
+See [`apps/playground-node/src/demo.ts`](apps/playground-node/src/demo.ts).
+
+### Benchmarks
+
+```bash
+bun run bench
+```
+
+See [`packages/melon-db-sqlite/README.md`](packages/melon-db-sqlite/README.md) for informal baseline notes.
+
+## v1 limitations
+
+- All mutations must run inside `db.write()`.
+- No automatic schema migrations.
+- No relation includes in queries (v1).
+- SQLite adapter targets Bun/Node only (not React Native yet).
+
+## Completed vs roadmap
+
+| Done | Deferred |
+|------|----------|
+| Core engine M0–M2 | RN JSI SQLite adapter |
+| SQLite SQL compiler + Bun adapter | `apps/playground-rn` |
+| Query / Mango / Prisma surfaces | `@melon/sync` |
+| React hooks | `@melon/db-codemods` |
+| Devtools bridge + SQL snapshots | Docs site |
+| CI (test, typecheck, biome) | |
+
+## Development
+
+Per-package typecheck: `bun run typecheck`. Adapter parity is enforced by shared vectors in `packages/melon-db/__fixtures__/`.
