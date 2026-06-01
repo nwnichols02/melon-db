@@ -15,6 +15,7 @@ Melon-owned SQLite native module for React Native **development builds**.
 ## Limitations
 
 - Bridge modules (RCT / `ReactContextBaseJavaModule`), not synchronous JSI codegen yet.
+- Android `exec()` routes `PRAGMA` through `rawQuery` (Android forbids `execSQL` for statements that return rows, e.g. `journal_mode = WAL`).
 - **BLOB / `bytes` fields** are not round-tripped on the native path (returned as `null`).
 - No native `observeQuery` triggers — the engine uses its change emitter fallback.
 

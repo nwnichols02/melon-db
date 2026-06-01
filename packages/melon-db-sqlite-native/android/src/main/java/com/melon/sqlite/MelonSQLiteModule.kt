@@ -12,6 +12,7 @@ import com.facebook.react.bridge.ReadableType
 import com.facebook.react.bridge.WritableArray
 import com.facebook.react.bridge.WritableMap
 import java.io.File
+import java.util.Locale
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -69,6 +70,24 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 		return args as Array<String>
 	}
 
+	/**
+	 * Android [SQLiteDatabase.execSQL] rejects statements that return rows (SELECT, many PRAGMAs).
+	 * Melon uses exec() for DDL and `PRAGMA journal_mode = WAL` during adapter init.
+	 */
+	private fun execSql(db: SQLiteDatabase, sql: String) {
+		val trimmed = sql.trimStart().uppercase(Locale.US)
+		if (trimmed.startsWith("SELECT") || trimmed.startsWith("PRAGMA")) {
+			val cursor = db.rawQuery(sql, null)
+			try {
+				// Consume rows so PRAGMA side effects apply (e.g. journal_mode).
+			} finally {
+				cursor.close()
+			}
+			return
+		}
+		db.execSQL(sql)
+	}
+
 	private fun rowToMap(cursor: Cursor): WritableMap {
 		val row = Arguments.createMap()
 		for (i in 0 until cursor.columnCount) {
@@ -122,7 +141,7 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 		lock.withLock {
 			val db = ensureOpen(promise) ?: return
 			try {
-				db.execSQL(sql)
+				execSql(db, sql)
 				promise.resolve(null)
 			} catch (e: Exception) {
 				promise.reject("SQLITE_EXEC", e.message, e)
