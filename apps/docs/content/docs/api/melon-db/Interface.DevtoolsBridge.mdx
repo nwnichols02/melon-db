@@ -1,0 +1,104 @@
+---
+title: "DevtoolsBridge"
+description: "API reference: DevtoolsBridge"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: DevtoolsBridge
+
+Defined in: [packages/melon-db/src/devtools.ts:39](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/devtools.ts#L39)
+
+## Methods
+
+### emitError()
+
+> **emitError**(`error`): `void`
+
+Defined in: [packages/melon-db/src/devtools.ts:43](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/devtools.ts#L43)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `error` | `Error` & `object` |
+
+#### Returns
+
+`void`
+
+***
+
+### emitQuery()
+
+> **emitQuery**(`snapshot`): `void`
+
+Defined in: [packages/melon-db/src/devtools.ts:40](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/devtools.ts#L40)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `snapshot` | [`QueryDebugSnapshot`](Interface.QueryDebugSnapshot) |
+
+#### Returns
+
+`void`
+
+***
+
+### emitSubscription()
+
+> **emitSubscription**(`event`): `void`
+
+Defined in: [packages/melon-db/src/devtools.ts:42](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/devtools.ts#L42)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `event` | \{ `active`: `boolean`; `collection`: `string`; \} |
+| `event.active` | `boolean` |
+| `event.collection` | `string` |
+
+#### Returns
+
+`void`
+
+***
+
+### emitSync()?
+
+> `optional` **emitSync**(`snapshot`): `void`
+
+Defined in: [packages/melon-db/src/devtools.ts:44](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/devtools.ts#L44)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `snapshot` | [`SyncDebugSnapshot`](Interface.SyncDebugSnapshot) |
+
+#### Returns
+
+`void`
+
+***
+
+### emitWrite()
+
+> **emitWrite**(`operation`): `void`
+
+Defined in: [packages/melon-db/src/devtools.ts:41](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/devtools.ts#L41)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `operation` | [`AdapterWriteOperation`](TypeAlias.AdapterWriteOperation) |
+
+#### Returns
+
+`void`

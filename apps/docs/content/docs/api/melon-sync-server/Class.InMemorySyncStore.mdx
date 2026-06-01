@@ -1,0 +1,98 @@
+---
+title: "InMemorySyncStore"
+description: "API reference: InMemorySyncStore"
+---
+
+[**Melon API**](index)
+
+***
+
+# Class: InMemorySyncStore
+
+Defined in: [packages/melon-sync-server/src/store.ts:29](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-sync-server/src/store.ts#L29)
+
+In-memory reference sync backend with timestamp-filtered pull.
+
+## Implements
+
+- [`SyncBackend`](Interface.SyncBackend)
+
+## Constructors
+
+### Constructor
+
+> **new InMemorySyncStore**(`options?`): `InMemorySyncStore`
+
+Defined in: [packages/melon-sync-server/src/store.ts:37](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-sync-server/src/store.ts#L37)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `options` | [`InMemorySyncStoreOptions`](Interface.InMemorySyncStoreOptions) |
+
+#### Returns
+
+`InMemorySyncStore`
+
+## Methods
+
+### getRecord()
+
+> **getRecord**(`id`): `SyncRecord` \| `undefined`
+
+Defined in: [packages/melon-sync-server/src/store.ts:130](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-sync-server/src/store.ts#L130)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `id` | `string` |
+
+#### Returns
+
+`SyncRecord` \| `undefined`
+
+***
+
+### pullChanges()
+
+> **pullChanges**(`args`): `Promise`\<`PullResult`\>
+
+Defined in: [packages/melon-sync-server/src/store.ts:62](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-sync-server/src/store.ts#L62)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args` | `PullArgs` |
+
+#### Returns
+
+`Promise`\<`PullResult`\>
+
+#### Implementation of
+
+[`SyncBackend`](Interface.SyncBackend).[`pullChanges`](Interface.SyncBackend.mdx#pullchanges)
+
+***
+
+### pushChanges()
+
+> **pushChanges**(`args`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-sync-server/src/store.ts:94](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-sync-server/src/store.ts#L94)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args` | `PushArgs` |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+#### Implementation of
+
+[`SyncBackend`](Interface.SyncBackend).[`pushChanges`](Interface.SyncBackend.mdx#pushchanges)

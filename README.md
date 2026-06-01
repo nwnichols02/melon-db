@@ -90,7 +90,7 @@ See [`packages/melon-db-sqlite/README.md`](packages/melon-db-sqlite/README.md) f
 bun run dev:docs
 ```
 
-Open http://localhost:3000 for guides and live in-browser playgrounds. See [`apps/docs/README.md`](apps/docs/README.md).
+Open http://localhost:3000 — guides at `/docs`, live playgrounds, package reference, and API docs. See [`apps/docs/README.md`](apps/docs/README.md) and the [docs phase](.cursor/phases/docs-fumadocs.md).
 
 ### Devtools
 
@@ -153,6 +153,8 @@ await synchronize({
 
 ## Completed vs roadmap
 
+Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun run dev:docs`). Summary:
+
 | Done | Deferred (Phase 18+) |
 |------|----------|
 | Core engine M0–M2 | Custom JSI/TurboModule SQLite |
@@ -167,7 +169,7 @@ await synchronize({
 | belongsTo relation includes | |
 | Reactive devtools bridge + sync event logging | |
 | Devtools React inspector panel (web + RN dev overlay) | |
-| `apps/docs` site with live playgrounds | |
+| Fumadocs + TanStack Start docs site | |
 | SQL predicate test coverage + debug flag | |
 | Benchmark harness (10k/50k/100k) + CI smoke | |
 | Adapter stress tests (rollback, write queue) | |

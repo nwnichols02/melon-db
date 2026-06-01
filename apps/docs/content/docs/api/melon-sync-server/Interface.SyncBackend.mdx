@@ -1,0 +1,48 @@
+---
+title: "SyncBackend"
+description: "API reference: SyncBackend"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: SyncBackend
+
+Defined in: [packages/melon-sync/src/protocol.ts:26](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-sync/src/protocol.ts#L26)
+
+## Methods
+
+### pullChanges()
+
+> **pullChanges**(`args`): `Promise`\<`PullResult`\>
+
+Defined in: [packages/melon-sync/src/protocol.ts:27](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-sync/src/protocol.ts#L27)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args` | `PullArgs` |
+
+#### Returns
+
+`Promise`\<`PullResult`\>
+
+***
+
+### pushChanges()
+
+> **pushChanges**(`args`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-sync/src/protocol.ts:28](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-sync/src/protocol.ts#L28)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args` | `PushArgs` |
+
+#### Returns
+
+`Promise`\<`void`\>

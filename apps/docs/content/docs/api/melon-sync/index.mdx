@@ -1,0 +1,62 @@
+---
+title: "Melon API"
+description: "API reference: Melon API"
+---
+
+**Melon API**
+
+***
+
+# Melon API
+
+## Classes
+
+- [SyncError](Class.SyncError)
+
+## Interfaces
+
+- [CheckpointStore](Interface.CheckpointStore)
+- [MetaStore](Interface.MetaStore)
+- [NetworkMonitor](Interface.NetworkMonitor)
+- [PullArgs](Interface.PullArgs)
+- [PullMigration](Interface.PullMigration)
+- [PullResult](Interface.PullResult)
+- [PushArgs](Interface.PushArgs)
+- [RetryPolicy](Interface.RetryPolicy)
+- [SyncBackend](Interface.SyncBackend)
+- [SyncDebugSnapshot](Interface.SyncDebugSnapshot)
+- [SyncErrorOptions](Interface.SyncErrorOptions)
+- [SynchronizeArgs](Interface.SynchronizeArgs)
+- [SynchronizeResult](Interface.SynchronizeResult)
+
+## Type Aliases
+
+- [SyncDebugPhase](TypeAlias.SyncDebugPhase)
+- [SyncErrorCode](TypeAlias.SyncErrorCode)
+- [SyncStatus](TypeAlias.SyncStatus)
+- [SyncStatusKind](TypeAlias.SyncStatusKind)
+
+## Variables
+
+- [DEFAULT\_RETRY\_POLICY](Variable.DEFAULT_RETRY_POLICY)
+- [SYNC\_LAST\_PULLED\_AT\_KEY](Variable.SYNC_LAST_PULLED_AT_KEY)
+- [SYNC\_LAST\_SCHEMA\_VERSION\_KEY](Variable.SYNC_LAST_SCHEMA_VERSION_KEY)
+- [SyncDebugPhase](Variable.SyncDebugPhase)
+- [SyncErrorCode](Variable.SyncErrorCode)
+- [SyncStatusKind](Variable.SyncStatusKind)
+
+## Functions
+
+- [buildPullMigration](Function.buildPullMigration)
+- [createAlwaysOnlineMonitor](Function.createAlwaysOnlineMonitor)
+- [createMemoryCheckpointStore](Function.createMemoryCheckpointStore)
+- [createMetaCheckpointStore](Function.createMetaCheckpointStore)
+- [createMutableNetworkMonitor](Function.createMutableNetworkMonitor)
+- [synchronize](Function.synchronize)
+- [withRetry](Function.withRetry)
+
+## References
+
+### SyncStatusKinds
+
+Renames and re-exports [SyncStatusKind](Variable.SyncStatusKind)

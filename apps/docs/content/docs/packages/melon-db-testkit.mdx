@@ -1,0 +1,20 @@
+---
+title: "@melon/db-testkit"
+description: Test helpers and withTestDatabase fixtures.
+---
+
+**Status:** Shipped · **Depends on:** `@melon/db` · **API:** [Reference](/docs/api/melon-db-testkit)
+
+Deterministic in-memory testing without native SQLite.
+
+```ts
+import { withTestDatabase } from '@melon/db-testkit';
+
+await withTestDatabase(schema, async (db) => {
+  await db.write(async (tx) => {
+    await tx.collection('tasks').insert({ id: '1', title: 'Test' });
+  });
+});
+```
+
+Re-exports in-memory adapter helpers aligned with `@melon/db` test patterns.

@@ -1,0 +1,16 @@
+{
+	"title": "Packages",
+	"pages": [
+		"melon-db",
+		"melon-db-sqlite",
+		"melon-db-query",
+		"melon-db-query-mango",
+		"melon-db-prisma",
+		"melon-db-react",
+		"melon-db-devtools",
+		"melon-db-testkit",
+		"melon-db-codemods",
+		"melon-sync",
+		"melon-sync-server"
+	]
+}

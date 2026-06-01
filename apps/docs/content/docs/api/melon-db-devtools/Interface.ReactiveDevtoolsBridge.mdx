@@ -1,0 +1,176 @@
+---
+title: "ReactiveDevtoolsBridge"
+description: "API reference: ReactiveDevtoolsBridge"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: ReactiveDevtoolsBridge
+
+Defined in: [melon-db-devtools/src/reactive-bridge.ts:11](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-devtools/src/reactive-bridge.ts#L11)
+
+## Extends
+
+- `DevtoolsBridge`
+
+## Properties
+
+| Property | Modifier | Type | Defined in |
+| ------ | ------ | ------ | ------ |
+| <a id="property-log"></a> `log` | `readonly` | [`DevtoolsEventLog`](Interface.DevtoolsEventLog) | [melon-db-devtools/src/reactive-bridge.ts:12](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-devtools/src/reactive-bridge.ts#L12) |
+
+## Methods
+
+### clear()
+
+> **clear**(): `void`
+
+Defined in: [melon-db-devtools/src/reactive-bridge.ts:15](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-devtools/src/reactive-bridge.ts#L15)
+
+#### Returns
+
+`void`
+
+***
+
+### emitError()
+
+> **emitError**(`error`): `void`
+
+Defined in: [melon-db/src/devtools.ts:43](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/devtools.ts#L43)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `error` | `Error` & `object` |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+`DevtoolsBridge.emitError`
+
+***
+
+### emitQuery()
+
+> **emitQuery**(`snapshot`): `void`
+
+Defined in: [melon-db/src/devtools.ts:40](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/devtools.ts#L40)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `snapshot` | `QueryDebugSnapshot` |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+`DevtoolsBridge.emitQuery`
+
+***
+
+### emitSubscription()
+
+> **emitSubscription**(`event`): `void`
+
+Defined in: [melon-db/src/devtools.ts:42](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/devtools.ts#L42)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `event` | \{ `active`: `boolean`; `collection`: `string`; \} |
+| `event.active` | `boolean` |
+| `event.collection` | `string` |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+`DevtoolsBridge.emitSubscription`
+
+***
+
+### emitSync()
+
+> **emitSync**(`snapshot`): `void`
+
+Defined in: [melon-db-devtools/src/reactive-bridge.ts:16](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-devtools/src/reactive-bridge.ts#L16)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `snapshot` | `SyncDebugSnapshot` |
+
+#### Returns
+
+`void`
+
+#### Overrides
+
+`DevtoolsBridge.emitSync`
+
+***
+
+### emitWrite()
+
+> **emitWrite**(`operation`): `void`
+
+Defined in: [melon-db/src/devtools.ts:41](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/devtools.ts#L41)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `operation` | `AdapterWriteOperation` |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+`DevtoolsBridge.emitWrite`
+
+***
+
+### getSnapshot()
+
+> **getSnapshot**(): [`DevtoolsEventLog`](Interface.DevtoolsEventLog)
+
+Defined in: [melon-db-devtools/src/reactive-bridge.ts:14](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-devtools/src/reactive-bridge.ts#L14)
+
+#### Returns
+
+[`DevtoolsEventLog`](Interface.DevtoolsEventLog)
+
+***
+
+### subscribe()
+
+> **subscribe**(`listener`): () => `void`
+
+Defined in: [melon-db-devtools/src/reactive-bridge.ts:13](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-devtools/src/reactive-bridge.ts#L13)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `listener` | () => `void` |
+
+#### Returns
+
+() => `void`

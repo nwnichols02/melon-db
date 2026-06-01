@@ -1,0 +1,28 @@
+---
+title: "createFetchNetworkMonitor"
+description: "API reference: createFetchNetworkMonitor"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: createFetchNetworkMonitor()
+
+> **createFetchNetworkMonitor**(`baseUrl`, `options?`): `NetworkMonitor`
+
+Defined in: [network-monitor.ts:6](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-react/src/network-monitor.ts#L6)
+
+Creates a network monitor that pings a URL and falls back to navigator.onLine on web.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `baseUrl` | `string` |
+| `options?` | \{ `intervalMs?`: `number`; \} |
+| `options.intervalMs?` | `number` |
+
+## Returns
+
+`NetworkMonitor`

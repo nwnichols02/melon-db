@@ -1,0 +1,26 @@
+---
+title: "compileWhere"
+description: "API reference: compileWhere"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: compileWhere()
+
+> **compileWhere**(`node`): [`SqlFragment`](Interface.SqlFragment)
+
+Defined in: [sql/compile-predicate.ts:61](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-sqlite/src/sql/compile-predicate.ts#L61)
+
+Compiles a boolean AST node into a SQL WHERE fragment.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `node` | `QueryBooleanNode` \| `undefined` |
+
+## Returns
+
+[`SqlFragment`](Interface.SqlFragment)

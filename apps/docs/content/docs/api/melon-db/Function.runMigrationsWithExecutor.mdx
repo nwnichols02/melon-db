@@ -1,0 +1,29 @@
+---
+title: "runMigrationsWithExecutor"
+description: "API reference: runMigrationsWithExecutor"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: runMigrationsWithExecutor()
+
+> **runMigrationsWithExecutor**(`schema`, `migrations`, `hooks`, `executor`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/migrations/runner.ts:27](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/migrations/runner.ts#L27)
+
+Runs migrations using adapter-specific step executors.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `schema` | [`MelonSchema`](Interface.MelonSchema) |
+| `migrations` | [`Migration`](Interface.Migration)[] |
+| `hooks` | [`MigrationAdapterHooks`](Interface.MigrationAdapterHooks) |
+| `executor` | [`MigrationStepExecutor`](Interface.MigrationStepExecutor) |
+
+## Returns
+
+`Promise`\<`void`\>

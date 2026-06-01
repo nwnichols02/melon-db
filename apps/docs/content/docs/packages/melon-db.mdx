@@ -1,0 +1,35 @@
+---
+title: "@melon/db"
+description: Core schema, AST, adapter contract, and runtime engine.
+---
+
+**Status:** Shipped · **Depends on:** — · **API:** [Reference](/docs/api/melon-db)
+
+Core storage engine: schema metadata, query AST, `StorageAdapter`, `MelonDatabase`, migrations, and in-memory adapter.
+
+## Quick example
+
+```ts
+import { createDatabase, createInMemoryAdapter, createMelonSchema } from '@melon/db';
+
+const db = createDatabase({
+  schema: createMelonSchema({ version: 1, collections: { /* ... */ } }),
+  adapter: createInMemoryAdapter(),
+});
+
+await db.write(async (tx) => {
+  await tx.collection('tasks').insert({ id: '1', title: 'Hello' });
+});
+```
+
+## Key types
+
+<AutoTypeTable path="../../../../packages/melon-db/src/database.ts" name="MelonDatabase" />
+
+<AutoTypeTable path="../../../../packages/melon-db/src/adapter.ts" name="StorageAdapter" />
+
+<AutoTypeTable path="../../../../packages/melon-db/src/ast.ts" name="QueryAst" />
+
+## Sync on the engine
+
+Enable with `sync: {}` on `createDatabase` for `getLocalChanges`, `applyRemoteChanges`, and outbox tracking. See [Sync](/docs/sync).

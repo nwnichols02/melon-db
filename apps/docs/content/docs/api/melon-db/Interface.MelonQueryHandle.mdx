@@ -1,0 +1,78 @@
+---
+title: "MelonQueryHandleRecordShape"
+description: "API reference: MelonQueryHandleRecordShape"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: MelonQueryHandle\<RecordShape\>
+
+Defined in: [packages/melon-db/src/database/types.ts:20](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L20)
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `RecordShape` | `Record`\<`string`, `unknown`\> |
+
+## Properties
+
+| Property | Modifier | Type | Defined in |
+| ------ | ------ | ------ | ------ |
+| <a id="property-prepared"></a> `prepared` | `readonly` | [`PreparedQuery`](Interface.PreparedQuery) | [packages/melon-db/src/database/types.ts:21](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L21) |
+
+## Methods
+
+### fetch()
+
+> **fetch**(): `Promise`\<`RecordShape`[]\>
+
+Defined in: [packages/melon-db/src/database/types.ts:22](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L22)
+
+#### Returns
+
+`Promise`\<`RecordShape`[]\>
+
+***
+
+### fetchCount()
+
+> **fetchCount**(): `Promise`\<`number`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:24](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L24)
+
+#### Returns
+
+`Promise`\<`number`\>
+
+***
+
+### fetchOne()
+
+> **fetchOne**(): `Promise`\<`RecordShape` \| `null`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:23](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L23)
+
+#### Returns
+
+`Promise`\<`RecordShape` \| `null`\>
+
+***
+
+### observe()
+
+> **observe**(`onValue`): () => `void`
+
+Defined in: [packages/melon-db/src/database/types.ts:25](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L25)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `onValue` | (`rows`) => `void` |
+
+#### Returns
+
+() => `void`

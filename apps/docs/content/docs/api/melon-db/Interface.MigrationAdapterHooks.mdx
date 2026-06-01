@@ -1,0 +1,67 @@
+---
+title: "MigrationAdapterHooks"
+description: "API reference: MigrationAdapterHooks"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: MigrationAdapterHooks
+
+Defined in: [packages/melon-db/src/migrations/types.ts:18](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/migrations/types.ts#L18)
+
+## Methods
+
+### execSql()
+
+> **execSql**(`sql`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/migrations/types.ts:19](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/migrations/types.ts#L19)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sql` | `string` |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### getMeta()
+
+> **getMeta**(`key`): `Promise`\<`string` \| `null`\>
+
+Defined in: [packages/melon-db/src/migrations/types.ts:20](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/migrations/types.ts#L20)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `key` | `string` |
+
+#### Returns
+
+`Promise`\<`string` \| `null`\>
+
+***
+
+### setMeta()
+
+> **setMeta**(`key`, `value`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/migrations/types.ts:21](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/migrations/types.ts#L21)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `key` | `string` |
+| `value` | `string` |
+
+#### Returns
+
+`Promise`\<`void`\>

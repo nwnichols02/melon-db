@@ -1,0 +1,98 @@
+---
+title: "SyncOutboxStore"
+description: "API reference: SyncOutboxStore"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: SyncOutboxStore
+
+Defined in: [packages/melon-db/src/sync/types.ts:57](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/types.ts#L57)
+
+## Methods
+
+### clear()
+
+> **clear**(`collections?`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/sync/types.ts:65](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/types.ts#L65)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `collections?` | `string`[] |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### findByRecord()
+
+> **findByRecord**(`collection`, `recordId`): `Promise`\<[`SyncOutboxEntry`](Interface.SyncOutboxEntry) \| `null`\>
+
+Defined in: [packages/melon-db/src/sync/types.ts:59](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/types.ts#L59)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `collection` | `string` |
+| `recordId` | `string` \| `number` |
+
+#### Returns
+
+`Promise`\<[`SyncOutboxEntry`](Interface.SyncOutboxEntry) \| `null`\>
+
+***
+
+### list()
+
+> **list**(): `Promise`\<[`SyncOutboxEntry`](Interface.SyncOutboxEntry)[]\>
+
+Defined in: [packages/melon-db/src/sync/types.ts:58](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/types.ts#L58)
+
+#### Returns
+
+`Promise`\<[`SyncOutboxEntry`](Interface.SyncOutboxEntry)[]\>
+
+***
+
+### removeByRecord()
+
+> **removeByRecord**(`collection`, `recordId`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/sync/types.ts:64](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/types.ts#L64)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `collection` | `string` |
+| `recordId` | `string` \| `number` |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### upsert()
+
+> **upsert**(`entry`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/sync/types.ts:63](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/types.ts#L63)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `entry` | [`SyncOutboxEntry`](Interface.SyncOutboxEntry) |
+
+#### Returns
+
+`Promise`\<`void`\>

@@ -1,0 +1,113 @@
+---
+title: "Melon API"
+description: "API reference: Melon API"
+---
+
+**Melon API**
+
+***
+
+# Melon API
+
+## Classes
+
+- [ChangeEmitter](Class.ChangeEmitter)
+- [MelonError](Class.MelonError)
+
+## Interfaces
+
+- [AdapterChangeSet](Interface.AdapterChangeSet)
+- [AdapterCountResult](Interface.AdapterCountResult)
+- [AdapterFindResult](Interface.AdapterFindResult)
+- [ApplyRemoteChangesOptions](Interface.ApplyRemoteChangesOptions)
+- [CheckpointStore](Interface.CheckpointStore)
+- [CollectionMetadata](Interface.CollectionMetadata)
+- [CollectionSchemaDefinition](Interface.CollectionSchemaDefinition)
+- [CreateDatabaseOptions](Interface.CreateDatabaseOptions)
+- [DatabaseSchemaDefinition](Interface.DatabaseSchemaDefinition)
+- [DevtoolsBridge](Interface.DevtoolsBridge)
+- [FieldDefinition](Interface.FieldDefinition)
+- [GetLocalChangesOptions](Interface.GetLocalChangesOptions)
+- [InitializeOptions](Interface.InitializeOptions)
+- [MelonCollection](Interface.MelonCollection)
+- [MelonDatabase](Interface.MelonDatabase)
+- [MelonErrorOptions](Interface.MelonErrorOptions)
+- [MelonQueryHandle](Interface.MelonQueryHandle)
+- [MelonSchema](Interface.MelonSchema)
+- [MetaStore](Interface.MetaStore)
+- [Migration](Interface.Migration)
+- [MigrationAdapterHooks](Interface.MigrationAdapterHooks)
+- [MigrationStepExecutor](Interface.MigrationStepExecutor)
+- [PreparedQuery](Interface.PreparedQuery)
+- [QueryAst](Interface.QueryAst)
+- [QueryDebugSnapshot](Interface.QueryDebugSnapshot)
+- [QueryExecutionDebug](Interface.QueryExecutionDebug)
+- [QueryPlan](Interface.QueryPlan)
+- [QueryPredicate](Interface.QueryPredicate)
+- [QueryRelationInclude](Interface.QueryRelationInclude)
+- [QuerySelect](Interface.QuerySelect)
+- [QuerySort](Interface.QuerySort)
+- [ReadContext](Interface.ReadContext)
+- [RelationDefinition](Interface.RelationDefinition)
+- [StorageAdapter](Interface.StorageAdapter)
+- [StorageAdapterCapabilities](Interface.StorageAdapterCapabilities)
+- [SyncChanges](Interface.SyncChanges)
+- [SyncConfig](Interface.SyncConfig)
+- [SyncDebugSnapshot](Interface.SyncDebugSnapshot)
+- [SyncOutboxEntry](Interface.SyncOutboxEntry)
+- [SyncOutboxStore](Interface.SyncOutboxStore)
+- [WriteContext](Interface.WriteContext)
+
+## Type Aliases
+
+- [AdapterRecord](TypeAlias.AdapterRecord)
+- [AdapterWriteOperation](TypeAlias.AdapterWriteOperation)
+- [CollectionRecord](TypeAlias.CollectionRecord)
+- [InsertInput](TypeAlias.InsertInput)
+- [MelonErrorCode](TypeAlias.MelonErrorCode)
+- [MelonScalar](TypeAlias.MelonScalar)
+- [MigrationStep](TypeAlias.MigrationStep)
+- [PreparedQuerySource](TypeAlias.PreparedQuerySource)
+- [QueryBooleanNode](TypeAlias.QueryBooleanNode)
+- [QueryOperator](TypeAlias.QueryOperator)
+- [SyncDebugPhase](TypeAlias.SyncDebugPhase)
+- [SyncOutboxOperation](TypeAlias.SyncOutboxOperation)
+- [SyncOutboxOperation](TypeAlias.SyncOutboxOperation-1)
+- [SyncRecord](TypeAlias.SyncRecord)
+- [UpdateInput](TypeAlias.UpdateInput)
+
+## Variables
+
+- [CREATE\_META\_TABLE\_SQL](Variable.CREATE_META_TABLE_SQL)
+- [MelonErrorCode](Variable.MelonErrorCode)
+- [META\_TABLE](Variable.META_TABLE)
+- [SCHEMA\_VERSION\_KEY](Variable.SCHEMA_VERSION_KEY)
+- [SYNC\_LAST\_PULLED\_AT\_KEY](Variable.SYNC_LAST_PULLED_AT_KEY)
+- [SYNC\_LAST\_SCHEMA\_VERSION\_KEY](Variable.SYNC_LAST_SCHEMA_VERSION_KEY)
+- [SyncDebugPhase](Variable.SyncDebugPhase)
+
+## Functions
+
+- [and](Function.and)
+- [createDatabase](Function.createDatabase)
+- [createInMemoryAdapter](Function.createInMemoryAdapter)
+- [createInMemoryMigrationExecutor](Function.createInMemoryMigrationExecutor)
+- [createMelonSchema](Function.createMelonSchema)
+- [createMemoryCheckpointStore](Function.createMemoryCheckpointStore)
+- [createMemorySyncOutboxStore](Function.createMemorySyncOutboxStore)
+- [createMetaCheckpointStore](Function.createMetaCheckpointStore)
+- [createSqlMigrationHooks](Function.createSqlMigrationHooks)
+- [ensureMetaTable](Function.ensureMetaTable)
+- [evaluateQuery](Function.evaluateQuery)
+- [getStoredSchemaVersion](Function.getStoredSchemaVersion)
+- [loadIncludes](Function.loadIncludes)
+- [mergeRemoteWithPendingFields](Function.mergeRemoteWithPendingFields)
+- [not](Function.not)
+- [or](Function.or)
+- [planQuery](Function.planQuery)
+- [predicate](Function.predicate)
+- [prepareQuery](Function.prepareQuery)
+- [queryAst](Function.queryAst)
+- [runMigrationsWithExecutor](Function.runMigrationsWithExecutor)
+- [validateQuery](Function.validateQuery)
+- [validateSyncChanges](Function.validateSyncChanges)

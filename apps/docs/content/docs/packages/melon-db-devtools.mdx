@@ -1,0 +1,18 @@
+---
+title: "@melon/db-devtools"
+description: Query, write, subscription, and sync inspector.
+---
+
+**Status:** Shipped · **Depends on:** `@melon/db` · **API:** [Reference](/docs/api/melon-db-devtools)
+
+Zero-cost when disabled via `createNoopDevtoolsBridge()`.
+
+```ts
+import { createReactiveDevtoolsBridge } from '@melon/db-devtools';
+import { MelonDevtoolsPanel, MelonDevtoolsProvider } from '@melon/db-devtools/react';
+
+const devtools = createReactiveDevtoolsBridge();
+const db = createDatabase({ schema, adapter, devtools });
+```
+
+Try the [CRUD playground](/docs/playgrounds/crud) with the panel embedded.

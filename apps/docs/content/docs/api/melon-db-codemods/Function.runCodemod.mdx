@@ -1,0 +1,27 @@
+---
+title: "runCodemod"
+description: "API reference: runCodemod"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: runCodemod()
+
+> **runCodemod**(`options`, `transform`): [`CodemodResult`](Interface.CodemodResult)
+
+Defined in: [codemods/runner.ts:82](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-codemods/src/codemods/runner.ts#L82)
+
+Runs a transform across source files with dry-run and ignore support.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `options` | [`CodemodOptions`](Interface.CodemodOptions) |
+| `transform` | (`sourceFile`, `result`) => `void` |
+
+## Returns
+
+[`CodemodResult`](Interface.CodemodResult)

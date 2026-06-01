@@ -1,0 +1,97 @@
+---
+title: "ChangeEmitter"
+description: "API reference: ChangeEmitter"
+---
+
+[**Melon API**](index)
+
+***
+
+# Class: ChangeEmitter
+
+Defined in: [packages/melon-db/src/change/emitter.ts:15](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/change/emitter.ts#L15)
+
+In-process change bus for collection-level notifications.
+
+## Constructors
+
+### Constructor
+
+> **new ChangeEmitter**(): `ChangeEmitter`
+
+#### Returns
+
+`ChangeEmitter`
+
+## Methods
+
+### emit()
+
+> **emit**(`change`): `void`
+
+Defined in: [packages/melon-db/src/change/emitter.ts:19](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/change/emitter.ts#L19)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `change` | `CollectionChange` |
+
+#### Returns
+
+`void`
+
+***
+
+### subscribe()
+
+> **subscribe**(`collection`, `listener`): () => `void`
+
+Defined in: [packages/melon-db/src/change/emitter.ts:31](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/change/emitter.ts#L31)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `collection` | `string` |
+| `listener` | `ChangeListener` |
+
+#### Returns
+
+() => `void`
+
+***
+
+### subscribeAll()
+
+> **subscribeAll**(`listener`): () => `void`
+
+Defined in: [packages/melon-db/src/change/emitter.ts:43](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/change/emitter.ts#L43)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `listener` | `ChangeListener` |
+
+#### Returns
+
+() => `void`
+
+***
+
+### toChangeSet()
+
+> **toChangeSet**(`changes`): [`AdapterChangeSet`](Interface.AdapterChangeSet)
+
+Defined in: [packages/melon-db/src/change/emitter.ts:50](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/change/emitter.ts#L50)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `changes` | `CollectionChange`[] |
+
+#### Returns
+
+[`AdapterChangeSet`](Interface.AdapterChangeSet)

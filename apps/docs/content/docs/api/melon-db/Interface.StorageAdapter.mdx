@@ -1,0 +1,197 @@
+---
+title: "StorageAdapter"
+description: "API reference: StorageAdapter"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: StorageAdapter
+
+Defined in: [packages/melon-db/src/adapter.ts:65](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L65)
+
+## Properties
+
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-capabilities"></a> `capabilities` | `readonly` | [`StorageAdapterCapabilities`](Interface.StorageAdapterCapabilities) | - | [packages/melon-db/src/adapter.ts:67](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L67) |
+| <a id="property-meta"></a> `meta?` | `readonly` | [`MetaStore`](Interface.MetaStore) | Populated after initialize when adapter supports meta storage. | [packages/melon-db/src/adapter.ts:71](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L71) |
+| <a id="property-name"></a> `name` | `readonly` | `string` | - | [packages/melon-db/src/adapter.ts:66](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L66) |
+| <a id="property-syncoutbox"></a> `syncOutbox?` | `readonly` | [`SyncOutboxStore`](Interface.SyncOutboxStore) | Populated after initialize when sync is enabled. | [packages/melon-db/src/adapter.ts:69](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L69) |
+
+## Methods
+
+### close()
+
+> **close**(): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/adapter.ts:82](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L82)
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### count()
+
+> **count**(`query`): `Promise`\<[`AdapterCountResult`](Interface.AdapterCountResult)\>
+
+Defined in: [packages/melon-db/src/adapter.ts:76](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L76)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `query` | [`PreparedQuery`](Interface.PreparedQuery) |
+
+#### Returns
+
+`Promise`\<[`AdapterCountResult`](Interface.AdapterCountResult)\>
+
+***
+
+### find()
+
+> **find**(`query`): `Promise`\<[`AdapterFindResult`](Interface.AdapterFindResult)\>
+
+Defined in: [packages/melon-db/src/adapter.ts:75](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L75)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `query` | [`PreparedQuery`](Interface.PreparedQuery) |
+
+#### Returns
+
+`Promise`\<[`AdapterFindResult`](Interface.AdapterFindResult)\>
+
+***
+
+### getChangedCollections()?
+
+> `optional` **getChangedCollections**(`sinceVersion`): `Promise`\<[`AdapterChangeSet`](Interface.AdapterChangeSet)\>
+
+Defined in: [packages/melon-db/src/adapter.ts:79](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L79)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sinceVersion` | `number` |
+
+#### Returns
+
+`Promise`\<[`AdapterChangeSet`](Interface.AdapterChangeSet)\>
+
+***
+
+### getLastQueryDebug()?
+
+> `optional` **getLastQueryDebug**(): [`QueryExecutionDebug`](Interface.QueryExecutionDebug) \| `undefined`
+
+Defined in: [packages/melon-db/src/adapter.ts:81](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L81)
+
+#### Returns
+
+[`QueryExecutionDebug`](Interface.QueryExecutionDebug) \| `undefined`
+
+***
+
+### initialize()
+
+> **initialize**(`schema`, `options?`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/adapter.ts:73](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L73)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `schema` | [`MelonSchema`](Interface.MelonSchema) |
+| `options?` | [`InitializeOptions`](Interface.InitializeOptions) |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### observeQuery()?
+
+> `optional` **observeQuery**(`query`, `onChange`): () => `void`
+
+Defined in: [packages/melon-db/src/adapter.ts:80](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L80)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `query` | [`PreparedQuery`](Interface.PreparedQuery) |
+| `onChange` | () => `void` |
+
+#### Returns
+
+() => `void`
+
+***
+
+### prepare()?
+
+> `optional` **prepare**(`query`): `Promise`\<[`PreparedQuery`](Interface.PreparedQuery)\>
+
+Defined in: [packages/melon-db/src/adapter.ts:74](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L74)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `query` | [`PreparedQuery`](Interface.PreparedQuery) |
+
+#### Returns
+
+`Promise`\<[`PreparedQuery`](Interface.PreparedQuery)\>
+
+***
+
+### transaction()
+
+> **transaction**\<`T`\>(`fn`): `Promise`\<`T`\>
+
+Defined in: [packages/melon-db/src/adapter.ts:78](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L78)
+
+#### Type Parameters
+
+| Type Parameter |
+| ------ |
+| `T` |
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `fn` | () => `Promise`\<`T`\> |
+
+#### Returns
+
+`Promise`\<`T`\>
+
+***
+
+### write()
+
+> **write**(`operation`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/adapter.ts:77](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/adapter.ts#L77)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `operation` | [`AdapterWriteOperation`](TypeAlias.AdapterWriteOperation) |
+
+#### Returns
+
+`Promise`\<`void`\>

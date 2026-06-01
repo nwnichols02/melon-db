@@ -11,7 +11,7 @@ melon-monorepo/
   apps/
     playground-rn/        # Example RN app using new arch + melon/db
     playground-web/       # Optional web example (if/when supported)
-    docs/                 # Docusaurus/Next docs site for the lib
+    docs/                 # Fumadocs + TanStack Start site (apps/docs)
   packages/
     melon-db/             # @melon/db core (schema, AST, engine)
     melon-db-sqlite/      # @melon/db-sqlite RN/Node SQLite adapter

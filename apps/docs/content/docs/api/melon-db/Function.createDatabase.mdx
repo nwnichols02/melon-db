@@ -1,0 +1,32 @@
+---
+title: "createDatabase"
+description: "API reference: createDatabase"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: createDatabase()
+
+> **createDatabase**\<`Schema`\>(`options`): [`MelonDatabase`](Interface.MelonDatabase)\<`Schema`\>
+
+Defined in: [packages/melon-db/src/database/create-database.ts:48](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/create-database.ts#L48)
+
+Creates a MelonDatabase instance wired to a storage adapter.
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
+| `Schema` *extends* [`MelonSchema`](Interface.MelonSchema)\<`Record`\<`string`, [`CollectionMetadata`](Interface.CollectionMetadata)\<`Record`\<`string`, `unknown`\>\>\>\> |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `options` | [`CreateDatabaseOptions`](Interface.CreateDatabaseOptions)\<`Schema`\> |
+
+## Returns
+
+[`MelonDatabase`](Interface.MelonDatabase)\<`Schema`\>

@@ -1,0 +1,27 @@
+---
+title: "createInMemoryMigrationExecutor"
+description: "API reference: createInMemoryMigrationExecutor"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: createInMemoryMigrationExecutor()
+
+> **createInMemoryMigrationExecutor**(`data`, `schema`): [`MigrationStepExecutor`](Interface.MigrationStepExecutor)
+
+Defined in: [packages/melon-db/src/migrations/in-memory-executor.ts:7](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/migrations/in-memory-executor.ts#L7)
+
+Applies migration steps to an in-memory adapter store.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `data` | `Map`\<`string`, `Map`\<`string` \| `number`, `Record`\<`string`, `unknown`\>\>\> |
+| `schema` | [`MelonSchema`](Interface.MelonSchema) |
+
+## Returns
+
+[`MigrationStepExecutor`](Interface.MigrationStepExecutor)

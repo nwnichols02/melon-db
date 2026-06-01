@@ -1,0 +1,19 @@
+{
+	"title": "Documentation",
+	"pages": [
+		"index",
+		"getting-started",
+		"architecture",
+		"migration",
+		"sync",
+		"roadmap",
+		"---Guides---",
+		"playgrounds",
+		"---Packages---",
+		"packages",
+		"---API---",
+		"api",
+		"---Contributing---",
+		"contributing"
+	]
+}

@@ -2,10 +2,13 @@
 	"name": "docs",
 	"private": true,
 	"type": "module",
+	"sideEffects": false,
 	"scripts": {
-		"dev": "bun --hot src/server.ts",
-		"build": "bun build ./index.html --outdir ./dist --minify",
-		"typecheck": "bunx tsc -p tsconfig.json --noEmit"
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"typecheck": "fumadocs-mdx && tsc --noEmit",
+		"docs:api": "bun run scripts/generate-api.ts && bun run scripts/fix-typedoc-links.ts"
 	},
 	"dependencies": {
 		"@melon/db": "workspace:*",
@@ -13,14 +16,30 @@
 		"@melon/db-query": "workspace:*",
 		"@melon/db-react": "workspace:*",
 		"@melon/sync": "workspace:*",
-		"@melon/sync-server": "workspace:*"
+		"@melon/sync-server": "workspace:*",
+		"@tanstack/react-router": "1.170.8",
+		"@tanstack/react-start": "1.168.13",
+		"fumadocs-core": "^16.9.3",
+		"fumadocs-mdx": "^15.0.10",
+		"fumadocs-typescript": "^5.2.6",
+		"fumadocs-ui": "^16.9.3",
+		"lucide-react": "^0.563.0",
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0",
+		"tailwind-merge": "^3.4.0",
+		"vite": "^8.0.14"
 	},
 	"devDependencies": {
-		"@types/bun": "latest",
-		"@types/react": "~19.1.10",
-		"@types/react-dom": "~19.1.10",
-		"react": "19.1.0",
-		"react-dom": "19.1.0",
-		"typescript": "^5"
+		"@tailwindcss/vite": "^4.3.0",
+		"@types/mdx": "^2.0.13",
+		"@types/node": "^22.15.0",
+		"@types/react": "^19.2.0",
+		"@types/react-dom": "^19.2.0",
+		"@vitejs/plugin-react": "^6.0.2",
+		"tailwindcss": "^4.1.0",
+		"typedoc": "^0.28.0",
+		"typedoc-plugin-frontmatter": "^1.3.0",
+		"typedoc-plugin-markdown": "^4.6.0",
+		"typescript": "^5.8.0"
 	}
 }

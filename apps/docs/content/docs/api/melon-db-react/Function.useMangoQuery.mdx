@@ -1,0 +1,34 @@
+---
+title: "useMangoQuery"
+description: "API reference: useMangoQuery"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: useMangoQuery()
+
+> **useMangoQuery**\<`T`\>(`collection`, `query`, `options?`): `T`[]
+
+Defined in: [hooks.ts:128](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-react/src/hooks.ts#L128)
+
+Reactive Mango-style query hook.
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `T` | `Record`\<`string`, `unknown`\> |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `collection` | `string` |
+| `query` | `MangoQuery` |
+| `options?` | [`UseQueryOptions`](Interface.UseQueryOptions)\<`T`\> |
+
+## Returns
+
+`T`[]

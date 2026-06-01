@@ -1,0 +1,125 @@
+---
+title: "SqliteDriver"
+description: "API reference: SqliteDriver"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: SqliteDriver
+
+Defined in: [driver.ts:4](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-sqlite/src/driver.ts#L4)
+
+Platform-neutral SQLite execution surface used by adapter-core.
+
+## Methods
+
+### close()
+
+> **close**(): `Promise`\<`void`\>
+
+Defined in: [driver.ts:13](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-sqlite/src/driver.ts#L13)
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### exec()
+
+> **exec**(`sql`): `Promise`\<`void`\>
+
+Defined in: [driver.ts:5](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-sqlite/src/driver.ts#L5)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sql` | `string` |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### queryAll()
+
+> **queryAll**(`sql`, `params`): `Promise`\<`Record`\<`string`, `unknown`\>[]\>
+
+Defined in: [driver.ts:6](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-sqlite/src/driver.ts#L6)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sql` | `string` |
+| `params` | `unknown`[] |
+
+#### Returns
+
+`Promise`\<`Record`\<`string`, `unknown`\>[]\>
+
+***
+
+### queryFirst()
+
+> **queryFirst**(`sql`, `params`): `Promise`\<`Record`\<`string`, `unknown`\> \| `null`\>
+
+Defined in: [driver.ts:7](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-sqlite/src/driver.ts#L7)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sql` | `string` |
+| `params` | `unknown`[] |
+
+#### Returns
+
+`Promise`\<`Record`\<`string`, `unknown`\> \| `null`\>
+
+***
+
+### run()
+
+> **run**(`sql`, `params`): `Promise`\<`void`\>
+
+Defined in: [driver.ts:11](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-sqlite/src/driver.ts#L11)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sql` | `string` |
+| `params` | `unknown`[] |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### transaction()
+
+> **transaction**\<`T`\>(`fn`): `Promise`\<`T`\>
+
+Defined in: [driver.ts:12](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-sqlite/src/driver.ts#L12)
+
+#### Type Parameters
+
+| Type Parameter |
+| ------ |
+| `T` |
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `fn` | () => `Promise`\<`T`\> |
+
+#### Returns
+
+`Promise`\<`T`\>

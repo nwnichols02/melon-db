@@ -1,0 +1,66 @@
+---
+title: Sync
+description: Watermelon-compatible pull/push with retry, conflicts, and checkpoints.
+---
+
+`@melon/sync` implements a Watermelon-compatible pull/push protocol with retry, network awareness, conflict policies, and migration-aware coordination.
+
+## Protocol steps
+
+| Step | Action |
+|------|--------|
+| Pull | `pullChanges({ lastPulledAt, schemaVersion, migration? })` → `{ changes, timestamp, schemaVersion? }` |
+| Apply | `db.applyRemoteChanges(changes, { conflictPolicy })` |
+| Push | `pushChanges({ changes: await db.getLocalChanges(), lastPulledAt })` |
+| Ack | `db.markLocalChangesPushed()` |
+| Checkpoint | `checkpointStore.setLastPulledAt(timestamp)` + `setLastSchemaVersion(version)` |
+
+## Sync status
+
+`synchronize()` emits:
+
+- `idle` → `pulling` → `pushing` → `complete`
+- `retrying` with `{ phase, attempt }` when pull/push retries
+- `paused` with `{ reason: 'offline' }` when network monitor reports offline
+- `failed` with a `SyncError` (checkpoint and outbox preserved for retry)
+
+## Retry and cancellation
+
+```ts
+import { DEFAULT_RETRY_POLICY, synchronize } from '@melon/sync';
+
+await synchronize({
+  db,
+  pullChanges,
+  pushChanges,
+  retryPolicy: DEFAULT_RETRY_POLICY,
+  signal: abortController.signal,
+});
+```
+
+## Conflict policies
+
+- `server-wins` (default)
+- `skip-existing`
+- `client-wins`
+- `last-write-wins`
+- `merge-by-field` — overlay pending local field patches onto remote rows
+
+## React hooks
+
+Use `@melon/db-react`:
+
+- `MelonSyncProvider`
+- `useSync()` / `useSyncStatus()`
+
+## Reference backend
+
+```bash
+bun run sync-server
+bun run postgres:up
+bun run sync-server:postgres
+```
+
+See [`@melon/sync-server`](/docs/packages/melon-sync-server).
+
+Try the [Sync playground](/docs/playgrounds/sync).

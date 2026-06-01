@@ -1,9 +1,14 @@
 {
 	"extends": "../../tooling/tsconfig.base.json",
 	"compilerOptions": {
+		"lib": ["DOM", "DOM.Iterable", "ES2022"],
 		"jsx": "react-jsx",
-		"lib": ["ESNext", "DOM", "DOM.Iterable"],
-		"types": ["bun", "react", "react-dom"]
+		"types": ["vite/client"],
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./src/*"],
+			"collections/*": ["./.source/*"]
+		}
 	},
-	"include": ["src/**/*", "index.html"]
+	"include": ["src/**/*.ts", "src/**/*.tsx", ".source/**/*.ts"]
 }

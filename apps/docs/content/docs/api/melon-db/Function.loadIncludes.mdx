@@ -1,0 +1,29 @@
+---
+title: "loadIncludes"
+description: "API reference: loadIncludes"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: loadIncludes()
+
+> **loadIncludes**(`parentRows`, `ast`, `schema`, `adapter`): `Promise`\<[`AdapterRecord`](TypeAlias.AdapterRecord)[]\>
+
+Defined in: [packages/melon-db/src/query/load-includes.ts:10](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/query/load-includes.ts#L10)
+
+Loads belongsTo relations and attaches nested objects on parent rows.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `parentRows` | [`AdapterRecord`](TypeAlias.AdapterRecord)[] |
+| `ast` | [`QueryAst`](Interface.QueryAst) |
+| `schema` | [`MelonSchema`](Interface.MelonSchema) |
+| `adapter` | [`StorageAdapter`](Interface.StorageAdapter) |
+
+## Returns
+
+`Promise`\<[`AdapterRecord`](TypeAlias.AdapterRecord)[]\>

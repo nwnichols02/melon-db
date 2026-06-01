@@ -1,0 +1,68 @@
+---
+title: "WriteContextSchema"
+description: "API reference: WriteContextSchema"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: WriteContext\<Schema\>
+
+Defined in: [packages/melon-db/src/database/types.ts:49](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L49)
+
+## Extends
+
+- [`ReadContext`](Interface.ReadContext)\<`Schema`\>
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `Schema` *extends* [`MelonSchema`](Interface.MelonSchema) | [`MelonSchema`](Interface.MelonSchema) |
+
+## Methods
+
+### batch()
+
+> **batch**(`operations`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:51](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L51)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `operations` | [`AdapterWriteOperation`](TypeAlias.AdapterWriteOperation)[] |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### collection()
+
+> **collection**\<`Name`\>(`name`): [`MelonCollection`](Interface.MelonCollection)\<[`CollectionRecord`](TypeAlias.CollectionRecord)\>
+
+Defined in: [packages/melon-db/src/database/types.ts:44](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L44)
+
+#### Type Parameters
+
+| Type Parameter |
+| ------ |
+| `Name` *extends* `string` |
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `name` | `Name` |
+
+#### Returns
+
+[`MelonCollection`](Interface.MelonCollection)\<[`CollectionRecord`](TypeAlias.CollectionRecord)\>
+
+#### Inherited from
+
+[`ReadContext`](Interface.ReadContext).[`collection`](Interface.ReadContext.mdx#collection)

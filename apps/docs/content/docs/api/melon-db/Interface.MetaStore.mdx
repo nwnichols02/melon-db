@@ -1,0 +1,51 @@
+---
+title: "MetaStore"
+description: "API reference: MetaStore"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: MetaStore
+
+Defined in: [packages/melon-db/src/sync/checkpoint.ts:10](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/checkpoint.ts#L10)
+
+Key-value meta storage backed by adapter `_melon_meta` table.
+
+## Methods
+
+### getMeta()
+
+> **getMeta**(`key`): `Promise`\<`string` \| `null`\>
+
+Defined in: [packages/melon-db/src/sync/checkpoint.ts:11](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/checkpoint.ts#L11)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `key` | `string` |
+
+#### Returns
+
+`Promise`\<`string` \| `null`\>
+
+***
+
+### setMeta()
+
+> **setMeta**(`key`, `value`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/sync/checkpoint.ts:12](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/checkpoint.ts#L12)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `key` | `string` |
+| `value` | `string` |
+
+#### Returns
+
+`Promise`\<`void`\>

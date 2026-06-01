@@ -1,0 +1,169 @@
+---
+title: "MelonCollectionRecordShape"
+description: "API reference: MelonCollectionRecordShape"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: MelonCollection\<RecordShape\>
+
+Defined in: [packages/melon-db/src/database/types.ts:28](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L28)
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `RecordShape` | `Record`\<`string`, `unknown`\> |
+
+## Properties
+
+| Property | Modifier | Type | Defined in |
+| ------ | ------ | ------ | ------ |
+| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/melon-db/src/database/types.ts:29](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L29) |
+
+## Methods
+
+### count()
+
+> **count**(`query?`): `Promise`\<`number`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:33](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L33)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `query?` | [`QueryAst`](Interface.QueryAst) |
+
+#### Returns
+
+`Promise`\<`number`\>
+
+***
+
+### delete()
+
+> **delete**(`id`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:40](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L40)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `id` | `string` \| `number` |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### findById()
+
+> **findById**(`id`): `Promise`\<`RecordShape` \| `null`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:30](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L30)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `id` | `string` \| `number` |
+
+#### Returns
+
+`Promise`\<`RecordShape` \| `null`\>
+
+***
+
+### findFirst()
+
+> **findFirst**(`query?`): `Promise`\<`RecordShape` \| `null`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:32](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L32)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `query?` | [`QueryAst`](Interface.QueryAst) |
+
+#### Returns
+
+`Promise`\<`RecordShape` \| `null`\>
+
+***
+
+### findMany()
+
+> **findMany**(`query?`): `Promise`\<`RecordShape`[]\>
+
+Defined in: [packages/melon-db/src/database/types.ts:31](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L31)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `query?` | [`QueryAst`](Interface.QueryAst) |
+
+#### Returns
+
+`Promise`\<`RecordShape`[]\>
+
+***
+
+### insert()
+
+> **insert**(`data`): `Promise`\<`RecordShape`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:35](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L35)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `data` | [`InsertInput`](TypeAlias.InsertInput)\<`RecordShape`\> |
+
+#### Returns
+
+`Promise`\<`RecordShape`\>
+
+***
+
+### query()
+
+> **query**(`query?`): [`MelonQueryHandle`](Interface.MelonQueryHandle)\<`RecordShape`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:34](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L34)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `query?` | [`QueryAst`](Interface.QueryAst) |
+
+#### Returns
+
+[`MelonQueryHandle`](Interface.MelonQueryHandle)\<`RecordShape`\>
+
+***
+
+### update()
+
+> **update**(`id`, `data`): `Promise`\<`RecordShape`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:36](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L36)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `id` | `string` \| `number` |
+| `data` | [`UpdateInput`](TypeAlias.UpdateInput)\<`RecordShape`\> |
+
+#### Returns
+
+`Promise`\<`RecordShape`\>

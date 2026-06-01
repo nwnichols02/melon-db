@@ -1,0 +1,27 @@
+---
+title: "evaluateQuery"
+description: "API reference: evaluateQuery"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: evaluateQuery()
+
+> **evaluateQuery**(`ast`, `rows`): [`AdapterRecord`](TypeAlias.AdapterRecord)[]
+
+Defined in: [packages/melon-db/src/query/evaluate.ts:91](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/query/evaluate.ts#L91)
+
+Evaluates a query AST against in-memory rows.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `ast` | [`QueryAst`](Interface.QueryAst) |
+| `rows` | [`AdapterRecord`](TypeAlias.AdapterRecord)[] |
+
+## Returns
+
+[`AdapterRecord`](TypeAlias.AdapterRecord)[]

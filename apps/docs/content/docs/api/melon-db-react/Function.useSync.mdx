@@ -1,0 +1,31 @@
+---
+title: "useSync"
+description: "API reference: useSync"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: useSync()
+
+> **useSync**(): `object`
+
+Defined in: [sync-hooks.ts:14](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-react/src/sync-hooks.ts#L14)
+
+Runs sync against the configured backend and exposes reactive status.
+
+## Returns
+
+`object`
+
+| Name | Type | Defined in |
+| ------ | ------ | ------ |
+| `cancel()` | () => `void` | [sync-hooks.ts:16](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-react/src/sync-hooks.ts#L16) |
+| `error` | `SyncError` \| `null` | [sync-hooks.ts:22](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-react/src/sync-hooks.ts#L22) |
+| `isPaused` | `boolean` | [sync-hooks.ts:20](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-react/src/sync-hooks.ts#L20) |
+| `isSyncing` | `boolean` | [sync-hooks.ts:19](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-react/src/sync-hooks.ts#L19) |
+| `lastPulledAt` | `number` \| `null` | [sync-hooks.ts:18](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-react/src/sync-hooks.ts#L18) |
+| `retryCount` | `number` | [sync-hooks.ts:21](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-react/src/sync-hooks.ts#L21) |
+| `status` | `SyncStatus` | [sync-hooks.ts:17](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-react/src/sync-hooks.ts#L17) |
+| `sync()` | (`options?`) => `Promise`\<`SynchronizeResult`\> | [sync-hooks.ts:15](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-react/src/sync-hooks.ts#L15) |

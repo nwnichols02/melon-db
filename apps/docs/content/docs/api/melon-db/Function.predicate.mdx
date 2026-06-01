@@ -1,0 +1,28 @@
+---
+title: "predicate"
+description: "API reference: predicate"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: predicate()
+
+> **predicate**(`field`, `op`, `value?`): [`QueryBooleanNode`](TypeAlias.QueryBooleanNode)
+
+Defined in: [packages/melon-db/src/ast.ts:70](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/ast.ts#L70)
+
+Builds a single-field predicate node.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `field` | `string` |
+| `op` | [`QueryOperator`](TypeAlias.QueryOperator) |
+| `value?` | `unknown` |
+
+## Returns
+
+[`QueryBooleanNode`](TypeAlias.QueryBooleanNode)

@@ -1,0 +1,38 @@
+---
+title: "MangoQueryCompiler"
+description: "API reference: MangoQueryCompiler"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: MangoQueryCompiler
+
+Defined in: [compiler.ts:86](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-query-mango/src/compiler.ts#L86)
+
+## Properties
+
+| Property | Modifier | Type | Defined in |
+| ------ | ------ | ------ | ------ |
+| <a id="property-source"></a> `source` | `readonly` | `"mango"` | [compiler.ts:87](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-query-mango/src/compiler.ts#L87) |
+
+## Methods
+
+### compile()
+
+> **compile**(`query`, `collection`, `schema`): `PreparedQuery`
+
+Defined in: [compiler.ts:88](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-query-mango/src/compiler.ts#L88)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `query` | [`MangoQuery`](Interface.MangoQuery) |
+| `collection` | `string` |
+| `schema` | `MelonSchema` |
+
+#### Returns
+
+`PreparedQuery`

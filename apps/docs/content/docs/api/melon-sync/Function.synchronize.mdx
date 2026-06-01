@@ -1,0 +1,26 @@
+---
+title: "synchronize"
+description: "API reference: synchronize"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: synchronize()
+
+> **synchronize**(`args`): `Promise`\<[`SynchronizeResult`](Interface.SynchronizeResult)\>
+
+Defined in: [packages/melon-sync/src/synchronize.ts:102](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-sync/src/synchronize.ts#L102)
+
+Runs a full Watermelon-style sync: pull remote changes, apply locally, push local changes, update checkpoint.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args` | [`SynchronizeArgs`](Interface.SynchronizeArgs) |
+
+## Returns
+
+`Promise`\<[`SynchronizeResult`](Interface.SynchronizeResult)\>

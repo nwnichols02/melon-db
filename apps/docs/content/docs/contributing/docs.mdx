@@ -1,0 +1,25 @@
+---
+title: Documentation
+description: How to keep Melon docs up to date.
+---
+
+Canonical docs live in `apps/docs/content/docs/` as **MDX** files. The site uses [Fumadocs](https://www.fumadocs.dev/docs) on [TanStack Start](https://tanstack.com/start).
+
+## When you ship a feature
+
+1. Update the relevant `packages/<name>.mdx` page (status, examples).
+2. Update [`roadmap.mdx`](/docs/roadmap) if scope or deferrals change.
+3. Add JSDoc on new **public** exports.
+4. Run `bun run docs:api` before release builds.
+
+## Page tree
+
+Edit `meta.json` files next to MDX folders to reorder the sidebar.
+
+## Playgrounds
+
+Interactive demos live under `content/docs/playgrounds/` and import client-only React components from `apps/docs/src/components/playgrounds/`.
+
+## Phase tracking
+
+See [`.cursor/phases/docs-fumadocs.md`](https://github.com/melon/melon/blob/main/.cursor/phases/docs-fumadocs.md) for exit criteria.

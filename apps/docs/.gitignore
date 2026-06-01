@@ -1,0 +1,6 @@
+.source
+dist
+.output
+.nitro
+node_modules
+*.log

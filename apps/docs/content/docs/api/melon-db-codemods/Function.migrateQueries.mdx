@@ -1,0 +1,26 @@
+---
+title: "migrateQueries"
+description: "API reference: migrateQueries"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: migrateQueries()
+
+> **migrateQueries**(`options`): [`CodemodResult`](Interface.CodemodResult)
+
+Defined in: [codemods/migrate-queries.ts:254](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-codemods/src/codemods/migrate-queries.ts#L254)
+
+Transforms database.get().query(Q.*) calls to db.collection().findMany(q.from()...).
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `options` | [`CodemodOptions`](Interface.CodemodOptions) |
+
+## Returns
+
+[`CodemodResult`](Interface.CodemodResult)

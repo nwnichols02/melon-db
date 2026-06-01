@@ -1,0 +1,74 @@
+---
+title: "CheckpointStore"
+description: "API reference: CheckpointStore"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: CheckpointStore
+
+Defined in: [packages/melon-db/src/sync/checkpoint.ts:18](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/checkpoint.ts#L18)
+
+Persists the last successful pull timestamp for incremental sync.
+
+## Methods
+
+### getLastPulledAt()
+
+> **getLastPulledAt**(): `Promise`\<`number` \| `null`\>
+
+Defined in: [packages/melon-db/src/sync/checkpoint.ts:19](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/checkpoint.ts#L19)
+
+#### Returns
+
+`Promise`\<`number` \| `null`\>
+
+***
+
+### getLastSchemaVersion()?
+
+> `optional` **getLastSchemaVersion**(): `Promise`\<`number` \| `null`\>
+
+Defined in: [packages/melon-db/src/sync/checkpoint.ts:21](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/checkpoint.ts#L21)
+
+#### Returns
+
+`Promise`\<`number` \| `null`\>
+
+***
+
+### setLastPulledAt()
+
+> **setLastPulledAt**(`timestamp`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/sync/checkpoint.ts:20](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/checkpoint.ts#L20)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `timestamp` | `number` |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### setLastSchemaVersion()?
+
+> `optional` **setLastSchemaVersion**(`version`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/sync/checkpoint.ts:22](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/checkpoint.ts#L22)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `version` | `number` |
+
+#### Returns
+
+`Promise`\<`void`\>

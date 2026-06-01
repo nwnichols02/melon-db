@@ -3,7 +3,8 @@
 	"version": "0.0.0-alpha",
 	"type": "module",
 	"exports": {
-		".": "./src/index.ts"
+		".": "./src/index.ts",
+		"./in-memory": "./src/store.ts"
 	},
 	"scripts": {
 		"test": "bun test",

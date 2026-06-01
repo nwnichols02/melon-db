@@ -1,0 +1,44 @@
+---
+title: "NetworkMonitor"
+description: "API reference: NetworkMonitor"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: NetworkMonitor
+
+Defined in: [packages/melon-sync/src/network.ts:4](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-sync/src/network.ts#L4)
+
+Headless network status contract for sync orchestration.
+
+## Methods
+
+### isOnline()
+
+> **isOnline**(): `boolean` \| `Promise`\<`boolean`\>
+
+Defined in: [packages/melon-sync/src/network.ts:5](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-sync/src/network.ts#L5)
+
+#### Returns
+
+`boolean` \| `Promise`\<`boolean`\>
+
+***
+
+### subscribe()
+
+> **subscribe**(`onChange`): () => `void`
+
+Defined in: [packages/melon-sync/src/network.ts:6](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-sync/src/network.ts#L6)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `onChange` | (`online`) => `void` |
+
+#### Returns
+
+() => `void`

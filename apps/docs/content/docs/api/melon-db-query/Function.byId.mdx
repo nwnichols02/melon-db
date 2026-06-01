@@ -1,0 +1,34 @@
+---
+title: "byId"
+description: "API reference: byId"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: byId()
+
+> **byId**\<`RecordShape`\>(`collection`, `id`, `primaryKey?`): `QueryAst`
+
+Defined in: [utilities.ts:6](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-query/src/utilities.ts#L6)
+
+Builds a query AST that finds a record by primary key.
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `RecordShape` | `Record`\<`string`, `unknown`\> |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `collection` | `string` |
+| `id` | `string` \| `number` |
+| `primaryKey` | keyof `RecordShape` & `string` |
+
+## Returns
+
+`QueryAst`

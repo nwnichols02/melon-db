@@ -1,0 +1,29 @@
+---
+title: "compilePrismaQuery"
+description: "API reference: compilePrismaQuery"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: compilePrismaQuery()
+
+> **compilePrismaQuery**(`collection`, `args`, `schema`, `mode?`): `PreparedQuery`
+
+Defined in: [compiler.ts:66](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-prisma/src/compiler.ts#L66)
+
+Compiles Prisma-style find args into a PreparedQuery.
+
+## Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `collection` | `string` | `undefined` |
+| `args` | [`PrismaFindManyArgs`](Interface.PrismaFindManyArgs) \| `undefined` | `undefined` |
+| `schema` | `MelonSchema` | `undefined` |
+| `mode` | `"many"` \| `"one"` \| `"count"` | `"many"` |
+
+## Returns
+
+`PreparedQuery`

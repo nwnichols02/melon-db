@@ -1,0 +1,186 @@
+---
+title: "QueryBuilderRecordShape"
+description: "API reference: QueryBuilderRecordShape"
+---
+
+[**Melon API**](index)
+
+***
+
+# Class: QueryBuilder\<RecordShape\>
+
+Defined in: [query-builder.ts:12](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-query/src/query-builder.ts#L12)
+
+Fluent query builder that produces QueryAst.
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `RecordShape` | `Record`\<`string`, `unknown`\> |
+
+## Constructors
+
+### Constructor
+
+> **new QueryBuilder**\<`RecordShape`\>(`collection`): `QueryBuilder`\<`RecordShape`\>
+
+Defined in: [query-builder.ts:21](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-query/src/query-builder.ts#L21)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `collection` | `string` |
+
+#### Returns
+
+`QueryBuilder`\<`RecordShape`\>
+
+## Methods
+
+### and()
+
+> **and**(`group`): `this`
+
+Defined in: [query-builder.ts:40](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-query/src/query-builder.ts#L40)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `group` | (`q`) => `QueryBuilder`\<`RecordShape`\> |
+
+#### Returns
+
+`this`
+
+***
+
+### include()
+
+> **include**(`relation`, `config?`): `this`
+
+Defined in: [query-builder.ts:84](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-query/src/query-builder.ts#L84)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `relation` | keyof `RecordShape` & `string` |
+| `config?` | `Omit`\<`QueryRelationInclude`, `"relation"`\> |
+
+#### Returns
+
+`this`
+
+***
+
+### limit()
+
+> **limit**(`value`): `this`
+
+Defined in: [query-builder.ts:74](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-query/src/query-builder.ts#L74)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `value` | `number` |
+
+#### Returns
+
+`this`
+
+***
+
+### or()
+
+> **or**(`group`): `this`
+
+Defined in: [query-builder.ts:54](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-query/src/query-builder.ts#L54)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `group` | (`q`) => `QueryBuilder`\<`RecordShape`\> |
+
+#### Returns
+
+`this`
+
+***
+
+### orderBy()
+
+> **orderBy**(`field`, `direction?`): `this`
+
+Defined in: [query-builder.ts:66](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-query/src/query-builder.ts#L66)
+
+#### Parameters
+
+| Parameter | Type | Default value |
+| ------ | ------ | ------ |
+| `field` | keyof `RecordShape` & `string` | `undefined` |
+| `direction` | `"asc"` \| `"desc"` | `"asc"` |
+
+#### Returns
+
+`this`
+
+***
+
+### skip()
+
+> **skip**(`value`): `this`
+
+Defined in: [query-builder.ts:79](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-query/src/query-builder.ts#L79)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `value` | `number` |
+
+#### Returns
+
+`this`
+
+***
+
+### toAst()
+
+> **toAst**(`mode?`): `QueryAst`
+
+Defined in: [query-builder.ts:92](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-query/src/query-builder.ts#L92)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `mode?` | `"many"` \| `"one"` \| `"count"` |
+
+#### Returns
+
+`QueryAst`
+
+***
+
+### where()
+
+> **where**(`field`, `op`, `value?`): `this`
+
+Defined in: [query-builder.ts:25](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-query/src/query-builder.ts#L25)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `field` | keyof `RecordShape` & `string` |
+| `op` | `QueryOperator` |
+| `value?` | `unknown` |
+
+#### Returns
+
+`this`

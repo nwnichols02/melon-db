@@ -1,0 +1,28 @@
+---
+title: "@melon/db-query-mango"
+description: Mango-style JSON queries compiled to QueryAst.
+---
+
+**Status:** Shipped (documented subset) · **Depends on:** `@melon/db` · **API:** [Reference](/docs/api/melon-db-query-mango)
+
+Serializable CouchDB/RxDB-style selectors for configs, tests, and devtools.
+
+## Example
+
+```ts
+import { createMangoCompiler } from '@melon/db-query-mango';
+
+const compiler = createMangoCompiler();
+const prepared = compiler.compile(
+  {
+    selector: { status: 'open', priority: { $gte: 2 } },
+    sort: [{ updatedAt: 'desc' }],
+    limit: 20,
+  },
+  schema,
+);
+
+const rows = await db.collection('tasks').query(prepared).fetch();
+```
+
+Unsupported Mango operators fail at compile time with actionable errors.

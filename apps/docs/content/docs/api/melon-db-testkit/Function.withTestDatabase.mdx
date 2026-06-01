@@ -1,0 +1,33 @@
+---
+title: "withTestDatabase"
+description: "API reference: withTestDatabase"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: withTestDatabase()
+
+> **withTestDatabase**\<`T`\>(`definition`, `fn`): `Promise`\<`T`\>
+
+Defined in: [melon-db-testkit/src/with-test-database.ts:19](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-testkit/src/with-test-database.ts#L19)
+
+Runs a test function with an ephemeral in-memory database.
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
+| `T` |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `definition` | `DatabaseSchemaDefinition` |
+| `fn` | (`ctx`) => `Promise`\<`T`\> |
+
+## Returns
+
+`Promise`\<`T`\>

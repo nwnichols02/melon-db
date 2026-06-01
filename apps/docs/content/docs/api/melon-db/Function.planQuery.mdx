@@ -1,0 +1,27 @@
+---
+title: "planQuery"
+description: "API reference: planQuery"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: planQuery()
+
+> **planQuery**(`ast`, `schema`): [`QueryPlan`](Interface.QueryPlan)
+
+Defined in: [packages/melon-db/src/query/planner.ts:7](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/query/planner.ts#L7)
+
+Builds a query execution plan from AST and schema indexes.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `ast` | [`QueryAst`](Interface.QueryAst) |
+| `schema` | [`MelonSchema`](Interface.MelonSchema) |
+
+## Returns
+
+[`QueryPlan`](Interface.QueryPlan)

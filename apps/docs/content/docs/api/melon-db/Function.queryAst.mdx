@@ -1,0 +1,27 @@
+---
+title: "queryAst"
+description: "API reference: queryAst"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: queryAst()
+
+> **queryAst**(`collection`, `options`): [`QueryAst`](Interface.QueryAst)
+
+Defined in: [packages/melon-db/src/ast.ts:102](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/ast.ts#L102)
+
+Creates a query AST for a collection.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `collection` | `string` |
+| `options` | `Omit`\<[`QueryAst`](Interface.QueryAst), `"collection"` \| `"mode"`\> & `object` |
+
+## Returns
+
+[`QueryAst`](Interface.QueryAst)

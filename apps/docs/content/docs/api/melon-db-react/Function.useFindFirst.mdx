@@ -1,0 +1,34 @@
+---
+title: "useFindFirst"
+description: "API reference: useFindFirst"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: useFindFirst()
+
+> **useFindFirst**\<`T`\>(`collection`, `args?`, `options?`): `T` \| `null`
+
+Defined in: [hooks.ts:111](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-react/src/hooks.ts#L111)
+
+Reactive Prisma-style findFirst hook.
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `T` | `Record`\<`string`, `unknown`\> |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `collection` | `string` |
+| `args?` | `PrismaFindManyArgs` |
+| `options?` | [`UseQueryOptions`](Interface.UseQueryOptions)\<`T`\> |
+
+## Returns
+
+`T` \| `null`

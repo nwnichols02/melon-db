@@ -1,22 +1,32 @@
 # Melon docs
 
-Documentation site for the Melon offline-first database monorepo.
+Documentation site for the Melon monorepo, built with [Fumadocs](https://www.fumadocs.dev/docs) on [TanStack Start](https://tanstack.com/start) (SSR).
+
+**Requires Node.js 22+** for Fumadocs tooling.
 
 ## Development
 
 From the monorepo root:
 
 ```bash
+bun install
 bun run dev:docs
 ```
 
-Open http://localhost:3000
+Open http://localhost:3000 — documentation at `/docs`.
 
-## Pages
+## Scripts
 
-- Getting started — install and quick start
-- Architecture — package map and query flow
-- Sync — pull/push protocol
-- Migration — WatermelonDB codemods
-- Playground — live in-memory CRUD with devtools
-- Sync playground — in-browser sync demo
+| Script | Description |
+|--------|-------------|
+| `bun run dev` | TanStack Start dev server |
+| `bun run build` | Regenerate API docs + production build |
+| `bun run docs:api` | TypeDoc → `content/docs/api/<package>/` |
+| `bun run typecheck` | `fumadocs-mdx` + `tsc` |
+
+## Content
+
+- `content/docs/` — MDX guides, package pages, API reference, playgrounds
+- `meta.json` — sidebar structure per section
+
+See [`.cursor/phases/docs-fumadocs.md`](../../.cursor/phases/docs-fumadocs.md) for the out-of-cycle phase goals.

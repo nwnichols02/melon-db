@@ -1,0 +1,27 @@
+---
+title: "translateWatermelonQuery"
+description: "API reference: translateWatermelonQuery"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: translateWatermelonQuery()
+
+> **translateWatermelonQuery**(`collection`, `clauses`): `QueryAst`
+
+Defined in: [compat/translate-query.ts:110](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-codemods/src/compat/translate-query.ts#L110)
+
+Translates serializable Watermelon Q clauses into a Melon QueryAst.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `collection` | `string` |
+| `clauses` | [`WatermelonQueryClause`](TypeAlias.WatermelonQueryClause)[] |
+
+## Returns
+
+`QueryAst`

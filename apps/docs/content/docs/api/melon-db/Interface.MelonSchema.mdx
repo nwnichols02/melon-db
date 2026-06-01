@@ -1,0 +1,49 @@
+---
+title: "MelonSchemaCollections"
+description: "API reference: MelonSchemaCollections"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: MelonSchema\<Collections\>
+
+Defined in: [packages/melon-db/src/schema.ts:47](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/schema.ts#L47)
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `Collections` *extends* `Record`\<`string`, [`CollectionMetadata`](Interface.CollectionMetadata)\> | `Record`\<`string`, [`CollectionMetadata`](Interface.CollectionMetadata)\> |
+
+## Properties
+
+| Property | Modifier | Type | Defined in |
+| ------ | ------ | ------ | ------ |
+| <a id="property-collections"></a> `collections` | `readonly` | `Collections` | [packages/melon-db/src/schema.ts:54](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/schema.ts#L54) |
+| <a id="property-version"></a> `version` | `readonly` | `number` | [packages/melon-db/src/schema.ts:53](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/schema.ts#L53) |
+
+## Methods
+
+### getCollection()
+
+> **getCollection**\<`Name`\>(`name`): `Collections`\[`Name`\]
+
+Defined in: [packages/melon-db/src/schema.ts:55](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/schema.ts#L55)
+
+#### Type Parameters
+
+| Type Parameter |
+| ------ |
+| `Name` *extends* `string` |
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `name` | `Name` |
+
+#### Returns
+
+`Collections`\[`Name`\]

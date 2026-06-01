@@ -1,0 +1,29 @@
+---
+title: "@melon/db-query"
+description: Fluent type-safe query builder → QueryAst.
+---
+
+**Status:** Shipped · **Depends on:** `@melon/db` · **API:** [Reference](/docs/api/melon-db-query)
+
+Canonical query surface: pure builders with no database I/O.
+
+## Example
+
+```ts
+import { createQueryFactory } from '@melon/db-query';
+
+const q = createQueryFactory(schema);
+const ast = q
+  .from<Task>('tasks')
+  .where('status', 'eq', 'open')
+  .orderBy('updatedAt', 'desc')
+  .limit(20)
+  .toAst('many');
+
+const rows = await db.collection('tasks').findMany(ast);
+```
+
+## Exports
+
+- `QueryBuilder`, `createQueryFactory`, `QueryFactory`
+- `byId`, `byForeignKey` helpers

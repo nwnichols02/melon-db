@@ -1,0 +1,53 @@
+---
+title: Roadmap
+description: What is shipped in the monorepo vs deferred work.
+---
+
+This page is the **living status** for Melon. Update it when features land or deferrals change.
+
+## Shipped
+
+| Area | Status |
+|------|--------|
+| Core engine (`@melon/db`) M0–M2 | Shipped |
+| SQLite SQL compiler + Bun adapter | Shipped |
+| Expo SQLite adapter | Shipped |
+| Optional Node driver (`@melon/db-sqlite/node`) | Shipped |
+| `apps/playground-rn` + sync demo | Shipped |
+| Fluent / Mango / Prisma query surfaces | Shipped |
+| React hooks (`useFindMany`, `useMangoQuery`, `useSync`) | Shipped |
+| Schema migrations (add-column, create-table) | Shipped |
+| Prisma schema import + codegen CLI | Shipped |
+| `belongsTo` relation includes | Shipped |
+| Devtools bridge + React inspector | Shipped |
+| Fumadocs + TanStack Start docs site | Shipped |
+| Benchmark harness + CI smoke | Shipped |
+| `@melon/db-codemods` | Shipped |
+| `@melon/sync` outbox + orchestrator | Shipped |
+| Persistent SQLite checkpoints | Shipped |
+| `@melon/sync-server` HTTP + Postgres backend | Shipped |
+| Sync retry, cancellation, network monitor | Shipped |
+| Conflict policies + merge-by-field | Shipped |
+| Migration-aware sync coordination | Shipped |
+
+## Deferred (Phase 18+)
+
+| Area | Notes |
+|------|-------|
+| Custom JSI/TurboModule SQLite | Native RN performance path |
+| EAS Build CI | Release automation |
+| WatermelonDB benchmark comparison | Formal parity numbers |
+| Model/schema codemods, `Q.on` joins | Migration tooling gaps |
+| Background sync service | OS-level scheduling |
+| Custom conflict resolver hook | Beyond built-in policies |
+
+## Package milestones
+
+See [`.cursor/rules/package-roles.mdc`](https://github.com/melon/melon/blob/main/.cursor/rules/package-roles.mdc) for per-package M0–M2 goals. Each [package page](/docs/packages/melon-db) lists **alpha** vs **shipped** status.
+
+## v1 limitations
+
+- All mutations must run inside `db.write()`.
+- SQLite migrations: add-column and create-table only.
+- Relation includes: `belongsTo` only (no `hasMany` in queries).
+- Native SQLite `observeQuery` triggers not implemented (engine change emitter used).

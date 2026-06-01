@@ -28,6 +28,11 @@ jobs:
       - name: Docs typecheck
         run: bun run --filter docs typecheck
 
+      - name: Build docs
+        run: bun run build:docs
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+
       - name: Lint and format
         run: bun run check
 

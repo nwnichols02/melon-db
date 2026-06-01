@@ -1,0 +1,32 @@
+---
+title: "mergeRemoteWithPendingFields"
+description: "API reference: mergeRemoteWithPendingFields"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: mergeRemoteWithPendingFields()
+
+> **mergeRemoteWithPendingFields**(`args`): [`SyncRecord`](TypeAlias.SyncRecord)
+
+Defined in: [packages/melon-db/src/sync/merge-remote-record.ts:6](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/sync/merge-remote-record.ts#L6)
+
+Merges a remote sync record with locally pending field patches.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args` | \{ `local`: [`SyncRecord`](TypeAlias.SyncRecord) \| `null`; `mergeProtectedFields?`: `string`[]; `mergeRemoteFields?`: `string`[]; `pendingFields?`: `Record`\<`string`, `unknown`\>; `primaryKey`: `string`; `remote`: [`SyncRecord`](TypeAlias.SyncRecord); \} |
+| `args.local` | [`SyncRecord`](TypeAlias.SyncRecord) \| `null` |
+| `args.mergeProtectedFields?` | `string`[] |
+| `args.mergeRemoteFields?` | `string`[] |
+| `args.pendingFields?` | `Record`\<`string`, `unknown`\> |
+| `args.primaryKey` | `string` |
+| `args.remote` | [`SyncRecord`](TypeAlias.SyncRecord) |
+
+## Returns
+
+[`SyncRecord`](TypeAlias.SyncRecord)

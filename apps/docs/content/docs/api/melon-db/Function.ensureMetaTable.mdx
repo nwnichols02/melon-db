@@ -1,0 +1,28 @@
+---
+title: "ensureMetaTable"
+description: "API reference: ensureMetaTable"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: ensureMetaTable()
+
+> **ensureMetaTable**(`execSql`, `queryFirst`, `run`): `Promise`\<[`MigrationAdapterHooks`](Interface.MigrationAdapterHooks)\>
+
+Defined in: [packages/melon-db/src/migrations/meta-store.ts:41](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/migrations/meta-store.ts#L41)
+
+Ensures the meta table exists and returns SQL migration hooks.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `execSql` | (`sql`) => `Promise`\<`void`\> |
+| `queryFirst` | (`sql`, `params?`) => `Promise`\<`Record`\<`string`, `unknown`\> \| `null`\> |
+| `run` | (`sql`, `params?`) => `Promise`\<`void`\> |
+
+## Returns
+
+`Promise`\<[`MigrationAdapterHooks`](Interface.MigrationAdapterHooks)\>

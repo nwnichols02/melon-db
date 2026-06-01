@@ -1,0 +1,32 @@
+---
+title: "@melon/db-react"
+description: React provider and reactive hooks for MelonDatabase.
+---
+
+**Status:** Shipped · **Depends on:** `@melon/db`, optionally query packages · **API:** [Reference](/docs/api/melon-db-react)
+
+Hooks wire adapter subscriptions to React renders.
+
+## Example
+
+```tsx
+import { MelonDbProvider, useQuery, useWriter } from '@melon/db-react';
+
+function App() {
+  return (
+    <MelonDbProvider db={db}>
+      <TaskList />
+    </MelonDbProvider>
+  );
+}
+```
+
+## Hooks
+
+| Hook | Purpose |
+|------|---------|
+| `useDatabase` | Database from context |
+| `useQuery` | Reactive AST / PreparedQuery |
+| `useFindMany` / `useMangoQuery` | Higher-level reactive reads |
+| `useWriter` | Stable `db.write` |
+| `MelonSyncProvider` / `useSync` | Sync orchestration |

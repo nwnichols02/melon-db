@@ -1,0 +1,130 @@
+---
+title: "PrismaModelClientRecordShape"
+description: "API reference: PrismaModelClientRecordShape"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: PrismaModelClient\<RecordShape\>
+
+Defined in: [types.ts:16](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-prisma/src/types.ts#L16)
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `RecordShape` | `Record`\<`string`, `unknown`\> |
+
+## Methods
+
+### count()
+
+> **count**(`args?`): `Promise`\<`number`\>
+
+Defined in: [types.ts:19](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-prisma/src/types.ts#L19)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args?` | `Omit`\<[`PrismaFindManyArgs`](Interface.PrismaFindManyArgs), `"select"` \| `"include"`\> |
+
+#### Returns
+
+`Promise`\<`number`\>
+
+***
+
+### create()
+
+> **create**(`args`): `Promise`\<`RecordShape`\>
+
+Defined in: [types.ts:20](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-prisma/src/types.ts#L20)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args` | \{ `data`: `InsertInput`\<`RecordShape`\>; \} |
+| `args.data` | `InsertInput`\<`RecordShape`\> |
+
+#### Returns
+
+`Promise`\<`RecordShape`\>
+
+***
+
+### delete()
+
+> **delete**(`args`): `Promise`\<`RecordShape` \| `null`\>
+
+Defined in: [types.ts:25](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-prisma/src/types.ts#L25)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args` | \{ `where`: [`PrismaWhereInput`](TypeAlias.PrismaWhereInput); \} |
+| `args.where` | [`PrismaWhereInput`](TypeAlias.PrismaWhereInput) |
+
+#### Returns
+
+`Promise`\<`RecordShape` \| `null`\>
+
+***
+
+### findFirst()
+
+> **findFirst**(`args?`): `Promise`\<`RecordShape` \| `null`\>
+
+Defined in: [types.ts:18](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-prisma/src/types.ts#L18)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args?` | [`PrismaFindManyArgs`](Interface.PrismaFindManyArgs) |
+
+#### Returns
+
+`Promise`\<`RecordShape` \| `null`\>
+
+***
+
+### findMany()
+
+> **findMany**(`args?`): `Promise`\<`RecordShape`[]\>
+
+Defined in: [types.ts:17](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-prisma/src/types.ts#L17)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args?` | [`PrismaFindManyArgs`](Interface.PrismaFindManyArgs) |
+
+#### Returns
+
+`Promise`\<`RecordShape`[]\>
+
+***
+
+### update()
+
+> **update**(`args`): `Promise`\<`RecordShape`\>
+
+Defined in: [types.ts:21](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-prisma/src/types.ts#L21)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args` | \{ `data`: `UpdateInput`\<`RecordShape`\>; `where`: [`PrismaWhereInput`](TypeAlias.PrismaWhereInput); \} |
+| `args.data` | `UpdateInput`\<`RecordShape`\> |
+| `args.where` | [`PrismaWhereInput`](TypeAlias.PrismaWhereInput) |
+
+#### Returns
+
+`Promise`\<`RecordShape`\>

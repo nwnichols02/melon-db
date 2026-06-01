@@ -1,0 +1,21 @@
+---
+title: "@melon/sync"
+description: Watermelon-compatible pull/push orchestrator.
+---
+
+**Status:** Shipped · **Depends on:** `@melon/db` only · **API:** [Reference](/docs/api/melon-sync)
+
+```ts
+import { synchronize, createMemoryCheckpointStore } from '@melon/sync';
+
+await synchronize({
+  db,
+  pullChanges,
+  pushChanges,
+  checkpointStore: createMemoryCheckpointStore(),
+});
+```
+
+Features: retry policy, cancellation, network monitor, conflict policies, migration-aware pull.
+
+Full guide: [Sync](/docs/sync).

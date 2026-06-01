@@ -1,0 +1,28 @@
+---
+title: "applyMigrateWritesTransform"
+description: "API reference: applyMigrateWritesTransform"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: applyMigrateWritesTransform()
+
+> **applyMigrateWritesTransform**(`sourceFile`, `options`, `result`): `void`
+
+Defined in: [codemods/migrate-writes.ts:81](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db-codemods/src/codemods/migrate-writes.ts#L81)
+
+Applies write migration transforms to a source file.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sourceFile` | `SourceFile` |
+| `options` | `Pick`\<[`CodemodOptions`](Interface.CodemodOptions), `"dbVar"` \| `"sourceVar"`\> |
+| `result` | [`CodemodResult`](Interface.CodemodResult) |
+
+## Returns
+
+`void`

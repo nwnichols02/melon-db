@@ -1,0 +1,31 @@
+---
+title: "MigrationStepExecutor"
+description: "API reference: MigrationStepExecutor"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: MigrationStepExecutor
+
+Defined in: [packages/melon-db/src/migrations/types.ts:24](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/migrations/types.ts#L24)
+
+## Methods
+
+### applyStep()
+
+> **applyStep**(`step`, `schema`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/migrations/types.ts:25](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/migrations/types.ts#L25)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `step` | [`MigrationStep`](TypeAlias.MigrationStep) |
+| `schema` | [`MelonSchema`](Interface.MelonSchema) |
+
+#### Returns
+
+`Promise`\<`void`\>

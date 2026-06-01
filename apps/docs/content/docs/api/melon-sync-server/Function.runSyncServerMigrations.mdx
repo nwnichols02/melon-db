@@ -1,0 +1,26 @@
+---
+title: "runSyncServerMigrations"
+description: "API reference: runSyncServerMigrations"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: runSyncServerMigrations()
+
+> **runSyncServerMigrations**(`options`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-sync-server/src/migrate.ts:12](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-sync-server/src/migrate.ts#L12)
+
+Runs idempotent SQL migration files in lexical order from the package sql/ directory.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `options` | [`RunMigrationsOptions`](Interface.RunMigrationsOptions) |
+
+## Returns
+
+`Promise`\<`void`\>

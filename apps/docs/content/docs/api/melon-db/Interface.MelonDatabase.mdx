@@ -1,0 +1,196 @@
+---
+title: "MelonDatabaseSchema"
+description: "API reference: MelonDatabaseSchema"
+---
+
+[**Melon API**](index)
+
+***
+
+# Interface: MelonDatabase\<Schema\>
+
+Defined in: [packages/melon-db/src/database/types.ts:57](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L57)
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `Schema` *extends* [`MelonSchema`](Interface.MelonSchema) | [`MelonSchema`](Interface.MelonSchema) |
+
+## Properties
+
+| Property | Modifier | Type | Defined in |
+| ------ | ------ | ------ | ------ |
+| <a id="property-adapter"></a> `adapter` | `readonly` | [`StorageAdapter`](Interface.StorageAdapter) | [packages/melon-db/src/database/types.ts:59](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L59) |
+| <a id="property-devtools"></a> `devtools?` | `readonly` | [`DevtoolsBridge`](Interface.DevtoolsBridge) | [packages/melon-db/src/database/types.ts:60](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L60) |
+| <a id="property-schema"></a> `schema` | `readonly` | `Schema` | [packages/melon-db/src/database/types.ts:58](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L58) |
+
+## Methods
+
+### applyRemoteChanges()
+
+> **applyRemoteChanges**(`changes`, `options?`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:71](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L71)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `changes` | [`SyncChanges`](Interface.SyncChanges) |
+| `options?` | [`ApplyRemoteChangesOptions`](Interface.ApplyRemoteChangesOptions) |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### collection()
+
+> **collection**\<`Name`\>(`name`): [`MelonCollection`](Interface.MelonCollection)\<[`CollectionRecord`](TypeAlias.CollectionRecord)\>
+
+Defined in: [packages/melon-db/src/database/types.ts:61](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L61)
+
+#### Type Parameters
+
+| Type Parameter |
+| ------ |
+| `Name` *extends* `string` |
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `name` | `Name` |
+
+#### Returns
+
+[`MelonCollection`](Interface.MelonCollection)\<[`CollectionRecord`](TypeAlias.CollectionRecord)\>
+
+***
+
+### createCheckpointStore()
+
+> **createCheckpointStore**(): [`CheckpointStore`](Interface.CheckpointStore)
+
+Defined in: [packages/melon-db/src/database/types.ts:76](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L76)
+
+#### Returns
+
+[`CheckpointStore`](Interface.CheckpointStore)
+
+***
+
+### getLocalChanges()
+
+> **getLocalChanges**(`options?`): `Promise`\<[`SyncChanges`](Interface.SyncChanges)\>
+
+Defined in: [packages/melon-db/src/database/types.ts:70](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L70)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `options?` | [`GetLocalChangesOptions`](Interface.GetLocalChangesOptions) |
+
+#### Returns
+
+`Promise`\<[`SyncChanges`](Interface.SyncChanges)\>
+
+***
+
+### markLocalChangesPushed()
+
+> **markLocalChangesPushed**(`collections?`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:75](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L75)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `collections?` | `string`[] |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### observeCollections()
+
+> **observeCollections**(`names`, `onChange`): () => `void`
+
+Defined in: [packages/melon-db/src/database/types.ts:66](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L66)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `names` | `string`[] |
+| `onChange` | (`changes`) => `void` |
+
+#### Returns
+
+() => `void`
+
+***
+
+### read()
+
+> **read**\<`T`\>(`fn`): `Promise`\<`T`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:64](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L64)
+
+#### Type Parameters
+
+| Type Parameter |
+| ------ |
+| `T` |
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `fn` | (`tx`) => `Promise`\<`T`\> |
+
+#### Returns
+
+`Promise`\<`T`\>
+
+***
+
+### unsafeReset()
+
+> **unsafeReset**(): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:77](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L77)
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### write()
+
+> **write**\<`T`\>(`fn`): `Promise`\<`T`\>
+
+Defined in: [packages/melon-db/src/database/types.ts:65](https://github.com/nwnichols02/melon/blob/795321394b842d707fe0c6536ea321179728d77a/packages/melon-db/src/database/types.ts#L65)
+
+#### Type Parameters
+
+| Type Parameter |
+| ------ |
+| `T` |
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `fn` | (`tx`) => `Promise`\<`T`\> |
+
+#### Returns
+
+`Promise`\<`T`\>
