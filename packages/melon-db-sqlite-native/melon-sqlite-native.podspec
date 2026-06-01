@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.platforms    = { :ios => "15.1" }
   # Local monorepo installs use :path in the Podfile; avoid a remote :git :tag that does not exist.
   s.source       = { :path => "." }
-  s.source_files = "ios/MelonSQLite.{h,mm}", "cpp/*.{h,cpp}"
+  s.source_files = "ios/MelonSQLite.{h,mm}", "ios/MelonSQLiteTurboModule.{h,mm}", "cpp/*.{h,cpp}"
   s.public_header_files = "ios/MelonSQLite.h"
   s.exclude_files = "ios/generated/**"
   s.libraries = "sqlite3"

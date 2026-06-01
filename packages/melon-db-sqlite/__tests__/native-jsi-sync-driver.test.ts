@@ -62,6 +62,12 @@ describe("createJsiSqliteAdapter mode selection", () => {
 			runSync: () => {},
 		};
 
+		mock.module("react-native", () => ({
+			TurboModuleRegistry: {
+				get: () => ({ close: async () => {} }),
+			},
+		}));
+
 		const { createJsiSqliteAdapter } = await import("../src/rn.ts");
 		const adapter = createJsiSqliteAdapter({
 			filename: "test.db",

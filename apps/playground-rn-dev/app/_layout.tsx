@@ -11,7 +11,7 @@ import { MelonDbProvider, MelonSyncProvider } from "@melon/db-react";
 import { DEFAULT_RETRY_POLICY } from "@melon/sync";
 import { Stack } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 /**
@@ -19,19 +19,38 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
  */
 export default function RootLayout(): React.ReactElement {
 	const [db, setDb] = useState<MelonDatabase<typeof taskSchema> | null>(null);
+	const [bootError, setBootError] = useState<string | null>(null);
 	const syncBackend = useMemo(() => createHttpSyncBackend(), []);
 
 	useEffect(() => {
 		let cancelled = false;
-		void getDatabase().then((database) => {
-			if (!cancelled) {
-				setDb(database);
-			}
-		});
+		void getDatabase()
+			.then((database) => {
+				if (!cancelled) {
+					setDb(database);
+				}
+			})
+			.catch((error: unknown) => {
+				if (!cancelled) {
+					setBootError(
+						error instanceof Error ? error.message : "Database bootstrap failed",
+					);
+				}
+			});
 		return () => {
 			cancelled = true;
 		};
 	}, []);
+
+	if (bootError != null) {
+		return (
+			<SafeAreaProvider>
+				<View style={styles.loading}>
+					<Text style={styles.errorText}>{bootError}</Text>
+				</View>
+			</SafeAreaProvider>
+		);
+	}
 
 	if (!db) {
 		return (
@@ -79,5 +98,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: "center",
 		justifyContent: "center",
+		padding: 24,
+	},
+	errorText: {
+		fontSize: 14,
+		color: "#b00020",
+		textAlign: "center",
 	},
 });

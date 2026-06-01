@@ -1,6 +1,5 @@
 #import "MelonSQLite.h"
-#import "../cpp/MelonSQLiteInstaller.h"
-#import <ReactCommon/CallInvoker.h>
+#import "MelonSQLiteTurboModule.h"
 #import <sqlite3.h>
 #import <React/RCTUtils.h>
 
@@ -33,12 +32,7 @@
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params {
-  if (params.jsInvoker != nullptr) {
-    params.jsInvoker->invokeSync([&](facebook::jsi::Runtime &runtime) {
-      melon::installMelonSqliteJsi(runtime);
-    });
-  }
-  return std::make_shared<facebook::react::NativeMelonSQLiteSpecJSI>(params);
+  return std::make_shared<facebook::react::MelonSQLiteTurboModuleJSI>(params);
 }
 
 - (void)ensureOpen:(RCTPromiseRejectBlock)reject {

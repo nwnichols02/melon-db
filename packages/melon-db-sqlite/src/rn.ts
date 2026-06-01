@@ -50,21 +50,47 @@ export function isJsiSyncSqliteAvailable(): boolean {
 	return isNativeJsiSyncAvailable();
 }
 
+/**
+ * Pokes the TurboModule so iOS installs global.melonSqliteJsi on first dispatch.
+ */
+async function ensureNativeJsiInstalled(): Promise<void> {
+	if (isNativeJsiSyncAvailable()) {
+		return;
+	}
+	if (!isJsiSqliteAvailable()) {
+		return;
+	}
+	const reactNative = require("react-native") as {
+		TurboModuleRegistry?: {
+			get: (name: string) => { close?: () => Promise<void> } | null;
+		};
+	};
+	const module = reactNative.TurboModuleRegistry?.get("MelonSQLite");
+	if (module?.close != null) {
+		await module.close();
+	}
+}
+
 function resolveDriverFactory(
 	mode: JsiSqliteAdapterMode,
 	path: string,
 ): () => Promise<import("./driver.ts").SqliteDriver> {
 	if (mode === "jsi-sync") {
-		return () => createNativeJsiSyncDriver({ path });
+		return async () => {
+			await ensureNativeJsiInstalled();
+			return createNativeJsiSyncDriver({ path });
+		};
 	}
 	if (mode === "turbo") {
 		return () => createNativeDriver({ path });
 	}
-	// Touch TurboModule first — iOS installs global.melonSqliteJsi in getTurboModule.
-	if (isJsiSqliteAvailable() && isNativeJsiSyncAvailable()) {
-		return () => createNativeJsiSyncDriver({ path });
-	}
-	return () => createNativeDriver({ path });
+	return async () => {
+		await ensureNativeJsiInstalled();
+		if (isNativeJsiSyncAvailable()) {
+			return createNativeJsiSyncDriver({ path });
+		}
+		return createNativeDriver({ path });
+	};
 }
 
 /**
@@ -78,21 +104,15 @@ export function createJsiSqliteAdapter(
 		? resolveNativeDatabasePath(filename, basePath)
 		: filename;
 
-	if (mode === "jsi-sync" && !isNativeJsiSyncAvailable()) {
-		throw new Error(
-			"Melon sync JSI SQLite is not installed. Use mode: 'turbo' or a development build on iOS.",
-		);
+	if (mode === "jsi-sync" && !isJsiSqliteAvailable()) {
+		throw new Error(JSI_SQLITE_DEV_BUILD_MESSAGE);
 	}
 
 	if (mode === "turbo" && !isJsiSqliteAvailable()) {
 		throw new Error(JSI_SQLITE_DEV_BUILD_MESSAGE);
 	}
 
-	if (
-		mode === "auto" &&
-		!isNativeJsiSyncAvailable() &&
-		!isJsiSqliteAvailable()
-	) {
+	if (mode === "auto" && !isJsiSqliteAvailable()) {
 		throw new Error(JSI_SQLITE_DEV_BUILD_MESSAGE);
 	}
 
