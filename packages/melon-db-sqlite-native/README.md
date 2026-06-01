@@ -27,19 +27,18 @@ const adapter = createJsiSqliteAdapter({
 });
 ```
 
-## Development build (playground-rn)
-
-Use the **development-build** environment only (`apps/playground-rn/env/.env.development-build`):
+## Development build (playground-rn-dev)
 
 ```bash
-bun run dev:rn:dev-build
+bun run dev:rn:dev
+bun run dev:rn:dev:start
 ```
 
-Expo Go uses a separate env file — see `apps/playground-rn/env/README.md`.
+Expo Go demo: `apps/playground-rn` (`bun run dev:rn`).
 
 ## Manual iOS verification checklist
 
-After `bun run dev:rn:dev-build` (or `prebuild:dev` + `run:ios:dev`):
+After `bun run dev:rn:dev` (or `bun run install:ios` in `apps/playground-rn-dev`):
 
 1. App launches without native module errors.
 2. Seeded tasks appear (same as expo path).

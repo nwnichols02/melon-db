@@ -128,7 +128,7 @@ export default function TasksScreen(): React.ReactElement {
 	return (
 		<SafeAreaView style={styles.container} edges={["bottom"]}>
 			<View style={styles.runtimeBadge}>
-				<Text style={styles.runtimeBadgeText}>Expo Go</Text>
+				<Text style={styles.runtimeBadgeText}>JSI development build</Text>
 			</View>
 			<View style={styles.syncBar}>
 				<Text style={styles.syncStatus}>{statusLabel}</Text>

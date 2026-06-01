@@ -70,6 +70,37 @@
         "expo": "~54.0.5",
         "expo-asset": "~12.0.13",
         "expo-constants": "~18.0.13",
+        "expo-linking": "~8.0.12",
+        "expo-router": "~6.0.24",
+        "expo-sqlite": "~16.0.10",
+        "expo-status-bar": "~3.0.9",
+        "react": "19.1.0",
+        "react-native": "0.81.5",
+        "react-native-gesture-handler": "~2.28.0",
+        "react-native-safe-area-context": "~5.6.0",
+        "react-native-screens": "~4.16.0",
+      },
+      "devDependencies": {
+        "@types/react": "~19.1.10",
+        "typescript": "^5",
+      },
+    },
+    "apps/playground-rn-dev": {
+      "name": "playground-rn-dev",
+      "version": "1.0.0",
+      "dependencies": {
+        "@melon/db": "workspace:*",
+        "@melon/db-devtools": "workspace:*",
+        "@melon/db-query": "workspace:*",
+        "@melon/db-react": "workspace:*",
+        "@melon/db-sqlite": "workspace:*",
+        "@melon/db-sqlite-native": "workspace:*",
+        "@melon/sync": "workspace:*",
+        "@shopify/flash-list": "2.0.2",
+        "babel-preset-expo": "~54.0.10",
+        "expo": "~54.0.5",
+        "expo-asset": "~12.0.13",
+        "expo-constants": "~18.0.13",
         "expo-dev-client": "~6.0.20",
         "expo-linking": "~8.0.12",
         "expo-router": "~6.0.24",
@@ -82,7 +113,6 @@
         "react-native-screens": "~4.16.0",
       },
       "devDependencies": {
-        "@melon/db-sqlite-native": "workspace:*",
         "@types/react": "~19.1.10",
         "typescript": "^5",
       },
@@ -1829,6 +1859,8 @@
     "playground-node": ["playground-node@workspace:apps/playground-node"],
 
     "playground-rn": ["playground-rn@workspace:apps/playground-rn"],
+
+    "playground-rn-dev": ["playground-rn-dev@workspace:apps/playground-rn-dev"],
 
     "plist": ["plist@3.1.1", "", { "dependencies": { "@xmldom/xmldom": "^0.9.10", "base64-js": "^1.5.1", "xmlbuilder": "^15.1.1" } }, "sha512-ZIfcLJC+7E7FBFnDxm9MPmt7D+DidyQ26lewieO75AdhA2ayMtsJSES0iWzqJQbcVRSrTufQoy0DR94xHue0oA=="],
 

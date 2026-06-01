@@ -1,0 +1,45 @@
+{
+  "name": "playground-rn-dev",
+  "private": true,
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "EXPO_OFFLINE=1 expo start --dev-client",
+    "start:clear": "EXPO_OFFLINE=1 expo start --dev-client --clear",
+    "prebuild": "expo prebuild --clean",
+    "run:ios": "expo run:ios",
+    "run:android": "expo run:android",
+    "install:ios": "bun run prebuild && bun run run:ios",
+    "typecheck": "bunx tsc -p tsconfig.json --noEmit",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
+  },
+  "dependencies": {
+    "@melon/db": "workspace:*",
+    "@melon/db-devtools": "workspace:*",
+    "@melon/db-query": "workspace:*",
+    "@melon/db-react": "workspace:*",
+    "@melon/db-sqlite": "workspace:*",
+    "@melon/db-sqlite-native": "workspace:*",
+    "@melon/sync": "workspace:*",
+    "@shopify/flash-list": "2.0.2",
+    "babel-preset-expo": "~54.0.10",
+    "expo": "~54.0.5",
+    "expo-asset": "~12.0.13",
+    "expo-constants": "~18.0.13",
+    "expo-dev-client": "~6.0.20",
+    "expo-linking": "~8.0.12",
+    "expo-router": "~6.0.24",
+    "expo-sqlite": "~16.0.10",
+    "expo-status-bar": "~3.0.9",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-gesture-handler": "~2.28.0",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.1.10",
+    "typescript": "^5"
+  }
+}

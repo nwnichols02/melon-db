@@ -3,6 +3,9 @@
 expo-env.d.ts
 # @end expo-cli
 
+/ios
+/android
+
 .env
 .env.local
 .env.*.local

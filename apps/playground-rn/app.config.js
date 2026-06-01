@@ -1,42 +1,23 @@
-require("./scripts/load-melon-env.cjs");
-
 /**
- * @param {import('expo/config').ConfigContext} context
  * @returns {import('expo/config').ExpoConfig}
  */
-module.exports = () => {
-	const melonEnv = process.env.MELON_ENV ?? "expo-go";
-	const isDevBuild = melonEnv === "development-build";
-
-	const baseExpo = {
-		name: isDevBuild ? "Melon Playground (Dev)" : "Melon Playground",
-		slug: isDevBuild ? "playground-rn-dev" : "playground-rn",
+module.exports = () => ({
+	expo: {
+		name: "Melon Playground",
+		slug: "playground-rn",
 		version: "1.0.0",
-		scheme: isDevBuild ? "melon-playground-dev" : "melon-playground",
+		scheme: "melon-playground",
 		orientation: "portrait",
 		newArchEnabled: true,
 		ios: {
-			bundleIdentifier: isDevBuild
-				? "com.nate.nichols.playgroundrn.devbuild"
-				: "com.nate.nichols.playgroundrn",
+			bundleIdentifier: "com.nate.nichols.playgroundrn",
 		},
 		android: {
-			package: isDevBuild
-				? "com.nate.nichols.playgroundrn.devbuild"
-				: "com.nate.nichols.playgroundrn",
+			package: "com.nate.nichols.playgroundrn",
 		},
-		plugins: [
-			...(isDevBuild ? ["expo-dev-client"] : []),
-			"expo-router",
-			"expo-sqlite",
-			"expo-asset",
-		],
+		plugins: ["expo-router", "expo-sqlite", "expo-asset"],
 		experiments: {
 			typedRoutes: true,
 		},
-	};
-
-	return {
-		expo: baseExpo,
-	};
-};
+	},
+});

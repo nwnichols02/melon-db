@@ -1,14 +1,17 @@
 import NativeMelonSQLite, {
-	type MelonSQLiteSpec,
+	type Spec,
 	type SqlParam,
 } from "./NativeMelonSQLite.ts";
 
-export type { MelonSQLiteSpec, SqlParam };
+export type { SqlParam };
+/** @deprecated Use {@link Spec} — kept for callers that used the old name. */
+export type MelonSQLiteSpec = Spec;
+export type { Spec };
 
 /**
  * Returns the native MelonSQLite TurboModule when linked in a development build.
  */
-export function getMelonSQLite(): MelonSQLiteSpec | null {
+export function getMelonSQLite(): Spec | null {
 	return NativeMelonSQLite;
 }
 

@@ -6,7 +6,7 @@ import {
 import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
 import { type Task, taskSchema } from "./schema";
 
-const DATABASE_FILENAME = "melon-playground.db";
+const DATABASE_FILENAME = "melon-playground-dev.db";
 
 export const devtoolsBridge = createReactiveDevtoolsBridge();
 
@@ -23,13 +23,19 @@ export async function getDatabase(): Promise<MelonDatabase<typeof taskSchema>> {
 }
 
 /**
- * Expo Go: expo-sqlite via @melon/db-sqlite/expo.
+ * JSI SQLite via @melon/db-sqlite-native (development build only).
  */
 async function createAdapter(): Promise<StorageAdapter> {
-	const SQLite = await import("expo-sqlite");
-	const { createExpoSqliteAdapter } = await import("@melon/db-sqlite/expo");
-	const database = await SQLite.openDatabaseAsync(DATABASE_FILENAME);
-	return createExpoSqliteAdapter({ database });
+	const { createJsiSqliteAdapter, isJsiSqliteAvailable } = await import(
+		"@melon/db-sqlite/rn"
+	);
+	if (!isJsiSqliteAvailable()) {
+		throw new Error(
+			"Melon JSI SQLite requires a native binary. " +
+				"From apps/playground-rn-dev run: bun run install:ios then bun run start",
+		);
+	}
+	return createJsiSqliteAdapter({ filename: DATABASE_FILENAME });
 }
 
 async function bootstrap(): Promise<MelonDatabase<typeof taskSchema>> {
@@ -59,7 +65,7 @@ async function seedTasks(db: MelonDatabase<typeof taskSchema>): Promise<void> {
 		},
 		{
 			id: "2",
-			title: "Ship playground-rn",
+			title: "Ship playground-rn-dev",
 			status: "open",
 			priority: 2,
 			updatedAt: new Date(),

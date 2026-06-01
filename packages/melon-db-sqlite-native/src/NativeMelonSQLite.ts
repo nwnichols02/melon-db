@@ -3,7 +3,7 @@ import { TurboModuleRegistry } from "react-native";
 
 export type SqlParam = string | number | boolean | null;
 
-export interface MelonSQLiteSpec extends TurboModule {
+export interface Spec extends TurboModule {
 	open(path: string): Promise<void>;
 	close(): Promise<void>;
 	exec(sql: string): Promise<void>;
@@ -21,4 +21,4 @@ export interface MelonSQLiteSpec extends TurboModule {
 /**
  * Native Melon SQLite module (development build only; absent in Expo Go).
  */
-export default TurboModuleRegistry.get<MelonSQLiteSpec>("MelonSQLite");
+export default TurboModuleRegistry.get<Spec>("MelonSQLite");

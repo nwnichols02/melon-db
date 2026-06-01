@@ -10,7 +10,7 @@
 		"typecheck": "bunx tsc -p tsconfig.json --noEmit"
 	},
 	"codegenConfig": {
-		"name": "MelonSQLiteSpec",
+		"name": "NativeMelonSQLite",
 		"type": "modules",
 		"jsSrcsDir": "src",
 		"android": {

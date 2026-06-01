@@ -9,7 +9,8 @@ Top-level layout
 text
 melon-monorepo/
   apps/
-    playground-rn/        # Example RN app using new arch + melon/db
+    playground-rn/        # Expo Go demo app (@melon/db-sqlite/expo)
+    playground-rn-dev/    # Dev client + JSI native SQLite demo
     playground-web/       # Optional web example (if/when supported)
     docs/                 # Fumadocs + TanStack Start site (apps/docs)
   packages/

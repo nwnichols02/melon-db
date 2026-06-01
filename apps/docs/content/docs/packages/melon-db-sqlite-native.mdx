@@ -17,7 +17,5 @@ Native SQLite module used by [`@melon/db-sqlite/rn`](/docs/packages/melon-db-sql
 
 ## Setup
 
-Playground uses two env files under `apps/playground-rn/env/`:
-
-- **Expo Go:** `bun run dev:rn` — does not use this package
-- **Development build:** `bun run dev:rn:dev-build` — loads `env/.env.development-build` and runs prebuild + `expo run:ios`
+- **Expo Go:** [`apps/playground-rn`](/docs/getting-started) — `bun run dev:rn` (does not use this package)
+- **Development build:** [`apps/playground-rn-dev`](/docs/getting-started) — `bun run dev:rn:dev` then `bun run dev:rn:dev:start`

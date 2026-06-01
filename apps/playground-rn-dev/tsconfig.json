@@ -1,0 +1,19 @@
+{
+	"extends": "../../tooling/tsconfig.base.json",
+	"compilerOptions": {
+		"lib": ["ESNext", "DOM"],
+		"jsx": "react-native",
+		"baseUrl": ".",
+		"types": ["react"],
+		"paths": {
+			"@/*": ["./src/*"]
+		}
+	},
+	"include": [
+		"app/**/*.tsx",
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		".expo/types/**/*.ts",
+		"expo-env.d.ts"
+	]
+}
