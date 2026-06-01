@@ -1,0 +1,52 @@
+---
+title: Setup
+description: Schema, models, migrations, and database initialization.
+---
+
+Setup covers everything you define **before** your app reads or writes data: collections, TypeScript record shapes, schema migrations, and wiring a storage adapter into `createDatabase`.
+
+## What to configure
+
+| Topic | Guide | Purpose |
+|-------|-------|---------|
+| [Schema](/docs/setup/schema) | Collections, fields, indexes, relations metadata | Single source of truth for storage and queries |
+| [Models](/docs/setup/models) | TypeScript interfaces for records | Type-safe app code without ORM classes |
+| [Migrations](/docs/setup/migrations) | Versioned schema upgrades | Safe upgrades on device and during sync |
+| [Database](/docs/setup/database) | Adapters, `createDatabase`, sync flag | Connect schema to SQLite or in-memory storage |
+
+## Recommended order
+
+1. Define a `DatabaseSchemaDefinition` and call `createMelonSchema`.
+2. Add TypeScript interfaces for each collection’s record shape.
+3. List migrations if `version > 1` (or plan them before shipping v2).
+4. Create an adapter for your runtime (Expo Go, dev client JSI, Node, or in-memory for tests).
+5. Call `createDatabase({ schema, adapter, migrations?, sync? })`.
+
+## Minimal example
+
+```ts
+import { createDatabase, createInMemoryAdapter, createMelonSchema } from '@melon/db';
+
+const schema = createMelonSchema({
+  version: 1,
+  collections: {
+    tasks: {
+      name: 'tasks',
+      primaryKey: 'id',
+      fields: {
+        id: { kind: 'string' },
+        title: { kind: 'string' },
+        status: { kind: 'string', indexed: true },
+      },
+      indexes: [['status']],
+    },
+  },
+});
+
+const db = createDatabase({
+  schema,
+  adapter: createInMemoryAdapter(),
+});
+```
+
+Next: [Usage](/docs/usage) for CRUD, queries, React hooks, and read/write boundaries.

@@ -3,7 +3,7 @@ title: "withRetry"
 description: "@melon/sync — withRetry"
 ---
 
-[**@melon/sync API Reference**](index)
+[**@melon/sync API Reference**](/docs/api/melon-sync)
 
 ***
 
@@ -11,7 +11,7 @@ description: "@melon/sync — withRetry"
 
 > **withRetry**\<`T`\>(`fn`, `policy`, `options?`): `Promise`\<`T`\>
 
-Defined in: [packages/melon-sync/src/retry.ts:57](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-sync/src/retry.ts#L57)
+Defined in: [packages/melon-sync/src/retry.ts:57](https://github.com/nwnichols02/melon/blob/c5a3d86cb230c0f5a97ea95ab2a74f29ae7f5ddf/packages/melon-sync/src/retry.ts#L57)
 
 Executes an async function with exponential backoff retries.
 
@@ -26,7 +26,7 @@ Executes an async function with exponential backoff retries.
 | Parameter | Type |
 | ------ | ------ |
 | `fn` | () => `Promise`\<`T`\> |
-| `policy` | [`RetryPolicy`](Interface.RetryPolicy) |
+| `policy` | [`RetryPolicy`](/docs/api/melon-sync/Interface.RetryPolicy) |
 | `options?` | \{ `onRetry?`: (`attempt`, `error`) => `void`; `signal?`: `AbortSignal`; \} |
 | `options.onRetry?` | (`attempt`, `error`) => `void` |
 | `options.signal?` | `AbortSignal` |

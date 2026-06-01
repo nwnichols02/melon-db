@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 380" role="img" aria-label="Native SQLite path decision">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <polygon points="0 0, 8 4, 0 8" fill="#64748b"/>
+    </marker>
+    <style>
+      .node { fill: #fff7ed; stroke: #ea580c; stroke-width: 1.5; rx: 8; }
+      .decision { fill: #fef3c7; stroke: #d97706; stroke-width: 1.5; }
+      .label { font: 600 12px Manrope, system-ui, sans-serif; fill: #0f172a; }
+      .small { font: 500 11px Manrope, system-ui, sans-serif; fill: #334155; }
+    </style>
+  </defs>
+  <rect class="node" x="250" y="20" width="200" height="40"/><text class="label" x="275" y="45">createSqliteAdapter on RN</text>
+  <polygon class="decision" points="350,90 440,130 350,170 260,130"/><text class="small" x="305" y="128">Expo Go?</text>
+  <rect class="node" x="480" y="110" width="180" height="40"/><text class="label" x="500" y="135">@melon/db-sqlite/expo</text>
+  <rect class="node" x="40" y="200" width="180" height="40"/><text class="label" x="55" y="225">@melon/db-sqlite/rn</text>
+  <rect class="node" x="260" y="280" width="200" height="40"/><text class="label" x="285" y="305">jsi-sync melonSqliteJsi</text>
+  <rect class="node" x="490" y="280" width="180" height="40"/><text class="label" x="510" y="305">TurboModule fallback</text>
+
+  <line x1="350" y1="60" x2="350" y2="90" stroke="#64748b" marker-end="url(#arrow)"/>
+  <line x1="440" y1="130" x2="480" y2="130" stroke="#64748b" marker-end="url(#arrow)"/><text class="small" x="448" y="122">yes</text>
+  <line x1="260" y1="130" x2="130" y2="200" stroke="#64748b" marker-end="url(#arrow)"/><text class="small" x="170" y="160">no / dev build</text>
+  <line x1="130" y1="240" x2="320" y2="280" stroke="#64748b" marker-end="url(#arrow)"/><text class="small" x="200" y="265">mode: auto</text>
+  <line x1="220" y1="220" x2="540" y2="280" stroke="#64748b" marker-end="url(#arrow)"/><text class="small" x="360" y="255">JSI unavailable</text>
+</svg>

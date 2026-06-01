@@ -1,0 +1,103 @@
+---
+title: Models
+description: TypeScript record types for collections — no ORM classes required.
+---
+
+Melon does **not** use decorator-based model classes like WatermelonDB. Collections are defined in schema metadata; your app uses plain **TypeScript interfaces** (or generated types) for record shapes.
+
+## Pattern
+
+Define one interface per collection next to your schema:
+
+```ts
+import { type DatabaseSchemaDefinition, createMelonSchema } from '@melon/db';
+
+export const taskSchemaDefinition: DatabaseSchemaDefinition = {
+  version: 1,
+  collections: {
+    tasks: {
+      name: 'tasks',
+      primaryKey: 'id',
+      fields: {
+        id: { kind: 'string' },
+        title: { kind: 'string' },
+        status: { kind: 'string', indexed: true },
+        priority: { kind: 'number' },
+        updatedAt: { kind: 'date' },
+      },
+    },
+  },
+};
+
+export const taskSchema = createMelonSchema(taskSchemaDefinition);
+
+export interface Task {
+  id: string;
+  title: string;
+  status: string;
+  priority: number;
+  updatedAt: Date;
+}
+```
+
+Use `Task` with collection methods and hooks:
+
+```ts
+const task = await db.collection('tasks').findById('1') as Task | null;
+```
+
+## Typing collections
+
+`MelonCollection` is generic over the record shape when you pass a type argument through your own wrappers. Hooks accept a generic:
+
+```ts
+import { useQuery } from '@melon/db-react';
+
+const tasks = useQuery<Task>(openTasksAst);
+```
+
+The query builder uses the same pattern:
+
+```ts
+import { createQueryFactory } from '@melon/db-query';
+
+createQueryFactory(taskSchema).from<Task>('tasks').where('status', 'eq', 'open');
+```
+
+## Inserts and updates
+
+`insert` and `update` accept partial objects (`InsertInput` / `UpdateInput`). You only need to supply required fields on insert:
+
+```ts
+await db.write(async (tx) => {
+  await tx.collection('tasks').insert({
+    id: crypto.randomUUID(),
+    title: 'Ship docs',
+    status: 'open',
+    priority: 2,
+    updatedAt: new Date(),
+  });
+});
+```
+
+## Relations on records
+
+When you `include` a `belongsTo` relation, the adapter attaches nested objects on each row:
+
+```ts
+interface TaskWithProject extends Task {
+  project?: { id: string; name: string } | null;
+}
+```
+
+There is no automatic inverse `hasMany` loader in v1 — fetch child rows with a separate query filtered by foreign key.
+
+## Prisma-style codegen (optional)
+
+[`@melon/db-prisma`](/docs/packages/melon-db-prisma) can import a Prisma schema and generate model interfaces plus a local client facade. The runtime engine remains `@melon/db`; generated types are a DX layer only.
+
+## Related
+
+- [Schema](/docs/setup/schema) — field and relation definitions
+- [CRUD](/docs/usage/crud) — collection read/write APIs
+- [React hooks](/docs/usage/react) — `useQuery<Task>(...)`

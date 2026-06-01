@@ -7,30 +7,11 @@ Melon uses an **AST-first** query architecture: every query surface compiles int
 
 ## System overview
 
-```mermaid
-flowchart TB
-  subgraph authoring [Query authoring]
-    Fluent["@melon/db-query"]
-    Mango["@melon/db-query-mango"]
-    Prisma["@melon/db-prisma"]
-  end
-  subgraph core ["@melon/db"]
-    AST[QueryAst]
-    Engine[MelonDatabase]
-  end
-  subgraph storage [Adapters]
-    Mem[In-memory]
-    BunSqlite["Bun / Node / Expo SQLite"]
-    Native["@melon/db-sqlite-native JSI"]
-  end
-  Fluent --> AST
-  Mango --> AST
-  Prisma --> AST
-  Engine --> AST
-  Engine --> Mem
-  Engine --> BunSqlite
-  Engine --> Native
-```
+<ArchitectureDiagram
+  alt="Melon system overview — query surfaces compile to QueryAst, MelonDatabase routes to adapters"
+  caption="Query authoring surfaces compile to one AST; the engine routes to in-memory, Expo/Bun SQLite, or native JSI adapters."
+  src="/diagrams/architecture/system-overview.svg"
+/>
 
 See [Packages](/docs/packages/melon-db) for per-package guides and [Architectural decisions](/docs/architecture/decisions) for ADRs with trade-offs.
 
@@ -53,22 +34,10 @@ See [Packages](/docs/packages/melon-db) for per-package guides and [Architectura
 
 ## Query pipeline
 
-```mermaid
-sequenceDiagram
-  participant Author as Query author
-  participant Compiler as Query compiler
-  participant Engine as MelonDatabase
-  participant Adapter as StorageAdapter
-  participant UI as Subscribers
-
-  Author->>Compiler: fluent / Mango / Prisma args
-  Compiler->>Compiler: compile to QueryAst
-  Compiler->>Engine: validate + plan + prepare
-  Engine->>Adapter: PreparedQuery
-  Adapter->>Adapter: SQL or in-memory filter
-  Adapter-->>Engine: rows
-  Engine-->>UI: observe on change
-```
+<ArchitectureDiagram
+  alt="Query pipeline sequence from author through compiler, engine, adapter, to subscribers"
+  src="/diagrams/architecture/query-pipeline.svg"
+/>
 
 Steps in code:
 
@@ -81,39 +50,10 @@ Steps in code:
 
 ## Package dependencies
 
-```mermaid
-flowchart BT
-  Codemods["@melon/db-codemods"]
-  Testkit["@melon/db-testkit"]
-  Devtools["@melon/db-devtools"]
-  React["@melon/db-react"]
-  Prisma["@melon/db-prisma"]
-  Mango["@melon/db-query-mango"]
-  Query["@melon/db-query"]
-  Sqlite["@melon/db-sqlite"]
-  Native["@melon/db-sqlite-native"]
-  Sync["@melon/sync"]
-  SyncServer["@melon/sync-server"]
-  Core["@melon/db"]
-
-  Query --> Core
-  Mango --> Core
-  Prisma --> Core
-  Sqlite --> Core
-  Native --> Core
-  React --> Core
-  Devtools --> Core
-  Testkit --> Core
-  Codemods --> Core
-  Sync --> Core
-  SyncServer --> Sync
-  SyncServer --> Core
-  React --> Query
-  React --> Prisma
-  React --> Mango
-  React --> Sync
-  Sqlite --> Native
-```
+<ArchitectureDiagram
+  alt="Package dependency graph — all packages depend on @melon/db at the bottom"
+  src="/diagrams/architecture/package-dependencies.svg"
+/>
 
 **Rules:**
 
@@ -126,15 +66,10 @@ flowchart BT
 
 All mutations run inside `db.write()`. The engine serializes writers and allows reads without concurrent writers.
 
-```mermaid
-stateDiagram-v2
-  [*] --> Idle
-  Idle --> Writing: db.write starts
-  Writing --> Idle: write completes
-  Idle --> Reading: db.read / collection queries
-  Reading --> Idle: read completes
-  note right of Writing: No concurrent writers
-```
+<ArchitectureDiagram
+  alt="Write boundary state machine — Idle, Writing, and Reading states"
+  src="/diagrams/architecture/write-boundary.svg"
+/>
 
 Collection `insert`, `update`, and `delete` throw if called outside a write context.
 

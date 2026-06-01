@@ -9,26 +9,10 @@ See [@melon/db-sqlite-native](/docs/packages/melon-db-sqlite-native) for setup a
 
 ## Path decision
 
-```mermaid
-flowchart TD
-  Start["Need SQLite on RN"]
-  ExpoGo{"Running in Expo Go?"}
-  DevBuild{"Custom dev / release build?"}
-  ExpoPath["@melon/db-sqlite/expo"]
-  RnExport["@melon/db-sqlite/rn"]
-  AutoMode["mode: auto default"]
-  JsiSync["jsi-sync global.melonSqliteJsi"]
-  Turbo["TurboModule async fallback"]
-
-  Start --> ExpoGo
-  ExpoGo -->|yes| ExpoPath
-  ExpoGo -->|no| DevBuild
-  DevBuild -->|yes| RnExport
-  DevBuild -->|no| ExpoPath
-  RnExport --> AutoMode
-  AutoMode --> JsiSync
-  AutoMode -->|JSI unavailable| Turbo
-```
+<ArchitectureDiagram
+  alt="Native SQLite path decision — Expo Go vs dev build with JSI and TurboModule fallback"
+  src="/diagrams/architecture/native-path-decision.svg"
+/>
 
 | Environment | Package / entry | Native module |
 |-------------|-----------------|---------------|
@@ -46,30 +30,10 @@ Example apps:
 
 Phases 20–26 built a layered native module:
 
-```mermaid
-flowchart TB
-  subgraph js [JavaScript]
-    RnTs["@melon/db-sqlite/rn"]
-    Bridge["MelonSQLiteBridge.ts"]
-    JsiTs["MelonSQLiteJsi.ts"]
-  end
-  subgraph native [Native]
-    TurboSpec["NativeMelonSQLite.ts codegen"]
-    TurboIOS["iOS MelonSQLiteTurboModule.mm"]
-    TurboAndroid["Android MelonSQLiteModule.kt"]
-    CppHost["cpp/MelonSQLiteHostObject.cpp"]
-    DbThread["Native DB worker thread"]
-  end
-  RnTs --> Bridge
-  Bridge --> TurboSpec
-  Bridge --> JsiTs
-  JsiTs --> CppHost
-  TurboSpec --> TurboIOS
-  TurboSpec --> TurboAndroid
-  TurboIOS --> CppHost
-  TurboAndroid --> CppHost
-  CppHost --> DbThread
-```
+<ArchitectureDiagram
+  alt="Native SQLite stack — JavaScript bridge, TurboModule codegen, C++ JSI host object"
+  src="/diagrams/architecture/native-stack-layers.svg"
+/>
 
 **Phase 22–23:** TurboModule codegen (`MelonSQLiteSpec`) on iOS and Android.
 

@@ -19,6 +19,23 @@ target_include_directories(melon_sqlite PRIVATE
   src/main/jni
 )
 
+if(DEFINED SQLITE3_SRC_DIR AND EXISTS "${SQLITE3_SRC_DIR}/sqlite3.c")
+  target_sources(melon_sqlite PRIVATE "${SQLITE3_SRC_DIR}/sqlite3.c")
+  target_include_directories(melon_sqlite PRIVATE "${SQLITE3_SRC_DIR}")
+  if(DEFINED SQLITE_BUILDFLAGS)
+    separate_arguments(SQLITE_BUILDFLAGS)
+    target_compile_options(melon_sqlite PRIVATE ${SQLITE_BUILDFLAGS})
+  endif()
+else()
+  find_library(SQLITE_LIB sqlite)
+  if(SQLITE_LIB)
+    target_link_libraries(melon_sqlite ${SQLITE_LIB})
+  else()
+    message(FATAL_ERROR
+      "sqlite3 not found. Set -DSQLITE3_SRC_DIR=... to expo-sqlite/vendor/sqlite3 or vendor/sqlite3.")
+  endif()
+endif()
+
 target_link_libraries(melon_sqlite
   android
   log
@@ -30,9 +47,4 @@ if(ReactAndroid_VERSION_MINOR GREATER_EQUAL 76)
   target_link_libraries(melon_sqlite ReactAndroid::reactnative)
 else()
   target_link_libraries(melon_sqlite ReactAndroid::reactnativejni)
-endif()
-
-find_library(SQLITE_LIB sqlite)
-if(SQLITE_LIB)
-  target_link_libraries(melon_sqlite ${SQLITE_LIB})
 endif()

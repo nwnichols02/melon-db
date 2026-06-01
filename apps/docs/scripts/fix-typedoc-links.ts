@@ -83,6 +83,35 @@ function normalizeFrontmatter(
 	return `---\ntitle: "${title}"\ndescription: "${description}"\n---\n\n${body}`;
 }
 
+function rewriteApiLinks(body: string, pkg: ApiPackageId | null): string {
+	if (!pkg) {
+		return body;
+	}
+
+	const base = `/docs/api/${pkg}`;
+
+	return body.replace(/\]\(([^)]+)\)/g, (match, href: string) => {
+		if (
+			href.startsWith("http://") ||
+			href.startsWith("https://") ||
+			href.startsWith("#") ||
+			href.startsWith("/docs/")
+		) {
+			return match;
+		}
+
+		if (href === "index" || href === "./index") {
+			return `](${base})`;
+		}
+
+		if (/^(Class|Function|Interface|TypeAlias|Variable)\./.test(href)) {
+			return `](${base}/${href})`;
+		}
+
+		return match;
+	});
+}
+
 function normalizeIndexBody(file: string, body: string): string {
 	const pkg = packageIdFromFile(file);
 	if (!pkg || path.basename(file, path.extname(file)) !== "index") {
@@ -123,7 +152,8 @@ for (const file of files) {
 	content = content.replace(/\]\(([^)]*)\/index\)/g, "]($1)");
 
 	const bodyOnly = content.replace(/^---[\s\S]*?---\s*/u, "");
-	const normalizedBody = normalizeIndexBody(file, bodyOnly);
+	let normalizedBody = normalizeIndexBody(file, bodyOnly);
+	normalizedBody = rewriteApiLinks(normalizedBody, pkg);
 	content = normalizeFrontmatter(file, normalizedBody, pkg);
 
 	if (file.endsWith(".md")) {

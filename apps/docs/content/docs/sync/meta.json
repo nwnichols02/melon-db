@@ -1,4 +1,4 @@
 {
 	"title": "Sync",
-	"pages": ["index"]
+	"pages": ["index", "frontend", "backend", "data-types", "faq"]
 }

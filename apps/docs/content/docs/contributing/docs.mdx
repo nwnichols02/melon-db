@@ -35,6 +35,16 @@ TypeDoc runs **once per package** with a scoped title (`@melon/db API Reference`
 
 Interactive demos live under `content/docs/playgrounds/` and import client-only React components from `apps/docs/src/components/playgrounds/`.
 
+## Architecture diagrams
+
+Diagrams are **SVG exports** in `apps/docs/public/diagrams/architecture/`, rendered via the `<ArchitectureDiagram />` MDX component (not mermaid). To edit:
+
+1. Import the SVG into [diagrams.net](https://app.diagrams.net/) (File → Import).
+2. Export updated SVG back to the same path.
+3. Reference with `<ArchitectureDiagram src="/diagrams/architecture/your-diagram.svg" alt="..." />`.
+
+Do not use mermaid code blocks in docs — they are not wired in this site.
+
 ## Phase tracking
 
 See [`.cursor/phases/docs-fumadocs.md`](https://github.com/melon/melon/blob/main/.cursor/phases/docs-fumadocs.md) for exit criteria and ongoing doc rules.

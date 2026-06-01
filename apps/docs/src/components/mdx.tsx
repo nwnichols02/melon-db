@@ -1,4 +1,6 @@
 import { BenchCompareResultsTable } from "@/components/bench-compare-results-table";
+import { ArchitectureDiagram } from "@/components/architecture-diagram";
+import { DocsLink } from "@/components/docs-link";
 import { ClientLivePlayground } from "@/components/playgrounds/client-live-playground";
 import { ClientSyncPlayground } from "@/components/playgrounds/client-sync-playground";
 import defaultMdxComponents from "fumadocs-ui/mdx";
@@ -11,7 +13,9 @@ import type { MDXComponents } from "mdx/types";
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
 	return {
 		...defaultMdxComponents,
+		a: DocsLink,
 		AutoTypeTable,
+		ArchitectureDiagram,
 		BenchCompareResultsTable,
 		LivePlayground: ClientLivePlayground,
 		SyncPlayground: ClientSyncPlayground,

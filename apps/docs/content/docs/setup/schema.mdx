@@ -1,0 +1,111 @@
+---
+title: Schema
+description: Collections, fields, indexes, and relations in Melon.
+---
+
+Melon uses a **code-first schema** — a plain TypeScript object that describes every collection, field, index, and relation. Adapters turn this into SQLite tables; query compilers validate filters against it.
+
+## Schema shape
+
+```ts
+import { createMelonSchema, type DatabaseSchemaDefinition } from '@melon/db';
+
+export const appSchemaDefinition: DatabaseSchemaDefinition = {
+  version: 1,
+  collections: {
+    tasks: {
+      name: 'tasks',
+      primaryKey: 'id',
+      fields: {
+        id: { kind: 'string' },
+        title: { kind: 'string' },
+        status: { kind: 'string', indexed: true },
+        priority: { kind: 'number' },
+        projectId: { kind: 'string', nullable: true },
+        updatedAt: { kind: 'date' },
+      },
+      relations: {
+        project: {
+          kind: 'belongsTo',
+          target: 'projects',
+          foreignKey: 'projectId',
+        },
+      },
+      indexes: [['status'], ['updatedAt']],
+    },
+    projects: {
+      name: 'projects',
+      primaryKey: 'id',
+      fields: {
+        id: { kind: 'string' },
+        name: { kind: 'string' },
+      },
+    },
+  },
+};
+
+export const appSchema = createMelonSchema(appSchemaDefinition);
+```
+
+Pass `appSchema` (the runtime `MelonSchema` object) to `createDatabase`. Keep `appSchemaDefinition` if you need the raw definition for codegen or docs.
+
+## Field options
+
+| Property | Description |
+|----------|-------------|
+| `kind` | Scalar type — see [supported types](/docs/sync/data-types) |
+| `nullable` | Allow `null` in storage (default: required) |
+| `indexed` | Single-column index hint on the field |
+| `default` | Default value metadata (adapter-dependent) |
+
+## Collection options
+
+| Property | Description |
+|----------|-------------|
+| `name` | Table/collection name (usually matches the key in `collections`) |
+| `primaryKey` | Primary key field name (typically `id`) |
+| `fields` | Map of field name → `FieldDefinition` |
+| `relations` | Optional `belongsTo` / `hasMany` metadata |
+| `indexes` | Composite indexes as arrays of field names |
+| `localOnly` | When `true`, excluded from sync push/pull (requires `sync: {}` on the database) |
+
+## Relations metadata
+
+Relations are declared on the schema for typing and query `include` — they are **not** separate tables unless you model them that way.
+
+```ts
+relations: {
+  project: {
+    kind: 'belongsTo',
+    target: 'projects',
+    foreignKey: 'projectId',
+  },
+  tasks: {
+    kind: 'hasMany',
+    target: 'tasks',
+    foreignKey: 'projectId',
+  },
+},
+```
+
+- **`belongsTo`** — this row stores a foreign key pointing at another collection.
+- **`hasMany`** — the inverse: other rows point here via a foreign key.
+
+Query-time `include` currently supports **`belongsTo` only** in v1. See [Relations](/docs/usage/relations).
+
+## Schema version
+
+`version` is a monotonic integer stored in adapter meta (`_melon_meta`). When you bump it:
+
+1. Add a matching [migration](/docs/setup/migrations) with `toVersion` equal to the new version.
+2. If using sync, the client sends migration hints on pull so the backend can align schema changes.
+
+## Validation
+
+`createMelonSchema` validates collection names, primary keys, and relation targets at construction time. Query compilers call `validateQuery` against the schema before execution.
+
+## Related
+
+- [Models](/docs/setup/models) — TypeScript record interfaces
+- [Migrations](/docs/setup/migrations) — upgrading `version`
+- [Query surfaces](/docs/usage/queries) — all queries compile to AST validated against this schema

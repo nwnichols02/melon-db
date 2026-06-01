@@ -1,0 +1,99 @@
+---
+title: Migrations
+description: Versioned schema upgrades with createTable, addColumns, addIndexes, and raw SQL.
+---
+
+Melon migrations upgrade the on-device schema from one `version` to the next. They run automatically when the adapter initializes, before your app reads or writes.
+
+## Migration object
+
+```ts
+import type { Migration } from '@melon/db';
+
+export const migrations: Migration[] = [
+  {
+    toVersion: 2,
+    steps: [
+      { type: 'createTable', collection: 'projects' },
+      {
+        type: 'addColumns',
+        collection: 'tasks',
+        fields: { dueDate: { kind: 'date', nullable: true } },
+      },
+      {
+        type: 'addIndexes',
+        collection: 'tasks',
+        indexes: [['dueDate']],
+      },
+    ],
+  },
+  {
+    toVersion: 3,
+    steps: [
+      { type: 'sql', sql: 'UPDATE tasks SET status = \'open\' WHERE status IS NULL' },
+    ],
+  },
+];
+```
+
+Pass migrations to `createDatabase`:
+
+```ts
+const db = createDatabase({
+  schema: appSchema, // schema.version must be >= highest toVersion
+  adapter,
+  migrations,
+});
+```
+
+## Step types
+
+| Step | Purpose |
+|------|---------|
+| `createTable` | Create a new collection table from current schema metadata |
+| `addColumns` | Add new fields to an existing collection |
+| `addIndexes` | Add composite indexes |
+| `sql` | Run arbitrary SQL (use sparingly; keep steps idempotent where possible) |
+
+## Rules
+
+- Migrations must be **contiguous**: `toVersion` 1, 2, 3, … with no gaps.
+- Each migration runs only if stored version &lt; `toVersion` and `toVersion` ≤ `schema.version`.
+- Version is persisted in `_melon_meta` under `schema_version`.
+- Initial install at `version: 1` with no migrations array creates tables from schema directly.
+
+## Sync-aware migrations
+
+When sync is enabled and the client schema version changes, pull requests can include a **migration payload** so the backend knows which tables/columns appeared:
+
+```ts
+// Built internally from your Migration[] — shape sent to pullChanges:
+{
+  from: 1,
+  tables: ['projects'],
+  columns: [{ table: 'tasks', columns: ['dueDate'] }],
+}
+```
+
+Your backend should apply equivalent DDL before returning rows for new columns/tables. See [Backend requirements](/docs/sync/backend).
+
+## Testing migrations
+
+Use the in-memory adapter in unit tests with the same `migrations` array you ship to production:
+
+```ts
+import { createDatabase, createInMemoryAdapter } from '@melon/db';
+
+const db = createDatabase({
+  schema: schemaV2,
+  adapter: createInMemoryAdapter(),
+  migrations,
+});
+await db.collection('tasks').findMany(); // triggers initialize + migrate
+```
+
+## Related
+
+- [Schema](/docs/setup/schema) — bump `version` when adding migrations
+- [Database](/docs/setup/database) — where migrations are passed
+- [Sync backend](/docs/sync/backend) — server-side migration coordination

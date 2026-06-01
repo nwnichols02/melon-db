@@ -30,6 +30,42 @@ def resolveReactNativeDirectory() {
 
 def reactNativeRootDir = resolveReactNativeDirectory()
 
+def toPlatformIndependentPath(File path) {
+  def result = path.toString()
+  if (org.apache.tools.ant.taskdefs.condition.Os.isFamily(
+      org.apache.tools.ant.taskdefs.condition.Os.FAMILY_WINDOWS)) {
+    result = result.replace(File.separatorChar, '/' as char)
+  }
+  return result
+}
+
+def resolveSqlite3SrcDir() {
+  def localVendor = file("${projectDir}/../vendor/sqlite3")
+  if (new File(localVendor, "sqlite3.c").exists()) {
+    return localVendor
+  }
+
+  def searchRoots = [] as LinkedHashSet
+  searchRoots.add(rootProject.projectDir)
+  searchRoots.add(rootProject.projectDir.parentFile)
+  searchRoots.add(projectDir)
+  def cursor = projectDir
+  for (int i = 0; i < 8 && cursor != null; i++) {
+    searchRoots.add(cursor)
+    cursor = cursor.parentFile
+  }
+
+  throw new GradleException(
+      "Could not find sqlite3 amalgamation at packages/melon-db-sqlite-native/vendor/sqlite3 " +
+      "(sqlite3.c + sqlite3.h). Use upstream SQLite amalgamation, not expo-sqlite's renamed build.")
+}
+
+def sqlite3SrcDir = resolveSqlite3SrcDir()
+
+def getSqliteBuildFlags() {
+  return "-DSQLITE_THREADSAFE=1 -DSQLITE_ENABLE_FTS4=1 -DSQLITE_ENABLE_FTS3_PARENTHESIS=1 -DSQLITE_ENABLE_FTS5=1"
+}
+
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
@@ -54,7 +90,9 @@ android {
     externalNativeBuild {
       cmake {
         cppFlags "-std=c++20", "-frtti", "-fexceptions", "-O2"
-        arguments "-DANDROID_STL=c++_shared"
+        arguments "-DANDROID_STL=c++_shared",
+          "-DSQLITE3_SRC_DIR=${toPlatformIndependentPath(sqlite3SrcDir)}",
+          "-DSQLITE_BUILDFLAGS=${getSqliteBuildFlags()}"
       }
     }
   }

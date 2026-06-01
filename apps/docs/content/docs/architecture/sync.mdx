@@ -9,24 +9,10 @@ For usage examples see the [Sync guide](/docs/sync). For the split-package ratio
 
 ## Components
 
-```mermaid
-flowchart LR
-  subgraph client [Client app]
-    DB["MelonDatabase sync: {}"]
-    Outbox["_melon_sync_outbox"]
-    SyncPkg["@melon/sync synchronize"]
-    Hooks["@melon/db-react useSync"]
-  end
-  subgraph backend [Backend]
-    Server["@melon/sync-server"]
-    PG["PostgresSyncStore optional"]
-  end
-  DB --> Outbox
-  SyncPkg --> DB
-  Hooks --> SyncPkg
-  SyncPkg -->|pull/push HTTP| Server
-  Server --> PG
-```
+<ArchitectureDiagram
+  alt="Sync components — client app, @melon/sync, and backend reference server"
+  src="/diagrams/architecture/sync-components.svg"
+/>
 
 | Piece | Owner | Role |
 |-------|-------|------|
@@ -39,45 +25,19 @@ flowchart LR
 
 ## Pull/push sequence
 
-```mermaid
-sequenceDiagram
-  participant App
-  participant Sync as @melon/sync
-  participant DB as MelonDatabase
-  participant Backend
-
-  App->>Sync: synchronize({ db, pullChanges, pushChanges })
-  Sync->>Backend: pullChanges({ lastPulledAt, schemaVersion })
-  Backend-->>Sync: { changes, timestamp, schemaVersion? }
-  Sync->>DB: applyRemoteChanges(changes, conflictPolicy)
-  Sync->>DB: getLocalChanges()
-  Sync->>Backend: pushChanges({ changes, lastPulledAt })
-  Sync->>DB: markLocalChangesPushed()
-  Sync->>Sync: checkpointStore.setLastPulledAt(timestamp)
-```
+<ArchitectureDiagram
+  alt="Sync pull and push sequence between app, sync orchestrator, database, and backend"
+  src="/diagrams/architecture/sync-pull-push.svg"
+/>
 
 ## Conflict resolution flow
 
 When a remote row collides with a local row (or outbox entry), `applyRemoteChanges` dispatches by policy:
 
-```mermaid
-flowchart TD
-  Remote[Remote change for record]
-  Local{Local row exists?}
-  Outbox{Outbox entry?}
-  Policy{conflictPolicy}
-
-  Remote --> Local
-  Local -->|no| Create[Insert remote row]
-  Local -->|yes| Outbox
-  Outbox --> Policy
-
-  Policy -->|server-wins| ServerWins[Overwrite with remote]
-  Policy -->|client-wins| ClientWins[Keep local skip remote]
-  Policy -->|last-write-wins| LWW[Compare sync timestamp field]
-  Policy -->|merge-by-field| Merge[Overlay pendingFields onto remote]
-  Policy -->|custom| Custom[conflictResolver hook]
-```
+<ArchitectureDiagram
+  alt="Conflict resolution decision flow by policy"
+  src="/diagrams/architecture/sync-conflicts.svg"
+/>
 
 Policies shipped in Phase 15–18:
 
