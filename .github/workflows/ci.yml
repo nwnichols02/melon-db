@@ -51,6 +51,33 @@ jobs:
       - name: Benchmark smoke (10k)
         run: bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts --scale=10k --json
 
+  bench-compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install better-sqlite3 for compare benchmarks (Node 22)
+        working-directory: packages/melon-db-sqlite
+        run: |
+          npm install better-sqlite3@11.8.1 --no-save
+          npm rebuild better-sqlite3
+
+      - name: Melon vs WatermelonDB smoke (10k)
+        run: bun run bench:compare:ci
+        env:
+          COMPARE_RUNNER_BIN: node
+
   postgres-sync:
     runs-on: ubuntu-latest
     services:

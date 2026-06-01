@@ -26,6 +26,8 @@
     "ios:rn:clear": "bun run --filter playground-rn start:clear",
     "bench": "bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts",
     "bench:full": "bun run packages/melon-db-sqlite/__benchmarks__/insert-query.bench.ts --scale=all",
+    "bench:compare": "bun run packages/melon-db-sqlite/__benchmarks__/compare-watermelon.bench.ts",
+    "bench:compare:ci": "bun run packages/melon-db-sqlite/__benchmarks__/compare-watermelon.bench.ts --scale=10k --json",
     "melon-codemod": "bun run packages/melon-db-codemods/src/bin/melon-codemod.ts",
     "docs:api": "bun run --filter docs docs:api",
     "typecheck:apps": "bun run --filter playground-rn typecheck && bun run --filter playground-rn-dev typecheck && bun run --filter docs typecheck",

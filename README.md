@@ -82,9 +82,10 @@ See [`packages/melon-db-prisma/README.md`](packages/melon-db-prisma/README.md).
 
 ```bash
 bun run bench
+bun run bench:compare    # Melon vs WatermelonDB (better-sqlite3 parity)
 ```
 
-See [`packages/melon-db-sqlite/README.md`](packages/melon-db-sqlite/README.md) for informal baseline notes.
+See [`packages/melon-db-sqlite/README.md`](packages/melon-db-sqlite/README.md) and [/docs/performance-comparison](/docs/performance-comparison) for methodology and baseline notes.
 
 ### Documentation site
 
@@ -158,12 +159,13 @@ await synchronize({
 
 Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun run dev:docs`). Summary:
 
-| Done | Deferred (Phase 24+) |
+| Done | Deferred (Phase 25+) |
 |------|----------|
 | Core engine M0–M2 | Native `observeQuery` / SQLite triggers |
 | SQLite SQL compiler + Bun adapter | EAS Build CI |
-| Expo SQLite adapter (`@melon/db-sqlite/expo`, Expo Go) | WatermelonDB benchmark comparison |
-| JSI SQLite (`@melon/db-sqlite/rn`, iOS + Android dev build) | Pure C++ JSI + native DB thread |
+| Expo SQLite adapter (`@melon/db-sqlite/expo`, Expo Go) | |
+| WatermelonDB benchmark comparison (`bench:compare`) | |
+| JSI SQLite (`@melon/db-sqlite/rn`, iOS + Android dev build) | |
 | iOS + Android TurboModule (`MelonSQLiteSpec` codegen) | |
 | Optional Node driver (`@melon/db-sqlite/node`) | Full multi-file schema codemods |
 | `apps/playground-rn` + sync demo | Background sync service |

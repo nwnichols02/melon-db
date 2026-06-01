@@ -1,12 +1,7 @@
 import type { AdapterWriteOperation } from "@melon/db";
-import {
-	type MelonDatabase,
-	type StorageAdapter,
-	createDatabase,
-	createInMemoryAdapter,
-} from "@melon/db";
-import { createSqliteAdapter } from "../../src/adapter.ts";
-import type { BenchEngine, BenchResult } from "./bench-runner.ts";
+import { type MelonDatabase, createDatabase } from "@melon/db";
+import { createNodeSqliteAdapter } from "../../src/node.ts";
+import type { BenchResult } from "./bench-runner.ts";
 import { measureMs } from "./bench-runner.ts";
 import {
 	BATCH_CHUNK_SIZE,
@@ -16,11 +11,8 @@ import {
 	taskRow,
 } from "./fixtures.ts";
 
-function createAdapter(kind: "sqlite" | "memory"): StorageAdapter {
-	if (kind === "memory") {
-		return createInMemoryAdapter();
-	}
-	return createSqliteAdapter({ filename: ":memory:" });
+function createNodeAdapter() {
+	return createNodeSqliteAdapter({ filename: ":memory:" });
 }
 
 async function seedRowInsert(
@@ -55,33 +47,22 @@ async function seedBatchInsert(
 	});
 }
 
-function engineLabel(
-	adapterKind: "sqlite" | "memory",
-): BenchEngine | "in-memory" {
-	if (adapterKind === "memory") {
-		return "in-memory";
-	}
-	return "melon-bun";
-}
-
 /**
- * Runs all benchmark scenarios for one adapter and scale.
+ * Runs Melon scenarios via createNodeSqliteAdapter (better-sqlite3).
  */
-export async function runScenarios(
-	adapterKind: "sqlite" | "memory",
+export async function runMelonNodeScenarios(
 	scale: number,
 ): Promise<BenchResult[]> {
-	const adapterLabel = engineLabel(adapterKind);
 	const results: BenchResult[] = [];
 
 	{
 		const db = createDatabase({
 			schema: benchSchema,
-			adapter: createAdapter(adapterKind),
+			adapter: createNodeAdapter(),
 		});
 		const durationMs = await measureMs(() => seedRowInsert(db, scale));
 		results.push({
-			engine: adapterLabel,
+			engine: "melon-node",
 			scale,
 			scenario: "row-insert",
 			durationMs,
@@ -95,7 +76,7 @@ export async function runScenarios(
 			}
 		});
 		results.push({
-			engine: adapterLabel,
+			engine: "melon-node",
 			scale,
 			scenario: "filtered-query",
 			durationMs: queryMs,
@@ -109,7 +90,7 @@ export async function runScenarios(
 			}
 		});
 		results.push({
-			engine: adapterLabel,
+			engine: "melon-node",
 			scale,
 			scenario: "count-query",
 			durationMs: countMs,
@@ -122,7 +103,7 @@ export async function runScenarios(
 			}
 		});
 		results.push({
-			engine: adapterLabel,
+			engine: "melon-node",
 			scale,
 			scenario: "find-by-id",
 			durationMs: findByIdMs,
@@ -134,11 +115,11 @@ export async function runScenarios(
 	if (scale <= 50_000) {
 		const db = createDatabase({
 			schema: benchSchema,
-			adapter: createAdapter(adapterKind),
+			adapter: createNodeAdapter(),
 		});
 		const durationMs = await measureMs(() => seedBatchInsert(db, scale));
 		results.push({
-			engine: adapterLabel,
+			engine: "melon-node",
 			scale,
 			scenario: "batch-insert",
 			durationMs,

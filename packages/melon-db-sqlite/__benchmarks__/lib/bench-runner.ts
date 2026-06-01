@@ -1,5 +1,11 @@
+export type BenchEngine =
+	| "melon-bun"
+	| "melon-node"
+	| "watermelon"
+	| "in-memory";
+
 export interface BenchResult {
-	adapter: string;
+	engine: BenchEngine | string;
 	scale: number;
 	scenario: string;
 	durationMs: number;
@@ -11,6 +17,43 @@ export interface BenchSummary {
 	results: BenchResult[];
 	timestamp: string;
 }
+
+export interface CompareRow {
+	scenario: string;
+	scale: number;
+	melonNodeMs: number;
+	watermelonMs: number;
+	ratio: number;
+	winner: "melon" | "watermelon" | "tie";
+}
+
+export interface ParityReport {
+	timestamp: string;
+	scale: number;
+	comparisons: CompareRow[];
+	raw?: BenchResult[];
+	notes: string[];
+}
+
+export interface BenchCliOptions {
+	scales: number[];
+	adapter: "sqlite" | "memory" | "both";
+	json: boolean;
+}
+
+export interface CompareCliOptions {
+	scales: number[];
+	scaleArg: string;
+	json: boolean;
+	skipWdb: boolean;
+	melonEngines: Array<"bun" | "node">;
+}
+
+const SCALE_MAP: Record<string, number> = {
+	"10k": 10_000,
+	"50k": 50_000,
+	"100k": 100_000,
+};
 
 /**
  * Measures async function execution time in milliseconds.
@@ -33,7 +76,7 @@ export function printResults(results: BenchResult[]): void {
 					? ` (${result.rowCount} rows)`
 					: "";
 		console.log(
-			`[${result.adapter}] ${result.scenario} @ ${result.scale}: ${result.durationMs.toFixed(2)}ms${extra}`,
+			`[${result.engine}] ${result.scenario} @ ${result.scale}: ${result.durationMs.toFixed(2)}ms${extra}`,
 		);
 	}
 }
@@ -48,18 +91,6 @@ export function printJsonSummary(results: BenchResult[]): void {
 	};
 	console.log(JSON.stringify(summary));
 }
-
-export interface BenchCliOptions {
-	scales: number[];
-	adapter: "sqlite" | "memory" | "both";
-	json: boolean;
-}
-
-const SCALE_MAP: Record<string, number> = {
-	"10k": 10_000,
-	"50k": 50_000,
-	"100k": 100_000,
-};
 
 /**
  * Parses benchmark CLI flags from process.argv.
@@ -88,4 +119,42 @@ export function parseBenchCli(argv: string[]): BenchCliOptions {
 			: [SCALE_MAP[scaleArg] ?? 10_000];
 
 	return { scales, adapter, json };
+}
+
+/**
+ * Parses compare-watermelon CLI flags from process.argv.
+ */
+export function parseCompareCli(argv: string[]): CompareCliOptions {
+	let scaleArg = "10k";
+	let json = false;
+	let skipWdb = false;
+	let melonEngines: CompareCliOptions["melonEngines"] = ["node"];
+
+	for (const arg of argv) {
+		if (arg.startsWith("--scale=")) {
+			scaleArg = arg.slice("--scale=".length);
+		} else if (arg === "--json") {
+			json = true;
+		} else if (arg === "--skip-wdb") {
+			skipWdb = true;
+		} else if (arg.startsWith("--melon-engines=")) {
+			const value = arg.slice("--melon-engines=".length);
+			melonEngines = value
+				.split(",")
+				.map((part) => part.trim())
+				.filter(
+					(part): part is "bun" | "node" => part === "bun" || part === "node",
+				);
+			if (melonEngines.length === 0) {
+				melonEngines = ["node"];
+			}
+		}
+	}
+
+	const scales =
+		scaleArg === "all"
+			? [10_000, 50_000, 100_000]
+			: [SCALE_MAP[scaleArg] ?? 10_000];
+
+	return { scales, scaleArg, json, skipWdb, melonEngines };
 }

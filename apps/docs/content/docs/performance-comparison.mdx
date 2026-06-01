@@ -1,0 +1,57 @@
+---
+title: Performance comparison
+description: Melon vs WatermelonDB benchmark methodology and limitations.
+---
+
+Melon ships an optional **WatermelonDB baseline** in the `@melon/db-sqlite` benchmark harness. This is a measurement tool only — not a performance guarantee or optimization target.
+
+## Commands
+
+From the monorepo root:
+
+```bash
+bun run bench:compare              # human-readable table
+bun run bench:compare --scale=10k --json
+bun run bench:compare --melon-engines=bun,node
+bun run bench:compare --skip-wdb   # Melon-only (no @nozbe/watermelondb leg)
+```
+
+CI runs `bench:compare:ci` (10k, JSON) in the `bench-compare` workflow. The job is a **soft gate**: it logs parity JSON and does not fail on regressions.
+
+## Fairness
+
+| Engine | Stack | Compared to WDB? |
+|--------|--------|------------------|
+| `melon-node` | `createNodeSqliteAdapter` + **better-sqlite3** `:memory:` | **Yes** (primary axis) |
+| `watermelon` | WatermelonDB `SQLiteAdapter` + **better-sqlite3** `:memory:` | Baseline |
+| `melon-bun` | `createSqliteAdapter` + **bun:sqlite** `:memory:` | No (informational only) |
+
+Both sides use the same row counts and query shapes:
+
+- `row-insert` — one `write` with per-row creates
+- `batch-insert` — chunked `batch` / `prepareCreate` (≤50k scale)
+- `filtered-query` — status filter, priority desc, limit 20
+- `count-query` — filtered count
+- `find-by-id` — primary key lookup
+
+## Interpreting results
+
+Parity JSON includes `ratio = melonNodeMs / watermelonMs`:
+
+- **&lt; 1** — Melon faster on that scenario at that scale (on that machine)
+- **&gt; 1** — WatermelonDB faster
+
+Timings vary by hardware and cold JIT; treat CI output as a trend signal, not a release gate.
+
+## Requirements
+
+- Dev dependency `@nozbe/watermelondb` (bench-only)
+- Native **better-sqlite3** bindings for `melon-node` and `watermelon` legs
+
+If bindings are missing locally, the harness skips those legs and prints a warning. CI builds better-sqlite3 on Node 22 before running compare.
+
+## Non-goals
+
+- React Native on-device comparison (Expo / JSI native vs RN WatermelonDB)
+- Sync throughput or conflict merge benchmarks
+- LokiJS in-memory WatermelonDB adapter

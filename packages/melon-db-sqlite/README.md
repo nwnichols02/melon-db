@@ -42,5 +42,24 @@ Requires [`@melon/db-sqlite-native`](../melon-db-sqlite-native/README.md) linked
 
 ```bash
 bun test
-bun run bench   # from monorepo root
+bun run bench           # from monorepo root — Melon-only harness
+bun run bench:compare   # Melon vs WatermelonDB parity (dev deps)
 ```
+
+## Comparison with WatermelonDB
+
+`bench:compare` runs the same scenarios as `bench` for **melon-node** (`better-sqlite3`) and **WatermelonDB** (`@nozbe/watermelondb` on the Node SQLite adapter), plus optional **melon-bun** (`bun:sqlite`) for reference.
+
+```bash
+bun run bench:compare --scale=10k
+bun run bench:compare --scale=10k --json
+```
+
+Example parity table:
+
+```text
+scenario            melon-node  watermelon     ratio      winner
+row-insert             4200ms      5100ms      0.82       melon
+```
+
+See [/docs/performance-comparison](http://localhost:3000/docs/performance-comparison) for fairness rules and limitations. Requires native **better-sqlite3** bindings for the compare legs.
