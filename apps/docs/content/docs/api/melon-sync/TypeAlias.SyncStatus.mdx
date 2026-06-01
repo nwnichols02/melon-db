@@ -11,4 +11,4 @@ description: "API reference: Type Alias: SyncStatus"
 
 > **SyncStatus** = \{ `status`: *typeof* [`Idle`](Variable.SyncStatusKind.mdx#property-idle); \} \| \{ `status`: *typeof* [`Pulling`](Variable.SyncStatusKind.mdx#property-pulling); \} \| \{ `status`: *typeof* [`Pushing`](Variable.SyncStatusKind.mdx#property-pushing); \} \| \{ `attempt`: `number`; `phase`: `"pull"` \| `"push"`; `status`: *typeof* [`Retrying`](Variable.SyncStatusKind.mdx#property-retrying); \} \| \{ `reason`: `"offline"`; `status`: *typeof* [`Paused`](Variable.SyncStatusKind.mdx#property-paused); \} \| \{ `status`: *typeof* [`Complete`](Variable.SyncStatusKind.mdx#property-complete); \} \| \{ `error`: [`SyncError`](Class.SyncError); `status`: *typeof* [`Failed`](Variable.SyncStatusKind.mdx#property-failed); \}
 
-Defined in: [packages/melon-sync/src/state.ts:14](https://github.com/nwnichols02/melon/blob/2dc63e8dddec097c3667672d5c826a16180d92a9/packages/melon-sync/src/state.ts#L14)
+Defined in: [packages/melon-sync/src/state.ts:14](https://github.com/nwnichols02/melon/blob/2c379764728536768d12af16b0e8ff85e8701091/packages/melon-sync/src/state.ts#L14)
