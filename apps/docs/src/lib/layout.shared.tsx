@@ -1,5 +1,6 @@
+import { MelonLogo } from "@/components/melon-logo";
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
-import { appName, gitConfig } from "./shared";
+import { gitConfig } from "./shared";
 
 /**
  * Shared Fumadocs layout options for home and docs shells.
@@ -7,7 +8,8 @@ import { appName, gitConfig } from "./shared";
 export function baseOptions(): BaseLayoutProps {
 	return {
 		nav: {
-			title: appName,
+			title: <MelonLogo />,
+			url: "/",
 		},
 		githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
 	};

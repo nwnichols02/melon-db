@@ -66,7 +66,7 @@ interface WinnerBadgeProps {
 function WinnerBadge({ winner }: WinnerBadgeProps) {
 	const className =
 		winner === "melon"
-			? "rounded-md bg-emerald-500/15 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400"
+			? "rounded-md bg-fd-primary/15 px-2 py-0.5 text-xs font-medium text-fd-primary"
 			: winner === "watermelon"
 				? "rounded-md bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-800 dark:text-amber-300"
 				: "rounded-md bg-fd-muted px-2 py-0.5 text-xs font-medium text-fd-muted-foreground";

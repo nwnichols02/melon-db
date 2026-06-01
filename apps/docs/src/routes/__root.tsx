@@ -14,7 +14,21 @@ export const Route = createRootRoute({
 			{ name: "viewport", content: "width=device-width, initial-scale=1" },
 			{ title: "Melon — offline-first local database" },
 		],
-		links: [{ rel: "stylesheet", href: appCss }],
+		links: [
+			{ rel: "preconnect", href: "https://fonts.googleapis.com" },
+			{
+				rel: "preconnect",
+				href: "https://fonts.gstatic.com",
+				crossOrigin: "anonymous",
+			},
+			{
+				rel: "stylesheet",
+				href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap",
+			},
+			{ rel: "stylesheet", href: appCss },
+			{ rel: "icon", href: "/favicon.png", type: "image/png", sizes: "32x32" },
+			{ rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+		],
 	}),
 	component: RootComponent,
 });
@@ -33,7 +47,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<head>
 				<HeadContent />
 			</head>
-			<body className="flex min-h-screen flex-col">
+			<body className="flex min-h-screen flex-col font-sans">
 				<RootProvider>{children}</RootProvider>
 				<Scripts />
 			</body>

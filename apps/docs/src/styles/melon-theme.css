@@ -1,0 +1,64 @@
+@theme {
+	--font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+	--color-fd-background: hsl(38, 60%, 98%);
+	--color-fd-foreground: hsl(85, 30%, 14%);
+	--color-fd-primary: hsl(28, 92%, 52%);
+	--color-fd-primary-foreground: hsl(0, 0%, 100%);
+	--color-fd-border: hsla(28, 40%, 70%, 0.35);
+	--color-fd-ring: hsl(28, 92%, 52%);
+	--color-fd-accent: hsl(38, 80%, 94%);
+	--color-fd-accent-foreground: hsl(85, 35%, 22%);
+	--color-fd-muted: hsl(38, 45%, 93%);
+	--color-fd-muted-foreground: hsl(85, 20%, 42%);
+	--color-fd-secondary: hsl(38, 45%, 90%);
+	--color-fd-secondary-foreground: hsl(85, 30%, 18%);
+	--color-fd-card: hsl(38, 55%, 96%);
+	--color-fd-card-foreground: hsl(85, 30%, 14%);
+	--color-fd-popover: hsl(38, 60%, 99%);
+	--color-fd-popover-foreground: hsl(85, 30%, 14%);
+}
+
+.dark {
+	--color-fd-background: hsl(28, 25%, 7%);
+	--color-fd-foreground: hsl(38, 30%, 92%);
+	--color-fd-primary: hsl(28, 95%, 62%);
+	--color-fd-primary-foreground: hsl(28, 40%, 10%);
+	--color-fd-border: hsla(28, 30%, 40%, 0.3);
+	--color-fd-ring: hsl(28, 95%, 62%);
+	--color-fd-accent: hsl(28, 25%, 16%);
+	--color-fd-accent-foreground: hsl(38, 60%, 88%);
+	--color-fd-muted: hsl(28, 20%, 12%);
+	--color-fd-muted-foreground: hsl(38, 20%, 65%);
+	--color-fd-secondary: hsl(28, 20%, 14%);
+	--color-fd-secondary-foreground: hsl(38, 30%, 92%);
+	--color-fd-card: hsl(28, 22%, 10%);
+	--color-fd-card-foreground: hsl(38, 30%, 92%);
+	--color-fd-popover: hsl(28, 25%, 8%);
+	--color-fd-popover-foreground: hsl(38, 30%, 92%);
+}
+
+body {
+	font-family: var(--font-sans);
+}
+
+:root {
+	--melon-logo-aspect: 637 / 391;
+}
+
+.melon-logo-img {
+	aspect-ratio: var(--melon-logo-aspect);
+	height: var(--melon-logo-height, 1.75rem);
+	width: auto;
+	max-width: none;
+	object-fit: contain;
+	object-position: center;
+}
+
+.melon-logo-img--lg {
+	--melon-logo-height: 4rem;
+}
+
+.melon-logo-img--sm {
+	--melon-logo-height: 1.75rem;
+}
