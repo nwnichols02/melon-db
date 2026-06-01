@@ -1,0 +1,119 @@
+---
+title: "MelonSqliteJsiHostObject"
+description: "@melon/db-sqlite-native — MelonSqliteJsiHostObject"
+---
+
+[**@melon/db-sqlite-native API Reference**](index)
+
+***
+
+# Interface: MelonSqliteJsiHostObject
+
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:10](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L10)
+
+Sync C++ JSI host object installed as global.melonSqliteJsi (iOS dev build).
+
+## Methods
+
+### closeSync()
+
+> **closeSync**(): `void`
+
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:12](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L12)
+
+#### Returns
+
+`void`
+
+***
+
+### execSync()
+
+> **execSync**(`sql`): `void`
+
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:13](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L13)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sql` | `string` |
+
+#### Returns
+
+`void`
+
+***
+
+### openSync()
+
+> **openSync**(`path`): `void`
+
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:11](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L11)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `path` | `string` |
+
+#### Returns
+
+`void`
+
+***
+
+### queryAllSync()
+
+> **queryAllSync**(`sql`, `params?`): readonly `Record`\<`string`, `unknown`\>[]
+
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:14](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L14)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sql` | `string` |
+| `params?` | readonly [`SqlParam`](TypeAlias.SqlParam)[] |
+
+#### Returns
+
+readonly `Record`\<`string`, `unknown`\>[]
+
+***
+
+### queryFirstSync()
+
+> **queryFirstSync**(`sql`, `params?`): `Record`\<`string`, `unknown`\> \| `null`
+
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:18](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L18)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sql` | `string` |
+| `params?` | readonly [`SqlParam`](TypeAlias.SqlParam)[] |
+
+#### Returns
+
+`Record`\<`string`, `unknown`\> \| `null`
+
+***
+
+### runSync()
+
+> **runSync**(`sql`, `params?`): `void`
+
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:22](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L22)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sql` | `string` |
+| `params?` | readonly [`SqlParam`](TypeAlias.SqlParam)[] |
+
+#### Returns
+
+`void`

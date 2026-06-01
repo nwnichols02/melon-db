@@ -1,0 +1,1 @@
+/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/build/intermediates/cxx/Debug/2x4g6j21/obj/arm64-v8a

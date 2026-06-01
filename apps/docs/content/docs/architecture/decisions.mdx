@@ -1,0 +1,132 @@
+---
+title: Architectural decisions
+description: Key design decisions with context, pros, cons, and alternatives.
+---
+
+These ADRs capture the main architectural choices made during Phases 0–26. Each entry is intentionally short — see [Architecture overview](/docs/architecture) for diagrams.
+
+---
+
+## ADR-001: AST-first single query representation
+
+**Context:** WatermelonDB, RxDB, and ORMs each expose different query syntaxes. Adapters need one stable input.
+
+**Decision:** All query surfaces compile to `QueryAst` + `PreparedQuery` before execution. Adapters receive prepared queries only.
+
+**Pros:** One SQL generator; devtools can show AST + SQL; new syntaxes (Mango, Prisma) do not touch adapters.
+
+**Cons:** Some user-facing ergonomics are lost at the adapter boundary; advanced SQL features require AST extensions.
+
+**Alternatives:** Per-surface adapter encoding (rejected — duplicated logic and drift).
+
+---
+
+## ADR-002: Split storage and sync packages
+
+**Context:** Teams want offline CRUD without sync; sync has its own release cadence and backend contracts.
+
+**Decision:** `@melon/db` owns storage, outbox primitives, and `applyRemoteChanges`. `@melon/sync` owns pull/push orchestration and depends only on `@melon/db`.
+
+**Pros:** Tree-shakeable; local-only apps skip sync; sync can evolve without breaking query APIs.
+
+**Cons:** Two packages to install for full-stack offline apps; some sync types live on the engine for outbox access.
+
+**Alternatives:** Monolithic `@melon/db` with sync built-in (rejected — coupling and bundle size).
+
+---
+
+## ADR-003: Three query surfaces over one AST
+
+**Context:** Teams prefer fluent TS, JSON Mango, or Prisma-style args depending on background.
+
+**Decision:** Ship `@melon/db-query`, `@melon/db-query-mango`, and `@melon/db-prisma` as separate compilers to the same AST.
+
+**Pros:** Familiar APIs; Mango is serializable for tests/config; Prisma schema reuse for RN teams.
+
+**Cons:** Documentation and mental overhead; feature parity must be maintained across surfaces.
+
+**Alternatives:** Single fluent API only (rejected — migration and Prisma adoption friction).
+
+---
+
+## ADR-004: Adapter contract — PreparedQuery only
+
+**Context:** Adapters should not parse Mango, Prisma, or fluent syntax.
+
+**Decision:** `StorageAdapter.find/count` accept `PreparedQuery`; write ops use `AdapterWriteOperation` structs.
+
+**Pros:** Clear boundary for new backends (IndexedDB, etc.); pure SQL layer in `@melon/db-sqlite`.
+
+**Cons:** Include/join semantics must be resolved in engine or SQL layer with explicit v1 limits.
+
+**Alternatives:** Adapters accept raw AST (rejected — planning hints belong in `PreparedQuery`).
+
+---
+
+## ADR-005: Dual RN SQLite path (Expo Go vs dev build)
+
+**Context:** Expo Go cannot load custom native modules; production RN apps use dev/client builds.
+
+**Decision:** `@melon/db-sqlite/expo` for Expo Go; `@melon/db-sqlite/rn` + `@melon/db-sqlite-native` for dev builds with `mode: 'auto'`.
+
+**Pros:** Expo Go demo works out of the box; native path available when teams need JSI throughput.
+
+**Cons:** Two code paths to test; documentation must explain which path applies.
+
+**Alternatives:** Expo Go only (rejected — no path to native perf); native-only (rejected — Expo Go DX).
+
+---
+
+## ADR-006: Layered native stack — TurboModule then C++ JSI
+
+**Context:** RN New Architecture supports TurboModules; sync JSI avoids promise marshaling for hot paths.
+
+**Decision:** Phase 22–23: codegen TurboModule on iOS/Android. Phase 25–26: C++ JSI host object (`global.melonSqliteJsi`) with dedicated native DB thread; TurboModule remains async fallback.
+
+**Pros:** Progressive delivery; `mode: 'auto'` picks best available binding; aligns with WatermelonDB-style native throughput goals.
+
+**Cons:** Significant native maintenance; sync JSI blocks JS thread until native queue completes (documented).
+
+**Alternatives:** TurboModule-only forever (rejected — perf gap vs WatermelonDB native); bridge modules (deprecated on new arch).
+
+---
+
+## ADR-007: ChangeEmitter fallback vs native observeQuery
+
+**Context:** Fine-grained SQLite triggers for query invalidation are complex; v1 needed reactive hooks quickly.
+
+**Decision:** Engine **ChangeEmitter** re-runs queries on collection changes. Native `observeQuery` / SQLite triggers deferred to Phase 27+.
+
+**Pros:** Works on all adapters today; React hooks ship without native trigger work.
+
+**Cons:** Coarser invalidation than row-level triggers; extra re-fetch work on large tables.
+
+**Alternatives:** Block reactive APIs until native triggers (rejected — delayed RN playground and hooks).
+
+---
+
+## ADR-008: Prisma as schema/codegen layer, not runtime engine
+
+**Context:** Prisma RN support is Early Access; teams still want Prisma schema and client ergonomics locally.
+
+**Decision:** `@melon/db-prisma` imports schema, generates types/client stubs, and compiles Prisma-like args to AST. Runtime is always `MelonDatabase`.
+
+**Pros:** No Prisma engine in the app; honest positioning; Bun workspace codegen fits monorepo.
+
+**Cons:** Not full Prisma feature parity; migrations remain Melon's add-column/create-table subset.
+
+**Alternatives:** Embed Prisma engine (rejected — RN/engine constraints and coupling).
+
+---
+
+## ADR-009: Bun monorepo + Fumadocs docs site
+
+**Context:** Package READMEs alone could not carry phase history, ADRs, playgrounds, and API reference.
+
+**Decision:** Out-of-cycle investment in `apps/docs` — Fumadocs + TanStack Start, TypeDoc API, live CRUD/sync playgrounds, committed benchmark artifacts.
+
+**Pros:** Single docs source; search; package-scoped API; dogfood reactive demos in browser.
+
+**Cons:** Extra CI step (`docs:api`, `build:docs`); content must stay in sync with phases (see [Contributing — docs](/docs/contributing/docs)).
+
+**Alternatives:** GitHub wiki / README-only (rejected — poor API reference and interactivity).

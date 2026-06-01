@@ -4,6 +4,7 @@
 		"index",
 		"melon-db",
 		"melon-db-sqlite",
+		"melon-db-sqlite-native",
 		"melon-db-query",
 		"melon-db-query-mango",
 		"melon-db-prisma",

@@ -3,24 +3,11 @@
  */
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
+import { API_PACKAGES, PACKAGE_LABELS } from "./api-package-meta.ts";
 
 const root = import.meta.dir;
 const docsRoot = path.join(root, "..");
 const repoRoot = path.join(docsRoot, "../..");
-
-const API_PACKAGES = [
-	"melon-db",
-	"melon-db-sqlite",
-	"melon-db-query",
-	"melon-db-query-mango",
-	"melon-db-prisma",
-	"melon-db-react",
-	"melon-db-devtools",
-	"melon-db-testkit",
-	"melon-db-codemods",
-	"melon-sync",
-	"melon-sync-server",
-] as const;
 
 for (const pkg of API_PACKAGES) {
 	const entry = path.join(repoRoot, "packages", pkg, "src/index.ts");
@@ -28,6 +15,7 @@ for (const pkg of API_PACKAGES) {
 	await mkdir(outDir, { recursive: true });
 
 	const pkgTsconfig = path.join(repoRoot, "packages", pkg, "tsconfig.json");
+	const label = PACKAGE_LABELS[pkg];
 
 	const proc = Bun.spawn(
 		[
@@ -41,6 +29,8 @@ for (const pkg of API_PACKAGES) {
 			entry,
 			"--out",
 			outDir,
+			"--name",
+			`${label} API Reference`,
 		],
 		{
 			cwd: docsRoot,

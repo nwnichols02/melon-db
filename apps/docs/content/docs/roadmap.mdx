@@ -1,59 +1,110 @@
 ---
 title: Roadmap
-description: What is shipped in the monorepo vs deferred work.
+description: Phase-by-phase implementation history, shipped status, and deferred work.
 ---
 
-This page is the **living status** for Melon. Update it when features land or deferrals change.
+This page is the **living status** for Melon. Update it when features land or deferrals change. For product vision see [About Melon](/docs/about).
 
-## Shipped
+## Status summary
 
-| Area | Status |
-|------|--------|
-| Core engine (`@melon/db`) M0–M2 | Shipped |
-| SQLite SQL compiler + Bun adapter | Shipped |
-| Expo SQLite adapter | Shipped |
-| Optional Node driver (`@melon/db-sqlite/node`) | Shipped |
-| `apps/playground-rn` (Expo Go) + `apps/playground-rn-dev` (JSI) + sync demo | Shipped |
-| Fluent / Mango / Prisma query surfaces | Shipped |
-| React hooks (`useFindMany`, `useMangoQuery`, `useSync`) | Shipped |
-| Schema migrations (add-column, create-table) | Shipped |
-| Prisma schema import + codegen CLI | Shipped |
-| `belongsTo` relation includes | Shipped |
-| Devtools bridge + React inspector | Shipped |
-| Fumadocs + TanStack Start docs site | Shipped |
-| Benchmark harness + CI smoke | Shipped |
-| `@melon/db-codemods` | Shipped |
-| `@melon/sync` outbox + orchestrator | Shipped |
-| Persistent SQLite checkpoints | Shipped |
-| `@melon/sync-server` HTTP + Postgres backend | Shipped |
-| Sync retry, cancellation, network monitor | Shipped |
-| Conflict policies + merge-by-field | Shipped |
-| Custom conflict resolver hook | Shipped |
-| Migration-aware sync coordination | Shipped |
-| Codemods v2 (Q.and/or, fetch/observe, delete, withObservables) | Shipped |
-| Q.on migration recipes + migrate-schema spike | Shipped |
-| JSI SQLite spike (`@melon/db-sqlite-native`, `/rn` export, iOS) | Shipped |
-| Dual RN SQLite path (Expo Go + dev build) | Shipped |
-| JSI SQLite Android + native hardening (iOS busy timeout, basePath, tests) | Shipped |
-| iOS TurboModule codegen (`MelonSQLiteSpec`, `@melon/db-sqlite-native`) | Shipped |
-| Android TurboModule codegen (`MelonSQLiteSpec`, `@melon/db-sqlite-native`) | Shipped |
-| WatermelonDB benchmark comparison (`bench:compare`, CI `bench-compare`) | Shipped |
-| C++ JSI + native DB thread spike (iOS sync host object, `global.melonSqliteJsi`) | Shipped |
-| C++ JSI + native DB thread on Android (`libmelon_sqlite`, `MelonSQLiteJni`) | Shipped |
+| Area | Count / status |
+|------|----------------|
+| Packages | 12 under `packages/*` (core through sync-server + native) |
+| Example apps | 4 — `playground-node`, `playground-rn`, `playground-rn-dev`, `docs` |
+| Implementation phases | **0–26 shipped** (see chronology below) |
+| Out-of-cycle | Fumadocs docs site, TypeDoc API, playgrounds (ongoing maintenance) |
+| Next | Phase 27+ deferred items |
+
+**Quick links:** [Architecture](/docs/architecture) · [Phase ADRs](/docs/architecture/decisions) · [Packages](/docs/packages/melon-db) · [Performance](/docs/performance-comparison)
+
+---
+
+## Phase chronology
+
+Each phase was executed as a focused delivery increment. Phases 0–7 established the core stack; Phases 8–19 expanded RN, sync, and migration tooling; Phases 20–26 delivered native SQLite performance.
+
+### Foundation (Phases 0–7 + hardening)
+
+| Phase | Title | Packages | Key deliverables | Status |
+|-------|-------|----------|------------------|--------|
+| 0 | Monorepo bootstrap | workspace | Bun workspaces, tooling, `@melon/db` skeleton | Shipped |
+| 1 | `@melon/db` M0 | `@melon/db` | Schema, AST, adapter types, query pipeline stubs | Shipped |
+| 2 | `@melon/db` M1 | `@melon/db` | In-memory adapter, CRUD, serialized write queue | Shipped |
+| 3 | `@melon/db` M2 | `@melon/db` | ChangeEmitter, `observe`, collection subscriptions | Shipped |
+| 4 | `@melon/db-sqlite` M0 | `@melon/db-sqlite` | AST → SQL compiler, predicate tests | Shipped |
+| 5 | `@melon/db-sqlite` M1 | `@melon/db-sqlite` | Bun SQLite adapter, DDL, integration tests | Shipped |
+| 6 | Planned M2/M3 | — | RN native + perf milestones from db-core RFC | Superseded by Phases 8–10, 20–26 |
+| 7 | Downstream packages | query, react, mango, prisma, devtools, testkit | Fluent/Mango/Prisma surfaces, hooks, testkit | Shipped |
+| — | Hardening (post-7) | CI, playground-node | GitHub Actions, adapter CRUD vectors, initial benchmarks, devtools SQL snapshots | Shipped |
+
+### React Native and API (Phases 8–10)
+
+| Phase | Title | Packages | Key deliverables | Status |
+|-------|-------|----------|------------------|--------|
+| 8 | RN / Expo integration | `@melon/db-sqlite`, `@melon/db-react` | `expo-sqlite` adapter, SQLite change notifications, `playground-rn` | Shipped |
+| 9 | API completeness | db, react, prisma | `useFindMany`/`useMangoQuery`, migrations, belongsTo includes, Prisma CLI | Shipped |
+| 10 | Perf & hardening | `@melon/db-sqlite` | SQL test coverage, debug flag, 10k/50k/100k benchmarks, Node driver | Shipped |
+
+### Migration tooling (Phases 11, 19)
+
+| Phase | Title | Packages | Key deliverables | Status |
+|-------|-------|----------|------------------|--------|
+| 11 | Codemods v1 | `@melon/db-codemods` | Query translator, `migrate-queries`/`writes`/`react` CLI | Shipped |
+| 19 | Codemods v2 | `@melon/db-codemods` | Nested Q.and/or, fetch/observe handles, delete, `migrate-schema` spike, Q.on recipes | Shipped |
+
+### Sync (Phases 12–18)
+
+| Phase | Title | Packages | Key deliverables | Status |
+|-------|-------|----------|------------------|--------|
+| 12 | Sync foundation | `@melon/db`, `@melon/sync` | Outbox, `getLocalChanges`/`applyRemoteChanges`, `synchronize()` alpha | Shipped |
+| 13 | Sync integration | sync, sync-server, react | Persistent checkpoints, HTTP server, `useSync`/`useSyncStatus`, RN sync demo | Shipped |
+| 14 | Devtools + docs site | devtools, docs | Reactive bridge, inspector panel, Fumadocs + TanStack Start, CRUD/sync playgrounds | Shipped |
+| 15 | Sync reliability | sync, db | Retry/cancellation, network monitor, conflict policies, migration-aware sync | Shipped |
+| 16 | Postgres backend | `@melon/sync-server` | `PostgresSyncStore`, SQL migrations, Docker compose | Shipped |
+| 17 | Merge-by-field | `@melon/db`, sync | `pendingFields` outbox, field-level merge on apply | Shipped |
+| 18 | Custom conflict resolver | `@melon/db`, sync, react | `conflictPolicy: 'custom'` + `conflictResolver` hook | Shipped |
+
+### Native SQLite performance (Phases 20–26)
+
+| Phase | Title | Packages | Key deliverables | Status |
+|-------|-------|----------|------------------|--------|
+| 20 | Native SQLite spike | `@melon/db-sqlite-native`, `/rn` | iOS bridge module, native driver factory, initial spike | Shipped |
+| 21 | Android + hardening | native, playground-rn-dev | Real Android SQLite, iOS busy timeout/basePath, dev build app split | Shipped |
+| 22 | TurboModule (iOS) | native | Codegen `MelonSQLiteSpec`, iOS TurboModule | Shipped |
+| 23 | TurboModule (Android) | native | Android codegen parity with iOS | Shipped |
+| 24 | WDB benchmarks | `@melon/db-sqlite`, docs | `bench:compare`, CI `bench-compare`, performance comparison docs | Shipped |
+| 25 | C++ JSI (iOS) | native | `MelonSQLiteHostObject`, native DB thread, `global.melonSqliteJsi` | Shipped |
+| 26 | C++ JSI (Android) | native | NDK/JNI, `libmelon_sqlite`, Android worker thread parity | Shipped |
+
+### Out-of-cycle: Documentation
+
+| Phase | Title | Packages | Key deliverables | Status |
+|-------|-------|----------|------------------|--------|
+| — | Fumadocs + docs site | `apps/docs` | MDX guides, 12 package pages, TypeDoc API, search, live playgrounds | Shipped |
+| — | Docs expansion (this cycle) | docs | About/vision, phase history, architecture ADRs, package-scoped API titles | Shipped |
+
+---
+
+## Shipped at a glance
+
+Core engine, all three query surfaces, React/sync hooks, devtools, codemods, full sync stack (HTTP + Postgres), dual RN SQLite paths (Expo + native JSI on iOS/Android), WatermelonDB benchmark harness, and CI (test, typecheck, biome, bench-smoke, bench-compare, postgres-sync, docs build).
+
+---
 
 ## Deferred (Phase 27+)
 
 | Area | Notes |
 |------|-------|
-| Native `observeQuery` / SQLite triggers | Engine change emitter used today |
-| EAS Build CI | Release automation |
-| Full multi-file schema codemods | Beyond single-model spike |
+| Native `observeQuery` / SQLite triggers | Engine ChangeEmitter used today — see [ADR-007](/docs/architecture/decisions#adr-007-changeemitter-fallback-vs-native-observequery) |
+| RN on-device benchmark harness | Node `bench:compare` ships; native throughput benchmarks deferred |
+| EAS Build CI | Release automation for dev client artifacts |
+| Full multi-file schema codemods | Beyond single-model `migrate-schema` spike |
 | Background sync service | OS-level scheduling |
 | Per-field timestamps / three-way merge | Advanced conflict resolution |
+| `hasMany` relation includes in queries | `belongsTo` only in v1 |
+| `Q.on` join queries | Codemod recipes only; no engine join support yet |
 
-## Package milestones
-
-See [`.cursor/rules/package-roles.mdc`](https://github.com/melon/melon/blob/main/.cursor/rules/package-roles.mdc) for per-package M0–M2 goals. Each [package page](/docs/packages/melon-db) lists **alpha** vs **shipped** status.
+---
 
 ## v1 limitations
 
@@ -61,3 +112,9 @@ See [`.cursor/rules/package-roles.mdc`](https://github.com/melon/melon/blob/main
 - SQLite migrations: add-column and create-table only.
 - Relation includes: `belongsTo` only (no `hasMany` in queries).
 - Native SQLite `observeQuery` triggers not implemented (engine change emitter used).
+
+---
+
+## Package milestones
+
+Per-package M0–M2 goals from the monorepo RFCs are reflected in the phase history above. Each [package page](/docs/packages/melon-db) lists **alpha** vs **shipped** status and setup examples.

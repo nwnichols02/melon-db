@@ -4,6 +4,8 @@ Melon-owned SQLite native module for React Native **development builds**.
 
 **Not available in Expo Go.** Use [`@melon/db-sqlite/expo`](../melon-db-sqlite/README.md) for Expo Go and managed workflows.
 
+**Docs:** [Native SQLite architecture](http://localhost:3000/docs/architecture/native) · [Package guide](http://localhost:3000/docs/packages/melon-db-sqlite-native)
+
 ## Platform support
 
 | Platform | Native binding | Status |

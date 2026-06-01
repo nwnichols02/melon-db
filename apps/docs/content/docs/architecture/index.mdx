@@ -1,0 +1,149 @@
+---
+title: Overview
+description: AST-first query architecture, package layers, and dependency rules.
+---
+
+Melon uses an **AST-first** query architecture: every query surface compiles into one internal representation before reaching the storage adapter.
+
+## System overview
+
+```mermaid
+flowchart TB
+  subgraph authoring [Query authoring]
+    Fluent["@melon/db-query"]
+    Mango["@melon/db-query-mango"]
+    Prisma["@melon/db-prisma"]
+  end
+  subgraph core ["@melon/db"]
+    AST[QueryAst]
+    Engine[MelonDatabase]
+  end
+  subgraph storage [Adapters]
+    Mem[In-memory]
+    BunSqlite["Bun / Node / Expo SQLite"]
+    Native["@melon/db-sqlite-native JSI"]
+  end
+  Fluent --> AST
+  Mango --> AST
+  Prisma --> AST
+  Engine --> AST
+  Engine --> Mem
+  Engine --> BunSqlite
+  Engine --> Native
+```
+
+See [Packages](/docs/packages/melon-db) for per-package guides and [Architectural decisions](/docs/architecture/decisions) for ADRs with trade-offs.
+
+## Package layers
+
+| Package | Role |
+|---------|------|
+| `@melon/db` | Schema, AST, adapter contract, runtime engine, migrations, sync primitives |
+| `@melon/db-sqlite` | SQLite adapter (Bun, Node, Expo Go, RN `/rn` export) |
+| `@melon/db-sqlite-native` | Native TurboModule + C++ JSI for RN dev builds |
+| `@melon/db-query` | Fluent query builder → AST |
+| `@melon/db-query-mango` | Mango-style query compiler → AST |
+| `@melon/db-prisma` | Prisma schema import + local client facade |
+| `@melon/db-react` | React hooks and providers |
+| `@melon/db-devtools` | Query / SQL / sync inspector |
+| `@melon/db-testkit` | Test helpers and fixtures |
+| `@melon/db-codemods` | WatermelonDB migration codemods |
+| `@melon/sync` | Pull/push sync orchestrator |
+| `@melon/sync-server` | HTTP reference backend (in-memory + Postgres) |
+
+## Query pipeline
+
+```mermaid
+sequenceDiagram
+  participant Author as Query author
+  participant Compiler as Query compiler
+  participant Engine as MelonDatabase
+  participant Adapter as StorageAdapter
+  participant UI as Subscribers
+
+  Author->>Compiler: fluent / Mango / Prisma args
+  Compiler->>Compiler: compile to QueryAst
+  Compiler->>Engine: validate + plan + prepare
+  Engine->>Adapter: PreparedQuery
+  Adapter->>Adapter: SQL or in-memory filter
+  Adapter-->>Engine: rows
+  Engine-->>UI: observe on change
+```
+
+Steps in code:
+
+1. Author query (fluent builder, Mango JSON, or Prisma-like args)
+2. Compile to `QueryAst`
+3. Validate against schema metadata
+4. Plan and prepare (`PreparedQuery`)
+5. Adapter encodes to SQL (SQLite) or in-memory evaluation
+6. Results flow through reactive subscriptions (`MelonQueryHandle.observe`)
+
+## Package dependencies
+
+```mermaid
+flowchart BT
+  Codemods["@melon/db-codemods"]
+  Testkit["@melon/db-testkit"]
+  Devtools["@melon/db-devtools"]
+  React["@melon/db-react"]
+  Prisma["@melon/db-prisma"]
+  Mango["@melon/db-query-mango"]
+  Query["@melon/db-query"]
+  Sqlite["@melon/db-sqlite"]
+  Native["@melon/db-sqlite-native"]
+  Sync["@melon/sync"]
+  SyncServer["@melon/sync-server"]
+  Core["@melon/db"]
+
+  Query --> Core
+  Mango --> Core
+  Prisma --> Core
+  Sqlite --> Core
+  Native --> Core
+  React --> Core
+  Devtools --> Core
+  Testkit --> Core
+  Codemods --> Core
+  Sync --> Core
+  SyncServer --> Sync
+  SyncServer --> Core
+  React --> Query
+  React --> Prisma
+  React --> Mango
+  React --> Sync
+  Sqlite --> Native
+```
+
+**Rules:**
+
+- `@melon/db` is the bottom of the stack — no other melon packages
+- Query packages compile to AST only; they never touch SQLite directly
+- `@melon/sync` depends only on `@melon/db`
+- React bindings wire subscriptions to UI; they do not own business logic
+
+## Writes
+
+All mutations run inside `db.write()`. The engine serializes writers and allows reads without concurrent writers.
+
+```mermaid
+stateDiagram-v2
+  [*] --> Idle
+  Idle --> Writing: db.write starts
+  Writing --> Idle: write completes
+  Idle --> Reading: db.read / collection queries
+  Reading --> Idle: read completes
+  note right of Writing: No concurrent writers
+```
+
+Collection `insert`, `update`, and `delete` throw if called outside a write context.
+
+## Subscriptions
+
+When the adapter does not implement native `observeQuery`, the engine uses an internal **ChangeEmitter**: writes emit collection-level changes, and query handles re-fetch on invalidation. See [ADR-007](/docs/architecture/decisions#adr-007-changeemitter-fallback-vs-native-observequery).
+
+## Related
+
+- [Sync architecture](/docs/architecture/sync) — outbox, checkpoints, conflict policies
+- [Native SQLite paths](/docs/architecture/native) — Expo Go vs dev build
+- [Architectural decisions](/docs/architecture/decisions) — ADRs with pros and cons

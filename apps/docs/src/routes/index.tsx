@@ -23,7 +23,14 @@ function Home() {
 					</h1>
 					<p className="max-w-lg text-fd-muted-foreground text-lg">
 						Offline-first local database for React Native and TypeScript — a
-						modern successor to WatermelonDB.
+						modern successor to WatermelonDB.{" "}
+						<Link
+							className="text-fd-primary underline-offset-4 hover:underline"
+							params={{ _splat: "about" }}
+							to="/docs/$"
+						>
+							About Melon
+						</Link>
 					</p>
 					<div className="flex flex-wrap items-center justify-center gap-3">
 						<Link

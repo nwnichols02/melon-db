@@ -1,6 +1,6 @@
 {
 	"$schema": "https://typedoc.org/schema.json",
-	"name": "Melon API",
+	"name": "Melon Package API",
 	"readme": "none",
 	"excludePrivate": true,
 	"excludeInternal": true,

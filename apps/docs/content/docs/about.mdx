@@ -1,0 +1,64 @@
+---
+title: About Melon
+description: Vision, inspiration, design principles, and what Melon is (and is not).
+---
+
+Melon is a **local-first database stack** for React Native and TypeScript — a modern successor to [WatermelonDB](https://watermelon.dev/) with an AST-first query model, SQLite adapters, optional sync, and multiple query authoring surfaces.
+
+## What Melon is
+
+Melon is two modular products that work together or independently:
+
+1. **Storage and query engine** (`@melon/db` + adapters) — schema, query AST, runtime engine, reactive subscriptions, and migrations.
+2. **Sync engine** (`@melon/sync`) — Watermelon-compatible pull/push orchestration with conflict policies, retry, and checkpoints.
+
+Everything compiles into one internal **QueryAst** before reaching storage. Adapters translate prepared queries to SQL (SQLite) or in-memory filters. React hooks wire subscriptions to UI without owning business logic.
+
+## Vision
+
+Become the default local-first data layer for React Native teams that want WatermelonDB-class performance with a cleaner, TypeScript-first architecture:
+
+- **New Architecture ready** — TurboModule + C++ JSI native SQLite for dev builds; Expo Go via `expo-sqlite`.
+- **Multiple query surfaces** — fluent builder, Mango JSON, and Prisma-style args over one engine.
+- **Optional sync** — adopt storage first; add `@melon/sync` when you need pull/push.
+- **Migration path** — codemods and compatibility translator for WatermelonDB teams.
+
+## Inspiration
+
+| Source | What we took |
+|--------|--------------|
+| **WatermelonDB** | Adapter model, lazy SQLite queries, reactive UI, write boundaries, sync protocol shape |
+| **RxDB / CouchDB Mango** | Serializable JSON query DSL for tests, devtools, and config-driven screens |
+| **Prisma** | Schema-first typing, codegen ergonomics, and hook patterns — **not** the Prisma engine at runtime |
+
+Melon preserves WatermelonDB's strengths (offline-first, large datasets, reactivity) while modernizing setup for TypeScript, hooks, and React Native's new architecture.
+
+## Design principles
+
+- **AST-first** — every query surface compiles to one internal representation; adapters never see user syntax.
+- **Typed at the edge** — schema metadata drives inference for collections, queries, and sync payloads.
+- **Local execution first** — queries optimize for on-device SQLite, not remote servers.
+- **Composable and pure** — query builders and compilers are side-effect free until execution.
+- **Modular by design** — storage and sync evolve independently behind stable interfaces.
+
+## Target users
+
+- **WatermelonDB migrators** — familiar concepts with codemods and a documented parity matrix.
+- **Prisma-leaning RN teams** — schema import + local client without depending on Prisma's remote engine.
+- **Platform engineers** — serializable Mango queries for policy layers, fixtures, and devtools.
+- **TypeScript-heavy product teams** — explicit write boundaries, structured errors, and testkit helpers.
+
+## What Melon is not
+
+- **Not a remote ORM** — Melon executes locally; backends integrate via sync protocol, not query proxying.
+- **Not the full Prisma engine** — `@melon/db-prisma` is schema/codegen + client facade over `@melon/db`.
+- **Not CRDT-first** — conflict policies are configurable (server-wins, merge-by-field, custom), not automatic merge-by-default.
+- **Not native JSI in Expo Go** — managed Expo uses `@melon/db-sqlite/expo`; native JSI requires a dev build.
+
+## Learn more
+
+<Cards>
+  <Card title="Architecture" href="/docs/architecture" description="Package layers, query flow, and dependency rules." />
+  <Card title="Roadmap" href="/docs/roadmap" description="Phase-by-phase implementation history and deferred work." />
+  <Card title="Getting started" href="/docs/getting-started" description="Install, quick start, and playground apps." />
+</Cards>

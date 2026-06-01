@@ -1,0 +1,137 @@
+---
+title: "Spec"
+description: "@melon/db-sqlite-native — Spec"
+---
+
+[**@melon/db-sqlite-native API Reference**](index)
+
+***
+
+# Interface: Spec
+
+Defined in: [packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts:6](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts#L6)
+
+## Extends
+
+- `TurboModule`
+
+## Methods
+
+### close()
+
+> **close**(): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts:8](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts#L8)
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### exec()
+
+> **exec**(`sql`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts:9](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts#L9)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sql` | `string` |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### getConstants()?
+
+> `optional` **getConstants**(): `object`
+
+Defined in: node\_modules/.bun/react-native@0.81.5+ebadc8e7f1d17381/node\_modules/react-native/Libraries/TurboModule/RCTExport.d.ts:11
+
+#### Returns
+
+`object`
+
+#### Inherited from
+
+`TurboModule.getConstants`
+
+***
+
+### open()
+
+> **open**(`path`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts:7](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts#L7)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `path` | `string` |
+
+#### Returns
+
+`Promise`\<`void`\>
+
+***
+
+### queryAll()
+
+> **queryAll**(`sql`, `params`): `Promise`\<readonly `Record`\<`string`, `unknown`\>[]\>
+
+Defined in: [packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts:10](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts#L10)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sql` | `string` |
+| `params` | readonly `SqlParam`[] |
+
+#### Returns
+
+`Promise`\<readonly `Record`\<`string`, `unknown`\>[]\>
+
+***
+
+### queryFirst()
+
+> **queryFirst**(`sql`, `params`): `Promise`\<`Record`\<`string`, `unknown`\> \| `null`\>
+
+Defined in: [packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts:14](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts#L14)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sql` | `string` |
+| `params` | readonly `SqlParam`[] |
+
+#### Returns
+
+`Promise`\<`Record`\<`string`, `unknown`\> \| `null`\>
+
+***
+
+### run()
+
+> **run**(`sql`, `params`): `Promise`\<`void`\>
+
+Defined in: [packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts:18](https://github.com/nwnichols02/melon/blob/66e7c4662c5afe5dc26a2c4be7b5fac91b6db355/packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts#L18)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sql` | `string` |
+| `params` | readonly `SqlParam`[] |
+
+#### Returns
+
+`Promise`\<`void`\>

@@ -3,7 +3,9 @@ title: "api"
 description: "API reference: api"
 ---
 
-API documentation is generated from package entry points with **TypeDoc** and enriched with **Fumadocs TypeScript** type tables on package pages.
+API documentation is generated from each package's `src/index.ts` with **TypeDoc** and enriched with **Fumadocs TypeScript** type tables on [package guide](/docs/packages/melon-db) pages.
+
+Each package index is titled with its **npm scope** (e.g. `@melon/db`), not a generic "Melon API".
 
 ## Regenerate
 
@@ -13,20 +15,43 @@ From the monorepo root:
 bun run --filter docs docs:api
 ```
 
-## Packages
+## Packages by layer
 
-| Package | API index |
-|---------|-----------|
-| `@melon/db` | [melon-db](/docs/api/melon-db) |
-| `@melon/db-sqlite` | [melon-db-sqlite](/docs/api/melon-db-sqlite) |
-| `@melon/db-query` | [melon-db-query](/docs/api/melon-db-query) |
-| `@melon/db-query-mango` | [melon-db-query-mango](/docs/api/melon-db-query-mango) |
-| `@melon/db-prisma` | [melon-db-prisma](/docs/api/melon-db-prisma) |
-| `@melon/db-react` | [melon-db-react](/docs/api/melon-db-react) |
-| `@melon/db-devtools` | [melon-db-devtools](/docs/api/melon-db-devtools) |
-| `@melon/db-testkit` | [melon-db-testkit](/docs/api/melon-db-testkit) |
-| `@melon/db-codemods` | [melon-db-codemods](/docs/api/melon-db-codemods) |
-| `@melon/sync` | [melon-sync](/docs/api/melon-sync) |
-| `@melon/sync-server` | [melon-sync-server](/docs/api/melon-sync-server) |
+### Core
 
-Only symbols exported from each package `src/index.ts` are included.
+| Package | Depends on | API index |
+|---------|------------|-----------|
+| `@melon/db` | — | [melon-db](/docs/api/melon-db) |
+
+### SQLite adapters
+
+| Package | Depends on | API index |
+|---------|------------|-----------|
+| `@melon/db-sqlite` | `@melon/db` | [melon-db-sqlite](/docs/api/melon-db-sqlite) |
+| `@melon/db-sqlite-native` | `@melon/db-sqlite` (peer) | [melon-db-sqlite-native](/docs/api/melon-db-sqlite-native) |
+
+### Query surfaces
+
+| Package | Depends on | API index |
+|---------|------------|-----------|
+| `@melon/db-query` | `@melon/db` | [melon-db-query](/docs/api/melon-db-query) |
+| `@melon/db-query-mango` | `@melon/db` | [melon-db-query-mango](/docs/api/melon-db-query-mango) |
+| `@melon/db-prisma` | `@melon/db` | [melon-db-prisma](/docs/api/melon-db-prisma) |
+
+### React and tooling
+
+| Package | Depends on | API index |
+|---------|------------|-----------|
+| `@melon/db-react` | `@melon/db`, query packages, `@melon/sync` | [melon-db-react](/docs/api/melon-db-react) |
+| `@melon/db-devtools` | `@melon/db` | [melon-db-devtools](/docs/api/melon-db-devtools) |
+| `@melon/db-testkit` | `@melon/db` | [melon-db-testkit](/docs/api/melon-db-testkit) |
+| `@melon/db-codemods` | `@melon/db` | [melon-db-codemods](/docs/api/melon-db-codemods) |
+
+### Sync
+
+| Package | Depends on | API index |
+|---------|------------|-----------|
+| `@melon/sync` | `@melon/db` | [melon-sync](/docs/api/melon-sync) |
+| `@melon/sync-server` | `@melon/sync`, `@melon/db` | [melon-sync-server](/docs/api/melon-sync-server) |
+
+Only symbols exported from each package `src/index.ts` are included. Package guides under [/docs/packages](/docs/packages/melon-db) provide setup context and examples beyond the generated reference.
