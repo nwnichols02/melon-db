@@ -9,14 +9,6 @@
 	"scripts": {
 		"typecheck": "bunx tsc -p tsconfig.json --noEmit"
 	},
-	"codegenConfig": {
-		"name": "NativeMelonSQLite",
-		"type": "modules",
-		"jsSrcsDir": "src",
-		"android": {
-			"javaPackageName": "com.melon.sqlite"
-		}
-	},
 	"peerDependencies": {
 		"react": "*",
 		"react-native": "*"

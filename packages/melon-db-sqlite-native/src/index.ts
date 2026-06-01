@@ -1,23 +1,26 @@
-import NativeMelonSQLite, {
-	type Spec,
+import {
+	getMelonSQLiteModule,
+	type MelonSQLiteNativeModule,
 	type SqlParam,
-} from "./NativeMelonSQLite.ts";
+} from "./MelonSQLiteBridge.ts";
 
 export type { SqlParam };
-/** @deprecated Use {@link Spec} — kept for callers that used the old name. */
-export type MelonSQLiteSpec = Spec;
-export type { Spec };
+/** @deprecated Use {@link MelonSQLiteNativeModule} */
+export type MelonSQLiteSpec = MelonSQLiteNativeModule;
+export type { MelonSQLiteNativeModule };
+/** @deprecated Use {@link MelonSQLiteNativeModule} */
+export type Spec = MelonSQLiteNativeModule;
 
 /**
- * Returns the native MelonSQLite TurboModule when linked in a development build.
+ * Returns the native MelonSQLite module when linked in a development build.
  */
-export function getMelonSQLite(): Spec | null {
-	return NativeMelonSQLite;
+export function getMelonSQLite(): MelonSQLiteNativeModule | null {
+	return getMelonSQLiteModule();
 }
 
 /**
  * True when the MelonSQLite native module is present (not Expo Go).
  */
 export function isMelonSQLiteNativeAvailable(): boolean {
-	return NativeMelonSQLite != null;
+	return getMelonSQLiteModule() != null;
 }

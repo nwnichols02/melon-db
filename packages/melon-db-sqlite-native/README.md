@@ -82,4 +82,4 @@ After `bun run dev:rn:dev:android` then `bun run dev:rn:dev:start`:
 
 - iOS: `MelonSQLite` RCT module (`ios/MelonSQLite.mm`) using `sqlite3` with `sqlite3_busy_timeout`
 - Android: `MelonSQLiteModule` (`android/.../MelonSQLiteModule.kt`) using `SQLiteDatabase`
-- JS: TurboModule spec in `src/NativeMelonSQLite.ts`
+- JS: bridge accessor in `src/MelonSQLiteBridge.ts` (no TurboModule JNI codegen)
