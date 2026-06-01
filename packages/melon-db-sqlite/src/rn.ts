@@ -60,7 +60,8 @@ function resolveDriverFactory(
 	if (mode === "turbo") {
 		return () => createNativeDriver({ path });
 	}
-	if (isNativeJsiSyncAvailable()) {
+	// Touch TurboModule first — iOS installs global.melonSqliteJsi in getTurboModule.
+	if (isJsiSqliteAvailable() && isNativeJsiSyncAvailable()) {
 		return () => createNativeJsiSyncDriver({ path });
 	}
 	return () => createNativeDriver({ path });
