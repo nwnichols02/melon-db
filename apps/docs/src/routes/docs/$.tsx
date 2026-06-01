@@ -1,6 +1,6 @@
 import { useMDXComponents } from "@/components/mdx";
 import { baseOptions } from "@/lib/layout.shared";
-import { slugsToMarkdownPath, source } from "@/lib/source";
+import { slugsToMarkdownPath } from "@/lib/path-utils";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { useFumadocsLoader } from "fumadocs-core/source/client";
@@ -27,6 +27,7 @@ export const Route = createFileRoute("/docs/$")({
 const serverLoader = createServerFn({ method: "GET" })
 	.inputValidator((slugs: string[]) => slugs)
 	.handler(async ({ data: slugs }) => {
+		const { source } = await import("@/lib/source.server");
 		const page = source.getPage(slugs);
 		if (!page) {
 			throw notFound();

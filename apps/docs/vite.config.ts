@@ -25,6 +25,8 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@": path.join(rootDir, "src"),
+			"collections/server": path.join(rootDir, ".source/server.ts"),
+			"collections/browser": path.join(rootDir, ".source/browser.ts"),
 			tslib: "tslib/tslib.es6.js",
 		},
 	},

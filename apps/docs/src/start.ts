@@ -1,7 +1,7 @@
 import { createMiddleware, createStart } from "@tanstack/react-start";
 import { redirect } from "@tanstack/react-router";
 import { isMarkdownPreferred } from "fumadocs-core/negotiation";
-import { slugsToMarkdownPath } from "@/lib/source";
+import { slugsToMarkdownPath } from "@/lib/path-utils";
 import { docsRoute } from "@/lib/shared";
 
 const llmMiddleware = createMiddleware().server(({ next, request }) => {

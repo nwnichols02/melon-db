@@ -4,7 +4,7 @@
 	"type": "module",
 	"sideEffects": false,
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "fumadocs-mdx && vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
 		"typecheck": "fumadocs-mdx && tsc --noEmit",
