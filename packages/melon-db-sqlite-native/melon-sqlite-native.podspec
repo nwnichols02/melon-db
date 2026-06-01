@@ -10,9 +10,15 @@ Pod::Spec.new do |s|
   s.license      = "MIT"
   s.author       = "Melon"
   s.platforms    = { :ios => "15.1" }
-  s.source       = { :git => "https://github.com/melon/melon.git", :tag => "#{s.version}" }
+  # Local monorepo installs use :path in the Podfile; avoid a remote :git :tag that does not exist.
+  s.source       = { :path => "." }
   s.source_files = "ios/**/*.{h,m,mm}"
   s.public_header_files = "ios/*.h"
   s.frameworks = "sqlite3"
-  s.dependency "React-Core"
+
+  if defined?(install_modules_dependencies) != nil
+    install_modules_dependencies(s)
+  else
+    s.dependency "React-Core"
+  end
 end

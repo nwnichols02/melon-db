@@ -243,7 +243,7 @@
     },
     "packages/melon-db-sqlite-native": {
       "name": "@melon/db-sqlite-native",
-      "version": "0.0.0-alpha",
+      "version": "0.0.1",
       "devDependencies": {
         "@types/react": "~19.1.10",
         "react-native": "0.81.5",

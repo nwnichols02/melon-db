@@ -37,6 +37,18 @@ After the native app is installed once:
 bun run start
 ```
 
+## Troubleshooting
+
+**`pod install` / `melon-sqlite-native` not found** — run from `apps/playground-rn-dev/ios`:
+
+```bash
+pod install
+```
+
+The native package podspec must use `s.source = { :path => "." }` for monorepo installs (not a remote git tag).
+
+**`No development build … is installed`** — `bun run start` only starts Metro. Run `bun run install:ios` first, then open **Melon Playground (Dev)** on the simulator (not Expo Go).
+
 ## Typecheck
 
 ```bash
