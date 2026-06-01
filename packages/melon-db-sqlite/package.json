@@ -5,7 +5,8 @@
 	"exports": {
 		".": "./src/index.ts",
 		"./expo": "./src/expo.ts",
-		"./node": "./src/node.ts"
+		"./node": "./src/node.ts",
+		"./rn": "./src/rn.ts"
 	},
 	"scripts": {
 		"test": "bun test",
@@ -16,20 +17,30 @@
 		"@melon/db": "workspace:*"
 	},
 	"peerDependencies": {
+		"@melon/db-sqlite-native": "workspace:*",
 		"better-sqlite3": ">=11.0.0",
-		"expo-sqlite": ">=15.0.0"
+		"expo-sqlite": ">=15.0.0",
+		"react-native": "*"
 	},
 	"peerDependenciesMeta": {
+		"@melon/db-sqlite-native": {
+			"optional": true
+		},
 		"better-sqlite3": {
 			"optional": true
 		},
 		"expo-sqlite": {
 			"optional": true
+		},
+		"react-native": {
+			"optional": true
 		}
 	},
 	"devDependencies": {
 		"@melon/db-devtools": "workspace:*",
+		"@melon/db-sqlite-native": "workspace:*",
 		"@types/bun": "latest",
+		"react-native": "0.81.5",
 		"typescript": "^5"
 	}
 }

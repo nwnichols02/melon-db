@@ -69,6 +69,7 @@
         "expo": "~54.0.5",
         "expo-asset": "~12.0.13",
         "expo-constants": "~18.0.13",
+        "expo-file-system": "~19.0.21",
         "expo-linking": "~8.0.12",
         "expo-router": "~6.0.24",
         "expo-sqlite": "~16.0.10",
@@ -80,6 +81,7 @@
         "react-native-screens": "~4.16.0",
       },
       "devDependencies": {
+        "@melon/db-sqlite-native": "workspace:*",
         "@types/react": "~19.1.10",
         "typescript": "^5",
       },
@@ -96,8 +98,12 @@
     "packages/melon-db-codemods": {
       "name": "@melon/db-codemods",
       "version": "0.0.0-alpha",
+      "bin": {
+        "melon-codemod": "./src/bin/melon-codemod.ts",
+      },
       "dependencies": {
         "@melon/db": "workspace:*",
+        "@melon/db-query": "workspace:*",
         "ts-morph": "^25.0.1",
       },
       "devDependencies": {
@@ -186,17 +192,36 @@
       },
       "devDependencies": {
         "@melon/db-devtools": "workspace:*",
+        "@melon/db-sqlite-native": "workspace:*",
         "@types/bun": "latest",
+        "react-native": "0.81.5",
         "typescript": "^5",
       },
       "peerDependencies": {
+        "@melon/db-sqlite-native": "workspace:*",
         "better-sqlite3": ">=11.0.0",
         "expo-sqlite": ">=15.0.0",
+        "react-native": "*",
       },
       "optionalPeers": [
+        "@melon/db-sqlite-native",
         "better-sqlite3",
         "expo-sqlite",
+        "react-native",
       ],
+    },
+    "packages/melon-db-sqlite-native": {
+      "name": "@melon/db-sqlite-native",
+      "version": "0.0.0-alpha",
+      "devDependencies": {
+        "@types/react": "~19.1.10",
+        "react-native": "0.81.5",
+        "typescript": "^5",
+      },
+      "peerDependencies": {
+        "react": "*",
+        "react-native": "*",
+      },
     },
     "packages/melon-db-testkit": {
       "name": "@melon/db-testkit",
@@ -615,6 +640,8 @@
     "@melon/db-react": ["@melon/db-react@workspace:packages/melon-db-react"],
 
     "@melon/db-sqlite": ["@melon/db-sqlite@workspace:packages/melon-db-sqlite"],
+
+    "@melon/db-sqlite-native": ["@melon/db-sqlite-native@workspace:packages/melon-db-sqlite-native"],
 
     "@melon/db-testkit": ["@melon/db-testkit@workspace:packages/melon-db-testkit"],
 

@@ -15,11 +15,38 @@ import { createSqliteAdapter } from '@melon/db-sqlite';
 const adapter = createSqliteAdapter({ filename: 'app.db' });
 ```
 
-## Expo
+## React Native: Expo Go vs development build
+
+| Path | Import | Expo Go |
+|------|--------|---------|
+| **Default** | `@melon/db-sqlite/expo` + `expo-sqlite` | Yes |
+| **JSI spike** | `@melon/db-sqlite/rn` + `@melon/db-sqlite-native` | No — requires `expo prebuild` + dev build |
+
+### Expo Go
 
 ```ts
 import { createExpoSqliteAdapter } from '@melon/db-sqlite/expo';
+import * as SQLite from 'expo-sqlite';
+
+const database = await SQLite.openDatabaseAsync('app.db');
+const adapter = createExpoSqliteAdapter({ database });
 ```
+
+### JSI (development build, iOS spike)
+
+```ts
+import { createJsiSqliteAdapter, isJsiSqliteAvailable } from '@melon/db-sqlite/rn';
+
+if (!isJsiSqliteAvailable()) {
+  throw new Error('Use expo-sqlite or run a development build');
+}
+
+const adapter = createJsiSqliteAdapter({
+  filename: 'app.db',
+});
+```
+
+See [`@melon/db-sqlite-native`](/docs/packages/melon-db-sqlite-native) for native setup.
 
 ## Node (better-sqlite3)
 

@@ -1,13 +1,16 @@
-import { type MelonDatabase, createDatabase } from "@melon/db";
+import {
+	type MelonDatabase,
+	type StorageAdapter,
+	createDatabase,
+} from "@melon/db";
 import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
-import { createExpoSqliteAdapter } from "@melon/db-sqlite/expo";
-import type { SQLiteDatabase } from "expo-sqlite";
-import * as SQLite from "expo-sqlite";
 import { type Task, taskSchema } from "./schema";
 
 export const devtoolsBridge = createReactiveDevtoolsBridge();
 
 let databasePromise: Promise<MelonDatabase<typeof taskSchema>> | null = null;
+
+const JSI_FLAG = process.env.EXPO_PUBLIC_MELON_SQLITE === "jsi";
 
 /**
  * Opens the local Melon database and seeds demo tasks when empty.
@@ -19,13 +22,35 @@ export async function getDatabase(): Promise<MelonDatabase<typeof taskSchema>> {
 	return databasePromise;
 }
 
-async function bootstrap(): Promise<MelonDatabase<typeof taskSchema>> {
-	const expoDb: SQLiteDatabase = await SQLite.openDatabaseAsync(
-		"melon-playground.db",
+/**
+ * Creates the storage adapter: expo-sqlite (Expo Go) or JSI native (dev build).
+ */
+async function createAdapter(): Promise<StorageAdapter> {
+	if (!JSI_FLAG) {
+		const SQLite = await import("expo-sqlite");
+		const { createExpoSqliteAdapter } = await import("@melon/db-sqlite/expo");
+		const database = await SQLite.openDatabaseAsync("melon-playground.db");
+		return createExpoSqliteAdapter({ database });
+	}
+
+	const { createJsiSqliteAdapter, isJsiSqliteAvailable } = await import(
+		"@melon/db-sqlite/rn"
 	);
+	if (!isJsiSqliteAvailable()) {
+		throw new Error(
+			"Melon JSI SQLite requires a development build. Unset EXPO_PUBLIC_MELON_SQLITE or run: npx expo prebuild && npx expo run:ios",
+		);
+	}
+
+	return createJsiSqliteAdapter({
+		filename: "melon-playground.db",
+	});
+}
+
+async function bootstrap(): Promise<MelonDatabase<typeof taskSchema>> {
 	const db = createDatabase({
 		schema: taskSchema,
-		adapter: createExpoSqliteAdapter({ database: expoDb }),
+		adapter: await createAdapter(),
 		devtools: devtoolsBridge,
 		sync: {},
 	});

@@ -63,7 +63,8 @@ See [`apps/playground-node/src/demo.ts`](apps/playground-node/src/demo.ts).
 ### React Native / Expo playground
 
 ```bash
-bun run dev:rn
+bun run dev:rn          # Expo Go — @melon/db-sqlite/expo
+bun run dev:rn:jsi      # Dev build — @melon/db-sqlite/rn (iOS, prebuild required)
 ```
 
 Open the app in iOS Simulator or Android emulator. See [`apps/playground-rn/README.md`](apps/playground-rn/README.md).
@@ -156,11 +157,12 @@ await synchronize({
 
 Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun run dev:docs`). Summary:
 
-| Done | Deferred (Phase 20+) |
+| Done | Deferred (Phase 21+) |
 |------|----------|
-| Core engine M0–M2 | Custom JSI/TurboModule SQLite |
+| Core engine M0–M2 | JSI Android + native observeQuery |
 | SQLite SQL compiler + Bun adapter | EAS Build CI |
-| Expo SQLite adapter (`@melon/db-sqlite/expo`) | WatermelonDB benchmark comparison |
+| Expo SQLite adapter (`@melon/db-sqlite/expo`, Expo Go) | WatermelonDB benchmark comparison |
+| JSI SQLite spike (`@melon/db-sqlite/rn`, iOS dev build) | |
 | Optional Node driver (`@melon/db-sqlite/node`) | Full multi-file schema codemods |
 | `apps/playground-rn` + sync demo | Background sync service |
 | Query / Mango / Prisma surfaces | Per-field timestamps / three-way merge |

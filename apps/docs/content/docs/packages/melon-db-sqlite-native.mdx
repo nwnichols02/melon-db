@@ -1,0 +1,25 @@
+---
+title: "@melon/db-sqlite-native"
+description: Melon SQLite TurboModule for React Native development builds (Phase 20 spike).
+---
+
+**Status:** Spike (iOS) · **Expo Go:** Not supported
+
+Native SQLite module used by [`@melon/db-sqlite/rn`](/docs/packages/melon-db-sqlite). For Expo Go, use [`@melon/db-sqlite/expo`](/docs/packages/melon-db-sqlite) instead.
+
+## Platform support
+
+| Platform | Status |
+|----------|--------|
+| iOS (dev build) | Supported |
+| Android | Stub — use expo-sqlite |
+| Expo Go | Not available |
+
+## Setup
+
+```bash
+npx expo prebuild
+EXPO_PUBLIC_MELON_SQLITE=jsi npx expo run:ios
+```
+
+Playground: `bun run dev:rn` (expo) vs `bun run dev:rn:jsi` (native).

@@ -32,6 +32,7 @@
 		"react-native-screens": "~4.16.0"
 	},
 	"devDependencies": {
+		"@melon/db-sqlite-native": "workspace:*",
 		"@types/react": "~19.1.10",
 		"typescript": "^5"
 	}

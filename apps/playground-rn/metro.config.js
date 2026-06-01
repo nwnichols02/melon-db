@@ -32,6 +32,10 @@ config.resolver.extraNodeModules = {
 	"@melon/db-query": path.resolve(workspaceRoot, "packages/melon-db-query"),
 	"@melon/db-react": path.resolve(workspaceRoot, "packages/melon-db-react"),
 	"@melon/db-sqlite": path.resolve(workspaceRoot, "packages/melon-db-sqlite"),
+	"@melon/db-sqlite-native": path.resolve(
+		workspaceRoot,
+		"packages/melon-db-sqlite-native",
+	),
 	"@melon/sync": path.resolve(workspaceRoot, "packages/melon-sync"),
 	"expo-sqlite": resolvePackageDir("expo-sqlite"),
 };
