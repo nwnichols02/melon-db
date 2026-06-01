@@ -11,19 +11,77 @@ Use `@melon/db-codemods` for automated migration helpers.
 bun run melon-codemod migrate-queries --path=./src
 bun run melon-codemod migrate-writes --path=./src
 bun run melon-codemod migrate-react --path=./src
+bun run melon-codemod migrate-schema --path=./src/models/Task.ts
 ```
+
+Add `--dry-run` to preview changes. `migrate-schema` prints extracted `DatabaseSchemaDefinition` JSON (read-only).
 
 ## Runtime query translator
 
-The compatibility layer converts serializable Watermelon `Q` clauses to Melon `QueryAst` without a WatermelonDB dependency.
+The compatibility layer converts serializable Watermelon `Q` clauses to Melon `QueryAst` without a WatermelonDB dependency. Nested `Q.and` / `Q.or` are supported in the translator and in `migrate-queries`.
+
+## Q.on (join) queries {#q-on}
+
+Melon v1 does **not** support Watermelon-style join queries at runtime. The codemod detects `Q.on`, inserts a migration recipe comment, and migrates any non-join clauses it can.
+
+**Recommended rewrite:**
+
+1. Add a `belongsTo` relation on the parent collection (e.g. `tasks` → `projects` via `project_id`).
+2. Use the fluent builder `.include('project', { where: … })` when filtering on related fields.
+3. Or run a two-step query: fetch matching related ids, then filter the parent with `.where('project_id', 'in', ids)`.
+
+```ts
+// Before (WatermelonDB)
+database.get('tasks').query(
+  Q.on('projects', Q.where('name', 'Acme')),
+  Q.where('status', 'open'),
+);
+
+// After (Melon — two-step)
+const projects = await db.collection('projects').findMany(
+  q.from('projects').where('name', 'eq', 'Acme').toAst(),
+);
+const projectIds = projects.map((p) => p.id);
+const tasks = await db.collection('tasks').findMany(
+  q.from('tasks')
+    .where('status', 'eq', 'open')
+    .where('project_id', 'in', projectIds)
+    .toAst(),
+);
+```
+
+## withObservables {#withobservables}
+
+The `migrate-react` codemod detects common `withObservables` HOC patterns and emits hook migration comments. Replace the HOC with hooks inside your component:
+
+```tsx
+// Before
+const Enhanced = withObservables(['tasks'], ({ database }) => ({
+  tasks: database.get('tasks').query(Q.where('status', 'open')).observe(),
+}))(TaskList);
+
+// After
+import { useFindMany } from '@melon/db-react';
+
+function TaskList() {
+  const tasks = useFindMany('tasks', /* compile query args */);
+  // ...
+}
+```
+
+Complex HOC shapes still require manual migration.
+
+## Schema extraction (spike)
+
+`migrate-schema` extracts a single Watermelon `Model` class file into Melon `DatabaseSchemaDefinition` JSON. Multi-file schema assembly and migration version mapping are not automated yet.
 
 ## Manual migration
 
 These patterns still require manual work:
 
-- Join queries (`Q.on`)
-- Model decorator → schema codemods
-- `withObservables` HOC patterns
+- Full multi-file schema / migration codegen
+- Complex `database.batch` operation mapping
+- `Q.on` join semantics (use recipes above)
 
 See [`@melon/db-codemods`](/docs/packages/melon-db-codemods) for the full compatibility matrix.
 

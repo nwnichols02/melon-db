@@ -76,6 +76,42 @@ function formatObjectLiteral(fields: Record<string, string>): string {
 }
 
 /**
+ * Infers collection name from a record identifier using prior create map or static table.
+ */
+function inferCollectionForRecord(
+	recordName: string,
+	collectionByVar: Map<string, string>,
+	sourceFile: SourceFile,
+): string | null {
+	const fromCreate = collectionByVar.get(recordName);
+	if (fromCreate) {
+		return fromCreate;
+	}
+
+	const decl = sourceFile.getVariableDeclaration(recordName);
+	const typeNode = decl?.getTypeNode()?.getText() ?? "";
+	const tableMatch = typeNode.match(/table\s*=\s*['"]([^'"]+)['"]/);
+	if (tableMatch?.[1]) {
+		return tableMatch[1];
+	}
+
+	for (const cls of sourceFile.getClasses()) {
+		const tableProp = cls.getStaticProperty("table");
+		if (tableProp && Node.isPropertyDeclaration(tableProp)) {
+			const init = tableProp.getInitializer();
+			if (init && Node.isStringLiteral(init)) {
+				const className = cls.getName();
+				if (className && typeNode.includes(className)) {
+					return init.getLiteralText();
+				}
+			}
+		}
+	}
+
+	return null;
+}
+
+/**
  * Applies write migration transforms to a source file.
  */
 export function applyMigrateWritesTransform(
@@ -105,6 +141,7 @@ export function applyMigrateWritesTransform(
 		if (!Node.isPropertyAccessExpression(writeExpr)) {
 			continue;
 		}
+
 		const dbRef = writeExpr.getExpression();
 		if (!Node.isIdentifier(dbRef) || dbRef.getText() !== sourceVar) {
 			continue;
@@ -128,16 +165,17 @@ export function applyMigrateWritesTransform(
 			continue;
 		}
 
-		transformWriteBlock(body, sourceVar, result);
+		transformWriteBlock(body, sourceVar, sourceFile, result);
 	}
 }
 
 /**
- * Transforms create/update calls inside a db.write block.
+ * Transforms create/update/delete calls inside a db.write block.
  */
 function transformWriteBlock(
 	block: Block,
 	sourceVar: string,
+	sourceFile: SourceFile,
 	result: CodemodResult,
 ): void {
 	const collectionByVar = new Map<string, string>();
@@ -150,9 +188,48 @@ function transformWriteBlock(
 
 	for (const stmt of block.getStatements()) {
 		if (Node.isExpressionStatement(stmt)) {
-			transformUpdateStatement(stmt, collectionByVar, result);
+			transformUpdateStatement(stmt, collectionByVar, sourceFile, result);
+			transformDeleteStatement(stmt, collectionByVar, sourceFile, result);
+			transformBatchStatement(stmt, sourceVar, result);
 		}
 	}
+}
+
+/**
+ * Transforms database.batch(...) inside a write callback to tx.batch(...).
+ */
+function transformBatchStatement(
+	stmt: import("ts-morph").ExpressionStatement,
+	sourceVar: string,
+	result: CodemodResult,
+): void {
+	const expr = stmt.getExpression();
+	if (!Node.isAwaitExpression(expr)) {
+		return;
+	}
+
+	const call = expr.getExpression();
+	if (!call || !Node.isCallExpression(call)) {
+		return;
+	}
+
+	const callExpr = call.getExpression();
+	if (
+		!Node.isPropertyAccessExpression(callExpr) ||
+		callExpr.getName() !== "batch"
+	) {
+		return;
+	}
+
+	const dbRef = callExpr.getExpression();
+	if (!Node.isIdentifier(dbRef) || dbRef.getText() !== sourceVar) {
+		return;
+	}
+
+	callExpr.getExpression().replaceWithText("tx");
+	result.warnings.push(
+		`database.batch at line ${call.getStartLineNumber()} — verify tx.batch operation shape`,
+	);
 }
 
 /**
@@ -239,6 +316,7 @@ function transformCreateStatement(
 function transformUpdateStatement(
 	stmt: import("ts-morph").ExpressionStatement,
 	collectionByVar: Map<string, string>,
+	sourceFile: SourceFile,
 	result: CodemodResult,
 ): void {
 	const expr = stmt.getExpression();
@@ -264,7 +342,10 @@ function transformUpdateStatement(
 		return;
 	}
 
-	const collection = collectionByVar.get(recordRef.getText());
+	const collection =
+		collectionByVar.get(recordRef.getText()) ??
+		inferCollectionForRecord(recordRef.getText(), collectionByVar, sourceFile);
+
 	if (!collection) {
 		result.warnings.push(
 			`Could not infer collection for ${recordRef.getText()}.update() — manual migration needed`,
@@ -289,6 +370,62 @@ function transformUpdateStatement(
 
 	call.replaceWithText(
 		`tx.collection('${collection}').update(${recordRef.getText()}.id, ${formatObjectLiteral(fields)})`,
+	);
+}
+
+/**
+ * Transforms destroyPermanently / markAsDeleted on a record.
+ */
+function transformDeleteStatement(
+	stmt: import("ts-morph").ExpressionStatement,
+	collectionByVar: Map<string, string>,
+	sourceFile: SourceFile,
+	result: CodemodResult,
+): void {
+	const expr = stmt.getExpression();
+	if (!Node.isAwaitExpression(expr)) {
+		return;
+	}
+
+	const call = expr.getExpression();
+	if (!call || !Node.isCallExpression(call)) {
+		return;
+	}
+
+	const callExpr = call.getExpression();
+	if (!Node.isPropertyAccessExpression(callExpr)) {
+		return;
+	}
+
+	const method = callExpr.getName();
+	if (method !== "destroyPermanently" && method !== "markAsDeleted") {
+		return;
+	}
+
+	const recordRef = callExpr.getExpression();
+	if (!Node.isIdentifier(recordRef)) {
+		return;
+	}
+
+	const collection =
+		collectionByVar.get(recordRef.getText()) ??
+		inferCollectionForRecord(recordRef.getText(), collectionByVar, sourceFile);
+
+	if (!collection) {
+		result.warnings.push(
+			`Could not infer collection for ${recordRef.getText()}.${method}() — manual migration needed`,
+		);
+		return;
+	}
+
+	if (method === "markAsDeleted") {
+		result.warnings.push(
+			`markAsDeleted at line ${call.getStartLineNumber()} — map to tx.collection().delete() or soft-delete field if your schema uses tombstones`,
+		);
+	}
+
+	call.replaceWithText(
+		`tx.collection('${collection}').delete(${recordRef.getText()}.id)`,
 	);
 }
 

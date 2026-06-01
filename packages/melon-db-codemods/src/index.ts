@@ -4,6 +4,12 @@ export {
 	translateWatermelonQuery,
 } from "./compat/translate-query.ts";
 
+export {
+	describeQOnMigration,
+	formatQOnRecipeComment,
+	type QOnMigrationRecipe,
+} from "./compat/q-on-recipe.ts";
+
 export type {
 	WatermelonQueryClause,
 	WatermelonWhereClause,
@@ -35,6 +41,7 @@ export {
 export {
 	migrateQueries,
 	applyMigrateQueriesTransform,
+	buildFromQExpr,
 } from "./codemods/migrate-queries.ts";
 
 export {
@@ -46,3 +53,11 @@ export {
 	migrateReact,
 	applyMigrateReactTransform,
 } from "./codemods/migrate-react.ts";
+
+export {
+	migrateSchema,
+	applyMigrateSchemaTransform,
+	extractSchemaFromModelClass,
+	extractSchemaFromSourceFile,
+	formatSchemaOutput,
+} from "./codemods/migrate-schema.ts";

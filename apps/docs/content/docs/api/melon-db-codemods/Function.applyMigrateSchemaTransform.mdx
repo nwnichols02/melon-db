@@ -1,0 +1,27 @@
+---
+title: "applyMigrateSchemaTransform"
+description: "API reference: applyMigrateSchemaTransform"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: applyMigrateSchemaTransform()
+
+> **applyMigrateSchemaTransform**(`sourceFile`, `result`): `DatabaseSchemaDefinition` \| `null`
+
+Defined in: codemods/migrate-schema.ts:158
+
+Applies schema extraction (no file mutations; populates result metadata).
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sourceFile` | `SourceFile` |
+| `result` | [`CodemodResult`](Interface.CodemodResult) |
+
+## Returns
+
+`DatabaseSchemaDefinition` \| `null`

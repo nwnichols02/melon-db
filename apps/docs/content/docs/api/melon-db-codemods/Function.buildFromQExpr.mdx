@@ -1,0 +1,28 @@
+---
+title: "buildFromQExpr"
+description: "API reference: buildFromQExpr"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: buildFromQExpr()
+
+> **buildFromQExpr**(`expr`, `warnings`, `parentCollection?`): `string`
+
+Defined in: [codemods/migrate-queries.ts:119](https://github.com/nwnichols02/melon/blob/207c4d1a85d3dfd22aa1ee5b62ec45a11b2c2384/packages/melon-db-codemods/src/codemods/migrate-queries.ts#L119)
+
+Builds filter chain fragments from Q expressions (where, and, or).
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `expr` | `Expression` |
+| `warnings` | `string`[] |
+| `parentCollection?` | `string` |
+
+## Returns
+
+`string`

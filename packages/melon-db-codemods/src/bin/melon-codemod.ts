@@ -1,6 +1,10 @@
 #!/usr/bin/env bun
 import { migrateQueries } from "../codemods/migrate-queries.ts";
 import { migrateReact } from "../codemods/migrate-react.ts";
+import {
+	formatSchemaOutput,
+	migrateSchema,
+} from "../codemods/migrate-schema.ts";
 import { migrateWrites } from "../codemods/migrate-writes.ts";
 import type { CodemodResult } from "../codemods/runner.ts";
 
@@ -22,7 +26,7 @@ const sourceVar = readArg("source-var") ?? "database";
 
 if (!path) {
 	console.error(
-		"Usage: melon-codemod <migrate-queries|migrate-writes|migrate-react> --path=<dir> [--dry-run]",
+		"Usage: melon-codemod <migrate-queries|migrate-writes|migrate-react|migrate-schema> --path=<dir|file> [--dry-run]",
 	);
 	console.error("");
 	console.error("Examples (from monorepo root):");
@@ -30,7 +34,7 @@ if (!path) {
 		"  bun run melon-codemod migrate-writes --path=apps/playground-rn/src --dry-run",
 	);
 	console.error(
-		"  bun run melon-codemod migrate-react --path=apps/playground-rn/app --dry-run",
+		"  bun run melon-codemod migrate-schema --path=src/models/Task.ts",
 	);
 	process.exit(1);
 }
@@ -44,9 +48,21 @@ try {
 		result = migrateWrites(options);
 	} else if (command === "migrate-react") {
 		result = migrateReact(options);
+	} else if (command === "migrate-schema") {
+		const { result: schemaResult, schemas } = migrateSchema(options);
+		result = schemaResult;
+		for (const schema of schemas) {
+			console.log(formatSchemaOutput(schema));
+		}
+		if (schemas.length === 0) {
+			console.error("No Model classes found to extract.");
+			process.exit(1);
+		}
 	} else {
 		console.error(`Unknown command: ${command ?? "(none)"}`);
-		console.error("Commands: migrate-queries, migrate-writes, migrate-react");
+		console.error(
+			"Commands: migrate-queries, migrate-writes, migrate-react, migrate-schema",
+		);
 		process.exit(1);
 	}
 } catch (error) {
@@ -54,9 +70,11 @@ try {
 	process.exit(1);
 }
 
-console.log(
-	`${dryRun ? "[dry-run] " : ""}Changed ${result.filesChanged} file(s)`,
-);
+if (command !== "migrate-schema") {
+	console.log(
+		`${dryRun ? "[dry-run] " : ""}Changed ${result.filesChanged} file(s)`,
+	);
+}
 for (const warning of result.warnings) {
 	console.warn(`  warn: ${warning}`);
 }

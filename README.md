@@ -114,9 +114,10 @@ Use the compatibility matrix and CLI codemods in [`@melon/db-codemods`](packages
 bun run melon-codemod migrate-queries --path=./src
 bun run melon-codemod migrate-writes --path=./src
 bun run melon-codemod migrate-react --path=./src
+bun run melon-codemod migrate-schema --path=./src/models/Task.ts
 ```
 
-The runtime query translator converts serializable Watermelon `Q` clauses to Melon `QueryAst` without a WatermelonDB dependency. Join queries (`Q.on`) and model decorator → schema codemods are manual / deferred — see the package README checklist.
+The runtime query translator converts serializable Watermelon `Q` clauses to Melon `QueryAst`. Joins (`Q.on`) require manual rewrite — see the [migration guide](/docs/migration#q-on). `migrate-schema` extracts a single Model file to JSON.
 
 ### Sync
 
@@ -155,12 +156,12 @@ await synchronize({
 
 Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun run dev:docs`). Summary:
 
-| Done | Deferred (Phase 19+) |
+| Done | Deferred (Phase 20+) |
 |------|----------|
 | Core engine M0–M2 | Custom JSI/TurboModule SQLite |
 | SQLite SQL compiler + Bun adapter | EAS Build CI |
 | Expo SQLite adapter (`@melon/db-sqlite/expo`) | WatermelonDB benchmark comparison |
-| Optional Node driver (`@melon/db-sqlite/node`) | Model/schema codemods, `Q.on` joins |
+| Optional Node driver (`@melon/db-sqlite/node`) | Full multi-file schema codemods |
 | `apps/playground-rn` + sync demo | Background sync service |
 | Query / Mango / Prisma surfaces | Per-field timestamps / three-way merge |
 | React hooks (`useFindMany`, `useMangoQuery`, `useSync`) | |
@@ -183,6 +184,7 @@ Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun r
 | Conflict policies (client-wins, last-write-wins) | |
 | Merge-by-field conflict resolver | |
 | Custom conflict resolver hook | |
+| Codemods v2 + Q.on recipes + migrate-schema spike | |
 | Migration-aware sync coordination | |
 | CI (test, typecheck, biome, bench-smoke, docs typecheck, postgres-sync) | |
 

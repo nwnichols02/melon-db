@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "collections": {
+    "tasks": {
+      "name": "tasks",
+      "primaryKey": "id",
+      "fields": {
+        "id": { "kind": "string" },
+        "title": { "kind": "string" },
+        "status": { "kind": "string" },
+        "updated_at": { "kind": "date" },
+        "created_at": { "kind": "date" }
+      },
+      "relations": {
+        "project": {
+          "kind": "belongsTo",
+          "target": "projects",
+          "foreignKey": "project_id"
+        }
+      }
+    }
+  }
+}

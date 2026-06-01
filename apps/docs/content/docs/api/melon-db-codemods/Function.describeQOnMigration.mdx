@@ -1,0 +1,29 @@
+---
+title: "describeQOnMigration"
+description: "API reference: describeQOnMigration"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: describeQOnMigration()
+
+> **describeQOnMigration**(`input`): [`QOnMigrationRecipe`](Interface.QOnMigrationRecipe)
+
+Defined in: compat/q-on-recipe.ts:10
+
+Describes how to manually migrate a Watermelon Q.on join to Melon v1 patterns.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | \{ `foreignKeyHint?`: `string`; `parentCollection`: `string`; `relatedTable`: `string`; \} |
+| `input.foreignKeyHint?` | `string` |
+| `input.parentCollection` | `string` |
+| `input.relatedTable` | `string` |
+
+## Returns
+
+[`QOnMigrationRecipe`](Interface.QOnMigrationRecipe)

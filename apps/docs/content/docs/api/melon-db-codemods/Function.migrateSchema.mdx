@@ -1,0 +1,31 @@
+---
+title: "migrateSchema"
+description: "API reference: migrateSchema"
+---
+
+[**Melon API**](index)
+
+***
+
+# Function: migrateSchema()
+
+> **migrateSchema**(`options`): `object`
+
+Defined in: codemods/migrate-schema.ts:175
+
+Reads model files and returns extracted schema definitions.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `options` | [`CodemodOptions`](Interface.CodemodOptions) |
+
+## Returns
+
+`object`
+
+| Name | Type | Defined in |
+| ------ | ------ | ------ |
+| `result` | [`CodemodResult`](Interface.CodemodResult) | codemods/migrate-schema.ts:176 |
+| `schemas` | `DatabaseSchemaDefinition`[] | codemods/migrate-schema.ts:177 |

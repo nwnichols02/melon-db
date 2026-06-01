@@ -3,14 +3,15 @@ title: "@melon/db-codemods"
 description: WatermelonDB migration codemods and query translator.
 ---
 
-**Status:** Shipped (common patterns) · **Depends on:** `@melon/db` types · **API:** [Reference](/docs/api/melon-db-codemods)
+**Status:** Shipped (v2) · **Depends on:** `@melon/db`, `@melon/db-query` · **API:** [Reference](/docs/api/melon-db-codemods)
 
 ```bash
 bun run melon-codemod migrate-queries --path=./src
 bun run melon-codemod migrate-writes --path=./src
 bun run melon-codemod migrate-react --path=./src
+bun run melon-codemod migrate-schema --path=./src/models/Task.ts
 ```
 
-Runtime `translateWatermelonQuery` converts serializable `Q` clauses to `QueryAst`. Joins (`Q.on`) and decorator schema codemods are **manual / deferred**.
+Phase 19 adds nested `Q.and`/`Q.or`, `.fetch()`/`.observe()` query handles, delete/batch writes, `withObservables` hook comments, `Q.on` recipes, and a `migrate-schema` spike.
 
 See [Migration](/docs/migration).
