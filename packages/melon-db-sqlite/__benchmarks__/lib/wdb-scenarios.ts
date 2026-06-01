@@ -1,12 +1,12 @@
 import { Q } from "@nozbe/watermelondb";
-import type Database from "@nozbe/watermelondb/Database";
+import type { Database as WdbDatabase } from "@nozbe/watermelondb";
 import type { BenchResult } from "./bench-runner.ts";
 import { measureMs } from "./bench-runner.ts";
 import { BATCH_CHUNK_SIZE, taskRow } from "./fixtures.ts";
 import { type Task, closeWdbDatabase, createWdbDatabase } from "./wdb-setup.ts";
 
 async function seedRowInsert(
-	database: Database,
+	database: WdbDatabase,
 	rowCount: number,
 ): Promise<void> {
 	await database.write(async () => {
@@ -23,7 +23,7 @@ async function seedRowInsert(
 }
 
 async function seedBatchInsert(
-	database: Database,
+	database: WdbDatabase,
 	rowCount: number,
 ): Promise<void> {
 	await database.write(async () => {

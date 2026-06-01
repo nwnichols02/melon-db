@@ -18,7 +18,7 @@
 	},
 	"peerDependencies": {
 		"@melon/db-sqlite-native": "workspace:*",
-		"better-sqlite3": "11.8.1",
+		"better-sqlite3": "12.10.0",
 		"expo-sqlite": ">=15.0.0",
 		"react-native": "*"
 	},
@@ -40,6 +40,7 @@
 		"@melon/db-devtools": "workspace:*",
 		"@melon/db-sqlite-native": "workspace:*",
 		"@nozbe/watermelondb": "0.27.1",
+		"better-sqlite3": "12.10.0",
 		"@types/better-sqlite3": "^7.6.13",
 		"@types/bun": "latest",
 		"react-native": "0.81.5",

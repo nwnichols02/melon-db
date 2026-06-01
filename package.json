@@ -37,5 +37,9 @@
     "@biomejs/biome": "^1.9.4",
     "@types/bun": "latest",
     "typescript": "^5"
+  },
+  "trustedDependencies": ["better-sqlite3"],
+  "overrides": {
+    "better-sqlite3": "12.10.0"
   }
 }

@@ -48,7 +48,7 @@ Timings vary by hardware and cold JIT; treat CI output as a trend signal, not a 
 - Dev dependency `@nozbe/watermelondb` (bench-only)
 - Native **better-sqlite3** bindings for `melon-node` and `watermelon` legs
 
-If bindings are missing locally, the harness skips those legs and prints a warning. CI builds better-sqlite3 on Node 22 before running compare.
+Dependencies install with **Bun** (`better-sqlite3@12.10.0`, root `trustedDependencies`). The entrypoint is `bun run bench:compare`. **melon-node** and **watermelon** legs run in a **Node** subprocess because `better-sqlite3` is a Node native addon and [does not load under Bun yet](https://github.com/oven-sh/bun/issues/4290). CI sets `COMPARE_RUNNER_BIN=node` and provides Node 22 on the path for that subprocess only.
 
 ## Non-goals
 

@@ -24,21 +24,25 @@ import { runMelonNodeScenarios } from "./lib/melon-node-scenarios.ts";
 import { runScenarios } from "./lib/scenarios.ts";
 import { runWdbScenarios } from "./lib/wdb-scenarios.ts";
 
-const compareNodeRunnerPath = fileURLToPath(
-	new URL("./lib/compare-node-runner.ts", import.meta.url),
+const compareSqliteRunnerPath = fileURLToPath(
+	new URL("./lib/compare-sqlite-runner.ts", import.meta.url),
 );
 
-async function runNodeLegsViaSubprocess(
+function runSqliteLegsViaSubprocess(
 	scaleArg: string,
 	skipWdb: boolean,
-): Promise<BenchResult[]> {
-	const runnerBin = resolveCompareRunnerBinary();
-	const args = [compareNodeRunnerPath, `--scale=${scaleArg}`, "--json"];
+): BenchResult[] {
+	const args = [compareSqliteRunnerPath, `--scale=${scaleArg}`, "--json"];
 	if (skipWdb) {
 		args.push("--skip-wdb");
 	}
 
-	const proc = spawnSync(runnerBin, args, {
+	const runnerBin = resolveCompareRunnerBinary();
+	const runnerArgs =
+		runnerBin === "node"
+			? ["--experimental-strip-types", ...args]
+			: args;
+	const proc = spawnSync(runnerBin, runnerArgs, {
 		encoding: "utf8",
 		cwd: fileURLToPath(new URL(".", import.meta.url)),
 	});
@@ -57,7 +61,7 @@ async function runNodeLegsViaSubprocess(
 	return parsed.results;
 }
 
-async function runNodeLegs(
+async function runBetterSqliteLegs(
 	scales: number[],
 	skipWdb: boolean,
 	melonEngines: Array<"bun" | "node">,
@@ -82,9 +86,9 @@ async function runNodeLegs(
 	}
 
 	console.warn(
-		"better-sqlite3 not available in this runtime; spawning compare subprocess for melon-node / watermelon legs.",
+		`better-sqlite3 not available in this process; spawning ${resolveCompareRunnerBinary()} subprocess for melon-node / watermelon legs.`,
 	);
-	return runNodeLegsViaSubprocess(scaleArg, skipWdb);
+	return runSqliteLegsViaSubprocess(scaleArg, skipWdb);
 }
 
 const cli = parseCompareCli(process.argv.slice(2));
@@ -102,15 +106,15 @@ for (const scale of cli.scales) {
 	}
 }
 
-const nodeResults = await runNodeLegs(
+const sqliteResults = await runBetterSqliteLegs(
 	cli.scales,
 	cli.skipWdb,
 	cli.melonEngines,
 	cli.scaleArg,
 );
-allResults.push(...nodeResults);
-if (!cli.json && nodeResults.length > 0) {
-	printResults(nodeResults);
+allResults.push(...sqliteResults);
+if (!cli.json && sqliteResults.length > 0) {
+	printResults(sqliteResults);
 }
 
 if (cli.json) {

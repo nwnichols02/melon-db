@@ -67,12 +67,6 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Install better-sqlite3 for compare benchmarks (Node 22)
-        working-directory: packages/melon-db-sqlite
-        run: |
-          npm install better-sqlite3@11.8.1 --no-save
-          npm rebuild better-sqlite3
-
       - name: Melon vs WatermelonDB smoke (10k)
         run: bun run bench:compare:ci
         env:

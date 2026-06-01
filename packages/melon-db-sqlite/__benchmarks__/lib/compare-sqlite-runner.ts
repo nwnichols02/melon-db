@@ -1,19 +1,20 @@
 import { parseCompareCli, printJsonSummary } from "./bench-runner.ts";
+import type { BenchResult } from "./bench-runner.ts";
 /**
- * Node/better-sqlite3 compare leg (melon-node + watermelon).
- * Run via Node when Bun cannot load better-sqlite3 bindings.
+ * better-sqlite3 compare leg (melon-node + watermelon).
+ * Run under Node when the parent is Bun (better-sqlite3 is a Node native addon).
  *
- *   node --experimental-strip-types lib/compare-node-runner.ts --scale=10k --json
+ *   node --experimental-strip-types lib/compare-sqlite-runner.ts --scale=10k --json
  */
 import { isBetterSqlite3Available } from "./better-sqlite3-available.ts";
 import { runMelonNodeScenarios } from "./melon-node-scenarios.ts";
 import { runWdbScenarios } from "./wdb-scenarios.ts";
 
-export async function runNodeCompareLegs(
+export async function runSqliteCompareLegs(
 	scales: number[],
 	skipWdb: boolean,
-): Promise<import("./bench-runner.ts").BenchResult[]> {
-	const allResults: import("./bench-runner.ts").BenchResult[] = [];
+): Promise<BenchResult[]> {
+	const allResults: BenchResult[] = [];
 
 	for (const scale of scales) {
 		allResults.push(...(await runMelonNodeScenarios(scale)));
@@ -28,7 +29,7 @@ export async function runNodeCompareLegs(
 const isMain =
 	typeof import.meta.main === "boolean"
 		? import.meta.main
-		: process.argv[1]?.includes("compare-node-runner");
+		: process.argv[1]?.includes("compare-sqlite-runner");
 
 if (isMain) {
 	const cli = parseCompareCli(process.argv.slice(2));
@@ -41,7 +42,7 @@ if (isMain) {
 		}
 		process.exit(0);
 	}
-	const results = await runNodeCompareLegs(cli.scales, cli.skipWdb);
+	const results = await runSqliteCompareLegs(cli.scales, cli.skipWdb);
 	if (cli.json) {
 		printJsonSummary(results);
 	} else {

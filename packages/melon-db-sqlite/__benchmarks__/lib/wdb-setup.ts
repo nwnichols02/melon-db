@@ -1,7 +1,20 @@
-import Database from "@nozbe/watermelondb/Database";
-import Model from "@nozbe/watermelondb/Model";
-import { appSchema, tableSchema } from "@nozbe/watermelondb/Schema";
-import SQLiteAdapter from "@nozbe/watermelondb/adapters/sqlite";
+import { mkdtempSync, rmSync } from "node:fs";
+import { createRequire } from "node:module";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import type { Database as WdbDatabase } from "@nozbe/watermelondb";
+
+const require = createRequire(import.meta.url);
+
+const {
+	Database,
+	Model,
+	appSchema,
+	tableSchema,
+} = require("@nozbe/watermelondb") as typeof import("@nozbe/watermelondb");
+
+const SQLiteAdapter = require("@nozbe/watermelondb/adapters/sqlite")
+	.default as typeof import("@nozbe/watermelondb/adapters/sqlite").default;
 
 export class Task extends Model {
 	static table = "tasks";
@@ -20,27 +33,35 @@ export const wdbAppSchema = appSchema({
 	],
 });
 
-let wdbCounter = 0;
+const wdbTempDirs = new WeakMap<WdbDatabase, string>();
 
 /**
- * Creates an in-memory WatermelonDB instance for benchmarks.
+ * Creates an isolated WatermelonDB instance for benchmarks (temp SQLite file).
  */
-export function createWdbDatabase(): Database {
-	wdbCounter += 1;
+export function createWdbDatabase(): WdbDatabase {
+	const dir = mkdtempSync(join(tmpdir(), "melon-wdb-bench-"));
+	const dbPath = join(dir, "bench.sqlite");
 	const adapter = new SQLiteAdapter({
 		schema: wdbAppSchema,
-		dbName: `:memory:bench_${wdbCounter}`,
+		dbName: dbPath,
 	});
 
-	return new Database({
+	const database = new Database({
 		adapter,
 		modelClasses: [Task],
 	});
+	wdbTempDirs.set(database, dir);
+	return database;
 }
 
 /**
  * Closes the underlying SQLite adapter connection.
  */
-export async function closeWdbDatabase(database: Database): Promise<void> {
+export async function closeWdbDatabase(database: WdbDatabase): Promise<void> {
 	await database.adapter.unsafeResetDatabase();
+	const dir = wdbTempDirs.get(database);
+	if (dir) {
+		rmSync(dir, { recursive: true, force: true });
+		wdbTempDirs.delete(database);
+	}
 }

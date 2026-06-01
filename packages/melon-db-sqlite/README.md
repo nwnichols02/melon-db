@@ -62,4 +62,4 @@ scenario            melon-node  watermelon     ratio      winner
 row-insert             4200ms      5100ms      0.82       melon
 ```
 
-See [/docs/performance-comparison](http://localhost:3000/docs/performance-comparison) for fairness rules and limitations. Requires native **better-sqlite3** bindings for the compare legs.
+See [/docs/performance-comparison](http://localhost:3000/docs/performance-comparison) for fairness rules and limitations. Compare legs use **better-sqlite3@12.10.0** (workspace devDependency; install with root `bun install` and `trustedDependencies`). The harness starts with **Bun**; melon-node/watermelon run in a **Node** subprocess when Bun cannot load the native addon.
