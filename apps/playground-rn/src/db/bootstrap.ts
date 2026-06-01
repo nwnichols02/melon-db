@@ -4,13 +4,15 @@ import {
 	createDatabase,
 } from "@melon/db";
 import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
+import {
+	getMelonRuntimeConfig,
+	isDevelopmentBuildRuntime,
+} from "../config/melon-runtime.ts";
 import { type Task, taskSchema } from "./schema";
 
 export const devtoolsBridge = createReactiveDevtoolsBridge();
 
 let databasePromise: Promise<MelonDatabase<typeof taskSchema>> | null = null;
-
-const JSI_FLAG = process.env.EXPO_PUBLIC_MELON_SQLITE === "jsi";
 
 /**
  * Opens the local Melon database and seeds demo tasks when empty.
@@ -23,13 +25,15 @@ export async function getDatabase(): Promise<MelonDatabase<typeof taskSchema>> {
 }
 
 /**
- * Creates the storage adapter: expo-sqlite (Expo Go) or JSI native (dev build).
+ * Expo Go: expo-sqlite. Development build: JSI native module (lazy-loaded).
  */
 async function createAdapter(): Promise<StorageAdapter> {
-	if (!JSI_FLAG) {
+	const { databaseFilename } = getMelonRuntimeConfig();
+
+	if (!isDevelopmentBuildRuntime()) {
 		const SQLite = await import("expo-sqlite");
 		const { createExpoSqliteAdapter } = await import("@melon/db-sqlite/expo");
-		const database = await SQLite.openDatabaseAsync("melon-playground.db");
+		const database = await SQLite.openDatabaseAsync(databaseFilename);
 		return createExpoSqliteAdapter({ database });
 	}
 
@@ -38,12 +42,14 @@ async function createAdapter(): Promise<StorageAdapter> {
 	);
 	if (!isJsiSqliteAvailable()) {
 		throw new Error(
-			"Melon JSI SQLite requires a development build. Unset EXPO_PUBLIC_MELON_SQLITE or run: npx expo prebuild && npx expo run:ios",
+			"Development-build environment requires a native app binary. " +
+				"Use: bun run prebuild:dev && bun run run:ios:dev (see apps/playground-rn/env/README.md). " +
+				"For Expo Go, use: bun run start:expo-go",
 		);
 	}
 
 	return createJsiSqliteAdapter({
-		filename: "melon-playground.db",
+		filename: databaseFilename,
 	});
 }
 

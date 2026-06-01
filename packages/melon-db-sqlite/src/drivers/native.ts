@@ -2,7 +2,7 @@ import type { SqliteDriver } from "../driver.ts";
 import { toSqlParams } from "../sql/bindings.ts";
 
 export const JSI_SQLITE_DEV_BUILD_MESSAGE =
-	"Melon JSI SQLite requires a development build. Remove EXPO_PUBLIC_MELON_SQLITE=jsi or run: npx expo prebuild && npx expo run:ios";
+	"Melon JSI SQLite requires a development build. Use apps/playground-rn env/.env.development-build: bun run prebuild:dev && bun run run:ios:dev";
 
 type NativeMelonModule = {
 	open(path: string): Promise<void>;

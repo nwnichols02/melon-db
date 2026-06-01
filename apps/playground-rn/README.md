@@ -2,69 +2,77 @@
 
 Expo app demonstrating `@melon/db` with SQLite, fluent queries, reactive hooks, and sync.
 
-## Requirements
+Two **isolated environments** — each has its own env file, scripts, app id, and database file. See [`env/README.md`](env/README.md).
 
-- Bun (monorepo install from repo root)
-- **Expo SDK 54** (matches Expo Go 54.x on device/simulator)
-- Xcode (iOS Simulator) or Android Studio (emulator), or Expo Go on a device
+## Environment A: Expo Go (default)
 
-## Quick start (Expo Go — default)
+**Purpose:** Fast iteration in Expo Go with `expo-sqlite` only. No custom native code.
 
-Uses **`@melon/db-sqlite/expo`** only. No custom native code. Works with Expo Go.
+| | |
+|---|---|
+| Env file | [`env/.env.expo-go`](env/.env.expo-go) |
+| SQLite | `@melon/db-sqlite/expo` |
+| DB file | `melon-playground.db` |
+| App name | Melon Playground |
 
-From the repo root:
+From repo root:
 
 ```bash
 bun install
-bun run sync-server   # optional, for sync demo
-bun run dev:rn
+bun run sync-server   # optional
+bun run dev:rn        # alias for dev:rn:expo-go
 ```
 
-Do **not** set `EXPO_PUBLIC_MELON_SQLITE=jsi` for this path.
+Or from this directory:
 
-## JSI development build (optional)
+```bash
+bun run start:expo-go
+```
 
-Uses **`@melon/db-sqlite/rn`** + **`@melon/db-sqlite-native`**. **Not supported in Expo Go.**
+Do **not** use `env/.env.development-build` or run `prebuild:dev` for this workflow.
+
+## Environment B: Development build (JSI)
+
+**Purpose:** Dogfood `@melon/db-sqlite-native` on a custom iOS/Android binary. **Not compatible with Expo Go.**
+
+| | |
+|---|---|
+| Env file | [`env/.env.development-build`](env/.env.development-build) |
+| SQLite | `@melon/db-sqlite/rn` + native module |
+| DB file | `melon-playground-dev.db` |
+| App name | Melon Playground (Dev) |
+| Bundle id | `com.nate.nichols.playgroundrn.devbuild` |
+
+From repo root:
+
+```bash
+bun run dev:rn:dev-build
+```
+
+Or step by step:
 
 ```bash
 cd apps/playground-rn
-npx expo prebuild
-EXPO_PUBLIC_MELON_SQLITE=jsi npx expo run:ios
+bun run prebuild:dev
+bun run run:ios:dev
 ```
 
-From repo root: `bun run dev:rn:jsi` (runs prebuild + iOS dev build).
+After the first native build, Metro only:
 
-**iOS only** in this spike. On Android, keep the default expo-sqlite path.
+```bash
+bun run start:dev-build
+```
 
-If JSI is enabled in Expo Go, the app shows a clear error asking for a dev build or to unset the env flag.
+**iOS** is supported for JSI in this spike. On Android, use Environment A until native Android ships.
 
 ## Sync
-
-Sync requires the reference server in a second terminal:
 
 ```bash
 bun run sync-server
 ```
-
-Without the sync server, local CRUD still works; **Sync now** will show a failed status.
-
-## What it demonstrates
-
-- SQLite via expo-sqlite (default) or Melon native module (JSI flag)
-- `MelonDbProvider`, `MelonSyncProvider`, `useQuery`, `useWriter`, `useSync`
-- Fluent queries via `@melon/db-query`
-- Reactive task list (`FlashList`)
-
-## Configuration
-
-- **New Architecture:** `newArchEnabled: true` in `app.config.js`
-- **SQLite driver:** `EXPO_PUBLIC_MELON_SQLITE` — unset / `expo` (default) or `jsi` (dev build)
-- **Metro:** `metro.config.js` resolves workspace packages
 
 ## Typecheck
 
 ```bash
 bun run typecheck
 ```
-
-(from this directory, or from repo root)

@@ -63,8 +63,9 @@ See [`apps/playground-node/src/demo.ts`](apps/playground-node/src/demo.ts).
 ### React Native / Expo playground
 
 ```bash
-bun run dev:rn          # Expo Go — @melon/db-sqlite/expo
-bun run dev:rn:jsi      # Dev build — @melon/db-sqlite/rn (iOS, prebuild required)
+bun run dev:rn              # Expo Go env — @melon/db-sqlite/expo
+bun run dev:rn:expo-go      # same as dev:rn
+bun run dev:rn:dev-build    # Development build env — JSI native (prebuild + run:ios)
 ```
 
 Open the app in iOS Simulator or Android emulator. See [`apps/playground-rn/README.md`](apps/playground-rn/README.md).

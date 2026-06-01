@@ -1,5 +1,6 @@
 import { AddTaskForm } from "@/components/add-task-form";
 import { TaskRow } from "@/components/task-row";
+import { getMelonRuntimeConfig } from "@/config/melon-runtime";
 import { createTaskId } from "@/db/create-task-id";
 import { type Task, taskSchema } from "@/db/schema";
 import { devNetworkMonitor } from "@/sync/network-monitor";
@@ -15,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
  * Task list screen backed by reactive Melon queries.
  */
 export default function TasksScreen(): React.ReactElement {
+	const runtime = getMelonRuntimeConfig();
 	const write = useWriter();
 	const { sync, status, isSyncing, isPaused, retryCount, error, cancel } =
 		useSync();
@@ -127,6 +129,9 @@ export default function TasksScreen(): React.ReactElement {
 
 	return (
 		<SafeAreaView style={styles.container} edges={["bottom"]}>
+			<View style={styles.runtimeBadge}>
+				<Text style={styles.runtimeBadgeText}>{runtime.displayName}</Text>
+			</View>
 			<View style={styles.syncBar}>
 				<Text style={styles.syncStatus}>{statusLabel}</Text>
 				<Pressable
@@ -177,6 +182,20 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: "#fff",
+	},
+	runtimeBadge: {
+		alignSelf: "flex-start",
+		marginHorizontal: 16,
+		marginTop: 8,
+		paddingHorizontal: 10,
+		paddingVertical: 4,
+		borderRadius: 6,
+		backgroundColor: "#eef6ff",
+	},
+	runtimeBadgeText: {
+		fontSize: 11,
+		fontWeight: "600",
+		color: "#1a5fb4",
 	},
 	syncBar: {
 		flexDirection: "row",

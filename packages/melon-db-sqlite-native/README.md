@@ -29,21 +29,17 @@ const adapter = createJsiSqliteAdapter({
 
 ## Development build (playground-rn)
 
-```bash
-# From repo root — Expo Go path (default)
-bun run dev:rn
+Use the **development-build** environment only (`apps/playground-rn/env/.env.development-build`):
 
-# JSI path — iOS dev build only
-cd apps/playground-rn
-npx expo prebuild
-EXPO_PUBLIC_MELON_SQLITE=jsi npx expo run:ios
+```bash
+bun run dev:rn:dev-build
 ```
 
-Or: `bun run dev:rn:jsi` from the monorepo root.
+Expo Go uses a separate env file — see `apps/playground-rn/env/README.md`.
 
 ## Manual iOS verification checklist
 
-After `expo prebuild` + `expo run:ios` with `EXPO_PUBLIC_MELON_SQLITE=jsi`:
+After `bun run dev:rn:dev-build` (or `prebuild:dev` + `run:ios:dev`):
 
 1. App launches without native module errors.
 2. Seeded tasks appear (same as expo path).
