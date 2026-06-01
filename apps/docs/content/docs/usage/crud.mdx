@@ -1,0 +1,94 @@
+---
+title: CRUD
+description: Create, read, update, and delete records through MelonCollection.
+---
+
+Collections expose CRUD methods backed by the storage adapter. **All mutations must run inside `db.write()`** — see [Read & write](/docs/usage/read-write).
+
+## Create
+
+```ts
+await db.write(async (tx) => {
+  await tx.collection('tasks').insert({
+    id: 'task-1',
+    title: 'Write docs',
+    status: 'open',
+    priority: 1,
+    updatedAt: new Date(),
+  });
+});
+```
+
+## Read by id
+
+```ts
+const task = await db.collection('tasks').findById('task-1');
+// null if missing
+```
+
+Reads can run outside `db.write()` — they do not block other readers and wait for writers to finish.
+
+## Query many / first / count
+
+Pass a [QueryAst](/docs/usage/queries) or use the query handle:
+
+```ts
+// Convenience — AST optional (returns all rows when omitted)
+const all = await db.collection('tasks').findMany();
+const one = await db.collection('tasks').findFirst(openTasksAst);
+const n = await db.collection('tasks').count(openTasksAst);
+
+// Query handle — lazy + observable
+const handle = db.collection('tasks').query(openTasksAst);
+const rows = await handle.fetch();
+const first = await handle.fetchOne();
+const count = await handle.fetchCount();
+const unsubscribe = handle.observe((rows) => {
+  console.log('tasks changed', rows.length);
+});
+```
+
+## Update
+
+```ts
+await db.write(async (tx) => {
+  await tx.collection('tasks').update('task-1', {
+    status: 'closed',
+    updatedAt: new Date(),
+  });
+});
+```
+
+Updates merge partial fields; unspecified columns are unchanged.
+
+## Delete
+
+```ts
+await db.write(async (tx) => {
+  await tx.collection('tasks').delete('task-1');
+});
+```
+
+## Batch operations inside one write
+
+Use `tx.batch` for multiple adapter operations in a single transaction:
+
+```ts
+await db.write(async (tx) => {
+  await tx.batch([
+    { type: 'insert', collection: 'tasks', values: { id: 'a', title: 'A', ... } },
+    { type: 'update', collection: 'tasks', primaryKey: 'b', values: { status: 'closed' } },
+    { type: 'delete', collection: 'tasks', primaryKey: 'c', id: 'c' },
+  ]);
+});
+```
+
+## Sync outbox
+
+When `createDatabase({ sync: {} })` is set, local inserts/updates/deletes are recorded in the sync outbox for push. Remote applies via `applyRemoteChanges` skip outbox recording.
+
+## Related
+
+- [Queries](/docs/usage/queries) — filters, sort, pagination
+- [Read & write](/docs/usage/read-write) — writer serialization rules
+- [React](/docs/usage/react) — `useWriter` for components

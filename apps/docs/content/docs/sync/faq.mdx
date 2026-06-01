@@ -1,0 +1,97 @@
+---
+title: Sync FAQ
+description: Limitations, common questions, and troubleshooting.
+---
+
+## General
+
+### Do I need sync to use Melon?
+
+No. Omit `sync` on `createDatabase` for local-only apps. Sync packages are optional.
+
+### Is this compatible with WatermelonDB backends?
+
+The pull/push **shape** is Watermelon-compatible (`changes` grouped by table, `lastPulledAt`, schema version). You still need to map Melon field names and wire Melon’s outbox — see the [migration guide](/docs/migration).
+
+### Can I use Supabase / Postgres / REST?
+
+Yes. Implement `SyncBackend` against any API that can return `SyncChanges` and accept pushes. Reference implementations: `@melon/sync-server` (in-memory + Postgres).
+
+## Frontend
+
+### Why does `getLocalChanges` throw?
+
+Pass `sync: {}` to `createDatabase`. Sync APIs are disabled by default.
+
+### Why aren’t my writes syncing?
+
+1. Mutations must use `db.write` (or `useWriter`).
+2. Remote applies via `applyRemoteChanges` do not enqueue outbox entries.
+3. Collections with `localOnly: true` are skipped when `respectLocalOnly` is true.
+
+### How do I retry after failure?
+
+Call `sync()` again — checkpoint and outbox are preserved on `failed`. Use `DEFAULT_RETRY_POLICY` for automatic retries during `synchronize()`.
+
+### merge-by-field vs custom resolver?
+
+Use **merge-by-field** when local edits track `pendingFields` in the outbox and you want remote rows with local overlays. Use **custom** when you need per-collection logic or server-specific merge rules.
+
+## Backend
+
+### What must the server store?
+
+At minimum: primary key, payload fields matching client schema, and a monotonic `updatedAt` (or `_updated_at`) for incremental pull.
+
+### How do schema migrations work across client and server?
+
+Client sends `migration: { from, tables, columns }` on pull after upgrading. Server should DDL new tables/columns **before** returning rows that use them. Keep `schemaVersion` in pull responses when server schema differs.
+
+### Can the server reject a push?
+
+Yes — throw from `pushChanges` handler; client surfaces `failed` status. Design idempotent handlers where possible so retries are safe.
+
+### Are partial pulls supported?
+
+The core protocol assumes a single `changes` blob per pull. For very large datasets, implement custom pagination inside your `pullChanges` handler (e.g. per-collection cursors) while keeping Melon’s checkpoint model.
+
+## Data & queries
+
+### Which collections sync?
+
+All except `localOnly: true` collections (when `respectLocalOnly` is default).
+
+### Do relation includes sync?
+
+No — sync moves row payloads. Relations are reassembled locally via foreign keys and queries.
+
+### Supported field types?
+
+See [Supported data types](/docs/sync/data-types). Use `string`, `number`, `boolean`, `date`, `json`, `bytes`.
+
+## Limitations (v1)
+
+| Area | Limitation |
+|------|------------|
+| Query includes | `belongsTo` only — no `hasMany` include in AST |
+| Server merge | No built-in server-side CRDT; client conflict policies on apply |
+| Protocol | No official paginated pull in `@melon/sync` — custom backends only |
+| Prisma sync | `@melon/db-prisma` is local-only — no Prisma Cloud sync |
+| Expo Go vs JSI | Performance differs; sync protocol is the same |
+
+## Troubleshooting
+
+| Symptom | Check |
+|---------|-------|
+| Duplicate rows after sync | Push idempotency; conflict policy on create collisions |
+| Missing remote updates | `lastPulledAt` checkpoint; server timestamp column |
+| Schema mismatch errors | Client `schemaVersion`, migration payload, server DDL |
+| Stuck outbox | Call `markLocalChangesPushed` only after successful push |
+| Dates wrong after sync | ISO parsing — ensure server sends strings client can coerce to `Date` |
+
+## Related
+
+- [Sync overview](/docs/sync)
+- [Frontend setup](/docs/sync/frontend)
+- [Backend contract](/docs/sync/backend)
+- [Architecture — Sync](/docs/architecture/sync)

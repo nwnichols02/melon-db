@@ -1,0 +1,148 @@
+---
+title: Sync backend
+description: Pull/push contract, checkpoints, migrations, and reference server.
+---
+
+Melon sync follows a **Watermelon-compatible** pull/push protocol. Your backend stores authoritative rows (Postgres, SQLite, etc.) and returns incremental changes since the client’s last checkpoint.
+
+## SyncBackend interface
+
+```ts
+interface SyncBackend {
+  pullChanges(args: PullArgs): Promise<PullResult>;
+  pushChanges(args: PushArgs): Promise<void>;
+}
+```
+
+### Pull
+
+**Request (`PullArgs`):**
+
+```ts
+{
+  lastPulledAt: number | null;  // null on first sync
+  schemaVersion: number;        // client schema.version
+  migration?: {                 // present when client upgraded schema
+    from: number;
+    tables: string[];
+    columns: Array<{ table: string; columns: string[] }>;
+  };
+}
+```
+
+**Response (`PullResult`):**
+
+```ts
+{
+  changes: SyncChanges;
+  timestamp: number;            // server clock for next lastPulledAt
+  schemaVersion?: number;       // optional server schema version
+}
+```
+
+### Push
+
+**Request (`PushArgs`):**
+
+```ts
+{
+  changes: SyncChanges;
+  lastPulledAt: number;         // timestamp from last successful pull
+}
+```
+
+**Response:** `204` / empty — no body required.
+
+## SyncChanges shape
+
+Grouped by collection name:
+
+```ts
+{
+  tasks: {
+    created: [{ id: '1', title: '...', status: 'open', ... }],
+    updated: [{ id: '2', title: 'Renamed', ... }],
+    deleted: ['3', '4'],  // primary key strings
+  },
+  projects: {
+    created: [],
+    updated: [],
+    deleted: [],
+  },
+}
+```
+
+Records are plain JSON objects matching client schema fields. Dates are typically ISO strings over the wire — normalize on both sides.
+
+## Backend responsibilities
+
+1. **Timestamp ordering** — return changes modified after `lastPulledAt` on pull; reject or reorder stale pushes using `lastPulledAt`.
+2. **Schema version** — accept client `schemaVersion`; when `migration` is present, run DDL for new tables/columns before serving data.
+3. **Idempotent push** — applying the same push twice should not corrupt data.
+4. **Deletion tombstones** — track deletions so pull includes deleted ids (Watermelon-style `_status` / tombstone patterns work well).
+5. **Conflict handling** — server may accept client writes as-is or apply server rules; client-side conflict policies run on **pull apply**.
+
+### Recommended columns
+
+| Column | Purpose |
+|--------|---------|
+| Primary key | Same id as client (`id` by default) |
+| `_updated_at` or `updatedAt` | Monotonic change ordering for pull |
+| Optional server-only fields | Protected from client merge (`mergeProtectedFields`) |
+
+## HTTP reference server
+
+`@melon/sync-server` exposes Bun HTTP endpoints:
+
+| Method | Path | Body |
+|--------|------|------|
+| `POST` | `/sync/pull` | `PullArgs` JSON |
+| `POST` | `/sync/push` | `PushArgs` JSON |
+
+Run locally:
+
+```bash
+bun run sync-server
+bun run postgres:up
+bun run sync-server:postgres
+```
+
+See [`@melon/sync-server`](/docs/packages/melon-sync-server) and [Architecture — Sync](/docs/architecture/sync).
+
+## Client wiring example
+
+```ts
+export function createHttpSyncBackend(baseUrl: string): SyncBackend {
+  return {
+    async pullChanges(args) {
+      const res = await fetch(`${baseUrl}/sync/pull`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(args),
+      });
+      return res.json();
+    },
+    async pushChanges(args) {
+      await fetch(`${baseUrl}/sync/push`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(args),
+      });
+    },
+  };
+}
+```
+
+Add auth, compression, and pagination as your product requires — the core contract stays the same.
+
+## Limitations (backend)
+
+- No built-in multi-tenant routing — you scope by auth in your handlers.
+- No CRDT / automatic merge on server — conflict semantics are client policy + your push validation.
+- Large initial sync may need pagination (not yet first-class in the protocol — batch by collection or time window in custom backends).
+
+## Related
+
+- [Sync frontend](/docs/sync/frontend)
+- [FAQ](/docs/sync/faq)
+- [Data types](/docs/sync/data-types)

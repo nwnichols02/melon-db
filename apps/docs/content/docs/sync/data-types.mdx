@@ -1,0 +1,76 @@
+---
+title: Supported data types
+description: Melon scalar types, storage mapping, and sync serialization.
+---
+
+Melon schemas use a fixed set of **scalar kinds**. Adapters map them to SQLite column types; sync sends JSON-compatible payloads.
+
+## Scalar kinds (`MelonScalar`)
+
+| Kind | TypeScript (app) | SQLite (typical) | Sync over JSON |
+|------|------------------|------------------|----------------|
+| `string` | `string` | `TEXT` | string |
+| `number` | `number` | `REAL` / `INTEGER` | number |
+| `boolean` | `boolean` | `INTEGER` (0/1) | boolean |
+| `date` | `Date` | `INTEGER` (ms) or `TEXT` (ISO) | ISO string recommended |
+| `json` | object / array | `TEXT` (serialized) | object / array |
+| `bytes` | `Uint8Array` | `BLOB` | base64 or binary transport-specific |
+
+Define fields in schema:
+
+```ts
+fields: {
+  id: { kind: 'string' },
+  count: { kind: 'number' },
+  active: { kind: 'boolean' },
+  updatedAt: { kind: 'date' },
+  metadata: { kind: 'json', nullable: true },
+  thumbnail: { kind: 'bytes', nullable: true },
+}
+```
+
+## Nullability
+
+`nullable: true` allows `null` in storage. Required fields should omit `nullable` or set `nullable: false`.
+
+## Indexes
+
+- Per-field `indexed: true` for single-column hints.
+- Composite indexes via `indexes: [['status', 'updatedAt']]`.
+
+Indexes affect query performance only — they do not change the TypeScript kind.
+
+## Query operators by type
+
+| Operators | Works on |
+|-----------|----------|
+| `eq`, `neq`, `in`, `notIn` | all scalars |
+| `gt`, `gte`, `lt`, `lte` | `number`, `date` |
+| `like`, `contains` | `string` (and `contains` on json string fields in limited cases) |
+| `isNull` | any nullable field |
+
+## Relations are not a type
+
+Foreign keys are stored as ordinary fields (`projectId: { kind: 'string' }`). Relation metadata drives `include` and validation only.
+
+## Sync payload notes
+
+- **Dates:** serialize as ISO 8601 strings in `created` / `updated` arrays unless you standardize on numeric epochs both sides.
+- **JSON:** must be JSON-serializable — no `Date`, `Map`, or `undefined` inside `json` fields on the wire.
+- **Bytes:** prefer base64 in JSON APIs; adapters may store raw BLOB locally.
+- **Deletes:** push/pull use string primary keys in the `deleted` array.
+
+## Unsupported / deferred
+
+| Feature | Status |
+|---------|--------|
+| Auto-increment integer ids | use string ids or assign in app code |
+| Enums as first-class schema kind | use `string` + app-level constants |
+| Full-text search | use `like` or raw SQL migrations |
+| Partial / filtered indexes | declare via `sql` migration step |
+
+## Related
+
+- [Schema](/docs/setup/schema) — field definitions
+- [Backend](/docs/sync/backend) — wire format for `SyncChanges`
+- [FAQ](/docs/sync/faq) — common type mistakes

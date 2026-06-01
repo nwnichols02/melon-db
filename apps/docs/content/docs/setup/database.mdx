@@ -1,0 +1,101 @@
+---
+title: Database & adapters
+description: createDatabase, storage adapters, and optional sync initialization.
+---
+
+`createDatabase` wires your schema to a [StorageAdapter](/docs/api/melon-db/Interface.StorageAdapter) and exposes collections, read/write scopes, and optional sync APIs.
+
+## createDatabase
+
+```ts
+import { createDatabase } from '@melon/db';
+
+const db = createDatabase({
+  schema: appSchema,
+  adapter,
+  migrations,           // optional Migration[]
+  devtools,             // optional DevtoolsBridge
+  sync: {},             // optional — enables sync outbox + checkpoint APIs
+});
+```
+
+The database lazy-initializes the adapter on first use (`initialize(schema, { migrations, sync })`).
+
+## Adapter options by runtime
+
+| Runtime | Package / entry | Notes |
+|---------|-----------------|-------|
+| Tests, playgrounds | `@melon/db` → `createInMemoryAdapter()` | No native deps |
+| Bun / Node | `@melon/db-sqlite` → `createNodeSqliteAdapter({ filename })` | Uses better-sqlite3 when available |
+| Expo Go | `@melon/db-sqlite/expo` → `createExpoSqliteAdapter({ database })` | `expo-sqlite` async API |
+| RN dev client (new arch) | `@melon/db-sqlite` → native JSI sync path | See [Native architecture](/docs/architecture/native) |
+
+### Expo Go example
+
+From `apps/playground-rn`:
+
+```ts
+import * as SQLite from 'expo-sqlite';
+import { createExpoSqliteAdapter } from '@melon/db-sqlite/expo';
+import { createDatabase } from '@melon/db';
+
+async function bootstrap() {
+  const database = await SQLite.openDatabaseAsync('app.db');
+  const adapter = createExpoSqliteAdapter({ database });
+
+  return createDatabase({
+    schema: taskSchema,
+    adapter,
+    sync: {}, // enable sync outbox when using @melon/sync
+  });
+}
+```
+
+### In-memory (tests)
+
+```ts
+import { createDatabase, createInMemoryAdapter } from '@melon/db';
+
+const db = createDatabase({
+  schema: taskSchema,
+  adapter: createInMemoryAdapter(),
+});
+```
+
+## Sync flag
+
+Pass `sync: {}` (or `sync: { respectLocalOnly: true }`) to enable:
+
+- `db.getLocalChanges()` — read pending outbox entries for push
+- `db.applyRemoteChanges(changes, options)` — apply server pull
+- `db.markLocalChangesPushed()` — ack after successful push
+- Checkpoint storage via adapter meta when available
+
+Without `sync`, those methods throw `SYNC_NOT_ENABLED`. See [Sync frontend](/docs/sync/frontend).
+
+## Devtools
+
+Pass a `DevtoolsBridge` from `@melon/db-devtools` to capture queries, writes, and timings:
+
+```ts
+import { createReactiveDevtoolsBridge } from '@melon/db-devtools';
+
+const db = createDatabase({
+  schema,
+  adapter,
+  devtools: createReactiveDevtoolsBridge(),
+});
+```
+
+## Lifecycle
+
+```ts
+await db.unsafeReset(); // dev/test — wipe local data
+await db.adapter.close(); // release native handles when shutting down
+```
+
+## Related
+
+- [Getting started](/docs/getting-started) — install and first run
+- [Read & write](/docs/usage/read-write) — transaction boundaries
+- [Sync](/docs/sync) — pull/push after `sync: {}`

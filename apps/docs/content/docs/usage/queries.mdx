@@ -1,0 +1,151 @@
+---
+title: Queries
+description: QueryAst, fluent builder, Mango, and Prisma-style query surfaces.
+---
+
+Every read path compiles to a **QueryAst** — collection, optional `where` boolean tree, `orderBy`, `skip`/`limit`, `select.include`, and `mode` (`many` | `one` | `count`). Adapters never see Mango or Prisma objects directly.
+
+## QueryAst (canonical)
+
+```ts
+import { predicate, and, type QueryAst } from '@melon/db';
+
+const ast: QueryAst = {
+  collection: 'tasks',
+  mode: 'many',
+  where: and(
+    predicate('status', 'eq', 'open'),
+    predicate('priority', 'gte', 2),
+  ),
+  orderBy: [{ field: 'updatedAt', direction: 'desc' }],
+  limit: 20,
+};
+```
+
+Supported operators: `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `like`, `contains`, `isNull`.
+
+Boolean nodes: `and`, `or`, `not`.
+
+```ts
+await db.collection('tasks').findMany(ast);
+```
+
+Use `planQuery` + `validateQuery` from `@melon/db` when building tooling; collection methods validate automatically.
+
+## Fluent builder (@melon/db-query)
+
+Recommended for app code — type-safe fields via generics:
+
+```ts
+import { createQueryFactory } from '@melon/db-query';
+
+const q = createQueryFactory(taskSchema);
+
+const openHighPriority = q
+  .from<Task>('tasks')
+  .where('status', 'eq', 'open')
+  .and((inner) => inner.where('priority', 'gte', 2))
+  .orderBy('updatedAt', 'desc')
+  .limit(20)
+  .include('project')
+  .toAst();
+
+const countAst = q.from('tasks').where('status', 'eq', 'open').toAst('count');
+```
+
+Utilities like `byId` live in `@melon/db-query` — see package API reference.
+
+## Mango (@melon/db-query-mango)
+
+JSON-serializable selectors for configs, tests, and devtools:
+
+```ts
+import { createMangoCompiler } from '@melon/db-query-mango';
+
+const compiler = createMangoCompiler();
+const prepared = compiler.compile(
+  {
+    selector: {
+      status: 'open',
+      priority: { $gte: 2 },
+      $or: [{ title: 'Urgent' }, { priority: { $gte: 5 } }],
+    },
+    sort: [{ updatedAt: 'desc' }],
+    limit: 20,
+  },
+  'tasks',
+  taskSchema,
+);
+
+await db.collection('tasks').findMany(prepared.ast);
+```
+
+### Supported Mango operators (v1)
+
+| Mango | AST |
+|-------|-----|
+| `$eq`, `$ne`, `$gt`, `$gte`, `$lt`, `$lte` | comparison ops |
+| `$in`, `$nin` | `in`, `notIn` |
+| `$like` | `like` |
+| `$and`, `$or`, `$not` | boolean nodes |
+| shorthand `{ field: value }` | `eq` |
+
+Unsupported operators fail at compile time with `QUERY_INVALID`.
+
+## Prisma-style (@melon/db-prisma)
+
+Local client facade — **not** the Prisma engine:
+
+```ts
+import { createPrismaLikeClient } from '@melon/db-prisma';
+
+const prisma = createPrismaLikeClient(db);
+
+await prisma.tasks.findMany({
+  where: {
+    status: 'open',
+    priority: { gte: 2 },
+    OR: [{ title: { contains: 'docs' } }],
+  },
+  orderBy: { updatedAt: 'desc' },
+  take: 20,
+});
+
+await prisma.tasks.count({ where: { status: 'open' } });
+```
+
+Supported `where` operators: `equals`, `not`, `gt`, `gte`, `lt`, `lte`, `in`, `notIn`, `contains`, plus `AND` / `OR`.
+
+Mutations route through `db.write` internally:
+
+```ts
+await prisma.tasks.create({
+  data: { id: '1', title: 'New', status: 'open', priority: 1, updatedAt: new Date() },
+});
+```
+
+Import a Prisma schema file for codegen with the `@melon/db-prisma` CLI — see package docs.
+
+## PreparedQuery and observation
+
+Hooks and `collection.query()` use `PreparedQuery` (`ast` + `plan` + `source`). The `source` tag (`melon` | `mango` | `prisma`) is for devtools only.
+
+```ts
+const handle = db.collection('tasks').query(prepared);
+handle.observe((rows) => { /* reactive */ });
+```
+
+## Choosing a surface
+
+| Surface | Best for |
+|---------|----------|
+| Fluent builder | TypeScript app code, inferred fields |
+| Mango | Serializable queries, remote config, tests |
+| Prisma-style | Teams with Prisma schema/codegen workflows |
+| Raw AST | Compilers, codemods, custom tooling |
+
+## Related
+
+- [React](/docs/usage/react) — `useQuery`, `useFindMany`, `useMangoQuery`
+- [Relations](/docs/usage/relations) — `include`
+- [Architecture](/docs/architecture) — query pipeline diagram

@@ -1,0 +1,60 @@
+---
+title: Usage
+description: CRUD, relations, queries, React hooks, and read/write boundaries.
+---
+
+Usage covers day-to-day application code: reading and writing records, loading relations, choosing a query surface, and connecting UI with React hooks.
+
+## Guides
+
+| Guide | Topics |
+|-------|--------|
+| [CRUD](/docs/usage/crud) | insert, update, delete, findById, findMany, count |
+| [Relations](/docs/usage/relations) | belongsTo includes, hasMany patterns |
+| [Queries](/docs/usage/queries) | AST, fluent builder, Mango, Prisma-style |
+| [React](/docs/usage/react) | Provider, useQuery, useWriter, sync hooks |
+| [Read & write](/docs/usage/read-write) | db.read, db.write, batch writes, serialized writers |
+
+## Mental model
+
+```
+Schema + adapter (setup)
+        ↓
+createDatabase → MelonCollection per table
+        ↓
+Reads: collection.find* / query(ast).fetch*
+Writes: db.write(tx => ...)  ← required for mutations
+        ↓
+React: MelonDbProvider + useQuery / useWriter
+```
+
+All query syntaxes compile to the same [QueryAst](/docs/api/melon-db/Interface.QueryAst) before the SQLite adapter runs SQL.
+
+## Quick cross-surface example
+
+```ts
+// Fluent (@melon/db-query)
+const ast = createQueryFactory(schema)
+  .from('tasks')
+  .where('status', 'eq', 'open')
+  .toAst();
+
+// Mango (@melon/db-query-mango)
+const mangoPrepared = createMangoCompiler().compile(
+  { selector: { status: 'open' }, collection: 'tasks' },
+  schema,
+);
+
+// Prisma-style (@melon/db-prisma)
+const prisma = createPrismaLikeClient(db);
+await prisma.tasks.findMany({ where: { status: 'open' } });
+
+// Direct AST
+await db.collection('tasks').findMany({
+  collection: 'tasks',
+  mode: 'many',
+  where: { type: 'predicate', predicate: { field: 'status', op: 'eq', value: 'open' } },
+});
+```
+
+Pick one authoring surface per feature; they share the same engine and subscriptions.

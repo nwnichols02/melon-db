@@ -1,0 +1,135 @@
+---
+title: React
+description: MelonDbProvider, useQuery, useWriter, and sync hooks.
+---
+
+[`@melon/db-react`](/docs/packages/melon-db-react) connects `MelonDatabase` to React with context and subscription-driven hooks.
+
+## Provider
+
+Bootstrap the database once, then wrap your tree:
+
+```tsx
+import { MelonDbProvider } from '@melon/db-react';
+
+export function App({ db }: { db: MelonDatabase }) {
+  return (
+    <MelonDbProvider db={db}>
+      <TaskList />
+    </MelonDbProvider>
+  );
+}
+```
+
+For sync, nest `MelonSyncProvider` inside `MelonDbProvider` (see [Sync frontend](/docs/sync/frontend)).
+
+## useQuery
+
+Subscribes to a query AST or `PreparedQuery` and re-renders when underlying rows change:
+
+```tsx
+import { createQueryFactory } from '@melon/db-query';
+import { useQuery } from '@melon/db-react';
+import { useMemo } from 'react';
+
+function TaskList() {
+  const query = useMemo(
+    () =>
+      createQueryFactory(taskSchema)
+        .from<Task>('tasks')
+        .where('status', 'eq', 'open')
+        .orderBy('priority', 'desc')
+        .toAst(),
+    [],
+  );
+
+  const tasks = useQuery<Task>(query);
+
+  return tasks.map((t) => <TaskRow key={t.id} task={t} />);
+}
+```
+
+Options:
+
+```tsx
+useQuery<Task>(query, {
+  enabled: true,
+  select: (rows) => rows.filter((t) => t.priority > 1),
+});
+```
+
+## useQueryCount
+
+```tsx
+const openCount = useQueryCount(openTasksCountAst);
+```
+
+## useFindMany / useFindFirst (Prisma args)
+
+```tsx
+import { useFindMany, useFindFirst } from '@melon/db-react';
+
+const tasks = useFindMany<Task>('tasks', {
+  where: { status: 'open' },
+  orderBy: { priority: 'desc' },
+  take: 20,
+});
+```
+
+Compiles Prisma-style args via `@melon/db-prisma` under the hood.
+
+## useMangoQuery
+
+```tsx
+import { useMangoQuery } from '@melon/db-react';
+
+const urgent = useMangoQuery<Task>('tasks', {
+  selector: { status: 'open', priority: { $gte: 3 } },
+  sort: [{ updatedAt: 'desc' }],
+});
+```
+
+## useWriter
+
+Stable callback wrapping `db.write` — use for mutations in components:
+
+```tsx
+import { useWriter } from '@melon/db-react';
+
+function AddTask() {
+  const write = useWriter();
+
+  async function onAdd(title: string) {
+    await write(async (tx) => {
+      await tx.collection('tasks').insert({
+        id: crypto.randomUUID(),
+        title,
+        status: 'open',
+        priority: 1,
+        updatedAt: new Date(),
+      });
+    });
+  }
+
+  // ...
+}
+```
+
+## Other hooks
+
+| Hook | Purpose |
+|------|---------|
+| `useDatabase()` | Access `MelonDatabase` from context |
+| `useCollection(name)` | Bound `MelonCollection` |
+| `useSync()` | Manual sync + status from `MelonSyncProvider` |
+| `useSyncStatus()` | Status-only subscription |
+
+## Example app
+
+See `apps/playground-rn/app/index.tsx` — open tasks list with `useQuery`, `useWriter`, and `useSync`.
+
+## Related
+
+- [CRUD](/docs/usage/crud) — underlying collection APIs
+- [Queries](/docs/usage/queries) — building AST / Mango / Prisma inputs
+- [Read & write](/docs/usage/read-write) — why mutations go through `useWriter`

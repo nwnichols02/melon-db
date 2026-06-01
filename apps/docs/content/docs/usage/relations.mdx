@@ -1,0 +1,107 @@
+---
+title: Relations
+description: belongsTo and hasMany schema metadata, includes, and fetch patterns.
+---
+
+Relations are declared in [schema metadata](/docs/setup/schema). Melon stores foreign keys as ordinary fields; relations describe how collections link together for validation and query `include`.
+
+## belongsTo
+
+The owning row stores the foreign key:
+
+```ts
+tasks: {
+  fields: {
+    projectId: { kind: 'string', nullable: true },
+    // ...
+  },
+  relations: {
+    project: {
+      kind: 'belongsTo',
+      target: 'projects',
+      foreignKey: 'projectId',
+    },
+  },
+},
+```
+
+### Include in queries (v1)
+
+Query `include` loads the related **parent** row and attaches it on each result:
+
+```ts
+import { createQueryFactory } from '@melon/db-query';
+
+const ast = createQueryFactory(schema)
+  .from('tasks')
+  .include('project')
+  .toAst();
+
+const tasks = await db.collection('tasks').findMany(ast);
+// each row may have task.project = { id, name, ... }
+```
+
+Nested includes support filters on the relation:
+
+```ts
+.include('project', {
+  where: { type: 'predicate', predicate: { field: 'name', op: 'eq', value: 'Melon' } },
+})
+```
+
+**v1 limitation:** only `belongsTo` includes are supported. `hasMany` includes in AST are rejected at validation time.
+
+## hasMany
+
+Declare the inverse for documentation and future APIs:
+
+```ts
+projects: {
+  relations: {
+    tasks: {
+      kind: 'hasMany',
+      target: 'tasks',
+      foreignKey: 'projectId',
+    },
+  },
+},
+```
+
+Fetch children with a filtered query:
+
+```ts
+const projectId = 'proj-1';
+const tasks = await db.collection('tasks').findMany(
+  createQueryFactory(schema)
+    .from('tasks')
+    .where('projectId', 'eq', projectId)
+    .orderBy('priority', 'desc')
+    .toAst(),
+);
+```
+
+## TypeScript shapes
+
+```ts
+interface Task {
+  id: string;
+  title: string;
+  projectId: string | null;
+  project?: Project | null; // present when included
+}
+
+interface Project {
+  id: string;
+  name: string;
+}
+```
+
+## SQLite behavior
+
+The adapter runs the main query on the parent collection, then batch-loads related rows by foreign key (`loadIncludes`). This avoids N+1 round-trips for `belongsTo` graphs at modest relation counts.
+
+## Related
+
+- [Queries](/docs/usage/queries) — `include` on fluent builder and AST
+- [Schema](/docs/setup/schema) — relation definitions
+- [Roadmap](/docs/roadmap) — hasMany query includes (deferred)

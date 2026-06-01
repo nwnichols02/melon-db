@@ -1,0 +1,97 @@
+---
+title: Read & write
+description: db.read, db.write, batching, and writer serialization.
+---
+
+Melon separates **read scopes** from **write scopes**, similar to WatermelonDB writers. This keeps mutations serialized and observable while allowing concurrent reads.
+
+## db.write (mutations)
+
+All inserts, updates, deletes, and `tx.batch` calls **must** run inside `db.write`:
+
+```ts
+await db.write(async (tx) => {
+  const task = await tx.collection('tasks').findById('1'); // read inside write OK
+  await tx.collection('tasks').update('1', { status: 'closed' });
+});
+```
+
+Calling `collection.insert` / `update` / `delete` outside `db.write` throws `WRITE_OUTSIDE_TRANSACTION`.
+
+### Serialized writers
+
+Writes are queued (`WriteQueue`) — only one `db.write` runs at a time. Nested `db.write` from the same call stack is not supported; use a single callback.
+
+The adapter wraps the callback in a SQLite transaction when available.
+
+## db.read (optional read scope)
+
+Use `db.read` when you want an explicit read boundary (useful for grouping reads or future read-transaction semantics):
+
+```ts
+const [tasks, count] = await db.read(async (tx) => {
+  const rows = await tx.collection('tasks').findMany(openAst);
+  const n = await tx.collection('tasks').count(openAst);
+  return [rows, n];
+});
+```
+
+Plain `db.collection(...).findMany()` without `db.read` is also valid — reads do not require a scope today.
+
+## Batch writes
+
+`tx.batch` accepts an array of [AdapterWriteOperation](/docs/api/melon-db/TypeAlias.AdapterWriteOperation) values:
+
+```ts
+await db.write(async (tx) => {
+  await tx.batch([
+    {
+      type: 'insert',
+      collection: 'tasks',
+      values: { id: 'a', title: 'A', status: 'open', priority: 1, updatedAt: new Date() },
+    },
+    {
+      type: 'update',
+      collection: 'tasks',
+      primaryKey: 'b',
+      values: { status: 'closed' },
+    },
+    {
+      type: 'delete',
+      collection: 'tasks',
+      primaryKey: 'c',
+      id: 'c',
+    },
+  ]);
+});
+```
+
+Batch emits a single change notification and one sync outbox pass per operation when sync is enabled.
+
+## Reads during sync
+
+`applyRemoteChanges` runs inside a write transaction with a flag that **skips sync outbox** for applied remote rows — preventing push loops.
+
+Local user edits inside `db.write` still enqueue outbox entries when `sync: {}` is configured.
+
+## observeCollections
+
+Subscribe to coarse collection-level changes:
+
+```ts
+const unsub = db.observeCollections(['tasks'], (changes) => {
+  console.log(changes.collections.tasks?.updated);
+});
+```
+
+Query handles prefer `handle.observe()` for row-level reactive queries.
+
+## React
+
+Use [`useWriter`](/docs/usage/react) instead of calling `db.write` directly in components to keep a stable function reference.
+
+## Related
+
+- [CRUD](/docs/usage/crud) — collection mutation methods
+- [Sync frontend](/docs/sync/frontend) — outbox + applyRemoteChanges
+- [Database setup](/docs/setup/database) — adapter transactions capability

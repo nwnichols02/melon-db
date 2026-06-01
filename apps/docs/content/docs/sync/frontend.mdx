@@ -1,0 +1,123 @@
+---
+title: Sync frontend
+description: Enable sync on the client, providers, hooks, and local change APIs.
+---
+
+The frontend owns local CRUD, outbox tracking, checkpoint storage, and calling your backend’s pull/push endpoints through `@melon/sync`.
+
+## Enable sync on the database
+
+```ts
+const db = createDatabase({
+  schema: appSchema,
+  adapter,
+  migrations,
+  sync: {}, // required for getLocalChanges / applyRemoteChanges
+});
+```
+
+Optional config:
+
+```ts
+sync: { respectLocalOnly: true }, // skip collections with localOnly: true
+```
+
+## MelonSyncProvider
+
+Wrap the app inside `MelonDbProvider`:
+
+```tsx
+import { MelonDbProvider, MelonSyncProvider } from '@melon/db-react';
+import { DEFAULT_RETRY_POLICY } from '@melon/sync';
+
+<MelonDbProvider db={db}>
+  <MelonSyncProvider
+    pullChanges={backend.pullChanges}
+    pushChanges={backend.pushChanges}
+    conflictPolicy="merge-by-field"
+    mergeProtectedFields={['updatedAt']}
+    retryPolicy={DEFAULT_RETRY_POLICY}
+    networkMonitor={myNetworkMonitor}
+    autoSyncOnReconnect
+  >
+    {children}
+  </MelonSyncProvider>
+</MelonDbProvider>
+```
+
+Implement `pullChanges` / `pushChanges` against your HTTP API — see [Backend requirements](/docs/sync/backend).
+
+## Manual sync
+
+```tsx
+const { sync, status, isSyncing, error, cancel } = useSync();
+
+await sync();
+```
+
+Or headless:
+
+```ts
+import { synchronize } from '@melon/sync';
+
+await synchronize({
+  db,
+  pullChanges,
+  pushChanges,
+  conflictPolicy: 'server-wins',
+  retryPolicy: DEFAULT_RETRY_POLICY,
+  signal: abortController.signal,
+});
+```
+
+## Protocol flow (client side)
+
+| Step | API |
+|------|-----|
+| 1. Pull | `pullChanges({ lastPulledAt, schemaVersion, migration? })` |
+| 2. Apply | `db.applyRemoteChanges(changes, { conflictPolicy, ... })` |
+| 3. Push | `pushChanges({ changes: await db.getLocalChanges(), lastPulledAt })` |
+| 4. Ack | `db.markLocalChangesPushed()` |
+| 5. Checkpoint | store `timestamp` + `schemaVersion` from pull result |
+
+Checkpoints persist in adapter meta when supported; otherwise in-memory until restart.
+
+## Conflict policies
+
+Pass to `MelonSyncProvider`, `synchronize`, or `applyRemoteChanges`:
+
+| Policy | Behavior |
+|--------|----------|
+| `server-wins` | Remote replaces local on collision (default) |
+| `client-wins` | Keep local row |
+| `skip-existing` | Skip remote create when id exists |
+| `last-write-wins` | Compare sync timestamp field |
+| `merge-by-field` | Overlay pending local field patches onto remote |
+| `custom` | Your `conflictResolver` per record |
+
+See [Sync overview](/docs/sync) for merge-by-field and custom resolver examples.
+
+## Local-only collections
+
+Mark schema collections with `localOnly: true` to exclude them from `getLocalChanges` when `respectLocalOnly` is true (default).
+
+## Status and network
+
+`useSyncStatus()` exposes idle → pulling → pushing → complete, plus `retrying`, `paused` (offline), and `failed`.
+
+Provide a `NetworkMonitor` so sync pauses offline and `autoSyncOnReconnect` can resume.
+
+## What you implement vs what Melon provides
+
+| You implement | Melon provides |
+|---------------|----------------|
+| HTTP (or other transport) to your backend | Outbox, checkpoints, `synchronize()` orchestration |
+| `pullChanges` / `pushChanges` functions | `getLocalChanges`, `applyRemoteChanges`, conflict engines |
+| Auth headers, tenancy, business rules | React hooks, retry policy, cancellation |
+
+## Related
+
+- [Backend requirements](/docs/sync/backend)
+- [Data types](/docs/sync/data-types) — serializable field kinds
+- [FAQ](/docs/sync/faq) — limitations and troubleshooting
+- [Sync playground](/docs/playgrounds/sync)
