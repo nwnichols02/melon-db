@@ -20,7 +20,7 @@ Add `--dry-run` to preview changes. `migrate-schema` prints extracted `DatabaseS
 
 The compatibility layer converts serializable Watermelon `Q` clauses to Melon `QueryAst` without a WatermelonDB dependency. Nested `Q.and` / `Q.or` are supported in the translator and in `migrate-queries`.
 
-## Q.on (join) queries {#q-on}
+<h2 id="q-on">Q.on (join) queries</h2>
 
 Melon v1 does **not** support Watermelon-style join queries at runtime. The codemod detects `Q.on`, inserts a migration recipe comment, and migrates any non-join clauses it can.
 
@@ -50,7 +50,7 @@ const tasks = await db.collection('tasks').findMany(
 );
 ```
 
-## withObservables {#withobservables}
+<h2 id="withobservables">withObservables</h2>
 
 The `migrate-react` codemod detects common `withObservables` HOC patterns and emits hook migration comments. Replace the HOC with hooks inside your component:
 
