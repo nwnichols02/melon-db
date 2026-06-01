@@ -49,12 +49,10 @@ From repo root:
 bun run dev:rn:dev-build
 ```
 
-Or step by step:
+Or one shot (from `apps/playground-rn`):
 
 ```bash
-cd apps/playground-rn
-bun run prebuild:dev
-bun run run:ios:dev
+bun run install:dev-build
 ```
 
 After the first native build, Metro only:
@@ -62,6 +60,10 @@ After the first native build, Metro only:
 ```bash
 bun run start:dev-build
 ```
+
+Open the **Melon Playground (Dev)** app on the simulator — do not use Expo Go. Pressing **`i`** in Metro only works after `run:ios:dev` has installed that app.
+
+If you see `No development build … is installed`, run `prebuild:dev` then `run:ios:dev` again (see [`env/README.md`](env/README.md)).
 
 **iOS** is supported for JSI in this spike. On Android, use Environment A until native Android ships.
 

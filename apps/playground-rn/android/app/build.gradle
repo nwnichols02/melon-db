@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.nate.nichols.playgroundrn'
+    namespace 'com.nate.nichols.playgroundrn.devbuild'
     defaultConfig {
-        applicationId 'com.nate.nichols.playgroundrn'
+        applicationId 'com.nate.nichols.playgroundrn.devbuild'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

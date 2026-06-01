@@ -1,3 +1,5 @@
+require("./scripts/load-melon-env.cjs");
+
 /**
  * @param {import('expo/config').ConfigContext} context
  * @returns {import('expo/config').ExpoConfig}
@@ -23,7 +25,12 @@ module.exports = () => {
 				? "com.nate.nichols.playgroundrn.devbuild"
 				: "com.nate.nichols.playgroundrn",
 		},
-		plugins: ["expo-router", "expo-sqlite", "expo-asset"],
+		plugins: [
+			...(isDevBuild ? ["expo-dev-client"] : []),
+			"expo-router",
+			"expo-sqlite",
+			"expo-asset",
+		],
 		experiments: {
 			typedRoutes: true,
 		},
