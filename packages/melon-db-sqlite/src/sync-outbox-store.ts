@@ -81,6 +81,10 @@ export function createSqliteSyncOutboxStore(
 				toSqlParams([entry.collection, String(entry.recordId)]),
 			);
 			await driver.run(
+				`DELETE FROM "${SYNC_OUTBOX_TABLE}" WHERE "id" = ?`,
+				toSqlParams([entry.id]),
+			);
+			await driver.run(
 				`INSERT INTO "${SYNC_OUTBOX_TABLE}" ("id", "collection", "record_id", "operation", "timestamp", "pending_fields") VALUES (?, ?, ?, ?, ?, ?)`,
 				toSqlParams([
 					entry.id,

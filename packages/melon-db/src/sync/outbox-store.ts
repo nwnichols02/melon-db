@@ -1,10 +1,13 @@
 import type { SyncOutboxEntry, SyncOutboxStore } from "./types.ts";
 
-let entryCounter = 0;
-
+/**
+ * Creates a globally unique outbox row id (stable across adapter re-open / JS reload).
+ */
 function nextEntryId(): string {
-	entryCounter += 1;
-	return `outbox_${entryCounter}`;
+	if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+		return crypto.randomUUID();
+	}
+	return `outbox_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
 }
 
 /**
@@ -40,6 +43,12 @@ export function createMemorySyncOutboxStore(): SyncOutboxStore {
 			if (existingId) {
 				entries.delete(existingId);
 			}
+			for (const [recKey, id] of byRecord.entries()) {
+				if (id === entry.id && recKey !== key) {
+					byRecord.delete(recKey);
+				}
+			}
+			entries.delete(entry.id);
 			entries.set(entry.id, entry);
 			byRecord.set(key, entry.id);
 		},

@@ -684,6 +684,36 @@ describe("sync (sqlite)", () => {
 		await adapter.close();
 	});
 
+	test("new writes after adapter re-open do not reuse stale outbox ids", async () => {
+		const path = `/tmp/melon-sync-outbox-${Bun.randomUUIDv7()}.db`;
+		const adapter1 = createSqliteAdapter({ filename: path });
+		const db1 = createSyncDb(adapter1);
+		await db1.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "seed-1",
+				title: "First",
+				status: "open",
+			});
+		});
+		await adapter1.close();
+
+		const adapter2 = createSqliteAdapter({ filename: path });
+		const db2 = createSyncDb(adapter2);
+		await expect(
+			db2.write(async (tx) => {
+				await tx.collection("tasks").insert({
+					id: "seed-2",
+					title: "After reload",
+					status: "open",
+				});
+			}),
+		).resolves.toBeUndefined();
+
+		const changes = await db2.getLocalChanges();
+		expect(changes.tasks?.created).toHaveLength(2);
+		await adapter2.close();
+	});
+
 	test("sqlite adapter sync roundtrip", async () => {
 		const db = createSyncDb(createSqliteAdapter({ filename: ":memory:" }));
 		await db.write(async (tx) => {
