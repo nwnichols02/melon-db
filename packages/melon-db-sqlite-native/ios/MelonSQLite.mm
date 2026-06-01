@@ -1,6 +1,5 @@
 #import "MelonSQLite.h"
 #import <sqlite3.h>
-#import <React/RCTBridgeModule.h>
 #import <React/RCTUtils.h>
 
 @implementation MelonSQLite {
@@ -8,10 +7,12 @@
   NSRecursiveLock *_lock;
 }
 
-RCT_EXPORT_MODULE(MelonSQLite);
-
 + (BOOL)requiresMainQueueSetup {
   return NO;
+}
+
++ (NSString *)moduleName {
+  return @"MelonSQLite";
 }
 
 - (instancetype)init {
@@ -26,6 +27,11 @@ RCT_EXPORT_MODULE(MelonSQLite);
     sqlite3_close(_db);
     _db = NULL;
   }
+}
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params {
+  return std::make_shared<facebook::react::NativeMelonSQLiteSpecJSI>(params);
 }
 
 - (void)ensureOpen:(RCTPromiseRejectBlock)reject {
@@ -102,9 +108,9 @@ RCT_EXPORT_MODULE(MelonSQLite);
   return [documents stringByAppendingPathComponent:path];
 }
 
-RCT_EXPORT_METHOD(open:(NSString *)path
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject) {
+- (void)open:(NSString *)path
+     resolve:(RCTPromiseResolveBlock)resolve
+      reject:(RCTPromiseRejectBlock)reject {
   [_lock lock];
   @try {
     if ([path containsString:@".."]) {
@@ -133,8 +139,7 @@ RCT_EXPORT_METHOD(open:(NSString *)path
   }
 }
 
-RCT_EXPORT_METHOD(close:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject) {
+- (void)close:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
   [_lock lock];
   @try {
     if (_db != NULL) {
@@ -147,9 +152,9 @@ RCT_EXPORT_METHOD(close:(RCTPromiseResolveBlock)resolve
   }
 }
 
-RCT_EXPORT_METHOD(exec:(NSString *)sql
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject) {
+- (void)exec:(NSString *)sql
+     resolve:(RCTPromiseResolveBlock)resolve
+      reject:(RCTPromiseRejectBlock)reject {
   [_lock lock];
   @try {
     [self ensureOpen:reject];
@@ -172,10 +177,10 @@ RCT_EXPORT_METHOD(exec:(NSString *)sql
   }
 }
 
-RCT_EXPORT_METHOD(queryAll:(NSString *)sql
-                  params:(NSArray *)params
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject) {
+- (void)queryAll:(NSString *)sql
+          params:(NSArray *)params
+         resolve:(RCTPromiseResolveBlock)resolve
+          reject:(RCTPromiseRejectBlock)reject {
   [_lock lock];
   @try {
     [self ensureOpen:reject];
@@ -221,10 +226,10 @@ RCT_EXPORT_METHOD(queryAll:(NSString *)sql
   }
 }
 
-RCT_EXPORT_METHOD(queryFirst:(NSString *)sql
-                  params:(NSArray *)params
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject) {
+- (void)queryFirst:(NSString *)sql
+            params:(NSArray *)params
+           resolve:(RCTPromiseResolveBlock)resolve
+            reject:(RCTPromiseRejectBlock)reject {
   [_lock lock];
   @try {
     [self ensureOpen:reject];
@@ -271,10 +276,10 @@ RCT_EXPORT_METHOD(queryFirst:(NSString *)sql
   }
 }
 
-RCT_EXPORT_METHOD(run:(NSString *)sql
-                  params:(NSArray *)params
-                  resolve:(RCTPromiseResolveBlock)resolve
-                  reject:(RCTPromiseRejectBlock)reject) {
+- (void)run:(NSString *)sql
+     params:(NSArray *)params
+    resolve:(RCTPromiseResolveBlock)resolve
+     reject:(RCTPromiseRejectBlock)reject {
   [_lock lock];
   @try {
     [self ensureOpen:reject];

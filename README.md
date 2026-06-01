@@ -158,12 +158,13 @@ await synchronize({
 
 Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun run dev:docs`). Summary:
 
-| Done | Deferred (Phase 22+) |
+| Done | Deferred (Phase 23+) |
 |------|----------|
 | Core engine M0–M2 | Native `observeQuery` / SQLite triggers |
 | SQLite SQL compiler + Bun adapter | EAS Build CI |
 | Expo SQLite adapter (`@melon/db-sqlite/expo`, Expo Go) | WatermelonDB benchmark comparison |
-| JSI SQLite (`@melon/db-sqlite/rn`, iOS + Android dev build) | |
+| JSI SQLite (`@melon/db-sqlite/rn`, iOS + Android dev build) | Android TurboModule codegen |
+| iOS TurboModule (`MelonSQLiteSpec` codegen) | Pure C++ JSI + native DB thread |
 | Optional Node driver (`@melon/db-sqlite/node`) | Full multi-file schema codemods |
 | `apps/playground-rn` + sync demo | Background sync service |
 | Query / Mango / Prisma surfaces | Per-field timestamps / three-way merge |

@@ -1,4 +1,10 @@
-#import <React/RCTBridgeModule.h>
+#import <Foundation/Foundation.h>
+#import <MelonSQLiteSpec/MelonSQLiteSpec.h>
 
-@interface MelonSQLite : NSObject <RCTBridgeModule>
+NS_ASSUME_NONNULL_BEGIN
+
+@interface MelonSQLite : NSObject <NativeMelonSQLiteSpec>
+
 @end
+
+NS_ASSUME_NONNULL_END

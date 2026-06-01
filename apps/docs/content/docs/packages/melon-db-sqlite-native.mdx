@@ -1,30 +1,33 @@
 ---
 title: "@melon/db-sqlite-native"
-description: Melon SQLite native module for React Native development builds (iOS + Android).
+description: Melon SQLite native module for React Native development builds (iOS TurboModule + Android bridge).
 ---
 
-**Status:** Shipped (iOS + Android dev builds) · **Expo Go:** Not supported
+**Status:** Shipped (iOS TurboModule + Android bridge) · **Expo Go:** Not supported
 
 Native SQLite module used by [`@melon/db-sqlite/rn`](/docs/packages/melon-db-sqlite). For Expo Go, use [`@melon/db-sqlite/expo`](/docs/packages/melon-db-sqlite) instead.
 
 ## Platform support
 
-| Platform | Status |
-|----------|--------|
-| iOS (dev build) | Supported |
-| Android (dev build) | Supported |
-| Expo Go | Not available |
+| Platform | Binding | Status |
+|----------|---------|--------|
+| iOS (dev build) | TurboModule (`MelonSQLiteSpec` codegen) | Supported |
+| Android (dev build) | Legacy bridge | Supported |
+| Expo Go | N/A | Not available |
 
 ## Limitations
 
-- Bridge modules (not synchronous JSI codegen yet).
+- Async TurboModule/bridge methods only (no sync C++ JSI on the JS thread).
 - **BLOB / `bytes` fields** are not round-tripped (returned as `null`).
 - No native `observeQuery` triggers.
+- Android TurboModule parity deferred to Phase 23.
 
 ## Setup
 
-- **Expo Go:** [`apps/playground-rn`](/docs/getting-started) — `bun run dev:rn` (does not use this package)
-- **Development build (iOS):** `bun run dev:rn:dev` then `bun run dev:rn:dev:start`
-- **Development build (Android):** `bun run dev:rn:dev:android` then `bun run dev:rn:dev:start`
+- **Expo Go:** [`apps/playground-rn`](/docs/getting-started) — `bun run dev:rn`
+- **Development build (iOS):** `bun run dev:rn:dev` then `bun run dev:rn:dev:start` — expect `native turbo (ios)` badge
+- **Development build (Android):** `bun run dev:rn:dev:android` then start Metro — expect `native bridge (android)` badge
 
 Pass `basePath` (e.g. `expo-file-system` `documentDirectory`) when using a relative `filename`.
+
+After changing [`NativeMelonSQLite.ts`](https://github.com/melon/melon/blob/main/packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts), regenerate codegen and run `expo prebuild --clean` in `apps/playground-rn-dev`. See the [package README](https://github.com/melon/melon/blob/main/packages/melon-db-sqlite-native/README.md).

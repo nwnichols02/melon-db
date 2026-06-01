@@ -1,10 +1,10 @@
-import { NativeModules } from "react-native";
+import { NativeModules, TurboModuleRegistry } from "react-native";
+import type { Spec } from "./NativeMelonSQLite.ts";
 
 export type SqlParam = string | number | boolean | null;
 
 /**
- * Bridge module contract for MelonSQLite (RCT on iOS, ReactContextBaseJavaModule on Android).
- * Not a TurboModule spec — avoids New Architecture JNI codegen until C++ impl lands.
+ * Native SQLite module contract (TurboModule on iOS, legacy bridge on Android).
  */
 export interface MelonSQLiteNativeModule {
 	open(path: string): Promise<void>;
@@ -21,13 +21,35 @@ export interface MelonSQLiteNativeModule {
 	run(sql: string, params: ReadonlyArray<SqlParam>): Promise<void>;
 }
 
-const melonSQLite = NativeModules.MelonSQLite as
-	| MelonSQLiteNativeModule
-	| undefined;
+export type MelonSQLiteNativeMode = "turbo" | "bridge";
+
+function resolveModule(): {
+	module: MelonSQLiteNativeModule;
+	mode: MelonSQLiteNativeMode;
+} | null {
+	const turbo = TurboModuleRegistry.get<Spec>("MelonSQLite");
+	if (turbo != null) {
+		return { module: turbo, mode: "turbo" };
+	}
+	const bridge = NativeModules.MelonSQLite as
+		| MelonSQLiteNativeModule
+		| undefined;
+	if (bridge != null) {
+		return { module: bridge, mode: "bridge" };
+	}
+	return null;
+}
 
 /**
- * Returns the MelonSQLite bridge module when linked in a development build.
+ * Returns how MelonSQLite is linked (turbo vs legacy bridge), or null when unavailable.
+ */
+export function getMelonSQLiteNativeMode(): MelonSQLiteNativeMode | null {
+	return resolveModule()?.mode ?? null;
+}
+
+/**
+ * Returns the MelonSQLite native module when linked in a development build.
  */
 export function getMelonSQLiteModule(): MelonSQLiteNativeModule | null {
-	return melonSQLite ?? null;
+	return resolveModule()?.module ?? null;
 }

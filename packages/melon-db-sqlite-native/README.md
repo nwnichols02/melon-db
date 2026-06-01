@@ -6,15 +6,16 @@ Melon-owned SQLite native module for React Native **development builds**.
 
 ## Platform support
 
-| Platform | Status |
-|----------|--------|
-| iOS (dev build) | Supported (system `sqlite3`) |
-| Android (dev build) | Supported (`SQLiteDatabase`) |
-| Expo Go | Not available |
+| Platform | Native binding | Status |
+|----------|----------------|--------|
+| iOS (dev build) | TurboModule codegen (`MelonSQLiteSpec`) | Supported |
+| Android (dev build) | Legacy bridge (`ReactContextBaseJavaModule`) | Supported |
+| Expo Go | N/A | Not available |
 
 ## Limitations
 
-- Bridge modules (RCT / `ReactContextBaseJavaModule`), not synchronous JSI codegen yet.
+- **iOS:** TurboModule with async promises — not synchronous C++ JSI host objects yet.
+- **Android:** Bridge module until Phase 23 TurboModule parity.
 - Android `exec()` routes `PRAGMA` through `rawQuery` (Android forbids `execSQL` for statements that return rows, e.g. `journal_mode = WAL`).
 - **BLOB / `bytes` fields** are not round-tripped on the native path (returned as `null`).
 - No native `observeQuery` triggers — the engine uses its change emitter fallback.
@@ -23,6 +24,21 @@ Melon-owned SQLite native module for React Native **development builds**.
 
 - React Native 0.76+ with New Architecture enabled
 - `expo prebuild` or bare React Native with autolinking
+
+## Codegen (iOS TurboModule)
+
+Spec: [`src/NativeMelonSQLite.ts`](src/NativeMelonSQLite.ts). Regenerate iOS artifacts after spec changes:
+
+```bash
+cd apps/playground-rn-dev
+node node_modules/react-native/scripts/generate-codegen-artifacts.js \
+  -p ../../packages/melon-db-sqlite-native \
+  -t ios \
+  -o ../../packages/melon-db-sqlite-native/ios/generated \
+  -s library
+```
+
+Then run `expo prebuild --clean` in `apps/playground-rn-dev` before native builds.
 
 ## Usage
 
@@ -40,6 +56,13 @@ const adapter = createJsiSqliteAdapter({
   filename: 'app.db',
   basePath: Paths.document.uri.replace(/^file:\/\//, ''),
 });
+```
+
+Inspect binding mode (turbo vs bridge):
+
+```ts
+import { getMelonSQLiteNativeMode } from '@melon/db-sqlite-native';
+// 'turbo' on iOS dev build, 'bridge' on Android, null in Expo Go
 ```
 
 ## Development build (playground-rn-dev)
@@ -65,22 +88,25 @@ Optional: `EXPO_PUBLIC_MELON_SQLITE=expo` in the dev app uses expo-sqlite instea
 After `bun run dev:rn:dev` (or `install:ios` in `apps/playground-rn-dev`):
 
 1. App launches without native module errors.
-2. Seeded tasks appear (same as expo path).
-3. Add / complete tasks persist across restart.
-4. Sync demo works against `bun run sync-server`.
-5. Compare behavior with `apps/playground-rn` on the same device.
+2. Runtime badge shows `native turbo (ios)`.
+3. Seeded tasks appear (same as expo path).
+4. Add / complete tasks persist across restart.
+5. Sync demo works against `bun run sync-server`.
 
 ### Android
 
 After `bun run dev:rn:dev:android` then `bun run dev:rn:dev:start`:
 
 1. App launches without `NOT_IMPLEMENTED` errors.
-2. Seeded tasks appear.
-3. Add / complete tasks persist across restart.
-4. Sync demo works against `bun run sync-server`.
+2. Runtime badge shows `native bridge (android)`.
+3. Seeded tasks appear.
+4. Add / complete tasks persist across restart.
+5. Sync demo works against `bun run sync-server`.
 
 ## Architecture
 
-- iOS: `MelonSQLite` RCT module (`ios/MelonSQLite.mm`) using `sqlite3` with `sqlite3_busy_timeout`
-- Android: `MelonSQLiteModule` (`android/.../MelonSQLiteModule.kt`) using `SQLiteDatabase`
-- JS: bridge accessor in `src/MelonSQLiteBridge.ts` (no TurboModule JNI codegen)
+- **iOS:** `MelonSQLite` implements `NativeMelonSQLiteSpec` (`ios/MelonSQLite.mm`) with `NativeMelonSQLiteSpecJSI` and system `sqlite3`.
+- **Android:** `MelonSQLiteModule` (`android/.../MelonSQLiteModule.kt`) using `SQLiteDatabase` (legacy bridge).
+- **JS:** `src/MelonSQLiteBridge.ts` resolves TurboModule first, then `NativeModules` fallback.
+
+**Phase 23+:** Android TurboModule, optional pure C++ JSI, dedicated native DB thread.
