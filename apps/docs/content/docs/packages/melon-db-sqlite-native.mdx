@@ -1,9 +1,9 @@
 ---
 title: "@melon/db-sqlite-native"
-description: Melon SQLite native module for React Native development builds (iOS TurboModule + Android bridge).
+description: Melon SQLite native module for React Native development builds (iOS + Android TurboModule).
 ---
 
-**Status:** Shipped (iOS TurboModule + Android bridge) · **Expo Go:** Not supported
+**Status:** Shipped (iOS + Android TurboModule) · **Expo Go:** Not supported
 
 Native SQLite module used by [`@melon/db-sqlite/rn`](/docs/packages/melon-db-sqlite). For Expo Go, use [`@melon/db-sqlite/expo`](/docs/packages/melon-db-sqlite) instead.
 
@@ -12,21 +12,20 @@ Native SQLite module used by [`@melon/db-sqlite/rn`](/docs/packages/melon-db-sql
 | Platform | Binding | Status |
 |----------|---------|--------|
 | iOS (dev build) | TurboModule (`MelonSQLiteSpec` codegen) | Supported |
-| Android (dev build) | Legacy bridge | Supported |
+| Android (dev build) | TurboModule (`MelonSQLiteSpec` codegen) | Supported |
 | Expo Go | N/A | Not available |
 
 ## Limitations
 
-- Async TurboModule/bridge methods only (no sync C++ JSI on the JS thread).
+- Async TurboModule methods only (no sync C++ JSI on the JS thread).
 - **BLOB / `bytes` fields** are not round-tripped (returned as `null`).
 - No native `observeQuery` triggers.
-- Android TurboModule parity deferred to Phase 23.
 
 ## Setup
 
 - **Expo Go:** [`apps/playground-rn`](/docs/getting-started) — `bun run dev:rn`
 - **Development build (iOS):** `bun run dev:rn:dev` then `bun run dev:rn:dev:start` — expect `native turbo (ios)` badge
-- **Development build (Android):** `bun run dev:rn:dev:android` then start Metro — expect `native bridge (android)` badge
+- **Development build (Android):** `bun run dev:rn:dev:android` then start Metro — expect `native turbo (android)` badge
 
 Pass `basePath` (e.g. `expo-file-system` `documentDirectory`) when using a relative `filename`.
 

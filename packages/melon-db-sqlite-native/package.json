@@ -14,7 +14,10 @@
 		"type": "modules",
 		"jsSrcsDir": "src",
 		"android": {
-			"javaPackageName": "com.melon.sqlite"
+			"javaPackageName": "com.melon.sqlite",
+			"modulesProvider": {
+				"MelonSQLite": "MelonSQLiteModule"
+			}
 		},
 		"ios": {
 			"modulesProvider": {

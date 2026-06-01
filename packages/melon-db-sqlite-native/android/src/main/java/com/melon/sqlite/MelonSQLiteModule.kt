@@ -2,27 +2,26 @@ package com.melon.sqlite
 
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
+import com.facebook.fbreact.specs.NativeMelonSQLiteSpec
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
-import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableType
 import com.facebook.react.bridge.WritableArray
 import com.facebook.react.bridge.WritableMap
+import com.facebook.react.module.annotations.ReactModule
 import java.io.File
 import java.util.Locale
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /**
- * Melon SQLite bridge for React Native development builds (Android).
+ * Melon SQLite TurboModule for React Native development builds (Android).
  */
+@ReactModule(name = NativeMelonSQLiteSpec.NAME)
 class MelonSQLiteModule(reactContext: ReactApplicationContext) :
-	ReactContextBaseJavaModule(reactContext) {
-	override fun getName(): String = "MelonSQLite"
-
+	NativeMelonSQLiteSpec(reactContext) {
 	private val lock = ReentrantLock()
 	private var database: SQLiteDatabase? = null
 
@@ -33,7 +32,9 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 		if (path.startsWith("/")) {
 			return path
 		}
-		val filesDir = reactApplicationContext.filesDir ?: throw IllegalStateException("filesDir unavailable")
+		val filesDir =
+			reactApplicationContext.filesDir
+				?: throw IllegalStateException("filesDir unavailable")
 		return File(filesDir, path).absolutePath
 	}
 
@@ -104,8 +105,7 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 		return row
 	}
 
-	@ReactMethod
-	fun open(path: String, promise: Promise) {
+	override fun open(path: String, promise: Promise) {
 		lock.withLock {
 			try {
 				if (path.contains("..")) {
@@ -123,8 +123,7 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 		}
 	}
 
-	@ReactMethod
-	fun close(promise: Promise) {
+	override fun close(promise: Promise) {
 		lock.withLock {
 			try {
 				database?.close()
@@ -136,8 +135,7 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 		}
 	}
 
-	@ReactMethod
-	fun exec(sql: String, promise: Promise) {
+	override fun exec(sql: String, promise: Promise) {
 		lock.withLock {
 			val db = ensureOpen(promise) ?: return
 			try {
@@ -149,8 +147,7 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 		}
 	}
 
-	@ReactMethod
-	fun queryAll(sql: String, params: ReadableArray, promise: Promise) {
+	override fun queryAll(sql: String, params: ReadableArray, promise: Promise) {
 		lock.withLock {
 			val db = ensureOpen(promise) ?: return
 			var cursor: Cursor? = null
@@ -170,8 +167,7 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 		}
 	}
 
-	@ReactMethod
-	fun queryFirst(sql: String, params: ReadableArray, promise: Promise) {
+	override fun queryFirst(sql: String, params: ReadableArray, promise: Promise) {
 		lock.withLock {
 			val db = ensureOpen(promise) ?: return
 			var cursor: Cursor? = null
@@ -191,8 +187,7 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 		}
 	}
 
-	@ReactMethod
-	fun run(sql: String, params: ReadableArray, promise: Promise) {
+	override fun run(sql: String, params: ReadableArray, promise: Promise) {
 		lock.withLock {
 			val db = ensureOpen(promise) ?: return
 			try {

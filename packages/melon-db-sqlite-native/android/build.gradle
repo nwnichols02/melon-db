@@ -2,26 +2,50 @@ buildscript {
   ext.kotlin_version = "2.0.21"
 }
 
+def safeExtGet(prop, fallback) {
+  rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+def isNewArchitectureEnabled() {
+  return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+}
+
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
-def safeExtGet(prop, fallback) {
-  rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+if (isNewArchitectureEnabled()) {
+  apply plugin: "com.facebook.react"
 }
 
 android {
   compileSdkVersion safeExtGet("compileSdkVersion", 35)
   namespace "com.melon.sqlite"
 
+  buildFeatures {
+    buildConfig true
+  }
+
   defaultConfig {
     minSdkVersion safeExtGet("minSdkVersion", 24)
     targetSdkVersion safeExtGet("targetSdkVersion", 35)
+    buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
   }
 
   sourceSets {
     main {
       java.srcDirs = ["src/main/java"]
+      if (isNewArchitectureEnabled()) {
+        java.srcDirs += ["${project.buildDir}/generated/source/codegen/java"]
+      }
     }
+  }
+}
+
+if (isNewArchitectureEnabled()) {
+  react {
+    jsRootDir = file("../")
+    libraryName = "MelonSQLiteSpec"
+    codegenJavaPackageName = "com.melon.sqlite"
   }
 }
 

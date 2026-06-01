@@ -4,7 +4,7 @@ import type { Spec } from "./NativeMelonSQLite.ts";
 export type SqlParam = string | number | boolean | null;
 
 /**
- * Native SQLite module contract (TurboModule on iOS, legacy bridge on Android).
+ * Native SQLite module contract (TurboModule on iOS/Android when New Architecture is enabled).
  */
 export interface MelonSQLiteNativeModule {
 	open(path: string): Promise<void>;
