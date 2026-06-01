@@ -1,0 +1,3 @@
+/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/.cxx/Debug/1a1fk6o2/x86/CMakeFiles/melon_sqlite.dir
+/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/.cxx/Debug/1a1fk6o2/x86/CMakeFiles/edit_cache.dir
+/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/.cxx/Debug/1a1fk6o2/x86/CMakeFiles/rebuild_cache.dir

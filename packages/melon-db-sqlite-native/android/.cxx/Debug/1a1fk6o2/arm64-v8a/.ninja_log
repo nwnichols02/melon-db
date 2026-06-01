@@ -1,7 +1,13 @@
 # ninja log v5
-0	700	1780357286517151212	CMakeFiles/melon_sqlite.dir/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/cpp/MelonSQLiteInstaller.cpp.o	8fb7dcbae476cf3a
-0	778	1780357286595419941	CMakeFiles/melon_sqlite.dir/src/main/jni/OnLoad.cpp.o	9a5a5c65fbb01eeb
-0	1707	1780357287519534944	CMakeFiles/melon_sqlite.dir/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/cpp/MelonSQLiteHostObject.cpp.o	191ff0f069a5438b
-1	2527	1780357288290123980	CMakeFiles/melon_sqlite.dir/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/vendor/sqlite3/sqlite3.c.o	33e8e23d2d3a1a2f
-3	2075	1780357325163403787	CMakeFiles/melon_sqlite.dir/src/main/jni/MelonSQLiteJni.cpp.o	29b4243059c17b28
 2075	2288	1780357325372156345	../../../../build/intermediates/cxx/Debug/1a1fk6o2/obj/arm64-v8a/libmelon_sqlite.so	74781e9d83cd73bf
+3	2075	1780357325163403787	CMakeFiles/melon_sqlite.dir/src/main/jni/MelonSQLiteJni.cpp.o	29b4243059c17b28
+0	700	1780357286517151212	CMakeFiles/melon_sqlite.dir/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/cpp/MelonSQLiteInstaller.cpp.o	8fb7dcbae476cf3a
+1	2527	1780357288290123980	CMakeFiles/melon_sqlite.dir/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/vendor/sqlite3/sqlite3.c.o	33e8e23d2d3a1a2f
+0	1707	1780357287519534944	CMakeFiles/melon_sqlite.dir/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/cpp/MelonSQLiteHostObject.cpp.o	191ff0f069a5438b
+0	778	1780357286595419941	CMakeFiles/melon_sqlite.dir/src/main/jni/OnLoad.cpp.o	9a5a5c65fbb01eeb
+3	961	1780357521104592856	CMakeFiles/melon_sqlite.dir/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/cpp/MelonSQLiteInstaller.cpp.o	235ffc151be6358d
+3	1035	1780357521179425093	CMakeFiles/melon_sqlite.dir/src/main/jni/OnLoad.cpp.o	f4117ed0893a3b71
+3	1094	1780357521238221950	CMakeFiles/melon_sqlite.dir/src/main/jni/MelonSQLiteJni.cpp.o	101c5d4dba71a1f4
+3	2244	1780357522382265663	CMakeFiles/melon_sqlite.dir/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/cpp/MelonSQLiteHostObject.cpp.o	dcf00a75cf34fcc0
+4	3261	1780357523349908121	CMakeFiles/melon_sqlite.dir/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/vendor/sqlite3/sqlite3.c.o	5cd9b241a12d126c
+3261	3378	1780357523522177271	../../../../build/intermediates/cxx/Debug/1a1fk6o2/obj/arm64-v8a/libmelon_sqlite.so	c907e730e07c01ed

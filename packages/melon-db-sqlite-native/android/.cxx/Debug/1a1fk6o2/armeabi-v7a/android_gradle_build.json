@@ -1,0 +1,48 @@
+{
+  "buildFiles": [
+    "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/.cxx/Debug/1a1fk6o2/prefab/armeabi-v7a/prefab/lib/arm-linux-androideabi/cmake/ReactAndroid/ReactAndroidConfig.cmake",
+    "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/.cxx/Debug/1a1fk6o2/prefab/armeabi-v7a/prefab/lib/arm-linux-androideabi/cmake/ReactAndroid/ReactAndroidConfigVersion.cmake",
+    "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/.cxx/Debug/1a1fk6o2/prefab/armeabi-v7a/prefab/lib/arm-linux-androideabi/cmake/fbjni/fbjniConfig.cmake",
+    "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/.cxx/Debug/1a1fk6o2/prefab/armeabi-v7a/prefab/lib/arm-linux-androideabi/cmake/fbjni/fbjniConfigVersion.cmake",
+    "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/natenichols/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/.cxx/Debug/1a1fk6o2/armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/natenichols/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/.cxx/Debug/1a1fk6o2/armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "melon_sqlite::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "armeabi-v7a",
+      "artifactName": "melon_sqlite",
+      "output": "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/build/intermediates/cxx/Debug/1a1fk6o2/obj/armeabi-v7a/libmelon_sqlite.so",
+      "runtimeFiles": [
+        "/Users/natenichols/.gradle/caches/8.14.3/transforms/52fba397ee69a489802542663b2a7886/transformed/react-android-0.81.5-debug/prefab/modules/jsi/libs/android.armeabi-v7a/libjsi.so",
+        "/Users/natenichols/.gradle/caches/8.14.3/transforms/6347936a505aab872d9b18fa868e791d/transformed/fbjni-0.7.0/prefab/modules/fbjni/libs/android.armeabi-v7a/libfbjni.so",
+        "/Users/natenichols/.gradle/caches/8.14.3/transforms/52fba397ee69a489802542663b2a7886/transformed/react-android-0.81.5-debug/prefab/modules/reactnative/libs/android.armeabi-v7a/libreactnative.so"
+      ]
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/Users/natenichols/Library/Android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/Users/natenichols/Library/Android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [
+    "c"
+  ],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

@@ -1,0 +1,327 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/build/intermediates/cxx/Debug/1a1fk6o2/obj/arm64-v8a/libmelon_sqlite.so"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"target_link_libraries",
+			"target_compile_options",
+			"target_include_directories",
+			"target_sources"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 7,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 39,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 47,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 27,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 17,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 24,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 23,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -std=c++20 -frtti -fexceptions -O2 -fno-limit-debug-info  -fPIC"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-DSQLITE_THREADSAFE=1"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-DSQLITE_ENABLE_FTS4=1"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-DSQLITE_ENABLE_FTS3_PARENTHESIS=1"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-DSQLITE_ENABLE_FTS5=1"
+				},
+				{
+					"fragment" : "-std=gnu++20"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"define" : "melon_sqlite_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 5,
+					"path" : "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/../cpp"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/src/main/jni"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/vendor/sqlite3"
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "/Users/natenichols/.gradle/caches/8.14.3/transforms/52fba397ee69a489802542663b2a7886/transformed/react-android-0.81.5-debug/prefab/modules/jsi/include"
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "/Users/natenichols/.gradle/caches/8.14.3/transforms/6347936a505aab872d9b18fa868e791d/transformed/fbjni-0.7.0/prefab/modules/fbjni/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "/Users/natenichols/.gradle/caches/8.14.3/transforms/52fba397ee69a489802542663b2a7886/transformed/react-android-0.81.5-debug/prefab/modules/reactnative/include"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					1
+				],
+				"standard" : "20"
+			},
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3
+			],
+			"sysroot" : 
+			{
+				"path" : "/Users/natenichols/Library/Android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/darwin-x86_64/sysroot"
+			}
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security  -fno-limit-debug-info  -fPIC"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-DSQLITE_THREADSAFE=1"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-DSQLITE_ENABLE_FTS4=1"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-DSQLITE_ENABLE_FTS3_PARENTHESIS=1"
+				},
+				{
+					"backtrace" : 4,
+					"fragment" : "-DSQLITE_ENABLE_FTS5=1"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"define" : "melon_sqlite_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 5,
+					"path" : "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/../cpp"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/src/main/jni"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/vendor/sqlite3"
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "/Users/natenichols/.gradle/caches/8.14.3/transforms/52fba397ee69a489802542663b2a7886/transformed/react-android-0.81.5-debug/prefab/modules/jsi/include"
+				},
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "/Users/natenichols/.gradle/caches/8.14.3/transforms/6347936a505aab872d9b18fa868e791d/transformed/fbjni-0.7.0/prefab/modules/fbjni/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "/Users/natenichols/.gradle/caches/8.14.3/transforms/52fba397ee69a489802542663b2a7886/transformed/react-android-0.81.5-debug/prefab/modules/reactnative/include"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				4
+			],
+			"sysroot" : 
+			{
+				"path" : "/Users/natenichols/Library/Android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/darwin-x86_64/sysroot"
+			}
+		}
+	],
+	"id" : "melon_sqlite::@6890427a1f51a3e7e1df",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-Wl,--build-id=sha1 -Wl,--no-rosegment -Wl,--no-undefined-version -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-landroid",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "-llog",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "/Users/natenichols/.gradle/caches/8.14.3/transforms/52fba397ee69a489802542663b2a7886/transformed/react-android-0.81.5-debug/prefab/modules/jsi/libs/android.arm64-v8a/libjsi.so",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "/Users/natenichols/.gradle/caches/8.14.3/transforms/6347936a505aab872d9b18fa868e791d/transformed/fbjni-0.7.0/prefab/modules/fbjni/libs/android.arm64-v8a/libfbjni.so",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 3,
+				"fragment" : "/Users/natenichols/.gradle/caches/8.14.3/transforms/52fba397ee69a489802542663b2a7886/transformed/react-android-0.81.5-debug/prefab/modules/reactnative/libs/android.arm64-v8a/libreactnative.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-latomic -lm",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX",
+		"sysroot" : 
+		{
+			"path" : "/Users/natenichols/Library/Android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/darwin-x86_64/sysroot"
+		}
+	},
+	"name" : "melon_sqlite",
+	"nameOnDisk" : "libmelon_sqlite.so",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2,
+				3,
+				4
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/cpp/MelonSQLiteHostObject.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/cpp/MelonSQLiteInstaller.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/main/jni/MelonSQLiteJni.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "src/main/jni/OnLoad.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 7,
+			"compileGroupIndex" : 1,
+			"path" : "/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/vendor/sqlite3/sqlite3.c",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "SHARED_LIBRARY"
+}

@@ -1,0 +1,5 @@
+/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/.cxx/Debug/1a1fk6o2/prefab/armeabi-v7a/prefab/lib/arm-linux-androideabi/cmake/ReactAndroid/ReactAndroidConfig.cmake
+/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/.cxx/Debug/1a1fk6o2/prefab/armeabi-v7a/prefab/lib/arm-linux-androideabi/cmake/ReactAndroid/ReactAndroidConfigVersion.cmake
+/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/.cxx/Debug/1a1fk6o2/prefab/armeabi-v7a/prefab/lib/arm-linux-androideabi/cmake/fbjni/fbjniConfig.cmake
+/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/.cxx/Debug/1a1fk6o2/prefab/armeabi-v7a/prefab/lib/arm-linux-androideabi/cmake/fbjni/fbjniConfigVersion.cmake
+/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/android/CMakeLists.txt

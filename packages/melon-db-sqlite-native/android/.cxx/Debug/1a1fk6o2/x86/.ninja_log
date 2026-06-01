@@ -1,0 +1,7 @@
+# ninja log v5
+0	380	1780357527731140520	CMakeFiles/melon_sqlite.dir/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/cpp/MelonSQLiteInstaller.cpp.o	7be1dcfff5dcac4c
+0	441	1780357527794878263	CMakeFiles/melon_sqlite.dir/src/main/jni/OnLoad.cpp.o	3aec3bb4a18c48eb
+0	533	1780357527885636279	CMakeFiles/melon_sqlite.dir/src/main/jni/MelonSQLiteJni.cpp.o	2be4e79684e3975e
+0	1250	1780357528599824334	CMakeFiles/melon_sqlite.dir/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/cpp/MelonSQLiteHostObject.cpp.o	55a35f1acae50194
+0	1419	1780357528723993108	CMakeFiles/melon_sqlite.dir/Users/natenichols/Desktop/Personal/melon/packages/melon-db-sqlite-native/vendor/sqlite3/sqlite3.c.o	f34d697a99a4b069
+1419	1468	1780357528819738937	../../../../build/intermediates/cxx/Debug/1a1fk6o2/obj/x86/libmelon_sqlite.so	e42968b035ff86f4
