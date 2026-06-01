@@ -9,14 +9,14 @@ description: "API reference: ApplyRemoteChangesOptions"
 
 # Interface: ApplyRemoteChangesOptions
 
-Defined in: [packages/melon-db/src/sync/types.ts:37](https://github.com/nwnichols02/melon/blob/207c4d1a85d3dfd22aa1ee5b62ec45a11b2c2384/packages/melon-db/src/sync/types.ts#L37)
+Defined in: [packages/melon-db/src/sync/types.ts:37](https://github.com/nwnichols02/melon/blob/6858894ce57dd2f409c4a9a4bb910798f94a69d0/packages/melon-db/src/sync/types.ts#L37)
 
 ## Properties
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-conflictpolicy"></a> `conflictPolicy?` | `"server-wins"` \| `"skip-existing"` \| `"client-wins"` \| `"last-write-wins"` \| `"merge-by-field"` \| `"custom"` | Default: server-wins — remote record replaces local on id collision. | [packages/melon-db/src/sync/types.ts:39](https://github.com/nwnichols02/melon/blob/207c4d1a85d3dfd22aa1ee5b62ec45a11b2c2384/packages/melon-db/src/sync/types.ts#L39) |
-| <a id="property-conflictresolver"></a> `conflictResolver?` | [`ConflictResolver`](TypeAlias.ConflictResolver) | Required when `conflictPolicy` is `custom`. | [packages/melon-db/src/sync/types.ts:47](https://github.com/nwnichols02/melon/blob/207c4d1a85d3dfd22aa1ee5b62ec45a11b2c2384/packages/melon-db/src/sync/types.ts#L47) |
-| <a id="property-mergeprotectedfields"></a> `mergeProtectedFields?` | `string`[] | Always use remote values for these fields (e.g. server-owned timestamps). | [packages/melon-db/src/sync/types.ts:53](https://github.com/nwnichols02/melon/blob/207c4d1a85d3dfd22aa1ee5b62ec45a11b2c2384/packages/melon-db/src/sync/types.ts#L53) |
-| <a id="property-mergeremotefields"></a> `mergeRemoteFields?` | `string`[] | When set, only these fields are taken from remote when not in pendingFields. | [packages/melon-db/src/sync/types.ts:51](https://github.com/nwnichols02/melon/blob/207c4d1a85d3dfd22aa1ee5b62ec45a11b2c2384/packages/melon-db/src/sync/types.ts#L51) |
-| <a id="property-synctimestampfield"></a> `syncTimestampField?` | `string` | Field used for last-write-wins; defaults to "_updated_at" when present. | [packages/melon-db/src/sync/types.ts:49](https://github.com/nwnichols02/melon/blob/207c4d1a85d3dfd22aa1ee5b62ec45a11b2c2384/packages/melon-db/src/sync/types.ts#L49) |
+| <a id="property-conflictpolicy"></a> `conflictPolicy?` | `"server-wins"` \| `"skip-existing"` \| `"client-wins"` \| `"last-write-wins"` \| `"merge-by-field"` \| `"custom"` | Default: server-wins — remote record replaces local on id collision. | [packages/melon-db/src/sync/types.ts:39](https://github.com/nwnichols02/melon/blob/6858894ce57dd2f409c4a9a4bb910798f94a69d0/packages/melon-db/src/sync/types.ts#L39) |
+| <a id="property-conflictresolver"></a> `conflictResolver?` | [`ConflictResolver`](TypeAlias.ConflictResolver) | Required when `conflictPolicy` is `custom`. | [packages/melon-db/src/sync/types.ts:47](https://github.com/nwnichols02/melon/blob/6858894ce57dd2f409c4a9a4bb910798f94a69d0/packages/melon-db/src/sync/types.ts#L47) |
+| <a id="property-mergeprotectedfields"></a> `mergeProtectedFields?` | `string`[] | Always use remote values for these fields (e.g. server-owned timestamps). | [packages/melon-db/src/sync/types.ts:53](https://github.com/nwnichols02/melon/blob/6858894ce57dd2f409c4a9a4bb910798f94a69d0/packages/melon-db/src/sync/types.ts#L53) |
+| <a id="property-mergeremotefields"></a> `mergeRemoteFields?` | `string`[] | When set, only these fields are taken from remote when not in pendingFields. | [packages/melon-db/src/sync/types.ts:51](https://github.com/nwnichols02/melon/blob/6858894ce57dd2f409c4a9a4bb910798f94a69d0/packages/melon-db/src/sync/types.ts#L51) |
+| <a id="property-synctimestampfield"></a> `syncTimestampField?` | `string` | Field used for last-write-wins; defaults to "_updated_at" when present. | [packages/melon-db/src/sync/types.ts:49](https://github.com/nwnichols02/melon/blob/6858894ce57dd2f409c4a9a4bb910798f94a69d0/packages/melon-db/src/sync/types.ts#L49) |
