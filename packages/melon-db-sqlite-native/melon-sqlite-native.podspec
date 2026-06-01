@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.source       = { :path => "." }
   s.source_files = "ios/**/*.{h,m,mm}"
   s.public_header_files = "ios/*.h"
-  s.frameworks = "sqlite3"
+  s.libraries = "sqlite3"
 
   if defined?(install_modules_dependencies) != nil
     install_modules_dependencies(s)
