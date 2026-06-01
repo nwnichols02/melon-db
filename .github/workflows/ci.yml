@@ -72,6 +72,11 @@ jobs:
         env:
           COMPARE_RUNNER_BIN: node
 
+      - name: Verify docs benchmark artifact generation
+        run: bun run bench:compare:docs
+        env:
+          COMPARE_RUNNER_BIN: node
+
   postgres-sync:
     runs-on: ubuntu-latest
     services:

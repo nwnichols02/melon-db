@@ -1,0 +1,14 @@
+---
+title: Latest results
+description: Most recent Melon vs WatermelonDB benchmark parity table from the committed harness artifact.
+---
+
+<BenchCompareResultsTable />
+
+The table above is generated from [`apps/docs/src/data/bench-compare-latest.json`](https://github.com/melon/melon/blob/main/apps/docs/src/data/bench-compare-latest.json). Refresh it after benchmark changes:
+
+```bash
+COMPARE_RUNNER_BIN=node bun run bench:compare:docs
+```
+
+Commit the updated JSON with your PR when timings should be reflected on the docs site.

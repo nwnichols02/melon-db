@@ -1,3 +1,4 @@
+import { BenchCompareResultsTable } from "@/components/bench-compare-results-table";
 import { ClientLivePlayground } from "@/components/playgrounds/client-live-playground";
 import { ClientSyncPlayground } from "@/components/playgrounds/client-sync-playground";
 import defaultMdxComponents from "fumadocs-ui/mdx";
@@ -11,6 +12,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 	return {
 		...defaultMdxComponents,
 		AutoTypeTable,
+		BenchCompareResultsTable,
 		LivePlayground: ClientLivePlayground,
 		SyncPlayground: ClientSyncPlayground,
 		...components,

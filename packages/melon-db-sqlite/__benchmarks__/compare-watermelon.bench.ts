@@ -4,127 +4,41 @@
  * Run: bun run packages/melon-db-sqlite/__benchmarks__/compare-watermelon.bench.ts
  * Flags: --scale=10k|50k|100k|all --json --skip-wdb --melon-engines=bun,node
  */
-import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
-import {
-	type BenchResult,
-	parseCompareCli,
-	printResults,
-} from "./lib/bench-runner.ts";
-import {
-	isBetterSqlite3Available,
-	resolveCompareRunnerBinary,
-} from "./lib/better-sqlite3-available.ts";
-import {
-	buildParityReport,
-	printParityJson,
-	printParityReport,
-} from "./lib/compare-report.ts";
-import { runMelonNodeScenarios } from "./lib/melon-node-scenarios.ts";
-import { runScenarios } from "./lib/scenarios.ts";
-import { runWdbScenarios } from "./lib/wdb-scenarios.ts";
-
-const compareSqliteRunnerPath = fileURLToPath(
-	new URL("./lib/compare-sqlite-runner.ts", import.meta.url),
-);
-
-function runSqliteLegsViaSubprocess(
-	scaleArg: string,
-	skipWdb: boolean,
-): BenchResult[] {
-	const args = [compareSqliteRunnerPath, `--scale=${scaleArg}`, "--json"];
-	if (skipWdb) {
-		args.push("--skip-wdb");
-	}
-
-	const runnerBin = resolveCompareRunnerBinary();
-	const runnerArgs =
-		runnerBin === "node"
-			? ["--experimental-strip-types", ...args]
-			: args;
-	const proc = spawnSync(runnerBin, runnerArgs, {
-		encoding: "utf8",
-		cwd: fileURLToPath(new URL(".", import.meta.url)),
-	});
-
-	if (proc.status !== 0) {
-		console.error(proc.stderr || proc.stdout);
-		throw new Error(`Compare subprocess failed (exit ${proc.status})`);
-	}
-
-	const line = proc.stdout.trim().split("\n").at(-1);
-	if (!line) {
-		throw new Error("Compare subprocess produced no JSON output");
-	}
-
-	const parsed = JSON.parse(line) as { results: BenchResult[] };
-	return parsed.results;
-}
-
-async function runBetterSqliteLegs(
-	scales: number[],
-	skipWdb: boolean,
-	melonEngines: Array<"bun" | "node">,
-	scaleArg: string,
-): Promise<BenchResult[]> {
-	const includeMelonNode = melonEngines.includes("node");
-	if (!includeMelonNode && skipWdb) {
-		return [];
-	}
-
-	if (await isBetterSqlite3Available()) {
-		const results: BenchResult[] = [];
-		for (const scale of scales) {
-			if (includeMelonNode) {
-				results.push(...(await runMelonNodeScenarios(scale)));
-			}
-			if (!skipWdb) {
-				results.push(...(await runWdbScenarios(scale)));
-			}
-		}
-		return results;
-	}
-
-	console.warn(
-		`better-sqlite3 not available in this process; spawning ${resolveCompareRunnerBinary()} subprocess for melon-node / watermelon legs.`,
-	);
-	return runSqliteLegsViaSubprocess(scaleArg, skipWdb);
-}
+import { parseCompareCli, printResults } from "./lib/bench-runner.ts";
+import { printParityJson, printParityReport } from "./lib/compare-report.ts";
+import { runCompareBenchmark } from "./lib/run-compare.ts";
 
 const cli = parseCompareCli(process.argv.slice(2));
-const allResults: BenchResult[] = [];
+const { results: allResults, reports } = await runCompareBenchmark(cli);
 
 for (const scale of cli.scales) {
 	console.log(`\n=== Scale: ${scale.toLocaleString()} rows ===\n`);
 
-	if (cli.melonEngines.includes("bun")) {
-		const bunResults = await runScenarios("sqlite", scale);
-		allResults.push(...bunResults);
-		if (!cli.json) {
+	if (!cli.json && cli.melonEngines.includes("bun")) {
+		const bunResults = allResults.filter(
+			(row) => row.engine === "melon-bun" && row.scale === scale,
+		);
+		if (bunResults.length > 0) {
 			printResults(bunResults);
 		}
 	}
 }
 
-const sqliteResults = await runBetterSqliteLegs(
-	cli.scales,
-	cli.skipWdb,
-	cli.melonEngines,
-	cli.scaleArg,
-);
-allResults.push(...sqliteResults);
-if (!cli.json && sqliteResults.length > 0) {
-	printResults(sqliteResults);
+if (!cli.json) {
+	const sqliteResults = allResults.filter(
+		(row) => row.engine === "melon-node" || row.engine === "watermelon",
+	);
+	if (sqliteResults.length > 0) {
+		printResults(sqliteResults);
+	}
 }
 
 if (cli.json) {
-	for (const scale of cli.scales) {
-		const report = buildParityReport(allResults, scale);
+	for (const report of reports) {
 		printParityJson(report);
 	}
 } else {
-	for (const scale of cli.scales) {
-		const report = buildParityReport(allResults, scale);
+	for (const report of reports) {
 		printParityReport(report);
 	}
 	console.log("\nDone.");

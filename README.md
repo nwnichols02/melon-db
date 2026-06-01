@@ -85,7 +85,7 @@ bun run bench
 bun run bench:compare    # Melon vs WatermelonDB (better-sqlite3 parity)
 ```
 
-See [`packages/melon-db-sqlite/README.md`](packages/melon-db-sqlite/README.md) and [/docs/performance-comparison](/docs/performance-comparison) for methodology and baseline notes.
+See [`packages/melon-db-sqlite/README.md`](packages/melon-db-sqlite/README.md), [/docs/performance-comparison](/docs/performance-comparison), and [/docs/performance-comparison/latest-results](/docs/performance-comparison/latest-results) for methodology and latest timings.
 
 ### Documentation site
 

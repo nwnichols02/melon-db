@@ -1,0 +1,94 @@
+{
+  "generatedAt": "2026-06-01T22:45:44.054Z",
+  "updatedBy": "bench:compare:docs",
+  "scales": [
+    10000
+  ],
+  "reports": [
+    {
+      "timestamp": "2026-06-01T22:45:44.054Z",
+      "scale": 10000,
+      "comparisons": [
+        {
+          "scenario": "row-insert",
+          "scale": 10000,
+          "melonNodeMs": 97.416459,
+          "watermelonMs": 2460.701333,
+          "ratio": 0.0396,
+          "winner": "melon"
+        },
+        {
+          "scenario": "batch-insert",
+          "scale": 10000,
+          "melonNodeMs": 36.077292,
+          "watermelonMs": 46.5751250000003,
+          "ratio": 0.7746,
+          "winner": "melon"
+        },
+        {
+          "scenario": "filtered-query",
+          "scale": 10000,
+          "melonNodeMs": 0.6957500000000039,
+          "watermelonMs": 1.3950420000001031,
+          "ratio": 0.4987,
+          "winner": "melon"
+        },
+        {
+          "scenario": "count-query",
+          "scale": 10000,
+          "melonNodeMs": 0.38437499999997726,
+          "watermelonMs": 0.40783399999963876,
+          "ratio": 0.9425,
+          "winner": "melon"
+        },
+        {
+          "scenario": "find-by-id",
+          "scale": 10000,
+          "melonNodeMs": 0.038250000000005,
+          "watermelonMs": 0.04383300000017698,
+          "ratio": 0.8726,
+          "winner": "tie"
+        }
+      ],
+      "notes": [
+        "Primary axis: melon-node vs watermelon on better-sqlite3 :memory:",
+        "ratio = melonNodeMs / watermelonMs (< 1 means Melon faster)"
+      ]
+    }
+  ],
+  "melonBun": [
+    {
+      "engine": "melon-bun",
+      "scale": 10000,
+      "scenario": "row-insert",
+      "durationMs": 47.945167,
+      "rowCount": 10000
+    },
+    {
+      "engine": "melon-bun",
+      "scale": 10000,
+      "scenario": "filtered-query",
+      "durationMs": 0.8992079999999874,
+      "resultCount": 20
+    },
+    {
+      "engine": "melon-bun",
+      "scale": 10000,
+      "scenario": "count-query",
+      "durationMs": 0.2570829999999944
+    },
+    {
+      "engine": "melon-bun",
+      "scale": 10000,
+      "scenario": "find-by-id",
+      "durationMs": 0.031125000000002956
+    },
+    {
+      "engine": "melon-bun",
+      "scale": 10000,
+      "scenario": "batch-insert",
+      "durationMs": 18.346417000000002,
+      "rowCount": 10000
+    }
+  ]
+}

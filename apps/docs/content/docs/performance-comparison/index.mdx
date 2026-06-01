@@ -1,9 +1,11 @@
 ---
-title: Performance comparison
+title: Overview
 description: Melon vs WatermelonDB benchmark methodology and limitations.
 ---
 
 Melon ships an optional **WatermelonDB baseline** in the `@melon/db-sqlite` benchmark harness. This is a measurement tool only — not a performance guarantee or optimization target.
+
+See **[Latest results](/docs/performance-comparison/latest-results)** for timings from the most recent committed benchmark run.
 
 ## Commands
 
@@ -14,6 +16,7 @@ bun run bench:compare              # human-readable table
 bun run bench:compare --scale=10k --json
 bun run bench:compare --melon-engines=bun,node
 bun run bench:compare --skip-wdb   # Melon-only (no @nozbe/watermelondb leg)
+bun run bench:compare:docs         # refresh docs latest-results JSON
 ```
 
 CI runs `bench:compare:ci` (10k, JSON) in the `bench-compare` workflow. The job is a **soft gate**: it logs parity JSON and does not fail on regressions.
