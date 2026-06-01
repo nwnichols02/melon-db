@@ -155,14 +155,14 @@ await synchronize({
 
 Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun run dev:docs`). Summary:
 
-| Done | Deferred (Phase 18+) |
+| Done | Deferred (Phase 19+) |
 |------|----------|
 | Core engine M0–M2 | Custom JSI/TurboModule SQLite |
 | SQLite SQL compiler + Bun adapter | EAS Build CI |
 | Expo SQLite adapter (`@melon/db-sqlite/expo`) | WatermelonDB benchmark comparison |
 | Optional Node driver (`@melon/db-sqlite/node`) | Model/schema codemods, `Q.on` joins |
 | `apps/playground-rn` + sync demo | Background sync service |
-| Query / Mango / Prisma surfaces | Custom conflict resolver hook |
+| Query / Mango / Prisma surfaces | Per-field timestamps / three-way merge |
 | React hooks (`useFindMany`, `useMangoQuery`, `useSync`) | |
 | Schema migrations | |
 | Prisma schema import + codegen CLI | |
@@ -182,6 +182,7 @@ Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun r
 | Network monitor hooks + auto-resume | |
 | Conflict policies (client-wins, last-write-wins) | |
 | Merge-by-field conflict resolver | |
+| Custom conflict resolver hook | |
 | Migration-aware sync coordination | |
 | CI (test, typecheck, biome, bench-smoke, docs typecheck, postgres-sync) | |
 

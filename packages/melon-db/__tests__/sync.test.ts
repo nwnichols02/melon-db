@@ -1,11 +1,13 @@
 import { describe, expect, test } from "bun:test";
 import { createSqliteAdapter } from "@melon/db-sqlite";
 import {
+	type ConflictResolver,
 	MelonErrorCode,
 	type StorageAdapter,
 	createDatabase,
 	createInMemoryAdapter,
 	createMelonSchema,
+	mergeRemoteWithPendingFields,
 } from "../src/index.ts";
 
 const syncSchema = createMelonSchema({
@@ -464,6 +466,204 @@ describe("sync (in-memory)", () => {
 		const task = await db.collection("tasks").findById("1");
 		expect(task?.title).toBe("Unpushed create");
 		expect(task?.status).toBe("open");
+	});
+
+	test("custom resolver skip keeps local row and outbox", async () => {
+		const db = createSyncDb();
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Local",
+				status: "open",
+			});
+		});
+		await db.markLocalChangesPushed();
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").update("1", { title: "Pending local" });
+		});
+
+		await db.applyRemoteChanges(
+			{
+				tasks: {
+					created: [],
+					updated: [{ id: "1", title: "Remote", status: "done" }],
+					deleted: [],
+				},
+			},
+			{
+				conflictPolicy: "custom",
+				conflictResolver: () => ({ action: "skip" }),
+			},
+		);
+
+		const task = await db.collection("tasks").findById("1");
+		expect(task?.title).toBe("Pending local");
+		expect(task?.status).toBe("open");
+		const changes = await db.getLocalChanges();
+		expect(changes.tasks?.updated).toHaveLength(1);
+	});
+
+	test("custom resolver apply merges disjoint field edits", async () => {
+		const db = createSyncDb();
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Baseline",
+				status: "open",
+			});
+		});
+		await db.markLocalChangesPushed();
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").update("1", { title: "Local title" });
+		});
+
+		const resolver: ConflictResolver = (ctx) => ({
+			action: "apply",
+			record: {
+				...ctx.remote,
+				title:
+					(ctx.outboxEntry?.pendingFields?.title as string | undefined) ??
+					ctx.remote.title,
+			},
+			clearOutbox: false,
+		});
+
+		await db.applyRemoteChanges(
+			{
+				tasks: {
+					created: [],
+					updated: [{ id: "1", title: "Remote title", status: "done" }],
+					deleted: [],
+				},
+			},
+			{ conflictPolicy: "custom", conflictResolver: resolver },
+		);
+
+		const task = await db.collection("tasks").findById("1");
+		expect(task?.title).toBe("Local title");
+		expect(task?.status).toBe("done");
+		const changes = await db.getLocalChanges();
+		expect(changes.tasks?.updated).toHaveLength(1);
+	});
+
+	test("custom resolver clearOutbox false preserves outbox after apply", async () => {
+		const db = createSyncDb();
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Local",
+				status: "open",
+			});
+		});
+		await db.markLocalChangesPushed();
+		await db.write(async (tx) => {
+			await tx.collection("tasks").update("1", { title: "Pending" });
+		});
+
+		await db.applyRemoteChanges(
+			{
+				tasks: {
+					created: [],
+					updated: [{ id: "1", title: "Remote", status: "done" }],
+					deleted: [],
+				},
+			},
+			{
+				conflictPolicy: "custom",
+				conflictResolver: (ctx) => ({
+					action: "apply",
+					record: { ...ctx.remote, title: "Pending" },
+					clearOutbox: false,
+				}),
+			},
+		);
+
+		expect((await db.getLocalChanges()).tasks?.updated).toHaveLength(1);
+	});
+
+	test("custom policy without resolver throws", async () => {
+		const db = createSyncDb();
+		await expect(
+			db.applyRemoteChanges(
+				{
+					tasks: { created: [], updated: [], deleted: [] },
+				},
+				{ conflictPolicy: "custom" },
+			),
+		).rejects.toMatchObject({ code: MelonErrorCode.SYNC_APPLY_FAILED });
+	});
+
+	test("custom resolver skip on delete preserves local row", async () => {
+		const db = createSyncDb();
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Keep me",
+				status: "open",
+			});
+		});
+		await db.markLocalChangesPushed();
+
+		await db.applyRemoteChanges(
+			{
+				tasks: {
+					created: [],
+					updated: [],
+					deleted: ["1"],
+				},
+			},
+			{
+				conflictPolicy: "custom",
+				conflictResolver: () => ({ action: "skip" }),
+			},
+		);
+
+		const task = await db.collection("tasks").findById("1");
+		expect(task?.title).toBe("Keep me");
+	});
+
+	test("custom resolver can use mergeRemoteWithPendingFields", async () => {
+		const db = createSyncDb();
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Baseline",
+				status: "open",
+			});
+		});
+		await db.markLocalChangesPushed();
+		await db.write(async (tx) => {
+			await tx.collection("tasks").update("1", { title: "Local title" });
+		});
+
+		await db.applyRemoteChanges(
+			{
+				tasks: {
+					created: [],
+					updated: [{ id: "1", title: "Remote title", status: "done" }],
+					deleted: [],
+				},
+			},
+			{
+				conflictPolicy: "custom",
+				conflictResolver: (ctx) => ({
+					action: "apply",
+					record: mergeRemoteWithPendingFields({
+						local: ctx.local,
+						remote: ctx.remote,
+						pendingFields: ctx.outboxEntry?.pendingFields,
+						primaryKey: ctx.primaryKey,
+					}),
+					clearOutbox: false,
+				}),
+			},
+		);
+
+		const task = await db.collection("tasks").findById("1");
+		expect(task?.title).toBe("Local title");
+		expect(task?.status).toBe("done");
 	});
 });
 

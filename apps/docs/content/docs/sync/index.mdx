@@ -10,7 +10,7 @@ description: Watermelon-compatible pull/push with retry, conflicts, and checkpoi
 | Step | Action |
 |------|--------|
 | Pull | `pullChanges({ lastPulledAt, schemaVersion, migration? })` → `{ changes, timestamp, schemaVersion? }` |
-| Apply | `db.applyRemoteChanges(changes, { conflictPolicy })` |
+| Apply | `db.applyRemoteChanges(changes, { conflictPolicy, conflictResolver? })` |
 | Push | `pushChanges({ changes: await db.getLocalChanges(), lastPulledAt })` |
 | Ack | `db.markLocalChangesPushed()` |
 | Checkpoint | `checkpointStore.setLastPulledAt(timestamp)` + `setLastSchemaVersion(version)` |
@@ -45,6 +45,34 @@ await synchronize({
 - `client-wins`
 - `last-write-wins`
 - `merge-by-field` — overlay pending local field patches onto remote rows
+- `custom` — call your own `conflictResolver` for each remote create/update/delete
+
+### Custom conflict resolver
+
+Set `conflictPolicy: 'custom'` and provide `conflictResolver`. The resolver receives local row, remote payload, and outbox entry, and returns `apply` (with merged `record`) or `skip`. Use `clearOutbox: false` on `apply` to keep local changes queued for push (same as merge-by-field).
+
+```ts
+import { mergeRemoteWithPendingFields, type ConflictResolver } from '@melon/db';
+
+const resolver: ConflictResolver = (ctx) => ({
+  action: 'apply',
+  record: mergeRemoteWithPendingFields({
+    local: ctx.local,
+    remote: ctx.remote,
+    pendingFields: ctx.outboxEntry?.pendingFields,
+    primaryKey: ctx.primaryKey,
+  }),
+  clearOutbox: false,
+});
+
+await synchronize({
+  db,
+  pullChanges,
+  pushChanges,
+  conflictPolicy: 'custom',
+  conflictResolver: resolver,
+});
+```
 
 ## React hooks
 

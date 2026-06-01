@@ -1,5 +1,6 @@
 import type {
 	ApplyRemoteChangesOptions,
+	ConflictResolver,
 	MelonDatabase,
 	Migration,
 } from "@melon/db";
@@ -52,6 +53,7 @@ export interface MelonSyncProviderProps {
 	networkMonitor?: NetworkMonitor;
 	autoSyncOnReconnect?: boolean;
 	conflictPolicy?: ApplyRemoteChangesOptions["conflictPolicy"];
+	conflictResolver?: ConflictResolver;
 	syncTimestampField?: string;
 	mergeRemoteFields?: ApplyRemoteChangesOptions["mergeRemoteFields"];
 	mergeProtectedFields?: ApplyRemoteChangesOptions["mergeProtectedFields"];
@@ -69,6 +71,7 @@ interface SyncProviderInnerProps {
 	networkMonitor?: NetworkMonitor;
 	autoSyncOnReconnect: boolean;
 	conflictPolicy?: ApplyRemoteChangesOptions["conflictPolicy"];
+	conflictResolver?: ConflictResolver;
 	syncTimestampField?: string;
 	mergeRemoteFields?: ApplyRemoteChangesOptions["mergeRemoteFields"];
 	mergeProtectedFields?: ApplyRemoteChangesOptions["mergeProtectedFields"];
@@ -86,6 +89,7 @@ function MelonSyncProviderInner({
 	networkMonitor,
 	autoSyncOnReconnect,
 	conflictPolicy,
+	conflictResolver,
 	syncTimestampField,
 	mergeRemoteFields,
 	mergeProtectedFields,
@@ -102,6 +106,8 @@ function MelonSyncProviderInner({
 	const mountedRef = useRef(true);
 	const abortRef = useRef<AbortController | null>(null);
 	const syncingRef = useRef(false);
+	const conflictResolverRef = useRef(conflictResolver);
+	conflictResolverRef.current = conflictResolver;
 
 	useEffect(() => {
 		mountedRef.current = true;
@@ -137,6 +143,7 @@ function MelonSyncProviderInner({
 					signal,
 					networkMonitor,
 					conflictPolicy,
+					conflictResolver: conflictResolverRef.current,
 					syncTimestampField,
 					mergeRemoteFields,
 					mergeProtectedFields,
@@ -273,6 +280,7 @@ export function MelonSyncProvider({
 	networkMonitor,
 	autoSyncOnReconnect = false,
 	conflictPolicy,
+	conflictResolver,
 	syncTimestampField,
 	mergeRemoteFields,
 	mergeProtectedFields,
@@ -291,6 +299,7 @@ export function MelonSyncProvider({
 			autoSyncOnReconnect={autoSyncOnReconnect}
 			checkpointStore={resolvedCheckpointStore}
 			conflictPolicy={conflictPolicy}
+			conflictResolver={conflictResolver}
 			db={db}
 			mergeProtectedFields={mergeProtectedFields}
 			mergeRemoteFields={mergeRemoteFields}

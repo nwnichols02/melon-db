@@ -1,5 +1,6 @@
 import type {
 	ApplyRemoteChangesOptions,
+	ConflictResolver,
 	MelonDatabase,
 	Migration,
 	SyncChanges,
@@ -28,6 +29,7 @@ export interface SynchronizeArgs {
 	signal?: AbortSignal;
 	networkMonitor?: NetworkMonitor;
 	conflictPolicy?: ApplyRemoteChangesOptions["conflictPolicy"];
+	conflictResolver?: ConflictResolver;
 	syncTimestampField?: string;
 	mergeRemoteFields?: ApplyRemoteChangesOptions["mergeRemoteFields"];
 	mergeProtectedFields?: ApplyRemoteChangesOptions["mergeProtectedFields"];
@@ -113,6 +115,7 @@ export async function synchronize(
 		signal,
 		networkMonitor = createAlwaysOnlineMonitor(),
 		conflictPolicy,
+		conflictResolver,
 		syncTimestampField,
 		mergeRemoteFields,
 		mergeProtectedFields,
@@ -235,6 +238,7 @@ export async function synchronize(
 		try {
 			await db.applyRemoteChanges(pullResult.changes, {
 				conflictPolicy,
+				conflictResolver,
 				syncTimestampField,
 				mergeRemoteFields,
 				mergeProtectedFields,

@@ -6,6 +6,9 @@ import { clearOutboxForRemoteRecord } from "./ledger.ts";
 import { mergeRemoteWithPendingFields } from "./merge-remote-record.ts";
 import type {
 	ApplyRemoteChangesOptions,
+	ConflictResolver,
+	ConflictResolverContext,
+	ConflictResolverResult,
 	SyncChanges,
 	SyncOutboxEntry,
 	SyncOutboxStore,
@@ -48,7 +51,9 @@ function resolveTimestampField(
 }
 
 function shouldApplyRemote(
-	conflictPolicy: NonNullable<ApplyRemoteChangesOptions["conflictPolicy"]>,
+	conflictPolicy: NonNullable<
+		Exclude<ApplyRemoteChangesOptions["conflictPolicy"], "custom">
+	>,
 	options: {
 		hasOutboxEntry: boolean;
 		local: SyncRecord | null;
@@ -96,7 +101,9 @@ function shouldSkipMergeByFieldApply(
 }
 
 function resolvePayloadForApply(
-	conflictPolicy: NonNullable<ApplyRemoteChangesOptions["conflictPolicy"]>,
+	conflictPolicy: NonNullable<
+		Exclude<ApplyRemoteChangesOptions["conflictPolicy"], "custom">
+	>,
 	options: {
 		local: SyncRecord | null;
 		remote: SyncRecord;
@@ -122,16 +129,49 @@ function resolvePayloadForApply(
 	});
 }
 
+async function resolveWithCustomResolver(
+	resolver: ConflictResolver,
+	ctx: ConflictResolverContext,
+): Promise<ConflictResolverResult> {
+	return resolver(ctx);
+}
+
 async function maybeClearOutboxAfterApply(
 	outbox: SyncOutboxStore,
-	conflictPolicy: NonNullable<ApplyRemoteChangesOptions["conflictPolicy"]>,
+	clearOutbox: boolean,
 	collectionName: string,
 	recordId: string | number,
 ): Promise<void> {
-	if (conflictPolicy === "merge-by-field") {
+	if (!clearOutbox) {
 		return;
 	}
 	await clearOutboxForRemoteRecord(outbox, collectionName, recordId);
+}
+
+async function applyCustomResolverResult(
+	tx: WriteContext<MelonSchema>,
+	collectionName: string,
+	pk: string,
+	recordId: string | number,
+	result: ConflictResolverResult,
+	outbox: SyncOutboxStore,
+): Promise<void> {
+	if (result.action === "skip") {
+		return;
+	}
+	const collection = tx.collection(collectionName);
+	const existing = await collection.findById(recordId);
+	if (existing) {
+		await collection.update(recordId, result.record);
+	} else {
+		await collection.insert(result.record);
+	}
+	await maybeClearOutboxAfterApply(
+		outbox,
+		result.clearOutbox !== false,
+		collectionName,
+		recordId,
+	);
 }
 
 /**
@@ -147,6 +187,20 @@ export async function applyRemoteChangesInWrite<Schema extends MelonSchema>(
 	validateSyncChanges(changes);
 	const conflictPolicy = options?.conflictPolicy ?? "server-wins";
 
+	if (conflictPolicy === "custom" && !options?.conflictResolver) {
+		throw new MelonError('conflictPolicy "custom" requires conflictResolver', {
+			code: MelonErrorCode.SYNC_APPLY_FAILED,
+		});
+	}
+
+	const customResolver = options?.conflictResolver;
+	const builtInConflictPolicy: NonNullable<
+		Exclude<ApplyRemoteChangesOptions["conflictPolicy"], "custom">
+	> =
+		conflictPolicy === "custom"
+			? "server-wins"
+			: (conflictPolicy ?? "server-wins");
+
 	for (const [collectionName, changeSet] of Object.entries(changes)) {
 		if (!(collectionName in schema.collections)) {
 			throw new MelonError(
@@ -161,6 +215,95 @@ export async function applyRemoteChangesInWrite<Schema extends MelonSchema>(
 		const meta = schema.getCollection(collectionName);
 		const pk = meta.primaryKey;
 
+		if (customResolver) {
+			for (const record of changeSet.created) {
+				const id = record[pk];
+				if (id === undefined || id === null) {
+					throw new MelonError(
+						`Remote created record missing primary key "${pk}" on "${collectionName}"`,
+						{ code: MelonErrorCode.SYNC_APPLY_FAILED },
+					);
+				}
+				const recordId = id as string | number;
+				const existing = await collection.findById(recordId);
+				const outboxEntry = await outbox.findByRecord(collectionName, recordId);
+				const result = await resolveWithCustomResolver(customResolver, {
+					collection: collectionName,
+					recordId,
+					operation: "created",
+					primaryKey: pk,
+					local: existing,
+					remote: record,
+					outboxEntry,
+				});
+				await applyCustomResolverResult(
+					tx,
+					collectionName,
+					pk,
+					recordId,
+					result,
+					outbox,
+				);
+			}
+
+			for (const record of changeSet.updated) {
+				const id = record[pk];
+				if (id === undefined || id === null) {
+					throw new MelonError(
+						`Remote updated record missing primary key "${pk}" on "${collectionName}"`,
+						{ code: MelonErrorCode.SYNC_APPLY_FAILED },
+					);
+				}
+				const recordId = id as string | number;
+				const existing = await collection.findById(recordId);
+				const outboxEntry = await outbox.findByRecord(collectionName, recordId);
+				const result = await resolveWithCustomResolver(customResolver, {
+					collection: collectionName,
+					recordId,
+					operation: "updated",
+					primaryKey: pk,
+					local: existing,
+					remote: record,
+					outboxEntry,
+				});
+				await applyCustomResolverResult(
+					tx,
+					collectionName,
+					pk,
+					recordId,
+					result,
+					outbox,
+				);
+			}
+
+			for (const id of changeSet.deleted) {
+				const outboxEntry = await outbox.findByRecord(collectionName, id);
+				const existing = await collection.findById(id);
+				const result = await resolveWithCustomResolver(customResolver, {
+					collection: collectionName,
+					recordId: id,
+					operation: "deleted",
+					primaryKey: pk,
+					local: existing,
+					remote: { [pk]: id },
+					outboxEntry,
+				});
+				if (result.action === "skip") {
+					continue;
+				}
+				if (existing) {
+					await collection.delete(id);
+				}
+				await maybeClearOutboxAfterApply(
+					outbox,
+					result.clearOutbox !== false,
+					collectionName,
+					id,
+				);
+			}
+			continue;
+		}
+
 		for (const record of changeSet.created) {
 			const id = record[pk];
 			if (id === undefined || id === null) {
@@ -174,12 +317,12 @@ export async function applyRemoteChangesInWrite<Schema extends MelonSchema>(
 				collectionName,
 				id as string | number,
 			);
-			if (conflictPolicy === "merge-by-field") {
+			if (builtInConflictPolicy === "merge-by-field") {
 				if (shouldSkipMergeByFieldApply(outboxEntry)) {
 					continue;
 				}
 			} else if (
-				!shouldApplyRemote(conflictPolicy, {
+				!shouldApplyRemote(builtInConflictPolicy, {
 					hasOutboxEntry: outboxEntry !== null,
 					local: existing,
 					remote: record,
@@ -188,7 +331,7 @@ export async function applyRemoteChangesInWrite<Schema extends MelonSchema>(
 			) {
 				continue;
 			}
-			const payload = resolvePayloadForApply(conflictPolicy, {
+			const payload = resolvePayloadForApply(builtInConflictPolicy, {
 				local: existing,
 				remote: record,
 				outboxEntry,
@@ -203,7 +346,7 @@ export async function applyRemoteChangesInWrite<Schema extends MelonSchema>(
 			}
 			await maybeClearOutboxAfterApply(
 				outbox,
-				conflictPolicy,
+				builtInConflictPolicy !== "merge-by-field",
 				collectionName,
 				id as string | number,
 			);
@@ -222,12 +365,12 @@ export async function applyRemoteChangesInWrite<Schema extends MelonSchema>(
 				collectionName,
 				id as string | number,
 			);
-			if (conflictPolicy === "merge-by-field") {
+			if (builtInConflictPolicy === "merge-by-field") {
 				if (shouldSkipMergeByFieldApply(outboxEntry)) {
 					continue;
 				}
 			} else if (
-				!shouldApplyRemote(conflictPolicy, {
+				!shouldApplyRemote(builtInConflictPolicy, {
 					hasOutboxEntry: outboxEntry !== null,
 					local: existing,
 					remote: record,
@@ -236,7 +379,7 @@ export async function applyRemoteChangesInWrite<Schema extends MelonSchema>(
 			) {
 				continue;
 			}
-			const payload = resolvePayloadForApply(conflictPolicy, {
+			const payload = resolvePayloadForApply(builtInConflictPolicy, {
 				local: existing,
 				remote: record,
 				outboxEntry,
@@ -251,7 +394,7 @@ export async function applyRemoteChangesInWrite<Schema extends MelonSchema>(
 			}
 			await maybeClearOutboxAfterApply(
 				outbox,
-				conflictPolicy,
+				builtInConflictPolicy !== "merge-by-field",
 				collectionName,
 				id as string | number,
 			);
@@ -260,19 +403,14 @@ export async function applyRemoteChangesInWrite<Schema extends MelonSchema>(
 		for (const id of changeSet.deleted) {
 			const outboxEntry = await outbox.findByRecord(collectionName, id);
 			if (
-				conflictPolicy === "merge-by-field" &&
+				builtInConflictPolicy === "merge-by-field" &&
 				outboxEntry?.operation === Op.Deleted
 			) {
-				await maybeClearOutboxAfterApply(
-					outbox,
-					conflictPolicy,
-					collectionName,
-					id,
-				);
+				await maybeClearOutboxAfterApply(outbox, false, collectionName, id);
 				continue;
 			}
 			if (
-				conflictPolicy === "merge-by-field" &&
+				builtInConflictPolicy === "merge-by-field" &&
 				outboxEntry?.operation === Op.Created
 			) {
 				continue;
@@ -283,7 +421,7 @@ export async function applyRemoteChangesInWrite<Schema extends MelonSchema>(
 			}
 			await maybeClearOutboxAfterApply(
 				outbox,
-				conflictPolicy,
+				builtInConflictPolicy !== "merge-by-field",
 				collectionName,
 				id,
 			);

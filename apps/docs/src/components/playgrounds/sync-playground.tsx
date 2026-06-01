@@ -1,8 +1,10 @@
 import {
 	type ApplyRemoteChangesOptions,
+	type ConflictResolver,
 	createDatabase,
 	createInMemoryAdapter,
 	createMelonSchema,
+	mergeRemoteWithPendingFields,
 } from "@melon/db";
 import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
 import {
@@ -56,7 +58,19 @@ const CONFLICT_OPTIONS: Array<{
 	{ label: "Client wins", value: "client-wins" },
 	{ label: "Last write wins", value: "last-write-wins" },
 	{ label: "Merge by field", value: "merge-by-field" },
+	{ label: "Custom resolver", value: "custom" },
 ];
+
+const customConflictResolver: ConflictResolver = (ctx) => ({
+	action: "apply",
+	record: mergeRemoteWithPendingFields({
+		local: ctx.local,
+		remote: ctx.remote,
+		pendingFields: ctx.outboxEntry?.pendingFields,
+		primaryKey: ctx.primaryKey,
+	}),
+	clearOutbox: false,
+});
 
 /**
  * Two-client sync demo with devtools sync event logging.
@@ -81,6 +95,8 @@ export function SyncPlayground(): ReactElement {
 				db,
 				checkpointStore: checkpoint,
 				conflictPolicy,
+				conflictResolver:
+					conflictPolicy === "custom" ? customConflictResolver : undefined,
 				retryPolicy: {
 					maxAttempts: 3,
 					baseDelayMs: 50,
@@ -102,6 +118,43 @@ export function SyncPlayground(): ReactElement {
 		},
 		[conflictPolicy, flakyNetwork, flakyRef],
 	);
+
+	const runCustomResolverDemo = useCallback(async () => {
+		setStatus("Running custom resolver demo…");
+		const customId = "custom-demo";
+		await db.write(async (tx) => {
+			const existing = await tx.collection("tasks").findById(customId);
+			if (!existing) {
+				await tx.collection("tasks").insert({
+					id: customId,
+					title: "Baseline",
+					status: "open",
+				});
+			}
+		});
+		await db.markLocalChangesPushed();
+		await db.write(async (tx) => {
+			await tx.collection("tasks").update(customId, { title: "Local title" });
+		});
+		await db.applyRemoteChanges(
+			{
+				tasks: {
+					created: [],
+					updated: [{ id: customId, title: "Remote title", status: "done" }],
+					deleted: [],
+				},
+			},
+			{
+				conflictPolicy: "custom",
+				conflictResolver: customConflictResolver,
+			},
+		);
+		const row = await db.collection("tasks").findById(customId);
+		const pending = await db.getLocalChanges();
+		setStatus(
+			`Custom merged: ${JSON.stringify(row)}; outbox pending: ${pending.tasks?.updated?.length ?? 0}`,
+		);
+	}, []);
 
 	const runMergeDemo = useCallback(async () => {
 		setStatus("Running merge-by-field demo…");
@@ -204,6 +257,13 @@ export function SyncPlayground(): ReactElement {
 							type="button"
 						>
 							Merge-by-field demo
+						</button>
+						<button
+							className="rounded-md bg-fd-secondary px-4 py-2"
+							onClick={() => void runCustomResolverDemo()}
+							type="button"
+						>
+							Custom resolver demo
 						</button>
 					</div>
 					<p className="mt-3 text-fd-muted-foreground">{status}</p>

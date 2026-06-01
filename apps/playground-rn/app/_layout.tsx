@@ -46,6 +46,7 @@ export default function RootLayout(): React.ReactElement {
 	return (
 		<SafeAreaProvider>
 			<MelonDbProvider db={db}>
+				{/* Default merge-by-field; Phase 18 also supports conflictPolicy="custom" + conflictResolver */}
 				<MelonSyncProvider
 					autoSyncOnReconnect
 					conflictPolicy="merge-by-field"

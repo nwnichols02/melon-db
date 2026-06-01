@@ -58,7 +58,11 @@ export { SyncDebugPhase } from "./devtools.ts";
 
 export type {
 	ApplyRemoteChangesOptions,
+	ConflictResolver,
+	ConflictResolverContext,
+	ConflictResolverResult,
 	GetLocalChangesOptions,
+	RemoteSyncOperation,
 	SyncChanges,
 	SyncConfig,
 	SyncOutboxEntry,
