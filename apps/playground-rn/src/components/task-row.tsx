@@ -1,5 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { Task } from "@/db/schema";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 interface TaskRowProps {
 	task: Task;
@@ -9,7 +9,10 @@ interface TaskRowProps {
 /**
  * Renders a single open task row with a complete action.
  */
-export function TaskRow({ task, onComplete }: TaskRowProps): React.ReactElement {
+export function TaskRow({
+	task,
+	onComplete,
+}: TaskRowProps): React.ReactElement {
 	return (
 		<View style={styles.row}>
 			<View style={styles.content}>

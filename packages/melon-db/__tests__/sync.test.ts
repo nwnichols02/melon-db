@@ -322,6 +322,149 @@ describe("sync (in-memory)", () => {
 		const task = await db.collection("tasks").findById("1");
 		expect(task?.title).toBe("Local newer");
 	});
+
+	test("merge-by-field merges disjoint local and remote field edits", async () => {
+		const db = createSyncDb();
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Baseline",
+				status: "open",
+			});
+		});
+		await db.markLocalChangesPushed();
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").update("1", { title: "Local title" });
+		});
+
+		await db.applyRemoteChanges(
+			{
+				tasks: {
+					created: [],
+					updated: [{ id: "1", title: "Remote title", status: "done" }],
+					deleted: [],
+				},
+			},
+			{ conflictPolicy: "merge-by-field" },
+		);
+
+		const task = await db.collection("tasks").findById("1");
+		expect(task?.title).toBe("Local title");
+		expect(task?.status).toBe("done");
+
+		const changes = await db.getLocalChanges();
+		expect(changes.tasks?.updated).toHaveLength(1);
+	});
+
+	test("merge-by-field keeps pending local title over remote on same field", async () => {
+		const db = createSyncDb();
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Baseline",
+				status: "open",
+			});
+		});
+		await db.markLocalChangesPushed();
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").update("1", { title: "Local edit" });
+		});
+
+		await db.applyRemoteChanges(
+			{
+				tasks: {
+					created: [],
+					updated: [{ id: "1", title: "Remote edit", status: "open" }],
+					deleted: [],
+				},
+			},
+			{ conflictPolicy: "merge-by-field" },
+		);
+
+		const task = await db.collection("tasks").findById("1");
+		expect(task?.title).toBe("Local edit");
+	});
+
+	test("merge-by-field mergeProtectedFields keeps remote timestamp", async () => {
+		const timestampSchema = createMelonSchema({
+			version: 1,
+			collections: {
+				tasks: {
+					name: "tasks",
+					primaryKey: "id",
+					fields: {
+						id: { kind: "string" },
+						title: { kind: "string" },
+						_updated_at: { kind: "number" },
+					},
+				},
+			},
+		});
+		const db = createDatabase({
+			schema: timestampSchema,
+			adapter: createInMemoryAdapter(),
+			sync: {},
+		});
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Local",
+				_updated_at: 100,
+			});
+		});
+		await db.markLocalChangesPushed();
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").update("1", { title: "Local newer" });
+		});
+
+		await db.applyRemoteChanges(
+			{
+				tasks: {
+					created: [],
+					updated: [{ id: "1", title: "Remote title", _updated_at: 200 }],
+					deleted: [],
+				},
+			},
+			{
+				conflictPolicy: "merge-by-field",
+				mergeProtectedFields: ["_updated_at"],
+			},
+		);
+
+		const task = await db.collection("tasks").findById("1");
+		expect(task?.title).toBe("Local newer");
+		expect(task?._updated_at).toBe(200);
+	});
+
+	test("merge-by-field skips remote update when outbox is created", async () => {
+		const db = createSyncDb();
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Unpushed create",
+				status: "open",
+			});
+		});
+
+		await db.applyRemoteChanges(
+			{
+				tasks: {
+					created: [],
+					updated: [{ id: "1", title: "Remote", status: "done" }],
+					deleted: [],
+				},
+			},
+			{ conflictPolicy: "merge-by-field" },
+		);
+
+		const task = await db.collection("tasks").findById("1");
+		expect(task?.title).toBe("Unpushed create");
+		expect(task?.status).toBe("open");
+	});
 });
 
 describe("sync (sqlite)", () => {
@@ -362,6 +505,31 @@ describe("sync (sqlite)", () => {
 
 		const pulled = await db.collection("tasks").findById("2");
 		expect(pulled?.title).toBe("Pulled");
+	});
+
+	test("persists pending_fields in outbox across adapter re-open", async () => {
+		const path = `/tmp/melon-sync-outbox-${Bun.randomUUIDv7()}.db`;
+		const adapter1 = createSqliteAdapter({ filename: path });
+		const db1 = createSyncDb(adapter1);
+		await db1.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				title: "Baseline",
+				status: "open",
+			});
+		});
+		await db1.markLocalChangesPushed();
+		await db1.write(async (tx) => {
+			await tx.collection("tasks").update("1", { title: "Pending title" });
+		});
+		await adapter1.close();
+
+		const adapter2 = createSqliteAdapter({ filename: path });
+		const db2 = createSyncDb(adapter2);
+		await db2.collection("tasks").count();
+		const changes = await db2.getLocalChanges();
+		expect(changes.tasks?.updated[0]?.title).toBe("Pending title");
+		await adapter2.close();
 	});
 
 	test("checkpoint persists across adapter re-open with same file", async () => {

@@ -1,4 +1,4 @@
-import { useState, type ReactElement } from "react";
+import { type ReactElement, useState } from "react";
 import { LivePlayground } from "./components/live-playground.tsx";
 import { MarkdownPageLoader } from "./components/markdown-page-loader.tsx";
 import { SyncPlayground } from "./components/sync-playground.tsx";
@@ -48,8 +48,7 @@ export function App(): ReactElement {
 							<button
 								onClick={() => setPage(item.id)}
 								style={{
-									background:
-										page === item.id ? "#333" : "transparent",
+									background: page === item.id ? "#333" : "transparent",
 									border: "none",
 									borderRadius: 6,
 									color: "#fff",
@@ -116,9 +115,7 @@ export function App(): ReactElement {
 				{page === PageKind.Architecture ? (
 					<MarkdownPageLoader path="architecture.md" />
 				) : null}
-				{page === PageKind.Sync ? (
-					<MarkdownPageLoader path="sync.md" />
-				) : null}
+				{page === PageKind.Sync ? <MarkdownPageLoader path="sync.md" /> : null}
 				{page === PageKind.Migration ? (
 					<MarkdownPageLoader path="migration.md" />
 				) : null}

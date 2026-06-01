@@ -74,6 +74,7 @@ export {
 	type CheckpointStore,
 } from "./sync/checkpoint.ts";
 export { createMemorySyncOutboxStore } from "./sync/outbox-store.ts";
+export { mergeRemoteWithPendingFields } from "./sync/merge-remote-record.ts";
 export { validateSyncChanges } from "./sync/get-local-changes.ts";
 
 export type {

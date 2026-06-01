@@ -10,11 +10,7 @@ export interface MarkdownPageProps {
 export function MarkdownPage({ markdown }: MarkdownPageProps): ReactElement {
 	const blocks = parseMarkdown(markdown);
 
-	return (
-		<article style={{ lineHeight: 1.6, maxWidth: 720 }}>
-			{blocks}
-		</article>
-	);
+	return <article style={{ lineHeight: 1.6, maxWidth: 720 }}>{blocks}</article>;
 }
 
 function parseMarkdown(markdown: string): ReactElement[] {

@@ -53,6 +53,8 @@ export interface MelonSyncProviderProps {
 	autoSyncOnReconnect?: boolean;
 	conflictPolicy?: ApplyRemoteChangesOptions["conflictPolicy"];
 	syncTimestampField?: string;
+	mergeRemoteFields?: ApplyRemoteChangesOptions["mergeRemoteFields"];
+	mergeProtectedFields?: ApplyRemoteChangesOptions["mergeProtectedFields"];
 	migrationSyncPolicy?: "strict" | "lenient";
 	migrations?: Migration[];
 	children: React.ReactNode;
@@ -68,6 +70,8 @@ interface SyncProviderInnerProps {
 	autoSyncOnReconnect: boolean;
 	conflictPolicy?: ApplyRemoteChangesOptions["conflictPolicy"];
 	syncTimestampField?: string;
+	mergeRemoteFields?: ApplyRemoteChangesOptions["mergeRemoteFields"];
+	mergeProtectedFields?: ApplyRemoteChangesOptions["mergeProtectedFields"];
 	migrationSyncPolicy?: "strict" | "lenient";
 	migrations?: Migration[];
 	children: React.ReactNode;
@@ -83,6 +87,8 @@ function MelonSyncProviderInner({
 	autoSyncOnReconnect,
 	conflictPolicy,
 	syncTimestampField,
+	mergeRemoteFields,
+	mergeProtectedFields,
 	migrationSyncPolicy,
 	migrations,
 	children,
@@ -132,6 +138,8 @@ function MelonSyncProviderInner({
 					networkMonitor,
 					conflictPolicy,
 					syncTimestampField,
+					mergeRemoteFields,
+					mergeProtectedFields,
 					migrationSyncPolicy,
 					migrations,
 					onSyncEvent,
@@ -181,6 +189,8 @@ function MelonSyncProviderInner({
 			networkMonitor,
 			conflictPolicy,
 			syncTimestampField,
+			mergeRemoteFields,
+			mergeProtectedFields,
 			migrationSyncPolicy,
 			migrations,
 		],
@@ -264,6 +274,8 @@ export function MelonSyncProvider({
 	autoSyncOnReconnect = false,
 	conflictPolicy,
 	syncTimestampField,
+	mergeRemoteFields,
+	mergeProtectedFields,
 	migrationSyncPolicy,
 	migrations,
 	children,
@@ -280,6 +292,8 @@ export function MelonSyncProvider({
 			checkpointStore={resolvedCheckpointStore}
 			conflictPolicy={conflictPolicy}
 			db={db}
+			mergeProtectedFields={mergeProtectedFields}
+			mergeRemoteFields={mergeRemoteFields}
 			migrationSyncPolicy={migrationSyncPolicy}
 			migrations={migrations}
 			networkMonitor={networkMonitor}

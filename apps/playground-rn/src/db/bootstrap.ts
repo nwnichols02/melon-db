@@ -1,7 +1,7 @@
-import { createDatabase, type MelonDatabase } from "@melon/db";
+import { type MelonDatabase, createDatabase } from "@melon/db";
 import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
-import type { SQLiteDatabase } from "expo-sqlite";
 import { createExpoSqliteAdapter } from "@melon/db-sqlite/expo";
+import type { SQLiteDatabase } from "expo-sqlite";
 import * as SQLite from "expo-sqlite";
 import { type Task, taskSchema } from "./schema";
 
@@ -12,9 +12,7 @@ let databasePromise: Promise<MelonDatabase<typeof taskSchema>> | null = null;
 /**
  * Opens the local Melon database and seeds demo tasks when empty.
  */
-export async function getDatabase(): Promise<
-	MelonDatabase<typeof taskSchema>
-> {
+export async function getDatabase(): Promise<MelonDatabase<typeof taskSchema>> {
 	if (!databasePromise) {
 		databasePromise = bootstrap();
 	}
@@ -40,9 +38,7 @@ async function bootstrap(): Promise<MelonDatabase<typeof taskSchema>> {
 	return db;
 }
 
-async function seedTasks(
-	db: MelonDatabase<typeof taskSchema>,
-): Promise<void> {
+async function seedTasks(db: MelonDatabase<typeof taskSchema>): Promise<void> {
 	const seeds: Task[] = [
 		{
 			id: "1",

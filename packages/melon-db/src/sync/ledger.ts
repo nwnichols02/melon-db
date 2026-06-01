@@ -48,6 +48,20 @@ function recordIdFromOperation(
 	return null;
 }
 
+function mergePendingFields(
+	existing: Record<string, unknown> | undefined,
+	values: Record<string, unknown>,
+	primaryKey: string,
+): Record<string, unknown> {
+	const next = { ...(existing ?? {}) };
+	for (const [key, value] of Object.entries(values)) {
+		if (key !== primaryKey) {
+			next[key] = value;
+		}
+	}
+	return next;
+}
+
 /**
  * Records a local write in the sync outbox with coalescing semantics.
  */
@@ -92,12 +106,18 @@ export async function recordSyncOutboxWrite(
 		if (existing?.operation === Op.Created) {
 			return;
 		}
+		const meta = schema.getCollection(collection);
 		const entry: SyncOutboxEntry = {
 			id: existing?.id ?? createOutboxEntryId(),
 			collection,
 			recordId,
 			operation: Op.Updated,
 			timestamp: Date.now(),
+			pendingFields: mergePendingFields(
+				existing?.pendingFields,
+				operation.values,
+				meta.primaryKey,
+			),
 		};
 		await store.upsert(entry);
 		return;

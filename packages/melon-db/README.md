@@ -64,6 +64,8 @@ const db = createDatabase({
 
 Local writes inside `db.write()` are tracked in an engine-managed outbox (`_melon_sync_outbox` table on SQLite). Collections with `localOnly: true` are excluded.
 
+Conflict policies on `applyRemoteChanges()` include `server-wins`, `client-wins`, `last-write-wins`, and `merge-by-field` (pending field patches stored in `pendingFields` on the outbox).
+
 Use `@melon/sync` for pull/push orchestration — see [`packages/melon-sync/README.md`](../melon-sync/README.md).
 
 ## v1 limitations

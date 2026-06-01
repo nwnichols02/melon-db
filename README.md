@@ -153,14 +153,14 @@ await synchronize({
 
 ## Completed vs roadmap
 
-| Done | Deferred (Phase 17+) |
+| Done | Deferred (Phase 18+) |
 |------|----------|
 | Core engine M0–M2 | Custom JSI/TurboModule SQLite |
 | SQLite SQL compiler + Bun adapter | EAS Build CI |
 | Expo SQLite adapter (`@melon/db-sqlite/expo`) | WatermelonDB benchmark comparison |
 | Optional Node driver (`@melon/db-sqlite/node`) | Model/schema codemods, `Q.on` joins |
-| `apps/playground-rn` + sync demo | Merge-by-field conflict resolver |
-| Query / Mango / Prisma surfaces | Background sync service |
+| `apps/playground-rn` + sync demo | Background sync service |
+| Query / Mango / Prisma surfaces | Custom conflict resolver hook |
 | React hooks (`useFindMany`, `useMangoQuery`, `useSync`) | |
 | Schema migrations | |
 | Prisma schema import + codegen CLI | |
@@ -179,6 +179,7 @@ await synchronize({
 | Sync retry queue + cancellation | |
 | Network monitor hooks + auto-resume | |
 | Conflict policies (client-wins, last-write-wins) | |
+| Merge-by-field conflict resolver | |
 | Migration-aware sync coordination | |
 | CI (test, typecheck, biome, bench-smoke, docs typecheck, postgres-sync) | |
 

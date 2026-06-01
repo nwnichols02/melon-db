@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactElement } from "react";
+import { type ReactElement, useEffect, useState } from "react";
 import { MarkdownPage } from "./markdown-page.tsx";
 
 export interface MarkdownPageLoaderProps {

@@ -73,6 +73,7 @@ Pass `conflictPolicy` to `synchronize()`:
 - `skip-existing`
 - `client-wins`
 - `last-write-wins` (optional `syncTimestampField`)
+- `merge-by-field` (optional `mergeRemoteFields`, `mergeProtectedFields`)
 
 ## Migration-aware sync
 
@@ -130,7 +131,7 @@ Use `@melon/db-react` for `MelonSyncProvider`, `useSync`, and `useSyncStatus`.
 ## v1 limitations
 
 - See [`@melon/sync-server`](../melon-sync-server/README.md) for HTTP and Postgres reference backends
-- No merge-by-field conflict resolver
+- No custom per-record `conflictResolver` hook
 - No background sync service
 
 ## Development

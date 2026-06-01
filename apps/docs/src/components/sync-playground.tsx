@@ -1,8 +1,8 @@
 import {
+	type ApplyRemoteChangesOptions,
 	createDatabase,
 	createInMemoryAdapter,
 	createMelonSchema,
-	type ApplyRemoteChangesOptions,
 } from "@melon/db";
 import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
 import {
@@ -11,14 +11,14 @@ import {
 } from "@melon/db-devtools/react";
 import { MelonDbProvider } from "@melon/db-react";
 import {
-	createMemoryCheckpointStore,
-	synchronize,
 	type PullArgs,
 	type PullResult,
 	type PushArgs,
+	createMemoryCheckpointStore,
+	synchronize,
 } from "@melon/sync";
 import { InMemorySyncStore } from "@melon/sync-server";
-import { useCallback, useMemo, useState, type ReactElement } from "react";
+import { type ReactElement, useCallback, useMemo, useState } from "react";
 
 const syncSchema = createMelonSchema({
 	version: 1,
@@ -55,6 +55,7 @@ const CONFLICT_OPTIONS: Array<{
 	{ label: "Server wins", value: "server-wins" },
 	{ label: "Client wins", value: "client-wins" },
 	{ label: "Last write wins", value: "last-write-wins" },
+	{ label: "Merge by field", value: "merge-by-field" },
 ];
 
 /**
@@ -102,6 +103,39 @@ export function SyncPlayground(): ReactElement {
 		[conflictPolicy, flakyNetwork, flakyRef],
 	);
 
+	const runMergeDemo = useCallback(async () => {
+		setStatus("Running merge-by-field demo…");
+		const mergeId = "merge-demo";
+		await db.write(async (tx) => {
+			const existing = await tx.collection("tasks").findById(mergeId);
+			if (!existing) {
+				await tx.collection("tasks").insert({
+					id: mergeId,
+					title: "Baseline",
+					status: "open",
+				});
+			}
+		});
+		await db.markLocalChangesPushed();
+		await db.write(async (tx) => {
+			await tx.collection("tasks").update(mergeId, { title: "Local title" });
+		});
+		await db.applyRemoteChanges(
+			{
+				tasks: {
+					created: [],
+					updated: [{ id: mergeId, title: "Remote title", status: "done" }],
+					deleted: [],
+				},
+			},
+			{ conflictPolicy: "merge-by-field" },
+		);
+		const row = await db.collection("tasks").findById(mergeId);
+		setStatus(
+			`Merged row: ${JSON.stringify(row)} (local title + remote status)`,
+		);
+	}, []);
+
 	const seedAndSync = useCallback(async () => {
 		if (flakyNetwork) {
 			flakyRef.remainingFailures = 2;
@@ -148,7 +182,8 @@ export function SyncPlayground(): ReactElement {
 							<select
 								onChange={(event) =>
 									setConflictPolicy(
-										event.target.value as ApplyRemoteChangesOptions["conflictPolicy"],
+										event.target
+											.value as ApplyRemoteChangesOptions["conflictPolicy"],
 									)
 								}
 								value={conflictPolicy}
@@ -161,20 +196,36 @@ export function SyncPlayground(): ReactElement {
 							</select>
 						</label>
 					</div>
-					<button
-						onClick={() => void seedAndSync()}
-						style={{
-							background: "#111",
-							border: "none",
-							borderRadius: 6,
-							color: "#fff",
-							cursor: "pointer",
-							padding: "8px 16px",
-						}}
-						type="button"
-					>
-						Seed + sync
-					</button>
+					<div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+						<button
+							onClick={() => void seedAndSync()}
+							style={{
+								background: "#111",
+								border: "none",
+								borderRadius: 6,
+								color: "#fff",
+								cursor: "pointer",
+								padding: "8px 16px",
+							}}
+							type="button"
+						>
+							Seed + sync
+						</button>
+						<button
+							onClick={() => void runMergeDemo()}
+							style={{
+								background: "#333",
+								border: "none",
+								borderRadius: 6,
+								color: "#fff",
+								cursor: "pointer",
+								padding: "8px 16px",
+							}}
+							type="button"
+						>
+							Merge-by-field demo
+						</button>
+					</div>
 					<p style={{ color: "#666", marginTop: 12 }}>{status}</p>
 				</div>
 				<MelonDevtoolsPanel />

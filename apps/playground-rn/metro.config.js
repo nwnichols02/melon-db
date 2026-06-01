@@ -25,7 +25,10 @@ config.resolver.unstable_enableSymlinks = true;
 
 config.resolver.extraNodeModules = {
 	"@melon/db": path.resolve(workspaceRoot, "packages/melon-db"),
-	"@melon/db-devtools": path.resolve(workspaceRoot, "packages/melon-db-devtools"),
+	"@melon/db-devtools": path.resolve(
+		workspaceRoot,
+		"packages/melon-db-devtools",
+	),
 	"@melon/db-query": path.resolve(workspaceRoot, "packages/melon-db-query"),
 	"@melon/db-react": path.resolve(workspaceRoot, "packages/melon-db-react"),
 	"@melon/db-sqlite": path.resolve(workspaceRoot, "packages/melon-db-sqlite"),

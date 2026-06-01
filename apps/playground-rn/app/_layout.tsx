@@ -1,4 +1,4 @@
-import { getDatabase, devtoolsBridge } from "@/db/bootstrap";
+import { devtoolsBridge, getDatabase } from "@/db/bootstrap";
 import type { taskSchema } from "@/db/schema";
 import { createHttpSyncBackend } from "@/sync/client";
 import { devNetworkMonitor } from "@/sync/network-monitor";
@@ -48,12 +48,12 @@ export default function RootLayout(): React.ReactElement {
 			<MelonDbProvider db={db}>
 				<MelonSyncProvider
 					autoSyncOnReconnect
-					conflictPolicy="last-write-wins"
+					conflictPolicy="merge-by-field"
+					mergeProtectedFields={["updatedAt"]}
 					networkMonitor={devNetworkMonitor}
 					pullChanges={syncBackend.pullChanges}
 					pushChanges={syncBackend.pushChanges}
 					retryPolicy={DEFAULT_RETRY_POLICY}
-					syncTimestampField="updatedAt"
 				>
 					{__DEV__ ? (
 						<MelonDevtoolsProvider bridge={devtoolsBridge}>

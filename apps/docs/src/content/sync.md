@@ -43,6 +43,29 @@ Pass `conflictPolicy` to `synchronize()` or `MelonSyncProvider`:
 - `skip-existing`
 - `client-wins` — skip remote apply when outbox has a pending entry
 - `last-write-wins` — compare `syncTimestampField` or `_updated_at`
+- `merge-by-field` — overlay locally pending field patches onto remote rows (see below)
+
+### Merge-by-field
+
+When `conflictPolicy` is `merge-by-field`, local `update` writes accumulate `pendingFields` in the sync outbox. On pull apply:
+
+- Start from the remote row, then overlay each pending local field.
+- If both sides changed the same field, the pending local value wins.
+- Unpushed `created` rows skip remote updates (whole-record client-wins).
+- Pending `deleted` rows skip remote create/update.
+- The outbox is **not** cleared on apply — push still runs so merged state reaches the server.
+
+Optional apply options:
+
+- `mergeRemoteFields` — only take these fields from remote when not pending locally.
+- `mergeProtectedFields` — always use remote values (e.g. server-owned `updatedAt`).
+
+```ts
+await db.applyRemoteChanges(changes, {
+  conflictPolicy: 'merge-by-field',
+  mergeProtectedFields: ['updatedAt'],
+});
+```
 
 ## Network monitor
 

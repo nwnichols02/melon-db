@@ -22,7 +22,10 @@ import { createSqliteMigrationExecutor } from "./migration-executor.ts";
 import { generateDdl } from "./schema-ddl.ts";
 import { toSqlParams } from "./sql/bindings.ts";
 import { compileQuery } from "./sql/compile-query.ts";
-import { generateSyncOutboxDdl } from "./sync-outbox-ddl.ts";
+import {
+	generateSyncOutboxDdl,
+	migrateSyncOutboxPendingFieldsColumn,
+} from "./sync-outbox-ddl.ts";
 import { createSqliteSyncOutboxStore } from "./sync-outbox-store.ts";
 
 export interface SqliteAdapterCoreOptions {
@@ -162,6 +165,11 @@ export function createSqliteAdapterFromDriver(
 				for (const ddl of generateSyncOutboxDdl()) {
 					await sqlite.exec(ddl);
 				}
+				await migrateSyncOutboxPendingFieldsColumn(
+					(sql, params) =>
+						sqlite.queryAll(sql, toSqlParams([...(params ?? [])])),
+					(sql) => sqlite.exec(sql),
+				);
 				syncOutboxStore = createSqliteSyncOutboxStore(sqlite);
 			}
 

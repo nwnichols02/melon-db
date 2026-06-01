@@ -59,7 +59,8 @@ export function AddTaskForm({ onAdd }: AddTaskFormProps): React.ReactElement {
 					}}
 					style={[
 						styles.button,
-						(isSubmitting || title.trim().length === 0) && styles.buttonDisabled,
+						(isSubmitting || title.trim().length === 0) &&
+							styles.buttonDisabled,
 					]}
 				>
 					<Text style={styles.buttonText}>Add</Text>

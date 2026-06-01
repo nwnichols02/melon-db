@@ -7,6 +7,34 @@ function recordKey(collection: string, recordId: string | number): string {
 	return `${collection}:${String(recordId)}`;
 }
 
+function parsePendingFields(raw: unknown): Record<string, unknown> | undefined {
+	if (raw === null || raw === undefined) {
+		return undefined;
+	}
+	const text = String(raw);
+	if (text.length === 0) {
+		return undefined;
+	}
+	try {
+		const parsed = JSON.parse(text) as unknown;
+		if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+			return parsed as Record<string, unknown>;
+		}
+	} catch {
+		return undefined;
+	}
+	return undefined;
+}
+
+function serializePendingFields(
+	pendingFields: Record<string, unknown> | undefined,
+): string | null {
+	if (!pendingFields || Object.keys(pendingFields).length === 0) {
+		return null;
+	}
+	return JSON.stringify(pendingFields);
+}
+
 function mapOutboxRow(row: Record<string, unknown>): SyncOutboxEntry {
 	return {
 		id: String(row.id),
@@ -14,6 +42,7 @@ function mapOutboxRow(row: Record<string, unknown>): SyncOutboxEntry {
 		recordId: String(row.record_id),
 		operation: String(row.operation) as SyncOutboxEntry["operation"],
 		timestamp: Number(row.timestamp),
+		pendingFields: parsePendingFields(row.pending_fields),
 	};
 }
 
@@ -26,7 +55,7 @@ export function createSqliteSyncOutboxStore(
 	return {
 		async list(): Promise<SyncOutboxEntry[]> {
 			const rows = await driver.queryAll(
-				`SELECT "id", "collection", "record_id", "operation", "timestamp" FROM "${SYNC_OUTBOX_TABLE}"`,
+				`SELECT "id", "collection", "record_id", "operation", "timestamp", "pending_fields" FROM "${SYNC_OUTBOX_TABLE}"`,
 				[],
 			);
 			return rows.map((row) => mapOutboxRow(row));
@@ -37,7 +66,7 @@ export function createSqliteSyncOutboxStore(
 			recordId: string | number,
 		): Promise<SyncOutboxEntry | null> {
 			const row = await driver.queryFirst(
-				`SELECT "id", "collection", "record_id", "operation", "timestamp" FROM "${SYNC_OUTBOX_TABLE}" WHERE "collection" = ? AND "record_id" = ? LIMIT 1`,
+				`SELECT "id", "collection", "record_id", "operation", "timestamp", "pending_fields" FROM "${SYNC_OUTBOX_TABLE}" WHERE "collection" = ? AND "record_id" = ? LIMIT 1`,
 				toSqlParams([collection, String(recordId)]),
 			);
 			if (!row) {
@@ -52,13 +81,14 @@ export function createSqliteSyncOutboxStore(
 				toSqlParams([entry.collection, String(entry.recordId)]),
 			);
 			await driver.run(
-				`INSERT INTO "${SYNC_OUTBOX_TABLE}" ("id", "collection", "record_id", "operation", "timestamp") VALUES (?, ?, ?, ?, ?)`,
+				`INSERT INTO "${SYNC_OUTBOX_TABLE}" ("id", "collection", "record_id", "operation", "timestamp", "pending_fields") VALUES (?, ?, ?, ?, ?, ?)`,
 				toSqlParams([
 					entry.id,
 					entry.collection,
 					String(entry.recordId),
 					entry.operation,
 					entry.timestamp,
+					serializePendingFields(entry.pendingFields),
 				]),
 			);
 		},

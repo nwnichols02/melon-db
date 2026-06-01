@@ -1,3 +1,8 @@
+import { AddTaskForm } from "@/components/add-task-form";
+import { TaskRow } from "@/components/task-row";
+import { createTaskId } from "@/db/create-task-id";
+import { type Task, taskSchema } from "@/db/schema";
+import { devNetworkMonitor } from "@/sync/network-monitor";
 import { createQueryFactory } from "@melon/db-query";
 import { useQuery, useSync, useWriter } from "@melon/db-react";
 import { SyncStatusKind } from "@melon/sync";
@@ -5,11 +10,6 @@ import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AddTaskForm } from "@/components/add-task-form";
-import { TaskRow } from "@/components/task-row";
-import { createTaskId } from "@/db/create-task-id";
-import { type Task, taskSchema } from "@/db/schema";
-import { devNetworkMonitor } from "@/sync/network-monitor";
 
 /**
  * Task list screen backed by reactive Melon queries.
@@ -76,10 +76,20 @@ export default function TasksScreen(): React.ReactElement {
 	}, []);
 
 	const handleConflictDemo = useCallback(async () => {
+		const demoId = "conflict-demo";
 		await write(async (tx) => {
+			const existing = await tx.collection("tasks").findById(demoId);
+			if (existing) {
+				await tx.collection("tasks").update(demoId, {
+					title: "Local title (merge demo)",
+					priority: 99,
+					updatedAt: new Date(),
+				});
+				return;
+			}
 			await tx.collection("tasks").insert({
-				id: "conflict-demo",
-				title: "Local conflict version",
+				id: demoId,
+				title: "Local title (merge demo)",
 				status: "open",
 				priority: 99,
 				updatedAt: new Date(),
@@ -105,9 +115,7 @@ export default function TasksScreen(): React.ReactElement {
 		switch (status.status) {
 			case SyncStatusKind.Pulling:
 			case SyncStatusKind.Pushing:
-				return retryCount > 0
-					? `Syncing… (retry ${retryCount})`
-					: "Syncing…";
+				return retryCount > 0 ? `Syncing… (retry ${retryCount})` : "Syncing…";
 			case SyncStatusKind.Complete:
 				return "Synced";
 			case SyncStatusKind.Failed:

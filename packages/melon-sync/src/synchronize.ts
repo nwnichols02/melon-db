@@ -29,6 +29,8 @@ export interface SynchronizeArgs {
 	networkMonitor?: NetworkMonitor;
 	conflictPolicy?: ApplyRemoteChangesOptions["conflictPolicy"];
 	syncTimestampField?: string;
+	mergeRemoteFields?: ApplyRemoteChangesOptions["mergeRemoteFields"];
+	mergeProtectedFields?: ApplyRemoteChangesOptions["mergeProtectedFields"];
 	migrationSyncPolicy?: "strict" | "lenient";
 	migrations?: Migration[];
 }
@@ -112,6 +114,8 @@ export async function synchronize(
 		networkMonitor = createAlwaysOnlineMonitor(),
 		conflictPolicy,
 		syncTimestampField,
+		mergeRemoteFields,
+		mergeProtectedFields,
 		migrationSyncPolicy = "strict",
 		migrations = [],
 	} = args;
@@ -232,6 +236,8 @@ export async function synchronize(
 			await db.applyRemoteChanges(pullResult.changes, {
 				conflictPolicy,
 				syncTimestampField,
+				mergeRemoteFields,
+				mergeProtectedFields,
 			});
 		} catch (error) {
 			if (

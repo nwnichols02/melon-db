@@ -1,18 +1,14 @@
 {
-  "expo": {
-    "name": "Melon Playground",
-    "slug": "playground-rn",
-    "version": "1.0.0",
-    "scheme": "melon-playground",
-    "orientation": "portrait",
-    "newArchEnabled": true,
-    "plugins": [
-      "expo-router",
-      "expo-sqlite",
-      "expo-asset"
-    ],
-    "experiments": {
-      "typedRoutes": true
-    }
-  }
+	"expo": {
+		"name": "Melon Playground",
+		"slug": "playground-rn",
+		"version": "1.0.0",
+		"scheme": "melon-playground",
+		"orientation": "portrait",
+		"newArchEnabled": true,
+		"plugins": ["expo-router", "expo-sqlite", "expo-asset"],
+		"experiments": {
+			"typedRoutes": true
+		}
+	}
 }

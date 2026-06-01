@@ -1,7 +1,4 @@
-import {
-	type DatabaseSchemaDefinition,
-	createMelonSchema,
-} from "@melon/db";
+import { type DatabaseSchemaDefinition, createMelonSchema } from "@melon/db";
 
 export const taskSchemaDefinition: DatabaseSchemaDefinition = {
 	version: 1,

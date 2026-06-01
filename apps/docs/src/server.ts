@@ -26,4 +26,6 @@ Bun.serve({
 	},
 });
 
-console.log(`Melon docs running at http://localhost:${process.env.PORT ?? 3000}`);
+console.log(
+	`Melon docs running at http://localhost:${process.env.PORT ?? 3000}`,
+);

@@ -20,9 +20,14 @@ export interface ApplyRemoteChangesOptions {
 		| "server-wins"
 		| "skip-existing"
 		| "client-wins"
-		| "last-write-wins";
+		| "last-write-wins"
+		| "merge-by-field";
 	/** Field used for last-write-wins; defaults to "_updated_at" when present. */
 	syncTimestampField?: string;
+	/** When set, only these fields are taken from remote when not in pendingFields. */
+	mergeRemoteFields?: string[];
+	/** Always use remote values for these fields (e.g. server-owned timestamps). */
+	mergeProtectedFields?: string[];
 }
 
 export interface SyncConfig {
@@ -45,6 +50,8 @@ export interface SyncOutboxEntry {
 	recordId: string | number;
 	operation: SyncOutboxOperation;
 	timestamp: number;
+	/** Field values touched by local updates since last successful push. */
+	pendingFields?: Record<string, unknown>;
 }
 
 export interface SyncOutboxStore {

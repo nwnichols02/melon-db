@@ -10,7 +10,7 @@ import {
 } from "@melon/db-devtools/react";
 import { createQueryFactory } from "@melon/db-query";
 import { MelonDbProvider, useQuery, useWriter } from "@melon/db-react";
-import { useCallback, useMemo, useState, type ReactElement } from "react";
+import { type ReactElement, useCallback, useMemo, useState } from "react";
 
 const demoSchema = createMelonSchema({
 	version: 1,
