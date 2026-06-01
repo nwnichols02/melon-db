@@ -5,6 +5,29 @@ describe("MelonSQLite bridge resolution", () => {
 		mock.restore();
 	});
 
+	test("prefers jsi-sync when host object is installed", async () => {
+		mock.module("react-native", () => ({
+			TurboModuleRegistry: { get: () => null },
+			NativeModules: {},
+		}));
+
+		globalThis.melonSqliteJsi = {
+			openSync: () => {},
+			closeSync: () => {},
+			execSync: () => {},
+			queryAllSync: () => [],
+			queryFirstSync: () => null,
+			runSync: () => {},
+		};
+
+		const { getMelonSQLiteNativeMode } = await import(
+			"../src/MelonSQLiteBridge.ts"
+		);
+		expect(getMelonSQLiteNativeMode()).toBe("jsi-sync");
+
+		globalThis.melonSqliteJsi = undefined;
+	});
+
 	test("prefers TurboModule over NativeModules bridge", async () => {
 		const turboCalls: string[] = [];
 		const bridgeCalls: string[] = [];

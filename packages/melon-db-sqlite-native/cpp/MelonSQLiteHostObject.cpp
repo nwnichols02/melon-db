@@ -17,6 +17,14 @@
 #include <dispatch/dispatch.h>
 #endif
 
+#ifdef __ANDROID__
+#include <condition_variable>
+#include <future>
+#include <mutex>
+#include <queue>
+#include <thread>
+#endif
+
 namespace melon {
 namespace {
 
@@ -43,6 +51,69 @@ struct SqlBindParam {
   std::string stringValue;
 };
 
+#ifdef __ANDROID__
+class AndroidDbSerialQueue {
+ public:
+  AndroidDbSerialQueue() : worker_([this]() { runWorker(); }) {}
+
+  ~AndroidDbSerialQueue() {
+    {
+      std::lock_guard<std::mutex> lock(mutex_);
+      stop_ = true;
+    }
+    cv_.notify_all();
+    if (worker_.joinable()) {
+      worker_.join();
+    }
+  }
+
+  void run(const std::function<void()> &fn) {
+    if (onWorkerThread_) {
+      fn();
+      return;
+    }
+    std::promise<void> done;
+    auto future = done.get_future();
+    {
+      std::lock_guard<std::mutex> lock(mutex_);
+      queue_.push([&fn, &done]() {
+        fn();
+        done.set_value();
+      });
+    }
+    cv_.notify_one();
+    future.wait();
+  }
+
+ private:
+  void runWorker() {
+    onWorkerThread_ = true;
+    while (true) {
+      std::function<void()> task;
+      {
+        std::unique_lock<std::mutex> lock(mutex_);
+        cv_.wait(lock, [this]() { return stop_ || !queue_.empty(); });
+        if (stop_ && queue_.empty()) {
+          return;
+        }
+        task = std::move(queue_.front());
+        queue_.pop();
+      }
+      task();
+    }
+  }
+
+  std::mutex mutex_;
+  std::condition_variable cv_;
+  std::queue<std::function<void()>> queue_;
+  std::thread worker_;
+  bool stop_ = false;
+  thread_local static bool onWorkerThread_;
+};
+
+thread_local bool AndroidDbSerialQueue::onWorkerThread_ = false;
+#endif
+
 class MelonSQLiteHostObject : public HostObject {
  public:
   MelonSQLiteHostObject() {
@@ -65,6 +136,9 @@ class MelonSQLiteHostObject : public HostObject {
       dispatch_release(dbQueue_);
       dbQueue_ = nullptr;
     }
+#endif
+#ifdef __ANDROID__
+    androidDbQueue_.reset();
 #endif
   }
 
@@ -244,6 +318,10 @@ class MelonSQLiteHostObject : public HostObject {
   dispatch_queue_t dbQueue_ = nullptr;
   void *queueKey_ = nullptr;
 #endif
+#ifdef __ANDROID__
+  std::unique_ptr<AndroidDbSerialQueue> androidDbQueue_ =
+      std::make_unique<AndroidDbSerialQueue>();
+#endif
 
   void runOnDbQueue(const std::function<void()> &fn) {
 #ifdef __APPLE__
@@ -254,6 +332,8 @@ class MelonSQLiteHostObject : public HostObject {
     dispatch_sync(dbQueue_, ^{
       fn();
     });
+#elif defined(__ANDROID__)
+    androidDbQueue_->run(fn);
 #else
     fn();
 #endif

@@ -9,7 +9,7 @@ Melon-owned SQLite native module for React Native **development builds**.
 | Platform | Native binding | Status |
 |----------|----------------|--------|
 | iOS (dev build) | Sync C++ JSI (`global.melonSqliteJsi`) + TurboModule fallback | Supported |
-| Android (dev build) | TurboModule codegen (`MelonSQLiteSpec`) | Supported |
+| Android (dev build) | Sync C++ JSI (`global.melonSqliteJsi`) + TurboModule fallback | Supported |
 | Expo Go | N/A | Not available |
 
 ## RN SQLite paths
@@ -17,13 +17,12 @@ Melon-owned SQLite native module for React Native **development builds**.
 | Path | Export | Binding |
 |------|--------|---------|
 | Expo Go (default) | `@melon/db-sqlite/expo` | expo-sqlite async |
-| Dev build (fast, iOS) | `@melon/db-sqlite/rn` + `mode: 'auto'` | Sync C++ JSI + dedicated DB queue |
+| Dev build (fast) | `@melon/db-sqlite/rn` + `mode: 'auto'` | Sync C++ JSI + dedicated DB queue |
 | Dev build (legacy) | `@melon/db-sqlite/rn` + `mode: 'turbo'` | Async TurboModule promises |
 
 ## Limitations
 
-- **Sync C++ JSI is iOS-only** today. Android uses async TurboModule (`mode: 'auto'` falls back to turbo on Android).
-- Android `exec()` routes `PRAGMA` through `rawQuery` (Android forbids `execSQL` for statements that return rows, e.g. `journal_mode = WAL`).
+- Kotlin TurboModule `exec()` routes `PRAGMA` through `rawQuery` on the async fallback path only (C++ JSI uses `sqlite3_exec`).
 - **BLOB / `bytes` fields** are not round-tripped on the native path (returned as `null`).
 - No native `observeQuery` triggers — the engine uses its change emitter fallback.
 - Sync JSI calls block the JS thread until the native DB queue completes (intentional for throughput; keep queries bounded).
@@ -74,7 +73,7 @@ if (!isJsiSqliteAvailable()) {
 const adapter = createJsiSqliteAdapter({
   filename: 'app.db',
   basePath: Paths.document.uri.replace(/^file:\/\//, ''),
-  mode: 'auto', // prefers sync JSI on iOS when installed
+  mode: 'auto', // prefers sync JSI when installed (iOS + Android)
 });
 ```
 
@@ -82,8 +81,8 @@ Inspect binding mode:
 
 ```ts
 import { getMelonSQLiteNativeMode } from '@melon/db-sqlite-native';
-// 'jsi-sync' on iOS when C++ host object installed
-// 'turbo' on Android or when forcing async path
+// 'jsi-sync' when C++ host object installed
+// 'turbo' when forcing async path or host object absent
 // null in Expo Go
 ```
 
@@ -124,19 +123,20 @@ After `bun run dev:rn:dev` (or `install:ios` in `apps/playground-rn-dev`):
 
 ### Android
 
-After `bun run dev:rn:dev:android` then `bun run dev:rn:dev:start`:
+After `expo prebuild --clean` + `bun run dev:rn:dev:android` then `bun run dev:rn:dev:start`:
 
-1. App launches without `NOT_IMPLEMENTED` errors.
-2. Runtime badge shows `native turbo (android)`.
+1. App launches without native module errors.
+2. Runtime badge shows `native jsi-sync (android)` (or `native turbo (android)` when `EXPO_PUBLIC_MELON_SQLITE=turbo`).
 3. Seeded tasks appear.
 4. Add / complete tasks persist across restart.
 5. Sync demo works against `bun run sync-server`.
 
 ## Architecture
 
-- **iOS (fast path):** `cpp/MelonSQLiteHostObject.cpp` installs `global.melonSqliteJsi` — sync JSI host object with SQLite on a dedicated serial dispatch queue. Installed from `MelonSQLite.mm` during TurboModule init.
-- **iOS / Android (fallback):** `MelonSQLite` TurboModule (`MelonSQLiteSpec` codegen) with async promises.
-- **Android:** `MelonSQLiteModule` extends `NativeMelonSQLiteSpec` with `SQLiteDatabase`.
-- **JS:** `MelonSQLiteJsi.ts` reads sync host object; `MelonSQLiteBridge.ts` reports `jsi-sync` | `turbo` | `bridge`.
+- **Shared C++:** `cpp/MelonSQLiteHostObject.cpp` + `MelonSQLiteInstaller.cpp` — sync JSI host object (`openSync`, `queryAllSync`, …) with a dedicated serial DB queue (GCD on iOS, worker thread on Android).
+- **iOS install:** `MelonSQLiteTurboModule.mm` calls `installMelonSqliteJsi` on first Turbo dispatch.
+- **Android install:** `MelonSQLiteJni` + NDK `libmelon_sqlite.so` installs via `RuntimeExecutor` on first Turbo call from `MelonSQLiteModule`.
+- **Fallback:** `MelonSQLite` TurboModule (`MelonSQLiteSpec` codegen) with async promises on both platforms.
+- **JS:** `MelonSQLiteJsi.ts` reads `global.melonSqliteJsi`; `MelonSQLiteBridge.ts` reports `jsi-sync` | `turbo` | `bridge`.
 
-**Phase 26+:** Android C++ JSI parity; native `observeQuery` triggers.
+**Phase 27+:** native `observeQuery` triggers; RN on-device benchmark harness.

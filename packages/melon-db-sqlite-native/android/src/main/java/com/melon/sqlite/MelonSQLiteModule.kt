@@ -25,6 +25,15 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 	private val lock = ReentrantLock()
 	private var database: SQLiteDatabase? = null
 
+	/**
+	 * Installs global.melonSqliteJsi once the React runtime is ready (lazy, first Turbo call).
+	 */
+	private fun ensureMelonJsiInstalled() {
+		val runtimeExecutor =
+			reactApplicationContext.catalystInstance?.runtimeExecutor ?: return
+		MelonSQLiteJni.install(runtimeExecutor)
+	}
+
 	private fun resolveDatabasePath(path: String): String {
 		if (path.contains("..")) {
 			throw IllegalArgumentException("Database path must not contain '..'")
@@ -106,6 +115,7 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 	}
 
 	override fun open(path: String, promise: Promise) {
+		ensureMelonJsiInstalled()
 		lock.withLock {
 			try {
 				if (path.contains("..")) {
@@ -124,6 +134,7 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 	}
 
 	override fun close(promise: Promise) {
+		ensureMelonJsiInstalled()
 		lock.withLock {
 			try {
 				database?.close()
@@ -136,6 +147,7 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 	}
 
 	override fun exec(sql: String, promise: Promise) {
+		ensureMelonJsiInstalled()
 		lock.withLock {
 			val db = ensureOpen(promise) ?: return
 			try {
@@ -148,6 +160,7 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 	}
 
 	override fun queryAll(sql: String, params: ReadableArray, promise: Promise) {
+		ensureMelonJsiInstalled()
 		lock.withLock {
 			val db = ensureOpen(promise) ?: return
 			var cursor: Cursor? = null
@@ -168,6 +181,7 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 	}
 
 	override fun queryFirst(sql: String, params: ReadableArray, promise: Promise) {
+		ensureMelonJsiInstalled()
 		lock.withLock {
 			val db = ensureOpen(promise) ?: return
 			var cursor: Cursor? = null
@@ -188,6 +202,7 @@ class MelonSQLiteModule(reactContext: ReactApplicationContext) :
 	}
 
 	override fun run(sql: String, params: ReadableArray, promise: Promise) {
+		ensureMelonJsiInstalled()
 		lock.withLock {
 			val db = ensureOpen(promise) ?: return
 			try {

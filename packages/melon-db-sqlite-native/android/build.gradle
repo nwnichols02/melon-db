@@ -10,6 +10,26 @@ def isNewArchitectureEnabled() {
   return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
 }
 
+def resolveReactNativeDirectory() {
+  if (rootProject.ext.has("reactNativeDir")) {
+    return rootProject.ext.reactNativeDir
+  }
+  def candidates = [
+    file("${rootProject.projectDir}/../node_modules/react-native"),
+    file("${projectDir}/../../node_modules/react-native"),
+    file("${projectDir}/../../../node_modules/react-native"),
+    file("${projectDir}/../../../../node_modules/react-native"),
+  ]
+  def found = candidates.find { it.exists() }
+  if (found == null) {
+    throw new GradleException(
+        "Could not find react-native. Set ext.reactNativeDir in the app build.gradle.")
+  }
+  return found
+}
+
+def reactNativeRootDir = resolveReactNativeDirectory()
+
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
@@ -23,12 +43,40 @@ android {
 
   buildFeatures {
     buildConfig true
+    prefab true
   }
 
   defaultConfig {
     minSdkVersion safeExtGet("minSdkVersion", 24)
     targetSdkVersion safeExtGet("targetSdkVersion", 35)
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
+
+    externalNativeBuild {
+      cmake {
+        cppFlags "-std=c++20", "-frtti", "-fexceptions", "-O2"
+        arguments "-DANDROID_STL=c++_shared"
+      }
+    }
+  }
+
+  externalNativeBuild {
+    cmake {
+      path "CMakeLists.txt"
+    }
+  }
+
+  packaging {
+    jniLibs {
+      pickFirsts += [
+        "**/libc++_shared.so",
+        "**/libfbjni.so",
+        "**/libjsi.so",
+        "**/libreactnative.so",
+        "**/libreactnativejni.so",
+        "**/libreact_nativemodule_core.so",
+        "**/libturbomodulejsijni.so",
+      ]
+    }
   }
 
   sourceSets {

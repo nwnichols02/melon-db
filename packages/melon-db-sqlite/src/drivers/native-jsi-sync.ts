@@ -2,7 +2,7 @@ import type { SqliteDriver } from "../driver.ts";
 import { toSqlParams } from "../sql/bindings.ts";
 
 export const JSI_SYNC_SQLITE_MESSAGE =
-	"Melon sync JSI SQLite requires a development build on iOS. Set mode: 'turbo' or use @melon/db-sqlite/expo.";
+	"Melon sync JSI SQLite requires a development build on iOS or Android. Set mode: 'turbo' or use @melon/db-sqlite/expo.";
 
 type MelonSqliteJsiHostObject = {
 	openSync(path: string): void;
@@ -47,7 +47,7 @@ function normalizeRow(row: Record<string, unknown>): Record<string, unknown> {
 }
 
 /**
- * Creates a SqliteDriver backed by sync C++ JSI (iOS development build only).
+ * Creates a SqliteDriver backed by sync C++ JSI (iOS/Android development builds).
  */
 export async function createNativeJsiSyncDriver(options: {
 	path: string;

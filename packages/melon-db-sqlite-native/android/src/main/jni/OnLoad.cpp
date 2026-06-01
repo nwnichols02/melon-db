@@ -1,0 +1,9 @@
+#include <fbjni/fbjni.h>
+
+#include "MelonSQLiteJni.h"
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void * /* reserved */) {
+  return facebook::jni::initialize(vm, [] {
+    melon::MelonSQLiteJni::registerNatives();
+  });
+}

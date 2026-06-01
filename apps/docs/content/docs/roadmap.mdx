@@ -38,13 +38,13 @@ This page is the **living status** for Melon. Update it when features land or de
 | iOS TurboModule codegen (`MelonSQLiteSpec`, `@melon/db-sqlite-native`) | Shipped |
 | Android TurboModule codegen (`MelonSQLiteSpec`, `@melon/db-sqlite-native`) | Shipped |
 | WatermelonDB benchmark comparison (`bench:compare`, CI `bench-compare`) | Shipped |
-| C++ JSI + native DB thread spike (iOS sync host object, `global.melonSqliteJsi`) | Shipped (iOS only) |
+| C++ JSI + native DB thread spike (iOS sync host object, `global.melonSqliteJsi`) | Shipped |
+| C++ JSI + native DB thread on Android (`libmelon_sqlite`, `MelonSQLiteJni`) | Shipped |
 
-## Deferred (Phase 26+)
+## Deferred (Phase 27+)
 
 | Area | Notes |
 |------|-------|
-| C++ JSI + native DB thread on Android | iOS spike shipped; Android still async TurboModule |
 | Native `observeQuery` / SQLite triggers | Engine change emitter used today |
 | EAS Build CI | Release automation |
 | Full multi-file schema codemods | Beyond single-model spike |

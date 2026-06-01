@@ -21,7 +21,7 @@ export interface JsiSqliteAdapterOptions {
 	/** Directory prefix when filename is relative (e.g. expo documentDirectory). */
 	basePath?: string;
 	debug?: boolean;
-	/** Driver selection: auto prefers sync JSI when installed (iOS). */
+	/** Driver selection: auto prefers sync JSI when installed (iOS/Android). */
 	mode?: JsiSqliteAdapterMode;
 }
 
@@ -51,7 +51,7 @@ export function isJsiSyncSqliteAvailable(): boolean {
 }
 
 /**
- * Pokes the TurboModule so iOS installs global.melonSqliteJsi on first dispatch.
+ * Pokes the TurboModule so native code installs global.melonSqliteJsi on first dispatch.
  */
 async function ensureNativeJsiInstalled(): Promise<void> {
 	if (isNativeJsiSyncAvailable()) {
