@@ -6,12 +6,8 @@ import type { Database as WdbDatabase } from "@nozbe/watermelondb";
 
 const require = createRequire(import.meta.url);
 
-const {
-	Database,
-	Model,
-	appSchema,
-	tableSchema,
-} = require("@nozbe/watermelondb") as typeof import("@nozbe/watermelondb");
+const { Database, Model, appSchema, tableSchema } =
+	require("@nozbe/watermelondb") as typeof import("@nozbe/watermelondb");
 
 const SQLiteAdapter = require("@nozbe/watermelondb/adapters/sqlite")
 	.default as typeof import("@nozbe/watermelondb/adapters/sqlite").default;

@@ -8,16 +8,25 @@ Melon-owned SQLite native module for React Native **development builds**.
 
 | Platform | Native binding | Status |
 |----------|----------------|--------|
-| iOS (dev build) | TurboModule codegen (`MelonSQLiteSpec`) | Supported |
+| iOS (dev build) | Sync C++ JSI (`global.melonSqliteJsi`) + TurboModule fallback | Supported |
 | Android (dev build) | TurboModule codegen (`MelonSQLiteSpec`) | Supported |
 | Expo Go | N/A | Not available |
 
+## RN SQLite paths
+
+| Path | Export | Binding |
+|------|--------|---------|
+| Expo Go (default) | `@melon/db-sqlite/expo` | expo-sqlite async |
+| Dev build (fast, iOS) | `@melon/db-sqlite/rn` + `mode: 'auto'` | Sync C++ JSI + dedicated DB queue |
+| Dev build (legacy) | `@melon/db-sqlite/rn` + `mode: 'turbo'` | Async TurboModule promises |
+
 ## Limitations
 
-- **iOS / Android:** TurboModule with async promises — not synchronous C++ JSI host objects yet.
+- **Sync C++ JSI is iOS-only** today. Android uses async TurboModule (`mode: 'auto'` falls back to turbo on Android).
 - Android `exec()` routes `PRAGMA` through `rawQuery` (Android forbids `execSQL` for statements that return rows, e.g. `journal_mode = WAL`).
 - **BLOB / `bytes` fields** are not round-tripped on the native path (returned as `null`).
 - No native `observeQuery` triggers — the engine uses its change emitter fallback.
+- Sync JSI calls block the JS thread until the native DB queue completes (intentional for throughput; keep queries bounded).
 
 ## Requirements
 
@@ -65,14 +74,23 @@ if (!isJsiSqliteAvailable()) {
 const adapter = createJsiSqliteAdapter({
   filename: 'app.db',
   basePath: Paths.document.uri.replace(/^file:\/\//, ''),
+  mode: 'auto', // prefers sync JSI on iOS when installed
 });
 ```
 
-Inspect binding mode (turbo vs bridge):
+Inspect binding mode:
 
 ```ts
 import { getMelonSQLiteNativeMode } from '@melon/db-sqlite-native';
-// 'turbo' on iOS/Android dev builds with New Architecture, 'bridge' if turbo unavailable, null in Expo Go
+// 'jsi-sync' on iOS when C++ host object installed
+// 'turbo' on Android or when forcing async path
+// null in Expo Go
+```
+
+Force async TurboModule for A/B comparison:
+
+```bash
+EXPO_PUBLIC_MELON_SQLITE=turbo bun run dev:rn:dev:start
 ```
 
 ## Development build (playground-rn-dev)
@@ -98,10 +116,11 @@ Optional: `EXPO_PUBLIC_MELON_SQLITE=expo` in the dev app uses expo-sqlite instea
 After `bun run dev:rn:dev` (or `install:ios` in `apps/playground-rn-dev`):
 
 1. App launches without native module errors.
-2. Runtime badge shows `native turbo (ios)`.
+2. Runtime badge shows `native jsi-sync (ios)` (or `native turbo (ios)` when `EXPO_PUBLIC_MELON_SQLITE=turbo`).
 3. Seeded tasks appear (same as expo path).
 4. Add / complete tasks persist across restart.
 5. Sync demo works against `bun run sync-server`.
+6. Optional perf: insert 10k tasks and compare jsi-sync vs turbo on the same device.
 
 ### Android
 
@@ -115,8 +134,9 @@ After `bun run dev:rn:dev:android` then `bun run dev:rn:dev:start`:
 
 ## Architecture
 
-- **iOS:** `MelonSQLite` implements `NativeMelonSQLiteSpec` (`ios/MelonSQLite.mm`) with `NativeMelonSQLiteSpecJSI` and system `sqlite3`.
-- **Android:** `MelonSQLiteModule` extends `NativeMelonSQLiteSpec` (`android/.../MelonSQLiteModule.kt`) with `SQLiteDatabase`, registered via `BaseReactPackage` + `isTurboModule`.
-- **JS:** `src/MelonSQLiteBridge.ts` resolves TurboModule first, then `NativeModules` fallback.
+- **iOS (fast path):** `cpp/MelonSQLiteHostObject.cpp` installs `global.melonSqliteJsi` — sync JSI host object with SQLite on a dedicated serial dispatch queue. Installed from `MelonSQLite.mm` during TurboModule init.
+- **iOS / Android (fallback):** `MelonSQLite` TurboModule (`MelonSQLiteSpec` codegen) with async promises.
+- **Android:** `MelonSQLiteModule` extends `NativeMelonSQLiteSpec` with `SQLiteDatabase`.
+- **JS:** `MelonSQLiteJsi.ts` reads sync host object; `MelonSQLiteBridge.ts` reports `jsi-sync` | `turbo` | `bridge`.
 
-**Phase 24+:** Optional pure C++ JSI, dedicated native DB thread.
+**Phase 26+:** Android C++ JSI parity; native `observeQuery` triggers.

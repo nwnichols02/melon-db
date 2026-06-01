@@ -1,4 +1,5 @@
 #import "MelonSQLite.h"
+#import "../cpp/MelonSQLiteInstaller.h"
 #import <sqlite3.h>
 #import <React/RCTUtils.h>
 
@@ -31,6 +32,7 @@
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params {
+  melon::installMelonSqliteJsi(params.runtime);
   return std::make_shared<facebook::react::NativeMelonSQLiteSpecJSI>(params);
 }
 

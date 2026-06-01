@@ -130,9 +130,11 @@ export default function TasksScreen(): React.ReactElement {
 	const sqliteAdapterLabel =
 		process.env.EXPO_PUBLIC_MELON_SQLITE === "expo"
 			? "expo-sqlite"
-			: nativeSqliteMode
-				? `native ${nativeSqliteMode} (${Platform.OS})`
-				: `native (${Platform.OS})`;
+			: process.env.EXPO_PUBLIC_MELON_SQLITE === "turbo"
+				? `native turbo (${Platform.OS})`
+				: nativeSqliteMode
+					? `native ${nativeSqliteMode} (${Platform.OS})`
+					: `native (${Platform.OS})`;
 
 	return (
 		<SafeAreaView style={styles.container} edges={["bottom"]}>

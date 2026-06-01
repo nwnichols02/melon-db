@@ -1,12 +1,12 @@
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import type { BenchResult, CompareCliOptions } from "./bench-runner.ts";
-import { buildParityReport } from "./compare-report.ts";
 import type { ParityReport } from "./bench-runner.ts";
 import {
 	isBetterSqlite3Available,
 	resolveCompareRunnerBinary,
 } from "./better-sqlite3-available.ts";
+import { buildParityReport } from "./compare-report.ts";
 import { runMelonNodeScenarios } from "./melon-node-scenarios.ts";
 import { runScenarios } from "./scenarios.ts";
 import { runWdbScenarios } from "./wdb-scenarios.ts";
@@ -31,9 +31,7 @@ function runSqliteLegsViaSubprocess(
 
 	const runnerBin = resolveCompareRunnerBinary();
 	const runnerArgs =
-		runnerBin === "node"
-			? ["--experimental-strip-types", ...args]
-			: args;
+		runnerBin === "node" ? ["--experimental-strip-types", ...args] : args;
 	const proc = spawnSync(runnerBin, runnerArgs, {
 		encoding: "utf8",
 		cwd: fileURLToPath(new URL("..", import.meta.url)),
@@ -104,7 +102,9 @@ export async function runCompareBenchmark(
 		)),
 	);
 
-	const reports = cli.scales.map((scale) => buildParityReport(allResults, scale));
+	const reports = cli.scales.map((scale) =>
+		buildParityReport(allResults, scale),
+	);
 
 	return { results: allResults, reports };
 }

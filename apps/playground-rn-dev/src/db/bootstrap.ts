@@ -52,9 +52,12 @@ async function createNativeAdapter(): Promise<StorageAdapter> {
 		);
 	}
 	const basePath = toFilesystemPath(Paths.document.uri);
+	const mode =
+		process.env.EXPO_PUBLIC_MELON_SQLITE === "turbo" ? "turbo" : "auto";
 	return createJsiSqliteAdapter({
 		filename: DATABASE_FILENAME,
 		basePath,
+		mode,
 	});
 }
 

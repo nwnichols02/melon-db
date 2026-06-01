@@ -165,6 +165,7 @@ Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun r
 | SQLite SQL compiler + Bun adapter | EAS Build CI |
 | Expo SQLite adapter (`@melon/db-sqlite/expo`, Expo Go) | |
 | WatermelonDB benchmark comparison (`bench:compare`) | |
+| C++ JSI + native DB thread (iOS, `mode: 'auto'`) | Android C++ JSI deferred |
 | JSI SQLite (`@melon/db-sqlite/rn`, iOS + Android dev build) | |
 | iOS + Android TurboModule (`MelonSQLiteSpec` codegen) | |
 | Optional Node driver (`@melon/db-sqlite/node`) | Full multi-file schema codemods |

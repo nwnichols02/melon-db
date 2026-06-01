@@ -1,9 +1,9 @@
 ---
 title: "@melon/db-sqlite-native"
-description: Melon SQLite native module for React Native development builds (iOS + Android TurboModule).
+description: Melon SQLite native module for React Native development builds (iOS sync JSI + Android TurboModule).
 ---
 
-**Status:** Shipped (iOS + Android TurboModule) · **Expo Go:** Not supported
+**Status:** Shipped (iOS sync JSI + Android TurboModule) · **Expo Go:** Not supported
 
 Native SQLite module used by [`@melon/db-sqlite/rn`](/docs/packages/melon-db-sqlite). For Expo Go, use [`@melon/db-sqlite/expo`](/docs/packages/melon-db-sqlite) instead.
 
@@ -11,22 +11,25 @@ Native SQLite module used by [`@melon/db-sqlite/rn`](/docs/packages/melon-db-sql
 
 | Platform | Binding | Status |
 |----------|---------|--------|
-| iOS (dev build) | TurboModule (`MelonSQLiteSpec` codegen) | Supported |
+| iOS (dev build) | Sync C++ JSI (`global.melonSqliteJsi`) | Supported |
+| iOS (dev build) | TurboModule fallback (`mode: 'turbo'`) | Supported |
 | Android (dev build) | TurboModule (`MelonSQLiteSpec` codegen) | Supported |
 | Expo Go | N/A | Not available |
 
 ## Limitations
 
-- Async TurboModule methods only (no sync C++ JSI on the JS thread).
+- Sync C++ JSI is **iOS-only**; Android uses async TurboModule.
 - **BLOB / `bytes` fields** are not round-tripped (returned as `null`).
 - No native `observeQuery` triggers.
 
 ## Setup
 
 - **Expo Go:** [`apps/playground-rn`](/docs/getting-started) — `bun run dev:rn`
-- **Development build (iOS):** `bun run dev:rn:dev` then `bun run dev:rn:dev:start` — expect `native turbo (ios)` badge
+- **Development build (iOS):** `bun run dev:rn:dev` then `bun run dev:rn:dev:start` — expect `native jsi-sync (ios)` badge
 - **Development build (Android):** `bun run dev:rn:dev:android` then start Metro — expect `native turbo (android)` badge
 
 Pass `basePath` (e.g. `expo-file-system` `documentDirectory`) when using a relative `filename`.
 
-After changing [`NativeMelonSQLite.ts`](https://github.com/melon/melon/blob/main/packages/melon-db-sqlite-native/src/NativeMelonSQLite.ts), regenerate codegen and run `expo prebuild --clean` in `apps/playground-rn-dev`. See the [package README](https://github.com/melon/melon/blob/main/packages/melon-db-sqlite-native/README.md).
+`createJsiSqliteAdapter({ mode: 'auto' })` prefers sync JSI on iOS. Set `EXPO_PUBLIC_MELON_SQLITE=turbo` to force the async TurboModule path for comparison.
+
+After changing native spec or C++ sources, run `expo prebuild --clean` in `apps/playground-rn-dev`. See the [package README](https://github.com/melon/melon/blob/main/packages/melon-db-sqlite-native/README.md).

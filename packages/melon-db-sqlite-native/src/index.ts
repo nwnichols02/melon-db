@@ -5,14 +5,22 @@ import {
 	getMelonSQLiteModule,
 	getMelonSQLiteNativeMode,
 } from "./MelonSQLiteBridge.ts";
+import {
+	type MelonSqliteJsiHostObject,
+	getMelonSqliteJsi,
+	isMelonSqliteJsiInstalled,
+	requireMelonSqliteJsi,
+} from "./MelonSQLiteJsi.ts";
 
 export type { SqlParam };
 export type { MelonSQLiteNativeMode };
 export type { MelonSQLiteNativeModule };
+export type { MelonSqliteJsiHostObject };
 export type { Spec } from "./NativeMelonSQLite.ts";
 /** @deprecated Use {@link MelonSQLiteNativeModule} */
 export type MelonSQLiteSpec = MelonSQLiteNativeModule;
 
+export { getMelonSqliteJsi, isMelonSqliteJsiInstalled, requireMelonSqliteJsi };
 export { getMelonSQLiteNativeMode };
 
 /**

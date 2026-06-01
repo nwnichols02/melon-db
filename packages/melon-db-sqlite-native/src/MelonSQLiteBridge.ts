@@ -1,4 +1,5 @@
 import { NativeModules, TurboModuleRegistry } from "react-native";
+import { isMelonSqliteJsiInstalled } from "./MelonSQLiteJsi.ts";
 import type { Spec } from "./NativeMelonSQLite.ts";
 
 export type SqlParam = string | number | boolean | null;
@@ -21,7 +22,7 @@ export interface MelonSQLiteNativeModule {
 	run(sql: string, params: ReadonlyArray<SqlParam>): Promise<void>;
 }
 
-export type MelonSQLiteNativeMode = "turbo" | "bridge";
+export type MelonSQLiteNativeMode = "jsi-sync" | "turbo" | "bridge";
 
 function resolveModule(): {
 	module: MelonSQLiteNativeModule;
@@ -41,9 +42,12 @@ function resolveModule(): {
 }
 
 /**
- * Returns how MelonSQLite is linked (turbo vs legacy bridge), or null when unavailable.
+ * Returns the active native SQLite binding mode, preferring sync JSI when installed.
  */
 export function getMelonSQLiteNativeMode(): MelonSQLiteNativeMode | null {
+	if (isMelonSqliteJsiInstalled()) {
+		return "jsi-sync";
+	}
 	return resolveModule()?.mode ?? null;
 }
 
