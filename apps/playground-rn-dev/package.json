@@ -10,6 +10,7 @@
     "run:ios": "expo run:ios",
     "run:android": "expo run:android",
     "install:ios": "bun run prebuild && bun run run:ios",
+    "install:android": "bun run prebuild && bun run run:android",
     "typecheck": "bunx tsc -p tsconfig.json --noEmit",
     "android": "expo run:android",
     "ios": "expo run:ios"

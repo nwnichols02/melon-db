@@ -4,6 +4,7 @@ import {
 	createDatabase,
 } from "@melon/db";
 import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
+import { Paths } from "expo-file-system";
 import { type Task, taskSchema } from "./schema";
 
 const DATABASE_FILENAME = "melon-playground-dev.db";
@@ -23,19 +24,38 @@ export async function getDatabase(): Promise<MelonDatabase<typeof taskSchema>> {
 }
 
 /**
- * JSI SQLite via @melon/db-sqlite-native (development build only).
+ * SQLite adapter for playground-rn-dev: native JSI by default, expo-sqlite when
+ * EXPO_PUBLIC_MELON_SQLITE=expo.
  */
 async function createAdapter(): Promise<StorageAdapter> {
+	if (process.env.EXPO_PUBLIC_MELON_SQLITE === "expo") {
+		return createExpoAdapter();
+	}
+	return createNativeAdapter();
+}
+
+async function createExpoAdapter(): Promise<StorageAdapter> {
+	const SQLite = await import("expo-sqlite");
+	const { createExpoSqliteAdapter } = await import("@melon/db-sqlite/expo");
+	const database = await SQLite.openDatabaseAsync(DATABASE_FILENAME);
+	return createExpoSqliteAdapter({ database });
+}
+
+async function createNativeAdapter(): Promise<StorageAdapter> {
 	const { createJsiSqliteAdapter, isJsiSqliteAvailable } = await import(
 		"@melon/db-sqlite/rn"
 	);
 	if (!isJsiSqliteAvailable()) {
 		throw new Error(
 			"Melon JSI SQLite requires a native binary. " +
-				"From apps/playground-rn-dev run: bun run install:ios then bun run start",
+				"From apps/playground-rn-dev run: bun run install:ios or bun run install:android, then bun run start",
 		);
 	}
-	return createJsiSqliteAdapter({ filename: DATABASE_FILENAME });
+	const basePath = toFilesystemPath(Paths.document.uri);
+	return createJsiSqliteAdapter({
+		filename: DATABASE_FILENAME,
+		basePath,
+	});
 }
 
 async function bootstrap(): Promise<MelonDatabase<typeof taskSchema>> {
@@ -52,6 +72,13 @@ async function bootstrap(): Promise<MelonDatabase<typeof taskSchema>> {
 	}
 
 	return db;
+}
+
+function toFilesystemPath(uri: string): string {
+	if (!uri.startsWith("file://")) {
+		return uri;
+	}
+	return decodeURIComponent(uri.replace(/^file:\/\//, ""));
 }
 
 async function seedTasks(db: MelonDatabase<typeof taskSchema>): Promise<void> {

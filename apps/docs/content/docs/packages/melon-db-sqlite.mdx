@@ -20,7 +20,7 @@ const adapter = createSqliteAdapter({ filename: 'app.db' });
 | Path | Import | Expo Go |
 |------|--------|---------|
 | **Default** | `@melon/db-sqlite/expo` + `expo-sqlite` | Yes |
-| **JSI spike** | `@melon/db-sqlite/rn` + `@melon/db-sqlite-native` | No — requires `expo prebuild` + dev build |
+| **Native** | `@melon/db-sqlite/rn` + `@melon/db-sqlite-native` | No — requires `expo prebuild` + dev build (iOS + Android) |
 
 ### Expo Go
 
@@ -32,9 +32,10 @@ const database = await SQLite.openDatabaseAsync('app.db');
 const adapter = createExpoSqliteAdapter({ database });
 ```
 
-### JSI (development build, iOS spike)
+### Native (development build, iOS + Android)
 
 ```ts
+import { Paths } from 'expo-file-system';
 import { createJsiSqliteAdapter, isJsiSqliteAvailable } from '@melon/db-sqlite/rn';
 
 if (!isJsiSqliteAvailable()) {
@@ -43,6 +44,7 @@ if (!isJsiSqliteAvailable()) {
 
 const adapter = createJsiSqliteAdapter({
   filename: 'app.db',
+  basePath: Paths.document.uri.replace(/^file:\/\//, ''),
 });
 ```
 

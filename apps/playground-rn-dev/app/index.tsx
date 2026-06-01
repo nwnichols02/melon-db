@@ -8,7 +8,7 @@ import { useQuery, useSync, useWriter } from "@melon/db-react";
 import { SyncStatusKind } from "@melon/sync";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 /**
@@ -125,10 +125,17 @@ export default function TasksScreen(): React.ReactElement {
 		}
 	}, [status, error, isPaused, offlineSimulated, retryCount]);
 
+	const sqliteAdapterLabel =
+		process.env.EXPO_PUBLIC_MELON_SQLITE === "expo"
+			? "expo-sqlite"
+			: `native (${Platform.OS})`;
+
 	return (
 		<SafeAreaView style={styles.container} edges={["bottom"]}>
 			<View style={styles.runtimeBadge}>
-				<Text style={styles.runtimeBadgeText}>JSI development build</Text>
+				<Text style={styles.runtimeBadgeText}>
+					Dev build · {sqliteAdapterLabel}
+				</Text>
 			</View>
 			<View style={styles.syncBar}>
 				<Text style={styles.syncStatus}>{statusLabel}</Text>

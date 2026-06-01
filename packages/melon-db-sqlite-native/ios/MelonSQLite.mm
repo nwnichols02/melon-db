@@ -126,6 +126,7 @@ RCT_EXPORT_METHOD(open:(NSString *)path
       reject(@"SQLITE_OPEN", message, nil);
       return;
     }
+    sqlite3_busy_timeout(_db, 5000);
     resolve(nil);
   } @finally {
     [_lock unlock];

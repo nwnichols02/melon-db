@@ -18,6 +18,7 @@
     "demo:sync:postgres": "DATABASE_URL=postgres://melon:melon@localhost:5433/melon_sync bun run --filter playground-node sync-postgres-demo",
     "dev:rn": "bun run --filter playground-rn start",
     "dev:rn:dev": "bun run --filter playground-rn-dev install:ios",
+    "dev:rn:dev:android": "bun run --filter playground-rn-dev install:android",
     "dev:rn:dev:start": "bun run --filter playground-rn-dev start",
     "dev:docs": "bun run --filter docs dev",
     "build:docs": "bun run docs:api && bun run --filter docs build",

@@ -1,9 +1,9 @@
 ---
 title: "@melon/db-sqlite-native"
-description: Melon SQLite TurboModule for React Native development builds (Phase 20 spike).
+description: Melon SQLite native module for React Native development builds (iOS + Android).
 ---
 
-**Status:** Spike (iOS) · **Expo Go:** Not supported
+**Status:** Shipped (iOS + Android dev builds) · **Expo Go:** Not supported
 
 Native SQLite module used by [`@melon/db-sqlite/rn`](/docs/packages/melon-db-sqlite). For Expo Go, use [`@melon/db-sqlite/expo`](/docs/packages/melon-db-sqlite) instead.
 
@@ -12,10 +12,19 @@ Native SQLite module used by [`@melon/db-sqlite/rn`](/docs/packages/melon-db-sql
 | Platform | Status |
 |----------|--------|
 | iOS (dev build) | Supported |
-| Android | Stub — use expo-sqlite |
+| Android (dev build) | Supported |
 | Expo Go | Not available |
+
+## Limitations
+
+- Bridge modules (not synchronous JSI codegen yet).
+- **BLOB / `bytes` fields** are not round-tripped (returned as `null`).
+- No native `observeQuery` triggers.
 
 ## Setup
 
 - **Expo Go:** [`apps/playground-rn`](/docs/getting-started) — `bun run dev:rn` (does not use this package)
-- **Development build:** [`apps/playground-rn-dev`](/docs/getting-started) — `bun run dev:rn:dev` then `bun run dev:rn:dev:start`
+- **Development build (iOS):** `bun run dev:rn:dev` then `bun run dev:rn:dev:start`
+- **Development build (Android):** `bun run dev:rn:dev:android` then `bun run dev:rn:dev:start`
+
+Pass `basePath` (e.g. `expo-file-system` `documentDirectory`) when using a relative `filename`.
