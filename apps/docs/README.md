@@ -17,6 +17,12 @@ Open http://localhost:3000 — documentation at `/docs`.
 
 If you see `Cannot find module 'collections/browser'`, run `bun run dev:docs` from the repo root (the dev script runs `fumadocs-mdx` first). Ensure port 3000 is free or set `PORT=3001`.
 
+## Vercel
+
+Deploy from the **monorepo root** (recommended) using the root [`vercel.json`](../../vercel.json), or set the Vercel project root to `apps/docs` and use [`apps/docs/vercel.json`](./vercel.json).
+
+Both configs run `bun install` at the repo root so workspace packages resolve. The docs Vite config aliases `@melon/*` imports to `packages/*/src` because Rolldown does not resolve workspace `exports` subpaths during `vite build`.
+
 ## Scripts
 
 | Script | Description |
