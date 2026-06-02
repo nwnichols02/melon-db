@@ -158,9 +158,9 @@ await synchronize({
 
 ## Completed vs roadmap
 
-Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun run dev:docs`). Phases **0–29** are shipped; see the docs for full phase history, [architecture ADRs](/docs/architecture/decisions), and [About](/docs/about).
+Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun run dev:docs`). Phases **0–30** are shipped; see the docs for full phase history, [architecture ADRs](/docs/architecture/decisions), and [About](/docs/about).
 
-| Done (Phases 0–29) | Deferred (Phase 30+) |
+| Done (Phases 0–30) | Deferred (Phase 31+) |
 |------|----------|
 | Core engine M0–M2 | EAS Build CI |
 | SQLite SQL compiler + Bun/Node/Expo adapters | Full multi-file schema codemods |

@@ -7,8 +7,11 @@ import {
 	useFluentQuery,
 	useMangoQuery,
 	useQueryCount,
+	useRecord,
+	useRecordState,
 } from "@melon/db-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Pressable } from "react-native";
 import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -20,6 +23,7 @@ const mangoCompiler = createMangoCompiler();
  */
 export default function DemosScreen(): React.ReactElement {
 	const db = useDatabase();
+	const [selectedId, setSelectedId] = useState<string | null>(null);
 
 	const mangoOpen = useMangoQuery<Task>("tasks", {
 		selector: { status: "open" },
@@ -34,23 +38,17 @@ export default function DemosScreen(): React.ReactElement {
 		include: { project: true },
 	});
 
-	const fluentWithProject = useFluentQuery<Task>(
-		"tasks",
-		(b) =>
-			b
-				.where("status", "eq", "open")
-				.include("project")
-				.orderBy("priority", "desc")
-				.limit(5),
+	const fluentWithProject = useFluentQuery<Task>("tasks", (b) =>
+		b
+			.where("status", "eq", "open")
+			.include("project")
+			.orderBy("priority", "desc")
+			.limit(5),
 	);
 
 	const openCount = useQueryCount(
 		useMemo(
-			() =>
-				q
-					.from<Task>("tasks")
-					.where("status", "eq", "open")
-					.toAst("count"),
+			() => q.from<Task>("tasks").where("status", "eq", "open").toAst("count"),
 			[],
 		),
 	);
@@ -66,15 +64,29 @@ export default function DemosScreen(): React.ReactElement {
 	);
 	const mangoOpenCount = useQueryCount(mangoCountQuery);
 
+	const selectedTask = useRecord<Task>("tasks", selectedId);
+	const selectedState = useRecordState<Task>("tasks", selectedId);
+
+	const collectionFluent = useFluentQuery<Task>("tasks", (b) =>
+		b
+			.where("status", "eq", "open")
+			.not((inner) => inner.where("status", "eq", "done"))
+			.orderBy("priority", "desc")
+			.limit(3),
+	);
+
 	return (
 		<SafeAreaView style={styles.container} edges={["bottom"]}>
 			<ScrollView contentContainerStyle={styles.content}>
 				<Text style={styles.heading}>Query surface demos</Text>
 				<DemoSection title="Mango findMany">
 					{mangoOpen.map((task) => (
-						<Text key={task.id} style={styles.row}>
-							{task.title} (p{task.priority})
-						</Text>
+						<Pressable key={task.id} onPress={() => setSelectedId(task.id)}>
+							<Text style={styles.row}>
+								{task.title} (p{task.priority})
+								{selectedId === task.id ? " · selected" : ""}
+							</Text>
+						</Pressable>
 					))}
 				</DemoSection>
 				<DemoSection title="Prisma-style useFindMany + include">
@@ -97,12 +109,24 @@ export default function DemosScreen(): React.ReactElement {
 					<Text style={styles.row}>Fluent count: {openCount}</Text>
 					<Text style={styles.row}>Mango count: {mangoOpenCount}</Text>
 				</DemoSection>
-				<DemoSection title="Builder on collection">
+				<DemoSection title="useRecord">
 					<Text style={styles.hint}>
-						Main list uses{" "}
-						<Text style={styles.mono}>collection.query((b) =&gt; …)</Text> with
-						project includes.
+						Tap a Mango row above. Status: {selectedState.status}
 					</Text>
+					{selectedTask ? (
+						<Text style={styles.row}>
+							{selectedTask.title} — {selectedTask.status}
+						</Text>
+					) : (
+						<Text style={styles.row}>No task selected</Text>
+					)}
+				</DemoSection>
+				<DemoSection title="Fluent .not() (open, not done)">
+					{collectionFluent.map((task) => (
+						<Text key={task.id} style={styles.row}>
+							{task.title}
+						</Text>
+					))}
 				</DemoSection>
 			</ScrollView>
 		</SafeAreaView>

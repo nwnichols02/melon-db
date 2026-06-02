@@ -10,11 +10,10 @@
 		"typecheck": "bunx tsc -p tsconfig.json --noEmit",
 		"build": "bun build ./src/index.ts --outdir ./dist --target node"
 	},
-	"optionalDependencies": {
+	"dependencies": {
 		"@melon/db-query": "workspace:*"
 	},
 	"devDependencies": {
-		"@melon/db-query": "workspace:*",
 		"@melon/db-sqlite": "workspace:*",
 		"@types/bun": "latest",
 		"typescript": "^5"

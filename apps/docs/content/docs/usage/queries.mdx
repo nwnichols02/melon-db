@@ -55,6 +55,23 @@ const countAst = q.from('tasks').where('status', 'eq', 'open').toAst('count');
 
 Utilities like `byId` live in `@melon/db-query` — see package API reference.
 
+### Builder on `MelonCollection`
+
+Pass a builder callback to `query`, `findMany`, `findFirst`, or `count` (same `CollectionQueryInput` as hooks):
+
+```ts
+const open = await db.collection('tasks').findMany((b) =>
+  b.where('status', 'eq', 'open').orderBy('priority', 'desc').limit(20),
+);
+
+const handle = db.collection('tasks').query((b) =>
+  b.where('status', 'eq', 'open').not((inner) => inner.where('archived', 'eq', true)),
+);
+handle.observe((rows) => { /* reactive */ });
+```
+
+You can also pass a plain `QueryAst` or `() => QueryAst` thunk.
+
 ## Mango (@melon/db-query-mango)
 
 JSON-serializable selectors for configs, tests, and devtools:
@@ -146,6 +163,6 @@ handle.observe((rows) => { /* reactive */ });
 
 ## Related
 
-- [React](/docs/usage/react) — `useQuery`, `useFindMany`, `useMangoQuery`
+- [React](/docs/usage/react) — `useQuery`, `useFindMany`, `useMangoQuery`, `useRecord`, `*State` hooks
 - [Relations](/docs/usage/relations) — `include`
 - [Architecture](/docs/architecture) — query pipeline diagram

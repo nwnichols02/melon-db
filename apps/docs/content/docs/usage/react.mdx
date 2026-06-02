@@ -78,6 +78,54 @@ const tasks = useFindMany<Task>('tasks', {
 
 Compiles Prisma-style args via `@melon/db-prisma` under the hood.
 
+## useFluentQuery
+
+Pass a builder callback (same shape as `collection.query((b) => …)`):
+
+```tsx
+import { useFluentQuery } from '@melon/db-react';
+
+const tasks = useFluentQuery<Task>('tasks', (b) =>
+  b.where('status', 'eq', 'open').orderBy('priority', 'desc').limit(20),
+);
+```
+
+## useRecord
+
+Subscribe to a single row by primary key:
+
+```tsx
+import { useRecord } from '@melon/db-react';
+
+function TaskDetail({ id }: { id: string }) {
+  const task = useRecord<Task>('tasks', id);
+  if (!task) return <Text>Loading…</Text>;
+  return <Text>{task.title}</Text>;
+}
+```
+
+## Async state hooks (`*State`)
+
+Array-returning hooks stay backward compatible. Use `*State` variants when you need loading or error UI:
+
+```tsx
+import { useQueryState, useRecordState } from '@melon/db-react';
+
+const listState = useQueryState<Task>(openTasksAst);
+const recordState = useRecordState<Task>('tasks', taskId);
+
+if (listState.status === 'loading') return <Spinner />;
+if (listState.status === 'error') return <ErrorView error={listState.error} />;
+if (listState.status === 'ready') return <List data={listState.data} />;
+```
+
+| Hook | Returns |
+|------|---------|
+| `useQueryState` | `QueryAsyncState<T[]>` |
+| `useFindManyState` | `QueryAsyncState<T[]>` |
+| `useFluentQueryState` | `QueryAsyncState<T[]>` |
+| `useRecordState` | `QueryAsyncState<T \| null>` |
+
 ## useMangoQuery
 
 ```tsx
@@ -121,6 +169,9 @@ function AddTask() {
 |------|---------|
 | `useDatabase()` | Access `MelonDatabase` from context |
 | `useCollection(name)` | Bound `MelonCollection` |
+| `useFluentQuery` | Fluent builder callback |
+| `useRecord` | Single record by id |
+| `useQueryState` / `useFindManyState` / `useFluentQueryState` / `useRecordState` | Loading + error discriminated union |
 | `useSync()` | Manual sync + status from `MelonSyncProvider` |
 | `useSyncStatus()` | Status-only subscription |
 

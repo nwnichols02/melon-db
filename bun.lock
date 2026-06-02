@@ -126,14 +126,13 @@
     "packages/melon-db": {
       "name": "@melon/db",
       "version": "0.0.0-alpha",
-      "devDependencies": {
+      "dependencies": {
         "@melon/db-query": "workspace:*",
+      },
+      "devDependencies": {
         "@melon/db-sqlite": "workspace:*",
         "@types/bun": "latest",
         "typescript": "^5",
-      },
-      "optionalDependencies": {
-        "@melon/db-query": "workspace:*",
       },
     },
     "packages/melon-db-codemods": {

@@ -62,8 +62,9 @@ This page tracks how Melon implementation compares to the product requirements i
 | `QueryBuilder` + `createQueryFactory` | Done | |
 | `byId` / `byForeignKey` | Done | |
 | `resolveCollectionQuery` | Done | Builder → AST for collections |
+| `findMany` / `findFirst` / `count` + builder | Done | Same `CollectionQueryInput` as `query()` |
 | Schema-driven inference | Partial | Factory accepts schema; no field inference yet |
-| Builder `.not()` | Gap | Use AST `not()` or Mango `$not` |
+| Builder `.not()` | Done | Mirrors `and` / `or` nesting |
 
 ---
 
@@ -87,8 +88,8 @@ This page tracks how Melon implementation compares to the product requirements i
 | Provider + core hooks | Done | |
 | `useMangoQuery`, `useFindMany`, `useFindFirst` | Done | |
 | `useFindMany` + fluent builder | Done | `useFluentQuery` helper |
-| `useRecord` | Gap | |
-| Hook loading/error state | Gap | |
+| `useRecord` | Done | Primary-key observe + `useRecordState` |
+| Hook loading/error state | Done | `useQueryState`, `useFindManyState`, `useFluentQueryState`, `useRecordState` |
 | Sync hooks in this package | Partial | Convenience; [package-roles](https://github.com) boundary drift |
 
 ---

@@ -11,9 +11,9 @@ This page is the **living status** for Melon. Update it when features land or de
 |------|----------------|
 | Packages | 12 under `packages/*` (core through sync-server + native) |
 | Example apps | 4 — `playground-node`, `playground-rn`, `playground-rn-dev`, `docs` |
-| Implementation phases | **0–29 shipped** (see chronology below) |
+| Implementation phases | **0–30 shipped** (see chronology below) |
 | Out-of-cycle | Fumadocs docs site, TypeDoc API, playgrounds (ongoing maintenance) |
-| Next | Phase 30+ deferred items |
+| Next | Phase 31+ deferred items |
 
 **Quick links:** [Architecture](/docs/architecture) · [Phase ADRs](/docs/architecture/decisions) · [Packages](/docs/packages/melon-db) · [Performance](/docs/performance-comparison)
 
@@ -78,6 +78,7 @@ Each phase was executed as a focused delivery increment. Phases 0–7 establishe
 | 27 | Native `observeQuery` | `@melon/db-sqlite` | Predicate-aware invalidation, SQLite triggers foundation, `reactiveSubscriptions: true` | Shipped |
 | 28 | RN on-device benchmarks | `@melon/db-sqlite/bench`, `playground-rn-dev` | Dev benchmark screen, jsi-sync vs turbo JSON report, shared scenario lib | Shipped |
 | 29 | Trigger-driven observation | `@melon/db-sqlite`, `@melon/db-sqlite-native` | Process `_melon_observation_events`, `flushObservationQueue`, native `sqlite3_update_hook` on JSI | Shipped |
+| 30 | Query + React DX | `@melon/db`, `@melon/db-query`, `@melon/db-react` | `collection.query(builder)`, `findMany`/`count` builder input, `QueryBuilder.not()`, `useRecord`, `*State` hooks, ADR-010 | Shipped |
 
 ### Out-of-cycle: Documentation
 
@@ -94,7 +95,7 @@ Core engine, all three query surfaces, React/sync hooks, devtools, codemods, ful
 
 ---
 
-## Deferred (Phase 30+)
+## Deferred (Phase 31+)
 
 See [PRD compliance — Phase 29+ decisions](/docs/prd-compliance#phase-29-decisions) for rationale.
 

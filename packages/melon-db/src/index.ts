@@ -85,6 +85,7 @@ export type {
 	InsertInput,
 	UpdateInput,
 	CollectionRecord,
+	CollectionQueryInput,
 	MelonQueryHandle,
 	MelonCollection,
 	ReadContext,

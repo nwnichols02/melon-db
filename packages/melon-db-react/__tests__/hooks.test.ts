@@ -3,6 +3,8 @@ import {
 	createDatabase,
 	createInMemoryAdapter,
 	createMelonSchema,
+	predicate,
+	prepareQuery,
 	queryAst,
 } from "@melon/db";
 import { compilePrismaQuery } from "@melon/db-prisma";
@@ -79,6 +81,78 @@ describe("db-react exports", () => {
 		await new Promise((r) => setTimeout(r, 15));
 		expect(updates.length).toBeGreaterThanOrEqual(2);
 		expect(updates.at(-1)).toBe(1);
+	});
+
+	test("useRecord observe contract via primary-key query", async () => {
+		const schema = createMelonSchema({
+			version: 1,
+			collections: {
+				tasks: {
+					name: "tasks",
+					primaryKey: "id",
+					fields: {
+						id: { kind: "string" },
+						status: { kind: "string" },
+					},
+				},
+			},
+		});
+		const db = createDatabase({ schema, adapter: createInMemoryAdapter() });
+		const prepared = prepareQuery(
+			{
+				collection: "tasks",
+				mode: "one",
+				where: predicate("id", "eq", "1"),
+				limit: 1,
+			},
+			schema,
+		);
+		const updates: Array<string | null> = [];
+		const handle = db.collection("tasks").query(prepared.ast);
+		handle.observe((rows) =>
+			updates.push(
+				(rows[0] as { status?: string } | undefined)?.status ?? null,
+			),
+		);
+		await new Promise((r) => setTimeout(r, 5));
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({ id: "1", status: "open" });
+		});
+		await new Promise((r) => setTimeout(r, 15));
+		expect(updates.at(-1)).toBe("open");
+		await db.write(async (tx) => {
+			await tx.collection("tasks").update("1", { status: "done" });
+		});
+		await new Promise((r) => setTimeout(r, 15));
+		expect(updates.at(-1)).toBe("done");
+	});
+
+	test("query state contract: fetch then observe updates", async () => {
+		const schema = createMelonSchema({
+			version: 1,
+			collections: {
+				tasks: {
+					name: "tasks",
+					primaryKey: "id",
+					fields: {
+						id: { kind: "string" },
+						status: { kind: "string" },
+					},
+				},
+			},
+		});
+		const db = createDatabase({ schema, adapter: createInMemoryAdapter() });
+		const prepared = prepareQuery(queryAst("tasks", {}), schema);
+		const handle = db.collection("tasks").query(prepared.ast);
+		const lengths: number[] = [];
+		await handle.fetch().then((rows) => lengths.push(rows.length));
+		handle.observe((rows) => lengths.push(rows.length));
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({ id: "1", status: "open" });
+		});
+		await new Promise((r) => setTimeout(r, 15));
+		expect(lengths[0]).toBe(0);
+		expect(lengths.at(-1)).toBe(1);
 	});
 
 	test("useMangoQuery observe contract via mango compiler", async () => {

@@ -43,9 +43,7 @@ function compileSelect(
 				typeof includeValue === "object" ? includeValue : undefined;
 			includes[relationName] = {
 				relation: relationName,
-				where: nestedArgs?.where
-					? whereToAst(nestedArgs.where)
-					: undefined,
+				where: nestedArgs?.where ? whereToAst(nestedArgs.where) : undefined,
 				orderBy: nestedArgs?.orderBy
 					? (Array.isArray(nestedArgs.orderBy)
 							? nestedArgs.orderBy

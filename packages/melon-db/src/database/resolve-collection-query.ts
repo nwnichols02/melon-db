@@ -5,7 +5,9 @@ import type { CollectionQueryInput } from "./query-input.ts";
 /**
  * Resolves QueryAst, a `() => QueryAst` thunk, or a fluent builder callback.
  */
-export function resolveCollectionQueryInput<RecordShape = Record<string, unknown>>(
+export function resolveCollectionQueryInput<
+	RecordShape = Record<string, unknown>,
+>(
 	collection: string,
 	input: QueryAst | CollectionQueryInput<RecordShape> | undefined,
 	defaultAst: () => QueryAst,

@@ -63,6 +63,21 @@ export class QueryBuilder<RecordShape = Record<string, unknown>> {
 		return this;
 	}
 
+	not(
+		group: (q: QueryBuilder<RecordShape>) => QueryBuilder<RecordShape>,
+	): this {
+		const nested = new QueryBuilder<RecordShape>(this.collection);
+		group(nested);
+		const node = nested.whereNode;
+		if (node) {
+			const notNode: QueryBooleanNode = { type: "not", node };
+			this.whereNode = this.whereNode
+				? { type: "and", nodes: [this.whereNode, notNode] }
+				: notNode;
+		}
+		return this;
+	}
+
 	orderBy(
 		field: keyof RecordShape & string,
 		direction: "asc" | "desc" = "asc",

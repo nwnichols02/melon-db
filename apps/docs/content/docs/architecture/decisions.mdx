@@ -134,3 +134,17 @@ These ADRs capture the main architectural choices made during Phases 0–26. Eac
 **Cons:** Extra CI step (`docs:api`, `build:docs`); content must stay in sync with phases (see [Contributing — docs](/docs/contributing/docs)).
 
 **Alternatives:** GitHub wiki / README-only (rejected — poor API reference and interactivity).
+
+---
+
+## ADR-010: `@melon/db` depends on `@melon/db-query` for fluent collection queries
+
+**Context:** `MelonCollection.query((b) => …)` needs `QueryBuilder` and `resolveCollectionQuery`. Strict package boundaries would duplicate builder logic in core or force every app to compile AST manually.
+
+**Decision:** `@melon/db` lists `@melon/db-query` as a runtime dependency. `resolveCollectionQueryInput` delegates builder callbacks to `@melon/db-query`.
+
+**Pros:** One builder implementation; Watermelon-style `collection.query(Q => Q.where(...))` works out of the box in monorepo apps.
+
+**Cons:** Core is no longer free of other `melon-*` packages; tree-shaking cannot drop `@melon/db-query` if you use fluent collection APIs.
+
+**Alternatives:** Optional peer dependency with runtime error (rejected — poor DX in the common case).

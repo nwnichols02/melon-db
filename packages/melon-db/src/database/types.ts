@@ -4,7 +4,6 @@ import type {
 	StorageAdapter,
 } from "../adapter.ts";
 import type { PreparedQuery, QueryAst } from "../ast.ts";
-import type { CollectionQueryInput } from "./query-input.ts";
 import type { DevtoolsBridge } from "../devtools.ts";
 import type { MelonSchema } from "../schema.ts";
 import type { CheckpointStore } from "../sync/checkpoint.ts";
@@ -14,6 +13,9 @@ import type {
 	SyncChanges,
 	SyncConfig,
 } from "../sync/types.ts";
+import type { CollectionQueryInput } from "./query-input.ts";
+
+export type { CollectionQueryInput } from "./query-input.ts";
 
 export type InsertInput<T> = Partial<T>;
 export type UpdateInput<T> = Partial<T>;
@@ -29,9 +31,11 @@ export interface MelonQueryHandle<RecordShape = Record<string, unknown>> {
 export interface MelonCollection<RecordShape = Record<string, unknown>> {
 	readonly name: string;
 	findById(id: string | number): Promise<RecordShape | null>;
-	findMany(query?: QueryAst): Promise<RecordShape[]>;
-	findFirst(query?: QueryAst): Promise<RecordShape | null>;
-	count(query?: QueryAst): Promise<number>;
+	findMany(query?: CollectionQueryInput<RecordShape>): Promise<RecordShape[]>;
+	findFirst(
+		query?: CollectionQueryInput<RecordShape>,
+	): Promise<RecordShape | null>;
+	count(query?: CollectionQueryInput<RecordShape>): Promise<number>;
 	query(
 		query?: CollectionQueryInput<RecordShape>,
 	): MelonQueryHandle<RecordShape>;

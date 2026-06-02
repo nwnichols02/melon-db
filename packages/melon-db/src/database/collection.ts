@@ -10,6 +10,7 @@ import { MelonError, MelonErrorCode } from "../errors.ts";
 import { prepareQuery } from "../query/prepare.ts";
 import type { CollectionMetadata, MelonSchema } from "../schema.ts";
 import { createQueryHandle } from "./query-handle.ts";
+import type { CollectionQueryInput } from "./query-input.ts";
 import { resolveCollectionQueryInput } from "./resolve-collection-query.ts";
 import type { InsertInput, MelonCollection, UpdateInput } from "./types.ts";
 
@@ -88,12 +89,19 @@ export function createCollection<RecordShape = Record<string, unknown>>(
 			return handle.fetchOne();
 		},
 
-		async findMany(query?: QueryAst): Promise<RecordShape[]> {
-			return toHandle(query).fetch();
+		async findMany(
+			query?: CollectionQueryInput<RecordShape>,
+		): Promise<RecordShape[]> {
+			const ast = resolveCollectionQueryInput(name, query, () => defaultAst());
+			return toHandle(ast).fetch();
 		},
 
-		async findFirst(query?: QueryAst): Promise<RecordShape | null> {
-			const ast = query ?? defaultAst("one");
+		async findFirst(
+			query?: CollectionQueryInput<RecordShape>,
+		): Promise<RecordShape | null> {
+			const ast = resolveCollectionQueryInput(name, query, () =>
+				defaultAst("one"),
+			);
 			return toHandle({
 				...ast,
 				collection: name,
@@ -102,16 +110,16 @@ export function createCollection<RecordShape = Record<string, unknown>>(
 			}).fetchOne();
 		},
 
-		async count(query?: QueryAst): Promise<number> {
-			const ast = query ?? defaultAst("count");
+		async count(query?: CollectionQueryInput<RecordShape>): Promise<number> {
+			const ast = resolveCollectionQueryInput(name, query, () =>
+				defaultAst("count"),
+			);
 			return toHandle({ ...ast, collection: name, mode: "count" }).fetchCount();
 		},
 
 		query(queryInput) {
-			const ast = resolveCollectionQueryInput(
-				name,
-				queryInput,
-				() => defaultAst(),
+			const ast = resolveCollectionQueryInput(name, queryInput, () =>
+				defaultAst(),
 			);
 			return toHandle(ast);
 		},
