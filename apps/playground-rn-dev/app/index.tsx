@@ -27,6 +27,7 @@ export default function TasksScreen(): React.ReactElement {
 			createQueryFactory(taskSchema)
 				.from<Task>("tasks")
 				.where("status", "eq", "open")
+				.include("project")
 				.orderBy("priority", "desc")
 				.toAst(),
 		[],
@@ -56,6 +57,15 @@ export default function TasksScreen(): React.ReactElement {
 					status: "closed",
 					updatedAt: new Date(),
 				});
+			});
+		},
+		[write],
+	);
+
+	const handleDelete = useCallback(
+		async (id: string) => {
+			await write(async (tx) => {
+				await tx.collection("tasks").delete(id);
 			});
 		},
 		[write],
@@ -163,6 +173,11 @@ export default function TasksScreen(): React.ReactElement {
 							<Text style={styles.devButtonText}>Benchmarks</Text>
 						</Pressable>
 					</Link>
+					<Link href="/demos" asChild>
+						<Pressable style={styles.devButton}>
+							<Text style={styles.devButtonText}>Query demos</Text>
+						</Pressable>
+					</Link>
 				</View>
 			) : null}
 			<View style={styles.devControls}>
@@ -191,7 +206,11 @@ export default function TasksScreen(): React.ReactElement {
 					data={tasks}
 					keyExtractor={(item) => item.id}
 					renderItem={({ item }) => (
-						<TaskRow onComplete={handleComplete} task={item} />
+						<TaskRow
+							onComplete={handleComplete}
+							onDelete={handleDelete}
+							task={item}
+						/>
 					)}
 				/>
 			)}
@@ -248,6 +267,9 @@ const styles = StyleSheet.create({
 		fontWeight: "600",
 	},
 	benchLinkRow: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		gap: 8,
 		paddingHorizontal: 16,
 		paddingTop: 8,
 	},

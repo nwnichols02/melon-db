@@ -10,6 +10,7 @@ import { MelonError, MelonErrorCode } from "../errors.ts";
 import { prepareQuery } from "../query/prepare.ts";
 import type { CollectionMetadata, MelonSchema } from "../schema.ts";
 import { createQueryHandle } from "./query-handle.ts";
+import { resolveCollectionQueryInput } from "./resolve-collection-query.ts";
 import type { InsertInput, MelonCollection, UpdateInput } from "./types.ts";
 
 export interface CollectionDeps {
@@ -106,8 +107,13 @@ export function createCollection<RecordShape = Record<string, unknown>>(
 			return toHandle({ ...ast, collection: name, mode: "count" }).fetchCount();
 		},
 
-		query(query?: QueryAst) {
-			return toHandle(query);
+		query(queryInput) {
+			const ast = resolveCollectionQueryInput(
+				name,
+				queryInput,
+				() => defaultAst(),
+			);
+			return toHandle(ast);
 		},
 
 		async insert(data: InsertInput<RecordShape>): Promise<RecordShape> {

@@ -1,0 +1,169 @@
+---
+title: PRD compliance matrix
+description: Mapping workspace PRDs and RFCs to implementation status across packages and apps.
+---
+
+This page tracks how Melon implementation compares to the product requirements in `.cursor/rules/` (prd-1 through prd-3, db-core, db-query, db-prisma, package-roles, file-layout). For shipped phase history see [Roadmap](/docs/roadmap).
+
+**Legend:** **Done** · **Partial** · **Deferred** (intentional v1 limit) · **Gap** (not scheduled / needs decision)
+
+---
+
+## Executive summary
+
+| Bucket | Examples |
+|--------|----------|
+| **Done** | Core engine, SQLite (Node/Bun/Expo/native), sync pull/push, codemods, devtools, RN benchmarks |
+| **Partial** | Mango/Prisma surfaces, testkit helpers, hook ergonomics |
+| **Deferred** | SQL joins, `hasMany` includes, `Q.on`, full schema codemods, background sync |
+| **Gap** | `getChangedCollections`, `useRecord`, Supabase/REST backends, `playground-web` |
+
+---
+
+## `@melon/db`
+
+| Requirement | Status | Notes |
+|-------------|--------|-------|
+| Schema + `createMelonSchema` | Done | |
+| AST + prepare/validate/plan | Done | |
+| `StorageAdapter` contract | Done | |
+| `createDatabase`, collections, CRUD, `observe` | Done | |
+| In-memory adapter | Done | In core; re-exported from testkit |
+| Serialized `write` queue | Done | |
+| `belongsTo` includes (engine) | Done | `loadIncludes` |
+| Sync APIs on DB | Done | Beyond minimal db-core |
+| `collection.query(builder => …)` | Done | Via `@melon/db-query` bridge |
+| `observeQuery` on in-memory | Partial | Engine `ChangeEmitter` fallback |
+| `getChangedCollections` | Gap | Not on any adapter; outbox used for sync |
+| Read blocked during write | Gap | Writes serialized; reads do not wait on queue |
+
+---
+
+## `@melon/db-sqlite` + `@melon/db-sqlite-native`
+
+| Requirement | Status | Notes |
+|-------------|--------|-------|
+| AST → SQL | Done | |
+| Node / Bun / Expo / RN | Done | |
+| Transactions | Done | |
+| `observeQuery` + triggers | Done | Phase 27 |
+| Benchmarks | Done | |
+| iOS/Android JSI + TurboModule | Done | |
+| SQL joins / partial select | Deferred | `capabilities.joins: false`; engine post-fetch for `belongsTo` |
+| `getChangedCollections` | Gap | |
+| Unified `createSqliteAdapter({ jsi })` | Partial | JSI via `createJsiSqliteAdapter` export |
+
+---
+
+## `@melon/db-query`
+
+| Requirement | Status | Notes |
+|-------------|--------|-------|
+| `QueryBuilder` + `createQueryFactory` | Done | |
+| `byId` / `byForeignKey` | Done | |
+| `resolveCollectionQuery` | Done | Builder → AST for collections |
+| Schema-driven inference | Partial | Factory accepts schema; no field inference yet |
+| Builder `.not()` | Gap | Use AST `not()` or Mango `$not` |
+
+---
+
+## `@melon/db-query-mango`
+
+| Requirement | Status | Notes |
+|-------------|--------|-------|
+| `createMangoCompiler` | Done | |
+| Core Mango operators | Done | |
+| `mode: one` / `count` | Done | `MangoQuery.mode` |
+| `normalizeMangoQuery` | Done | `MangoNormalizer` |
+| `$contains`, null checks | Partial | Limited operator map |
+| Operator matrix doc | Partial | See package README |
+
+---
+
+## `@melon/db-react`
+
+| Requirement | Status | Notes |
+|-------------|--------|-------|
+| Provider + core hooks | Done | |
+| `useMangoQuery`, `useFindMany`, `useFindFirst` | Done | |
+| `useFindMany` + fluent builder | Done | `useFluentQuery` helper |
+| `useRecord` | Gap | |
+| Hook loading/error state | Gap | |
+| Sync hooks in this package | Partial | Convenience; [package-roles](https://github.com) boundary drift |
+
+---
+
+## `@melon/db-prisma`
+
+| Requirement | Status | Notes |
+|-------------|--------|-------|
+| Prisma schema import | Done | `importPrismaSchema` on `./node` |
+| `compilePrismaQuery` + client | Done | |
+| `select` / `include` in compiler | Done | `belongsTo` includes only |
+| CLI `melon-prisma` | Done | `package.json` `bin` |
+| `observeMany` on client | Partial | Codegen re-exports hooks |
+| `emitZod` | Gap | |
+
+---
+
+## `@melon/db-devtools`, `@melon/db-testkit`, `@melon/db-codemods`
+
+| Package | Status | Main gap |
+|---------|--------|----------|
+| devtools | Done | Plan tab not in UI; SQL needs SQLite debug |
+| testkit | Partial | No Jest helpers / fake clock |
+| codemods | Done | `migrate-schema` spike; `Q.on` recipes only |
+
+---
+
+## `@melon/sync` + `@melon/sync-server`
+
+| Requirement | Status | Notes |
+|-------------|--------|-------|
+| Pull/push, checkpoint, retry, conflicts | Done | |
+| Postgres reference backend | Done | |
+| `merging` sync state | Deferred | See [Phase 29+ decisions](#phase-29-decisions) |
+| Persistent multi-job queue | Deferred | |
+| Supabase / REST recipes | Gap | |
+| React hooks | N/A | In `@melon/db-react` |
+
+---
+
+## Apps
+
+| Feature | playground-rn | playground-rn-dev | docs | playground-node |
+|---------|---------------|-------------------|------|-----------------|
+| SQLite | Expo | Native JSI | In-memory live UI | Node |
+| CRUD + reactive | Yes | Yes | Yes | Yes |
+| Delete in UI | Partial | Yes | Yes | — |
+| Mango / Prisma / relations demos | — | Demos screen | Docs only | — |
+| Benchmarks | No | Dev screen | Static JSON | Node benches |
+
+---
+
+## Phase 29+ decisions
+
+Product decisions recorded here (not blockers for phases 0–28):
+
+| Item | Decision | Rationale |
+|------|----------|-----------|
+| `getChangedCollections` | **Defer** | Sync uses outbox + `getLocalChanges`; adapter hook when sync needs incremental adapter scans |
+| SQL JOIN / `hasMany` / `Q.on` | **Defer** | Documented v1 limits on [Roadmap](/docs/roadmap) |
+| Sync `merging` state | **Defer** | Apply path is synchronous; add when merge UI needs distinct phase |
+| `@melon/db-react` → `@melon/sync` dep | **Accept** | DX for `useSync`; split only if publishing react without sync |
+| `playground-web` | **Defer** | No web adapter package yet |
+| Read-during-write blocking | **Defer** | Serialized writes sufficient for v1; revisit if readers observe torn state |
+
+---
+
+## PRD source index
+
+| File | Focus |
+|------|-------|
+| `prd-1.mdc` | Product vision, sync, RN, hooks, GA checklist |
+| `prd-2.mdc` | AST-first multi-surface queries |
+| `prd-3.mdc` | TypeScript interface contracts |
+| `db-core.mdc` | `@melon/db` + `@melon/db-sqlite` |
+| `db-query.mdc` | Fluent builder + React |
+| `db-prisma.mdc` | Prisma layer |
+| `package-roles.mdc` | Per-package milestones |

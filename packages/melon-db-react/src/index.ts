@@ -17,6 +17,7 @@ export {
 	useQueryCount,
 	useFindMany,
 	useFindFirst,
+	useFluentQuery,
 	useMangoQuery,
 	type UseQueryOptions,
 } from "./hooks.ts";

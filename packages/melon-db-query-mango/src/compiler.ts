@@ -9,6 +9,7 @@ import {
 	planQuery,
 	validateQuery,
 } from "@melon/db";
+import { normalizeMangoQuery } from "./normalizer.ts";
 import type { MangoQuery, MangoSelector } from "./types.ts";
 
 const MANGO_OP_MAP: Record<string, QueryOperator> = {
@@ -103,18 +104,20 @@ export function createMangoCompiler(): MangoQueryCompiler {
 			collection: string,
 			schema: MelonSchema,
 		): PreparedQuery {
+			const normalized = normalizeMangoQuery(query);
+			const mode = normalized.mode ?? "many";
 			const ast: QueryAst = {
 				collection,
-				where: compileSelector(query.selector),
-				orderBy: query.sort?.map((s) => {
+				where: compileSelector(normalized.selector),
+				orderBy: normalized.sort?.map((s) => {
 					const field = Object.keys(s)[0] ?? "";
 					const direction = s[field] ?? "asc";
 					return { field, direction };
 				}),
-				skip: query.skip,
-				limit: query.limit,
-				select: query.fields ? { fields: query.fields } : undefined,
-				mode: "many",
+				skip: normalized.skip,
+				limit: mode === "one" ? (normalized.limit ?? 1) : normalized.limit,
+				select: normalized.fields ? { fields: normalized.fields } : undefined,
+				mode,
 			};
 			validateQuery(ast, schema);
 			const plan = planQuery(ast, schema);

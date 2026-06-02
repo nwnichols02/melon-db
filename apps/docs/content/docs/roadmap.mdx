@@ -3,7 +3,7 @@ title: Roadmap
 description: Phase-by-phase implementation history, shipped status, and deferred work.
 ---
 
-This page is the **living status** for Melon. Update it when features land or deferrals change. For product vision see [About Melon](/docs/about).
+This page is the **living status** for Melon. Update it when features land or deferrals change. For product vision see [About Melon](/docs/about). For requirement-by-requirement PRD tracking see [PRD compliance](/docs/prd-compliance).
 
 ## Status summary
 
@@ -96,6 +96,8 @@ Core engine, all three query surfaces, React/sync hooks, devtools, codemods, ful
 
 ## Deferred (Phase 30+)
 
+See [PRD compliance — Phase 29+ decisions](/docs/prd-compliance#phase-29-decisions) for rationale.
+
 | Area | Notes |
 |------|-------|
 | EAS Build CI | Release automation for dev client artifacts |
@@ -104,6 +106,9 @@ Core engine, all three query surfaces, React/sync hooks, devtools, codemods, ful
 | Per-field timestamps / three-way merge | Advanced conflict resolution |
 | `hasMany` relation includes in queries | `belongsTo` only in v1 |
 | `Q.on` join queries | Codemod recipes only; no engine join support yet |
+| `getChangedCollections` on adapters | Sync uses outbox today |
+| Sync `merging` state | Apply is synchronous in v1 |
+| `playground-web` | No web adapter package yet |
 
 ---
 

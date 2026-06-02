@@ -4,6 +4,7 @@ import type {
 	StorageAdapter,
 } from "../adapter.ts";
 import type { PreparedQuery, QueryAst } from "../ast.ts";
+import type { CollectionQueryInput } from "./query-input.ts";
 import type { DevtoolsBridge } from "../devtools.ts";
 import type { MelonSchema } from "../schema.ts";
 import type { CheckpointStore } from "../sync/checkpoint.ts";
@@ -31,7 +32,9 @@ export interface MelonCollection<RecordShape = Record<string, unknown>> {
 	findMany(query?: QueryAst): Promise<RecordShape[]>;
 	findFirst(query?: QueryAst): Promise<RecordShape | null>;
 	count(query?: QueryAst): Promise<number>;
-	query(query?: QueryAst): MelonQueryHandle<RecordShape>;
+	query(
+		query?: CollectionQueryInput<RecordShape>,
+	): MelonQueryHandle<RecordShape>;
 	insert(data: InsertInput<RecordShape>): Promise<RecordShape>;
 	update(
 		id: string | number,

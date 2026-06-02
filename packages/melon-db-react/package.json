@@ -12,6 +12,7 @@
 	"dependencies": {
 		"@melon/db": "workspace:*",
 		"@melon/db-prisma": "workspace:*",
+		"@melon/db-query": "workspace:*",
 		"@melon/db-query-mango": "workspace:*",
 		"@melon/sync": "workspace:*"
 	},

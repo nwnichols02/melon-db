@@ -25,6 +25,7 @@ function DevStack(): React.ReactElement {
 			<Stack>
 				<Stack.Screen name="index" options={{ title: "Open Tasks" }} />
 				<Stack.Screen name="benchmark" options={{ title: "Benchmarks" }} />
+				<Stack.Screen name="demos" options={{ title: "Query demos" }} />
 			</Stack>
 			<MelonDevtoolsPanel />
 		</MelonDevtoolsProvider>

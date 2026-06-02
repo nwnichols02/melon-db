@@ -2,6 +2,9 @@
 	"name": "@melon/db-prisma",
 	"version": "0.0.0-alpha",
 	"type": "module",
+	"bin": {
+		"melon-prisma": "./src/bin/melon-prisma.ts"
+	},
 	"exports": {
 		".": "./src/index.ts",
 		"./node": "./src/node.ts"

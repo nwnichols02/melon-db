@@ -5,7 +5,7 @@ import {
 } from "@melon/db";
 import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
 import { Paths } from "expo-file-system";
-import { type Task, taskSchema } from "./schema";
+import { type Task, playgroundMigrations, taskSchema } from "./schema";
 
 const DATABASE_FILENAME = "melon-playground-dev.db";
 
@@ -133,8 +133,14 @@ async function bootstrap(): Promise<MelonDatabase<typeof taskSchema>> {
 		schema: taskSchema,
 		adapter: await createAdapter(),
 		devtools: devtoolsBridge,
+		migrations: playgroundMigrations,
 		sync: {},
 	});
+
+	const projectCount = await db.collection("projects").count();
+	if (projectCount === 0) {
+		await seedProjects(db);
+	}
 
 	const existing = await db.collection("tasks").count();
 	if (existing === 0) {
@@ -151,6 +157,17 @@ function toFilesystemPath(uri: string): string {
 	return decodeURIComponent(uri.replace(/^file:\/\//, ""));
 }
 
+async function seedProjects(
+	db: MelonDatabase<typeof taskSchema>,
+): Promise<void> {
+	await db.write(async (tx) => {
+		await tx.collection("projects").insert({
+			id: "p-demo",
+			name: "Melon demo",
+		});
+	});
+}
+
 async function seedTasks(db: MelonDatabase<typeof taskSchema>): Promise<void> {
 	const seeds: Task[] = [
 		{
@@ -158,6 +175,7 @@ async function seedTasks(db: MelonDatabase<typeof taskSchema>): Promise<void> {
 			title: "Learn Melon",
 			status: "open",
 			priority: 1,
+			projectId: "p-demo",
 			updatedAt: new Date(),
 		},
 		{
@@ -165,6 +183,7 @@ async function seedTasks(db: MelonDatabase<typeof taskSchema>): Promise<void> {
 			title: "Ship playground-rn-dev",
 			status: "open",
 			priority: 2,
+			projectId: "p-demo",
 			updatedAt: new Date(),
 		},
 	];

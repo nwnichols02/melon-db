@@ -93,7 +93,9 @@
       "dependencies": {
         "@melon/db": "workspace:*",
         "@melon/db-devtools": "workspace:*",
+        "@melon/db-prisma": "workspace:*",
         "@melon/db-query": "workspace:*",
+        "@melon/db-query-mango": "workspace:*",
         "@melon/db-react": "workspace:*",
         "@melon/db-sqlite": "workspace:*",
         "@melon/db-sqlite-native": "workspace:*",
@@ -125,9 +127,13 @@
       "name": "@melon/db",
       "version": "0.0.0-alpha",
       "devDependencies": {
+        "@melon/db-query": "workspace:*",
         "@melon/db-sqlite": "workspace:*",
         "@types/bun": "latest",
         "typescript": "^5",
+      },
+      "optionalDependencies": {
+        "@melon/db-query": "workspace:*",
       },
     },
     "packages/melon-db-codemods": {
@@ -168,6 +174,9 @@
     "packages/melon-db-prisma": {
       "name": "@melon/db-prisma",
       "version": "0.0.0-alpha",
+      "bin": {
+        "melon-prisma": "./src/bin/melon-prisma.ts",
+      },
       "dependencies": {
         "@melon/db": "workspace:*",
       },
@@ -205,6 +214,7 @@
       "dependencies": {
         "@melon/db": "workspace:*",
         "@melon/db-prisma": "workspace:*",
+        "@melon/db-query": "workspace:*",
         "@melon/db-query-mango": "workspace:*",
         "@melon/sync": "workspace:*",
       },

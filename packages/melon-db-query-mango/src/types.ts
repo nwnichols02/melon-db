@@ -6,4 +6,6 @@ export interface MangoQuery {
 	skip?: number;
 	limit?: number;
 	fields?: string[];
+	/** Result shape: many rows, one row, or count only. Defaults to `many`. */
+	mode?: "many" | "one" | "count";
 }

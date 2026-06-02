@@ -4,11 +4,69 @@ import {
 	type QueryAst,
 	type QueryBooleanNode,
 	type QueryOperator,
+	type QueryRelationInclude,
+	type QuerySelect,
 	planQuery,
 	predicate,
 	validateQuery,
 } from "@melon/db";
 import type { PrismaFindManyArgs, PrismaWhereInput } from "./types.ts";
+
+function compileSelect(
+	collection: string,
+	schema: MelonSchema,
+	args: PrismaFindManyArgs | undefined,
+): QuerySelect | undefined {
+	if (!args?.select && !args?.include) {
+		return undefined;
+	}
+
+	const select: QuerySelect = {};
+	if (args.select) {
+		select.fields = Object.entries(args.select)
+			.filter(([, enabled]) => enabled)
+			.map(([field]) => field);
+	}
+
+	if (args.include) {
+		const includes: Record<string, QueryRelationInclude> = {};
+		const collectionMeta = schema.getCollection(collection);
+		for (const [relationName, includeValue] of Object.entries(args.include)) {
+			if (!includeValue) {
+				continue;
+			}
+			const relation = collectionMeta.relations[relationName];
+			if (!relation || relation.kind !== "belongsTo") {
+				continue;
+			}
+			const nestedArgs =
+				typeof includeValue === "object" ? includeValue : undefined;
+			includes[relationName] = {
+				relation: relationName,
+				where: nestedArgs?.where
+					? whereToAst(nestedArgs.where)
+					: undefined,
+				orderBy: nestedArgs?.orderBy
+					? (Array.isArray(nestedArgs.orderBy)
+							? nestedArgs.orderBy
+							: [nestedArgs.orderBy]
+						).flatMap((o) =>
+							Object.entries(o).map(([field, direction]) => ({
+								field,
+								direction: direction ?? ("asc" as const),
+							})),
+						)
+					: undefined,
+				limit: nestedArgs?.take,
+			};
+		}
+		if (Object.keys(includes).length > 0) {
+			select.include = includes;
+		}
+	}
+
+	return select.fields?.length || select.include ? select : undefined;
+}
 
 function whereToAst(where: PrismaWhereInput): QueryBooleanNode | undefined {
 	const nodes: QueryBooleanNode[] = [];
@@ -85,6 +143,7 @@ export function compilePrismaQuery(
 		orderBy,
 		skip: args?.skip,
 		limit: args?.take,
+		select: compileSelect(collection, schema, args),
 		mode,
 	};
 

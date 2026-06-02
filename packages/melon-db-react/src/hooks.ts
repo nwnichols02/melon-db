@@ -7,6 +7,10 @@ import type {
 import { prepareQuery } from "@melon/db";
 import { compilePrismaQuery } from "@melon/db-prisma";
 import type { PrismaFindManyArgs } from "@melon/db-prisma";
+import {
+	type QueryBuilder,
+	resolveCollectionQuery,
+} from "@melon/db-query";
 import { createMangoCompiler } from "@melon/db-query-mango";
 import type { MangoQuery } from "@melon/db-query-mango";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -120,6 +124,22 @@ export function useFindFirst<T = Record<string, unknown>>(
 	);
 	const rows = useQuery<T>(prepared, options);
 	return rows[0] ?? null;
+}
+
+/**
+ * Reactive hook for a fluent {@link QueryBuilder} callback on a collection.
+ */
+export function useFluentQuery<T = Record<string, unknown>>(
+	collection: string,
+	builder: (q: QueryBuilder<T>) => QueryBuilder<T>,
+	options?: UseQueryOptions<T>,
+): T[] {
+	const db = useDatabase();
+	const prepared = useMemo(() => {
+		const ast = resolveCollectionQuery<T>(collection, builder);
+		return prepareQuery(ast, db.schema);
+	}, [db.schema, collection, builder]);
+	return useQuery<T>(prepared, options);
 }
 
 /**

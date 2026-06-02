@@ -33,4 +33,25 @@ describe("createMangoCompiler", () => {
 		);
 		expect(prepared.ast.where?.type).toBe("predicate");
 	});
+
+	test("compiles findOne mode", () => {
+		const compiler = createMangoCompiler();
+		const prepared = compiler.compile(
+			{ selector: { status: "open" }, mode: "one", limit: 5 },
+			"tasks",
+			schema,
+		);
+		expect(prepared.ast.mode).toBe("one");
+		expect(prepared.ast.limit).toBe(5);
+	});
+
+	test("compiles count mode", () => {
+		const compiler = createMangoCompiler();
+		const prepared = compiler.compile(
+			{ selector: { status: "open" }, mode: "count" },
+			"tasks",
+			schema,
+		);
+		expect(prepared.ast.mode).toBe("count");
+	});
 });

@@ -1,0 +1,279 @@
+---
+alwaysApply: true
+---
+# PRD: FUTURE! Sliding Window Subsystem for melon Offline Sync
+
+## Document status
+Draft product requirements document for the mobile sliding-window subsystem.
+
+## Product overview
+The sliding window subsystem defines how much data is kept locally on device, which data remains eligible for offline use, and when data can be safely pruned from melon without affecting unsynced changes or global business state. The subsystem is necessary because melon provides a powerful local relational store and custom sync hooks, but it does not provide an out-of-the-box tenant-aware retention engine that manages device footprint, business-safe pruning, and org-specific data scope policies.[1][2]
+
+The subsystem must support explicit, organization-aware download windows, local storage limits, and safe record eviction after synchronization. It must also distinguish between business deletes and cache pruning because melon sync-safe deletion is a different concern from device-side retention management.[3][1][4]
+
+## Problem statement
+The mobile app must support offline workflows over time without allowing the local database to grow without bound. Some records need to remain on device for recent and in-scope work, while other records should be removed once they fall outside the configured local window. The effective window may vary by organization, and a single user may belong to multiple organizations with different retention rules.
+
+A generic cache expiration policy is insufficient because the system must account for:
+- pending local mutations that must never be pruned before sync acknowledgement
+- org-specific scope rules such as date ranges, statuses, assignments, and hybrid business conditions
+- the difference between records that were deleted in the business domain and records that are merely no longer kept locally
+- low-storage behavior and hard device footprint limits
+- diagnostics and supportability so teams can explain why a record is present, absent, or returned later after re-entering scope
+
+## Goals
+- Keep the local melon footprint bounded and predictable over time.[2]
+- Define a per-organization sliding window that determines which records are eligible to be stored locally.
+- Support different window policies per organization and per entity type.
+- Allow device-side pruning of out-of-window rows only when it is safe to do so.
+- Preserve all unsynced local changes during pruning decisions.
+- Distinguish local pruning from business deletion using explicit local prune tracking rather than delete semantics.[3][1]
+- Support diagnostics for row counts, prune reasons, window versions, and storage pressure.
+- Make the subsystem observable so the UI and support tooling can react to local data and retention changes.[5][6]
+
+## Non-goals
+- Implement business conflict resolution on device. That remains server-owned.[1]
+- Replace server-side business deletes or tombstones. The sliding window concerns device retention only, not global delete semantics.[3][1]
+- Act as a general-purpose cache eviction framework for arbitrary network requests. This subsystem governs canonical offline entities stored in melon.
+
+## Users and stakeholders
+### Primary users
+- Mobile users who need recent and relevant records available offline without runaway local storage growth.
+- Support and operations staff who must diagnose why specific records are present, missing, or re-downloaded.
+
+### Product and technical stakeholders
+- Mobile engineers implementing melon, pruning, observability, and background scheduling.
+- Backend engineers exposing org-aware window definitions and scope-aware pull responses.
+- Product owners defining business scope rules per organization.
+- QA and support teams validating safety and retention behavior across offline and low-storage scenarios.
+
+## Product principles
+- **Safety first:** unsynced data must never be pruned.
+- **Window is explicit:** every local retention decision must trace back to a named window policy.
+- **Prune is not delete:** local removal must not imply business deletion.
+- **Pure policy evaluation:** window eligibility should be computed through deterministic pure functions so the behavior is testable and portable.
+- **Server defines scope, client enforces footprint:** the backend controls what is eligible to sync down; the client controls how aggressively it keeps or prunes in-scope history.
+- **Observable by design:** every important pruning decision should be inspectable.
+
+## Functional requirements
+### 1. Window definition model
+The system shall support a window definition per organization and, where needed, per entity type. A window definition may include:
+- date range boundaries
+- future and past horizon lengths
+- status filters
+- assignment or ownership conditions
+- priority or business flags
+- grace periods before prune eligibility
+- soft and hard row limits
+- soft and hard storage limits
+- a version or hash for change tracking
+
+The client shall treat the server as the source of truth for effective window definitions distributed through sync configuration or dedicated metadata endpoints. melon sync is designed around custom backend behavior, so this configuration shall be delivered through the app’s own API contract rather than assumed from the library.[2][1]
+
+### 2. Effective window computation
+The client shall compute an effective window per organization for the current user and device. If a user belongs to multiple organizations, the system shall maintain independent window state for each org.
+
+The effective window computation shall consider:
+- organization-level defaults
+- user or role-level overrides if supported
+- device pressure mode such as normal, low-storage, or emergency pruning mode
+- entity-specific retention rules
+
+This computation shall be implemented as deterministic pure functions so the logic is reusable in tests and support tooling.
+
+### 3. Record eligibility evaluation
+The client shall evaluate each syncable record against the effective window to determine one of the following states:
+- in-window and retained
+- out-of-window but protected
+- out-of-window and prune-eligible
+- deleted by business semantics
+
+A record shall be considered **protected** and not pruneable if any of the following are true:
+- it has pending local create, update, or delete mutations
+- it depends on or is depended on by another retained record and pruning would break a required local relationship
+- it is inside the grace period following the last successful sync or window transition
+- it is explicitly pinned for product or support reasons
+
+### 4. Prune planning
+The subsystem shall build prune plans after successful sync completion and when the app enters a storage-pressure mode. A prune plan is an ordered list of local-only removals with reasons and safety checks.
+
+Prune candidates shall be prioritized using configurable heuristics such as:
+- oldest out-of-window records first
+- completed/closed records before active records
+- low-value entities before high-value entities
+- large payload entities before small entities when storage pressure is the primary concern
+
+The planner shall never include unsynced rows or rows whose removal would break local consistency requirements.
+
+### 5. Prune execution
+The prune executor shall remove rows from melon only after all safety checks pass. melon supports sync-safe deletion and permanent destruction semantics, but this subsystem shall only use local destruction for rows that are purely out-of-window and not pending sync.[3]
+
+Prune execution shall:
+- log the planned reason before removal
+- remove the local row and any approved dependent local-only rows
+- record success or failure in a local prune ledger
+- update analytics counters
+
+### 6. Local prune ledger
+The client shall maintain a `local_prune_ledger` table that records each local-only removal. The ledger shall include:
+- entity name
+- record id
+- org id
+- window key or version
+- prune timestamp
+- prune reason
+- last known server version
+- recoverable-until timestamp if applicable
+- device pressure mode at time of prune
+
+The ledger exists so support and diagnostics can explain that a row was removed because of local retention policy rather than a business delete.
+
+### 7. Storage pressure modes
+The subsystem shall support at least three operating modes:
+
+| Mode | Behavior |
+|---|---|
+| Normal | Prune only rows safely outside the window after successful sync. |
+| Low-storage | Increase prune aggressiveness for out-of-window rows and shorten grace periods where safe. |
+| Emergency | Prevent additional nonessential data growth and perform high-priority pruning of safe candidates first. |
+
+The current mode may be determined by OS-level storage signals, row-count thresholds, approximate database size thresholds, or explicit feature-flagged behavior.
+
+### 8. Window transitions
+When a window definition changes, the subsystem shall:
+1. store the new window metadata
+2. compare it with the previous effective window
+3. identify records that moved into scope and out of scope
+4. avoid immediately pruning newly out-of-scope records until the configured grace period has passed and a successful sync has occurred
+5. trigger appropriate diagnostics and UI refreshes
+
+A record that re-enters the window later shall be allowed to sync down again as a normal retained record.
+
+### 9. Background and resume behavior
+The app shall evaluate whether sync and pruning should run on:
+- foreground resume
+- connectivity regain
+- periodic background task windows where supported
+
+Connectivity detection should use NetInfo or equivalent because retention actions should be aware of whether the app can reach the server and complete sync before pruning.[7][6]
+
+Periodic background scheduling may use `react-native-background-fetch` or platform-equivalent background task APIs to run sync/prune maintenance opportunistically, subject to OS limits.[8]
+
+### 10. Observability
+The subsystem shall expose observable state so UI and diagnostics screens can reflect retention health. melon queries and observation mechanisms can support reactive views of retained rows, counts, and prune ledgers.[5][6]
+
+Diagnostics shall expose at minimum:
+- current effective window per org
+- window version/hash
+- last prune run timestamp
+- last successful sync timestamp
+- total local row counts by entity
+- prune counts by entity and reason
+- number of protected out-of-window rows
+- current pressure mode
+- any prune failures
+
+## Data modeling requirements
+The subsystem shall require the following local data structures:
+
+| Table / state | Purpose |
+|---|---|
+| `sync_window_state` | Stores current effective window metadata per org and entity. |
+| `local_prune_ledger` | Records local-only removals with reasons and timing. |
+| `change_log` | Protects unsynced rows from prune eligibility because it reveals pending local mutations. |
+| `sync_cursor_state` | Helps ensure pruning occurs only after successful sync boundaries are known. |
+| Entity tables with queryable columns | Support local window evaluation using relational fields, not hidden JSON blobs.[4] |
+
+Window-critical attributes such as status, org id, timestamps, assignment, and priority shall be top-level columns or relational child values, not fields hidden exclusively inside JSON.[4]
+
+## Required libraries and implementation strategies
+### Recommended libraries
+| Purpose | Library / tool | Why |
+|---|---|---|
+| Local relational DB 
+| SQLite adapter | Watermelon SQLite adapter | Required to back melon on React Native.[2] |
+| Connectivity | 
+| Background maintenance | `react-native-background-fetch` or platform equivalent | Useful for periodic sync/prune passes within OS constraints.[8] |
+| Date calculations | `date-fns` | Useful for deterministic window math, grace periods, and retention cutoffs. |
+| Validation | `zod` | Validates server-provided window definitions before local application. |
+| Lightweight metadata | `react-native-mmkv` or equivalent | Stores small operational metadata such as last prune run and feature flags. |
+
+### Required implementation strategies
+- Build a **SlidingWindowEngine** as pure functions, not as ad hoc UI logic.
+- Centralize prune decisions in one planner/executor pipeline.
+- Run pruning only after a successful sync or under defined emergency policies.
+- Protect rows with unsynced local changes from pruning.
+- Keep local prune tracking separate from business tombstones and server deletes.
+- Use feature flags to tune aggressiveness per org or rollout cohort.
+- Maintain support diagnostics from day one rather than treating observability as optional.
+
+## User stories
+- As a mobile user, recent and relevant records remain available offline without the app storing unlimited historical data.
+- As a multi-org user, one organization’s larger history window does not force all organizations to keep the same amount of local data.
+- As a support engineer, it is possible to explain whether a missing record was deleted globally or only pruned locally.
+- As a product owner, pruning can become more aggressive on low-storage devices without risking unsynced user work.
+- As an engineer, window policy logic can be tested as deterministic pure functions without booting the full app.
+
+## Acceptance criteria
+### Safety
+- No record with pending local mutations is ever pruned.
+- No local prune is emitted to the server as a business delete.
+- No prune operation runs without a recorded reason and window context.
+
+### Correctness
+- A record outside the effective window becomes prune-eligible only after all safety checks pass.
+- A record that re-enters scope can be pulled down again on subsequent sync.
+- Different organizations on the same device can have different effective windows concurrently.
+
+### Observability
+- Diagnostics screen shows current window configuration, prune totals, pressure mode, and last prune outcome.
+- Support tooling can trace a pruned record through `local_prune_ledger`.
+
+### Performance
+- Window evaluation and prune planning complete within acceptable time for expected dataset sizes on target devices.
+- Background maintenance does not block UI-critical interactions.
+
+## Risks and mitigations
+| Risk | Impact | Mitigation |
+|---|---|---|
+| Query-critical values stored in JSON | Local window evaluation becomes brittle or impossible | Promote window fields to columns or child tables.[4] |
+| Pruning while offline with stale scope data | Over-aggressive removal of useful records | Prefer sync-first pruning and grace periods; use offline-safe conservative mode. |
+| Confusing prune with delete | Data integrity and support confusion | Keep prune ledger and delete/tombstone semantics separate.[3][1] |
+| Background maintenance inconsistency across platforms | Uneven retention behavior | Treat background tasks as opportunistic; always run on resume as well.[8] |
+| Unbounded ledger growth | Diagnostics tables become noisy | Add retention policy for old prune ledger entries. |
+| Window policy bugs | Silent data loss risk | Use pure functions, exhaustive tests, and schema validation with Zod. |
+
+## Phased implementation plan
+### Phase 1: policy foundation
+- Define window configuration schema.
+- Implement pure window evaluation functions.
+- Add `sync_window_state` and `local_prune_ledger` tables.
+- Add diagnostics counters.
+
+### Phase 2: planner and executor
+- Build prune planner.
+- Build prune executor with safety checks.
+- Prevent pruning of dirty or protected records.
+- Add row-count and storage-based thresholds.
+
+### Phase 3: operational integration
+- Trigger planner after successful sync.
+- Add connectivity-aware behavior using NetInfo.[7][6]
+- Add optional background maintenance using background fetch.[8]
+- Add multi-org support and policy rollout controls.
+
+### Phase 4: hardening and analytics
+- Add low-storage and emergency modes.
+- Add prune analytics UI and support traces.
+- Add retention policy for ledger entries.
+- Tune heuristics with production telemetry.
+
+## Open questions
+- Should storage limits be driven primarily by row counts, estimated bytes, or both?
+- Which entities are always protected even when out of window?
+- How should relational dependencies be handled for parent-child prune rules?
+- What is the exact low-storage signal source on iOS and Android?
+- How long should prune ledger entries remain on device for supportability?
+
+## Recommendation
+The sliding window should be implemented as a first-class subsystem around melon, not as an incidental cache policy. melon is the right local store for this because it supports relational modeling, local querying, and reactivity, but the actual retention logic should be built as a deterministic policy engine with a prune ledger, sync-aware safety checks, and org-aware window metadata.[2][5][1]
