@@ -121,7 +121,7 @@ After `bun run dev:rn:dev` (or `install:ios` in `apps/playground-rn-dev`):
 3. Seeded tasks appear (same as expo path).
 4. Add / complete tasks persist across restart.
 5. Sync demo works against `bun run sync-server`.
-6. Optional perf: insert 10k tasks and compare jsi-sync vs turbo on the same device.
+6. Benchmarks: open **Benchmarks** from the task screen (`__DEV__`) or navigate to `/benchmark`; run **jsi-sync + turbo** @ 10k and share the JSON report.
 
 ### Android
 
@@ -141,4 +141,4 @@ After `expo prebuild --clean` + `bun run dev:rn:dev:android` then `bun run dev:r
 - **Fallback:** `MelonSQLite` TurboModule (`MelonSQLiteSpec` codegen) with async promises on both platforms.
 - **JS:** `MelonSQLiteJsi.ts` reads `global.melonSqliteJsi`; `MelonSQLiteBridge.ts` reports `jsi-sync` | `turbo` | `bridge`.
 
-**Phase 28+:** RN on-device benchmark harness; native `sqlite3_update_hook` for zero-poll invalidation.
+**Phase 29+:** native `sqlite3_update_hook` for zero-poll invalidation on external writes.

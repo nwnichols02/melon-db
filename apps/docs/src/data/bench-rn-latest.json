@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-06-02T00:00:00.000Z",
+  "updatedBy": "manual-sample",
+  "note": "Placeholder sample structure — replace with Share JSON output from playground-rn-dev /benchmark after a real device run.",
+  "device": {
+    "platform": "ios",
+    "label": "Replace with device model after manual run"
+  },
+  "report": {
+    "timestamp": "2026-06-02T00:00:00.000Z",
+    "scale": 10000,
+    "platform": "ios",
+    "modes": ["jsi-sync", "turbo"],
+    "comparisons": [
+      {
+        "scenario": "row-insert",
+        "scale": 10000,
+        "jsiSyncMs": 0,
+        "turboMs": 0,
+        "ratio": 1,
+        "winner": "tie"
+      }
+    ],
+    "notes": [
+      "On-device Melon native SQLite: jsi-sync vs turbo",
+      "ratio = jsiSyncMs / turboMs (< 1 means jsi-sync faster)"
+    ]
+  }
+}

@@ -67,6 +67,7 @@ bun run start
 2. Seeded tasks appear.
 3. Add / complete tasks persist across restart.
 4. Sync demo works against `bun run sync-server`.
+5. **Benchmarks:** tap **Benchmarks** on the task screen → **Run jsi-sync + turbo** @ 10k completes → **Share JSON report** includes both engines and five scenarios.
 
 ### Android
 
@@ -74,6 +75,9 @@ bun run start
 2. Seeded tasks appear.
 3. Add / complete tasks persist across restart.
 4. Sync demo works against `bun run sync-server`.
+5. **Benchmarks:** same as iOS — `/benchmark`, jsi-sync + turbo @ 10k, share JSON.
+
+Bench runs use separate `melon-bench-*.db` files under the app documents directory; the main `melon-playground-dev.db` is untouched.
 
 ## Troubleshooting
 

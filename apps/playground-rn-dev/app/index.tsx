@@ -9,6 +9,7 @@ import { SyncStatusKind } from "@melon/sync";
 import { FlashList } from "@shopify/flash-list";
 import { useCallback, useMemo, useState } from "react";
 import { getMelonSQLiteNativeMode } from "@melon/db-sqlite-native";
+import { Link } from "expo-router";
 import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -155,6 +156,15 @@ export default function TasksScreen(): React.ReactElement {
 					</Text>
 				</Pressable>
 			</View>
+			{__DEV__ ? (
+				<View style={styles.benchLinkRow}>
+					<Link href="/benchmark" asChild>
+						<Pressable style={styles.devButton}>
+							<Text style={styles.devButtonText}>Benchmarks</Text>
+						</Pressable>
+					</Link>
+				</View>
+			) : null}
 			<View style={styles.devControls}>
 				<Pressable onPress={handleToggleOffline} style={styles.devButton}>
 					<Text style={styles.devButtonText}>
@@ -236,6 +246,10 @@ const styles = StyleSheet.create({
 		color: "#fff",
 		fontSize: 14,
 		fontWeight: "600",
+	},
+	benchLinkRow: {
+		paddingHorizontal: 16,
+		paddingTop: 8,
 	},
 	devControls: {
 		flexDirection: "row",

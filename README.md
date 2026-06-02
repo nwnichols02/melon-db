@@ -158,16 +158,17 @@ await synchronize({
 
 ## Completed vs roadmap
 
-Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun run dev:docs`). Phases **0–27** are shipped; see the docs for full phase history, [architecture ADRs](/docs/architecture/decisions), and [About](/docs/about).
+Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun run dev:docs`). Phases **0–28** are shipped; see the docs for full phase history, [architecture ADRs](/docs/architecture/decisions), and [About](/docs/about).
 
-| Done (Phases 0–27) | Deferred (Phase 28+) |
+| Done (Phases 0–28) | Deferred (Phase 29+) |
 |------|----------|
-| Core engine M0–M2 | RN on-device benchmark harness |
-| SQLite SQL compiler + Bun/Node/Expo adapters | EAS Build CI |
-| `@melon/db-sqlite-native` — iOS + Android TurboModule + C++ JSI | |
-| Predicate-aware SQLite `observeQuery` | |
-| Dual RN path: Expo Go + dev build (`/rn`, `mode: 'auto'`) | Full multi-file schema codemods |
-| WatermelonDB benchmark comparison (`bench:compare`, CI) | Background sync service |
+| Core engine M0–M2 | EAS Build CI |
+| SQLite SQL compiler + Bun/Node/Expo adapters | Full multi-file schema codemods |
+| `@melon/db-sqlite-native` — iOS + Android TurboModule + C++ JSI | Background sync service |
+| Predicate-aware SQLite `observeQuery` | Per-field timestamps / three-way merge |
+| RN on-device benchmark harness (`playground-rn-dev` /benchmark) | `hasMany` includes, `Q.on` joins |
+| Dual RN path: Expo Go + dev build (`/rn`, `mode: 'auto'`) | |
+| WatermelonDB benchmark comparison (`bench:compare`, CI) | |
 | Query / Mango / Prisma surfaces + React/sync hooks | Per-field timestamps / three-way merge |
 | Schema migrations, belongsTo includes, devtools + docs site | `hasMany` includes, `Q.on` joins |
 | Full sync stack (HTTP + Postgres, retry, merge-by-field, custom resolver) | |

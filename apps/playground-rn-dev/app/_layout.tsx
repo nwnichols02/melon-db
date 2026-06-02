@@ -79,6 +79,10 @@ export default function RootLayout(): React.ReactElement {
 						<MelonDevtoolsProvider bridge={devtoolsBridge}>
 							<Stack>
 								<Stack.Screen name="index" options={{ title: "Open Tasks" }} />
+								<Stack.Screen
+									name="benchmark"
+									options={{ title: "Benchmarks" }}
+								/>
 							</Stack>
 							<MelonDevtoolsPanel />
 						</MelonDevtoolsProvider>

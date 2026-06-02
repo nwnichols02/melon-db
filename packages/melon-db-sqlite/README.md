@@ -12,6 +12,7 @@ SQLite `StorageAdapter` for Bun, Node (`better-sqlite3`), Expo, and optional JSI
 | `@melon/db-sqlite/node` | Node + `better-sqlite3` | — |
 | `@melon/db-sqlite/expo` | React Native + `expo-sqlite` | **Yes** |
 | `@melon/db-sqlite/rn` | RN + `@melon/db-sqlite-native` | **No** (dev build only) |
+| `@melon/db-sqlite/bench` | Shared benchmark scenarios (Node + RN) | — |
 
 ## Expo Go (default)
 
@@ -45,6 +46,8 @@ bun test
 bun run bench           # from monorepo root — Melon-only harness
 bun run bench:compare   # Melon vs WatermelonDB parity (dev deps)
 ```
+
+On-device: `apps/playground-rn-dev` → **Benchmarks** (`/benchmark`, `__DEV__` only) runs `melon-jsi-sync` vs `melon-turbo` using this package’s bench scenarios.
 
 ## Reactive queries (`observeQuery`)
 

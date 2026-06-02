@@ -4,6 +4,7 @@
 	"type": "module",
 	"exports": {
 		".": "./src/index.ts",
+		"./bench": "./src/bench/index.ts",
 		"./expo": "./src/expo.ts",
 		"./node": "./src/node.ts",
 		"./rn": "./src/rn.ts"

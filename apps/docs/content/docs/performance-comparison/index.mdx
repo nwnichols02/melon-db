@@ -53,8 +53,37 @@ Timings vary by hardware and cold JIT; treat CI output as a trend signal, not a 
 
 Dependencies install with **Bun** (`better-sqlite3@12.10.0`, root `trustedDependencies`). The entrypoint is `bun run bench:compare`. **melon-node** and **watermelon** legs run in a **Node** subprocess because `better-sqlite3` is a Node native addon and [does not load under Bun yet](https://github.com/oven-sh/bun/issues/4290). CI sets `COMPARE_RUNNER_BIN=node` and provides Node 22 on the path for that subprocess only.
 
+## On-device (React Native)
+
+Phase 28 adds a **dev-only benchmark screen** in `apps/playground-rn-dev` that reuses the same scenarios via [`@melon/db-sqlite/bench`](../../packages/melon-db-sqlite/src/bench/index.ts).
+
+### How to run
+
+1. Build and install the dev client (`bun run dev:rn:dev` or `install:ios` / `install:android` from `apps/playground-rn-dev`).
+2. Start Metro (`bun run dev:rn:dev:start`).
+3. On the task list, tap **Benchmarks** (dev builds only) or open `/benchmark`.
+4. Choose scale **1k** (quick) or **10k** (full).
+5. Tap **Run jsi-sync + turbo** — uses separate bench DB files; does not touch the main app database.
+6. Tap **Share JSON report** to export timings and parity ratios.
+
+### Engine labels
+
+| Engine | Stack | Notes |
+|--------|--------|--------|
+| `melon-jsi-sync` | `createJsiSqliteAdapter({ mode: 'jsi-sync' })` | C++ JSI sync host object |
+| `melon-turbo` | `createJsiSqliteAdapter({ mode: 'turbo' })` | Async TurboModule path |
+| `melon-expo` | `createExpoSqliteAdapter` | Optional leg from benchmark screen |
+
+Parity JSON uses `ratio = jsiSyncMs / turboMs` (same shape as Node `buildRnParityReport`). See [sample device run](/docs/performance-comparison/latest-results#react-native-sample) when committed.
+
+### Limitations
+
+- Manual only — no CI device farm; plug in device and disable background apps for stable numbers.
+- Scales capped at **10k** on device (50k/100k remain Node-only).
+- WatermelonDB is not run on RN in this harness (Node `bench:compare` remains the WDB baseline).
+
 ## Non-goals
 
-- React Native on-device comparison in this harness — use the manual checklist in [`@melon/db-sqlite-native` README](https://github.com/melon/melon/blob/main/packages/melon-db-sqlite-native/README.md) (insert 10k on iOS `jsi-sync` vs `turbo`)
+- Automated CI on iOS/Android simulators for device benchmarks
 - Sync throughput or conflict merge benchmarks
 - LokiJS in-memory WatermelonDB adapter

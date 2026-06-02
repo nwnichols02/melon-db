@@ -12,3 +12,7 @@ COMPARE_RUNNER_BIN=node bun run bench:compare:docs
 ```
 
 Commit the updated JSON with your PR when timings should be reflected on the docs site.
+
+## React Native sample
+
+On-device benchmarks use [`apps/docs/src/data/bench-rn-latest.json`](https://github.com/melon/melon/blob/main/apps/docs/src/data/bench-rn-latest.json). After running **jsi-sync + turbo** @ 10k in `playground-rn-dev` → **Benchmarks** → **Share JSON report**, paste the payload into that file (or commit a maintainer-captured run). The committed file may be a placeholder until the first real device capture lands.

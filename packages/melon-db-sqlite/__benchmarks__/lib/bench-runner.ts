@@ -1,39 +1,14 @@
-export type BenchEngine =
-	| "melon-bun"
-	| "melon-node"
-	| "watermelon"
-	| "in-memory";
+export type {
+	BenchEngine,
+	BenchResult,
+	BenchSummary,
+	CompareRow,
+	ParityReport,
+} from "../../src/bench/types.ts";
+import type { BenchResult, BenchSummary } from "../../src/bench/types.ts";
+import { measureMs } from "../../src/bench/measure.ts";
 
-export interface BenchResult {
-	engine: BenchEngine | string;
-	scale: number;
-	scenario: string;
-	durationMs: number;
-	rowCount?: number;
-	resultCount?: number;
-}
-
-export interface BenchSummary {
-	results: BenchResult[];
-	timestamp: string;
-}
-
-export interface CompareRow {
-	scenario: string;
-	scale: number;
-	melonNodeMs: number;
-	watermelonMs: number;
-	ratio: number;
-	winner: "melon" | "watermelon" | "tie";
-}
-
-export interface ParityReport {
-	timestamp: string;
-	scale: number;
-	comparisons: CompareRow[];
-	raw?: BenchResult[];
-	notes: string[];
-}
+export { measureMs };
 
 export interface BenchCliOptions {
 	scales: number[];
@@ -54,15 +29,6 @@ const SCALE_MAP: Record<string, number> = {
 	"50k": 50_000,
 	"100k": 100_000,
 };
-
-/**
- * Measures async function execution time in milliseconds.
- */
-export async function measureMs(fn: () => Promise<void>): Promise<number> {
-	const start = performance.now();
-	await fn();
-	return performance.now() - start;
-}
 
 /**
  * Prints human-readable benchmark output.
