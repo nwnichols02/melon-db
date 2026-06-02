@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dist_tag:
+        description: npm dist-tag
+        required: true
+        default: alpha
+      dry_run:
+        description: Dry run (pack only, no npm publish)
+        type: boolean
+        default: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Test
+        run: bun test
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Audit (high/critical)
+        run: bun audit --audit-level=high || test "${{ github.event.inputs.dry_run }}" = "true"
+
+      - name: Build packages
+        run: bun run build:packages
+
+      - name: Validate exports
+        run: bun tooling/release/validate-exports.ts
+
+      - name: Pack smoke
+        run: bun run release:smoke
+
+      - name: Publish to npm
+        if: github.event.inputs.dry_run != 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: bun tooling/release/publish.ts --tag "${{ github.event.inputs.dist_tag }}"

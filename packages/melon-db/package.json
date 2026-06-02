@@ -1,14 +1,21 @@
 {
 	"name": "@melon/db",
-	"version": "0.0.0-alpha",
+	"version": "0.1.0-alpha.0",
 	"type": "module",
 	"exports": {
-		".": "./src/index.ts"
+		".": {
+			"types": "./dist/index.d.ts",
+			"bun": "./src/index.ts",
+			"development": "./src/index.ts",
+			"import": "./dist/index.js",
+			"default": "./src/index.ts"
+		}
 	},
 	"scripts": {
 		"test": "bun test",
 		"typecheck": "bunx tsc -p tsconfig.json --noEmit",
-		"build": "bun build ./src/index.ts --outdir ./dist --target node"
+		"build": "bunx tsc -b tsconfig.build.json --force",
+		"prepublishOnly": "bunx tsc -b tsconfig.build.json --force"
 	},
 	"dependencies": {
 		"@melon/db-query": "workspace:*"
@@ -17,5 +24,19 @@
 		"@melon/db-sqlite": "workspace:*",
 		"@types/bun": "latest",
 		"typescript": "^5"
-	}
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/melon/melon.git"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	]
 }

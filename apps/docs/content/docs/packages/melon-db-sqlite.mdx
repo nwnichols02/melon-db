@@ -7,6 +7,18 @@ description: SQLite StorageAdapter for Bun, Node, and Expo.
 
 Compiles `QueryAst` to parameterized SQL and implements `StorageAdapter` for production local storage. Includes **predicate-aware `observeQuery`** (Phase 27): reactive queries re-fetch only when a write can affect their WHERE clause.
 
+## Install (alpha)
+
+```bash
+npm install @melon/db-sqlite@alpha
+```
+
+Or with Bun:
+
+```bash
+bun add @melon/db-sqlite@alpha
+```
+
 ## Bun / Node
 
 ```ts

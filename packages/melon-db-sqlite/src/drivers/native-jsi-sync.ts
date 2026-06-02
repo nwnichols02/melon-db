@@ -103,6 +103,10 @@ export async function createNativeJsiSyncDriver(options: {
 	};
 }
 
+declare global {
+	var melonSqliteJsi: MelonSqliteJsiHostObject | undefined;
+}
+
 /**
  * Returns true when sync C++ JSI host object is installed.
  */

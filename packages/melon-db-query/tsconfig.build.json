@@ -1,0 +1,13 @@
+{
+  "extends": "../../tooling/tsconfig.build.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "paths": {
+      "@melon/db": ["../melon-db/dist/index.d.ts"],
+      "@melon/db/*": ["../melon-db/dist/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["**/__tests__/**", "**/*.test.ts"]
+}

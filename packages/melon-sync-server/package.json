@@ -1,10 +1,22 @@
 {
 	"name": "@melon/sync-server",
-	"version": "0.0.0-alpha",
+	"version": "0.1.0-alpha.0",
 	"type": "module",
 	"exports": {
-		".": "./src/index.ts",
-		"./in-memory": "./src/store.ts"
+		".": {
+			"types": "./dist/index.d.ts",
+			"bun": "./src/index.ts",
+			"development": "./src/index.ts",
+			"import": "./dist/index.js",
+			"default": "./src/index.ts"
+		},
+		"./in-memory": {
+			"types": "./dist/in-memory.d.ts",
+			"bun": "./src/in-memory.ts",
+			"development": "./src/in-memory.ts",
+			"import": "./dist/in-memory.js",
+			"default": "./src/in-memory.ts"
+		}
 	},
 	"scripts": {
 		"test": "bun test",
@@ -17,5 +29,19 @@
 	"devDependencies": {
 		"@types/bun": "latest",
 		"typescript": "^5"
-	}
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/melon/melon.git"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	]
 }

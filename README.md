@@ -21,6 +21,20 @@ Next-generation offline-first local database for React Native and TypeScript (Wa
 
 ## Quick start
 
+### Install from npm (alpha)
+
+```bash
+npm install @melon/db@alpha @melon/db-sqlite@alpha @melon/db-react@alpha
+```
+
+Or with Bun:
+
+```bash
+bun add @melon/db@alpha @melon/db-sqlite@alpha @melon/db-react@alpha
+```
+
+### Develop in this monorepo
+
 ```bash
 bun install
 bun test
@@ -153,27 +167,27 @@ await synchronize({
 
 - All mutations must run inside `db.write()`.
 - SQLite migrations support add-column and create-table only.
-- Relation includes support `belongsTo` only (no `hasMany` includes in queries).
-- SQLite `observeQuery` invalidates on WHERE match (not perfect top-N / order membership).
+- Relation includes load `belongsTo` and `hasMany` via post-fetch batching (no SQL JOIN shaping).
+- SQLite `observeQuery` uses predicate-aware invalidation and cross-collection `relationFilters`, but top-N membership edge cases still exist.
 
 ## Completed vs roadmap
 
-Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun run dev:docs`). Phases **0–32** are shipped; see the docs for full phase history, [architecture ADRs](/docs/architecture/decisions), and [About](/docs/about).
+Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun run dev:docs`). Phases **0–34** are shipped; see the docs for full phase history, [architecture ADRs](/docs/architecture/decisions), and [About](/docs/about).
 
-| Done (Phases 0–32) | Deferred (Phase 33+) |
+| Done (Phases 0–34) | Deferred (Phase 35+) |
 |------|----------|
 | Core engine M0–M2 | EAS Build CI |
 | SQLite SQL compiler + Bun/Node/Expo adapters | Full multi-file schema codemods |
 | `@melon/db-sqlite-native` — iOS + Android TurboModule + C++ JSI | Background sync service |
 | Predicate-aware SQLite `observeQuery` + trigger flush / JSI `update_hook` | Per-field timestamps / three-way merge |
-| RN on-device benchmark harness (`playground-rn-dev` /benchmark) | `hasMany` includes, `Q.on` joins |
+| RN on-device benchmark harness (`playground-rn-dev` /benchmark) | SQL SELECT JOIN shaping |
 | Dual RN path: Expo Go + dev build (`/rn`, `mode: 'auto'`) | |
 | WatermelonDB benchmark comparison (`bench:compare`, CI) | |
-| Query / Mango / Prisma surfaces + React/sync hooks | Per-field timestamps / three-way merge |
-| Schema migrations, relation includes, Q.on filters, devtools + docs site | SQL SELECT JOIN shaping |
+| Query / Mango / Prisma surfaces + React/sync hooks | `getChangedCollections` adapter API |
+| Schema migrations, relation includes, Q.on filters, devtools + docs site | Sliding window retention (prd-4) |
 | Full sync stack (HTTP + Postgres, retry, merge-by-field, custom resolver) | |
 | `@melon/db-codemods` v1 + v2 | |
-| CI (test, typecheck, biome, bench-smoke, bench-compare, postgres-sync, docs) | |
+| CI (test, typecheck, biome, bench-smoke, bench-compare, postgres-sync, docs, release-smoke) | |
 
 ## Development
 

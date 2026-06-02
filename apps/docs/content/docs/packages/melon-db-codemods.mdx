@@ -5,6 +5,18 @@ description: WatermelonDB migration codemods and query translator.
 
 **Status:** Shipped (v2) · **Depends on:** `@melon/db`, `@melon/db-query` · **API:** [Reference](/docs/api/melon-db-codemods)
 
+## Install (alpha)
+
+```bash
+npm install @melon/db-codemods@alpha
+```
+
+Or with Bun:
+
+```bash
+bun add @melon/db-codemods@alpha
+```
+
 ```bash
 bun run melon-codemod migrate-queries --path=./src
 bun run melon-codemod migrate-writes --path=./src

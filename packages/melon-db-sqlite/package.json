@@ -1,14 +1,50 @@
 {
 	"name": "@melon/db-sqlite",
-	"version": "0.0.0-alpha",
+	"version": "0.1.0-alpha.0",
 	"type": "module",
 	"exports": {
-		".": "./src/index.ts",
-		"./bench": "./src/bench/index.ts",
-		"./expo": "./src/expo.ts",
-		"./node": "./src/node.ts",
-		"./rn": "./src/rn.ts",
-		"./testing": "./src/testing.ts"
+		".": {
+			"types": "./dist/index.d.ts",
+			"bun": "./src/index.ts",
+			"development": "./src/index.ts",
+			"import": "./dist/index.js",
+			"default": "./src/index.ts"
+		},
+		"./bench": {
+			"types": "./dist/bench.d.ts",
+			"bun": "./src/bench/index.ts",
+			"development": "./src/bench/index.ts",
+			"import": "./dist/bench.js",
+			"default": "./src/bench/index.ts"
+		},
+		"./expo": {
+			"types": "./dist/expo.d.ts",
+			"bun": "./src/expo.ts",
+			"development": "./src/expo.ts",
+			"import": "./dist/expo.js",
+			"default": "./src/expo.ts"
+		},
+		"./node": {
+			"types": "./dist/node.d.ts",
+			"bun": "./src/node.ts",
+			"development": "./src/node.ts",
+			"import": "./dist/node.js",
+			"default": "./src/node.ts"
+		},
+		"./rn": {
+			"types": "./dist/rn.d.ts",
+			"bun": "./src/rn.ts",
+			"development": "./src/rn.ts",
+			"import": "./dist/rn.js",
+			"default": "./src/rn.ts"
+		},
+		"./testing": {
+			"types": "./dist/testing.d.ts",
+			"bun": "./src/testing.ts",
+			"development": "./src/testing.ts",
+			"import": "./dist/testing.js",
+			"default": "./src/testing.ts"
+		}
 	},
 	"scripts": {
 		"test": "bun test",
@@ -51,5 +87,19 @@
 		"@types/bun": "latest",
 		"react-native": "0.81.5",
 		"typescript": "^5"
-	}
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/melon/melon.git"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	]
 }

@@ -1,12 +1,18 @@
 {
 	"name": "@melon/db-codemods",
-	"version": "0.0.0-alpha",
+	"version": "0.1.0-alpha.0",
 	"type": "module",
 	"bin": {
-		"melon-codemod": "./src/bin/melon-codemod.ts"
+		"melon-codemod": "./dist/bin/melon-codemod.js"
 	},
 	"exports": {
-		".": "./src/index.ts"
+		".": {
+			"types": "./dist/index.d.ts",
+			"bun": "./src/index.ts",
+			"development": "./src/index.ts",
+			"import": "./dist/index.js",
+			"default": "./src/index.ts"
+		}
 	},
 	"scripts": {
 		"test": "bun test",
@@ -21,5 +27,19 @@
 		"@melon/db-testkit": "workspace:*",
 		"@types/bun": "latest",
 		"typescript": "^5"
-	}
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/melon/melon.git"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	]
 }

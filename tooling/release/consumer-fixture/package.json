@@ -1,0 +1,23 @@
+{
+  "name": "melon-alpha-consumer-fixture",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "bunx tsc -p tsconfig.json --noEmit",
+    "smoke": "bun run smoke.ts"
+  },
+  "dependencies": {
+    "@melon/db": "file:../artifacts/melon-db-0.1.0-alpha.0.tgz",
+    "@melon/db-query": "file:../artifacts/melon-db-query-0.1.0-alpha.0.tgz",
+    "@melon/db-sqlite": "file:../artifacts/melon-db-sqlite-0.1.0-alpha.0.tgz"
+  },
+  "overrides": {
+    "@melon/db": "file:../artifacts/melon-db-0.1.0-alpha.0.tgz",
+    "@melon/db-query": "file:../artifacts/melon-db-query-0.1.0-alpha.0.tgz"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "better-sqlite3": "^12.10.0",
+    "typescript": "^5"
+  }
+}

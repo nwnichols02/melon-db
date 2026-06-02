@@ -7,6 +7,24 @@ Melon is an offline-first local database for React Native and TypeScript — a m
 
 ## Install
 
+### Install from npm (alpha)
+
+Melon publishes alpha builds under the `alpha` dist-tag.
+
+```bash
+npm install @melon/db@alpha @melon/db-sqlite@alpha @melon/db-react@alpha
+```
+
+Or with Bun:
+
+```bash
+bun add @melon/db@alpha @melon/db-sqlite@alpha @melon/db-react@alpha
+```
+
+For Node/Bun SQLite, `@melon/db-sqlite` uses `bun:sqlite` by default. For React Native native JSI, install `@melon/db-sqlite-native@alpha` and follow the RN walkthrough.
+
+### Install from this monorepo
+
 From the monorepo root:
 
 ```bash

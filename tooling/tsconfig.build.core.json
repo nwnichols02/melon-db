@@ -1,0 +1,7 @@
+{
+  "files": [],
+  "references": [
+    { "path": "../packages/melon-db-query/tsconfig.build.json" },
+    { "path": "../packages/melon-db/tsconfig.build.json" }
+  ]
+}

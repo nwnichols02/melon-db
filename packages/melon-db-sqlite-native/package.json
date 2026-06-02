@@ -1,10 +1,10 @@
 {
 	"name": "@melon/db-sqlite-native",
-	"version": "0.0.1",
+	"version": "0.1.0-alpha.0",
 	"description": "Melon JSI/TurboModule SQLite for React Native development builds",
-	"main": "./src/index.ts",
+	"main": "./dist/index.js",
 	"react-native": "./src/index.ts",
-	"types": "./src/index.ts",
+	"types": "./dist/index.d.ts",
 	"scripts": {
 		"typecheck": "bunx tsc -p tsconfig.json --noEmit",
 		"test": "bun test"
@@ -33,5 +33,31 @@
 		"@types/react": "~19.1.10",
 		"react-native": "0.81.5",
 		"typescript": "^5"
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/melon/melon.git"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": [
+		"dist",
+		"src",
+		"ios",
+		"android",
+		"cpp",
+		"melon-sqlite-native.podspec",
+		"README.md"
+	],
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"bun": "./src/index.ts",
+			"development": "./src/index.ts",
+			"import": "./dist/index.js",
+			"default": "./src/index.ts"
+		}
 	}
 }

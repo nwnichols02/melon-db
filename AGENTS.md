@@ -9,6 +9,7 @@ bun install
 bun test                    # all packages
 bun run typecheck           # packages + apps
 bun run check               # biome
+bun run release:smoke        # packed-tarball consumer smoke
 ```
 
 ## Which app for what

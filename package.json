@@ -33,11 +33,15 @@
     "melon-codemod": "bun run packages/melon-db-codemods/src/bin/melon-codemod.ts",
     "docs:api": "bun run --filter docs docs:api",
     "typecheck:apps": "bun run --filter playground-rn typecheck && bun run --filter playground-rn-dev typecheck && bun run --filter playground-web typecheck && bun run --filter docs typecheck",
-    "melon-prisma": "bun run packages/melon-db-prisma/src/bin/melon-prisma.ts"
+    "melon-prisma": "bun run packages/melon-db-prisma/src/bin/melon-prisma.ts",
+    "build:packages": "bun tooling/release/build-all.ts",
+    "pack:packages": "bun run build:packages && bun tooling/release/pack-all.ts",
+    "release:smoke": "bun tooling/release/smoke-consumer.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/bun": "latest",
+    "@types/node": "^25.9.1",
     "typescript": "^5"
   },
   "trustedDependencies": ["better-sqlite3"],

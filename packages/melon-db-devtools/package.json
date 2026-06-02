@@ -1,10 +1,22 @@
 {
 	"name": "@melon/db-devtools",
-	"version": "0.0.0-alpha",
+	"version": "0.1.0-alpha.0",
 	"type": "module",
 	"exports": {
-		".": "./src/index.ts",
-		"./react": "./src/react/index.ts"
+		".": {
+			"types": "./dist/index.d.ts",
+			"bun": "./src/index.ts",
+			"development": "./src/index.ts",
+			"import": "./dist/index.js",
+			"default": "./src/index.ts"
+		},
+		"./react": {
+			"types": "./dist/react.d.ts",
+			"bun": "./src/react/index.ts",
+			"development": "./src/react/index.ts",
+			"import": "./dist/react.js",
+			"default": "./src/react/index.ts"
+		}
 	},
 	"scripts": {
 		"test": "bun test",
@@ -23,5 +35,19 @@
 		"react-dom": "19.1.0",
 		"react-native": "0.81.5",
 		"typescript": "^5"
-	}
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/melon/melon.git"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	]
 }

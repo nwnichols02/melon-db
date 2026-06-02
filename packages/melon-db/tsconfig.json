@@ -1,4 +1,7 @@
 {
 	"extends": "../../tooling/tsconfig.base.json",
+	"compilerOptions": {
+		"composite": true
+	},
 	"include": ["src/**/*", "__tests__/**/*", "__fixtures__/**/*"]
 }

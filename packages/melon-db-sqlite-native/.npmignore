@@ -1,0 +1,6 @@
+android/.cxx
+android/.gradle
+android/build
+**/*.o
+**/*.a
+.DS_Store

@@ -1,0 +1,14 @@
+{
+  "extends": "../../tooling/tsconfig.build.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "types": ["node", "bun"],
+    "paths": {
+      "@melon/db": ["../melon-db/dist/index.d.ts"],
+      "@melon/db-sqlite-native": ["../melon-db-sqlite-native/dist/index.d.ts"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["**/__tests__/**", "**/*.test.ts", "**/__benchmarks__/**"]
+}

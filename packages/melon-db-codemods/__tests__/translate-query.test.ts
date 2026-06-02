@@ -3,8 +3,8 @@ import { MelonError, MelonErrorCode } from "@melon/db";
 import {
 	taskSchema,
 	taskSchemaDefinition,
-	withTestDatabase,
-} from "@melon/db-testkit";
+} from "../../melon-db/__fixtures__/task-schema.ts";
+import { withTestDatabase } from "@melon/db-testkit";
 import {
 	queryDescriptionToAst,
 	translateWatermelonQuery,

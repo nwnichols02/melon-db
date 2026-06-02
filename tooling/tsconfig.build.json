@@ -1,0 +1,16 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.build.core.json" },
+    { "path": "../packages/melon-db-query-mango/tsconfig.build.json" },
+    { "path": "../packages/melon-db-testkit/tsconfig.build.json" },
+    { "path": "../packages/melon-db-sqlite/tsconfig.build.json" },
+    { "path": "../packages/melon-db-sqlite-native/tsconfig.build.json" },
+    { "path": "../packages/melon-db-prisma/tsconfig.build.json" },
+    { "path": "../packages/melon-db-devtools/tsconfig.build.json" },
+    { "path": "../packages/melon-sync/tsconfig.build.json" },
+    { "path": "../packages/melon-sync-server/tsconfig.build.json" },
+    { "path": "../packages/melon-db-react/tsconfig.build.json" },
+    { "path": "../packages/melon-db-codemods/tsconfig.build.json" }
+  ]
+}

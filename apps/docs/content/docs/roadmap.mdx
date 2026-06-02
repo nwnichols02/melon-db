@@ -11,9 +11,9 @@ This page is the **living status** for Melon. Update it when features land or de
 |------|----------------|
 | Packages | 12 under `packages/*` (core through sync-server + native) |
 | Example apps | 5 — `playground-node`, `playground-rn`, `playground-rn-dev`, `playground-web`, `docs` |
-| Implementation phases | **0–33 shipped** (see chronology below) |
+| Implementation phases | **0–34 shipped** (see chronology below) |
 | Out-of-cycle | Fumadocs docs site, TypeDoc API, playgrounds (ongoing maintenance) |
-| Next | Phase 34+ deferred items; **Phase 34 = alpha / open-source release prep** |
+| Next | Phase 35+ feature work; Phase 34 shipped release engineering |
 
 **Quick links:** [Architecture](/docs/architecture) · [Phase ADRs](/docs/architecture/decisions) · [Packages](/docs/packages/melon-db) · [Performance](/docs/performance-comparison)
 
@@ -82,7 +82,7 @@ Each phase was executed as a focused delivery increment. Phases 0–7 establishe
 | 31 | PRD compliance + DX | docs, devtools, `playground-web` | prd-4 matrix, walkthroughs, devtools Plan/SQL params, `AGENTS.md` + melon-dev skill, typing pass | Shipped |
 | 32 | Query engine — relations | `@melon/db`, `@melon/db-sqlite`, codemods | `hasMany` includes (post-fetch), `relationFilters` / Q.on via SQL `IN` subquery, Prisma include parity | Shipped |
 | 33 | observeQuery precision | `@melon/db`, `@melon/db-sqlite` | Cross-collection `relationFilters` invalidation, field-aware updates, trigger delete fix, schema-aware subscription fingerprint | Shipped |
-| 34+ | Alpha / open-source release | all publishable packages | npm `@melon` org, public GitHub, security & community files, alpha dist-tag publish CI | **Next** |
+| 34 | Alpha / open-source release | all publishable packages | Publishable tarballs, CI smoke from packed tarballs, release workflow + docs/support policy | Shipped |
 
 ### Out-of-cycle: Documentation
 

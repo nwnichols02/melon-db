@@ -27,6 +27,11 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .cache
 *.tsbuildinfo
 
+# Accidental tsc emit next to sources
+packages/*/src/**/*.js
+packages/*/src/**/*.d.ts
+packages/*/__fixtures__/**/*.d.ts
+
 # IntelliJ based IDEs
 .idea
 
@@ -35,6 +40,14 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # Expo local state
 .expo/
+
+# React Native native build artifacts
+packages/melon-db-sqlite-native/android/.cxx/
+packages/melon-db-sqlite-native/android/.gradle/
+packages/melon-db-sqlite-native/android/build/
+
+# Release pack output
+tooling/release/artifacts/
 
 # Prisma codegen output
 **/__generated__/

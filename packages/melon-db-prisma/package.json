@@ -1,13 +1,25 @@
 {
 	"name": "@melon/db-prisma",
-	"version": "0.0.0-alpha",
+	"version": "0.1.0-alpha.0",
 	"type": "module",
 	"bin": {
-		"melon-prisma": "./src/bin/melon-prisma.ts"
+		"melon-prisma": "./dist/bin/melon-prisma.js"
 	},
 	"exports": {
-		".": "./src/index.ts",
-		"./node": "./src/node.ts"
+		".": {
+			"types": "./dist/index.d.ts",
+			"bun": "./src/index.ts",
+			"development": "./src/index.ts",
+			"import": "./dist/index.js",
+			"default": "./src/index.ts"
+		},
+		"./node": {
+			"types": "./dist/node.d.ts",
+			"bun": "./src/node.ts",
+			"development": "./src/node.ts",
+			"import": "./dist/node.js",
+			"default": "./src/node.ts"
+		}
 	},
 	"scripts": {
 		"test": "bun test",
@@ -20,5 +32,19 @@
 		"@prisma/internals": "^7.8.0",
 		"@types/bun": "latest",
 		"typescript": "^5"
-	}
+	},
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/melon/melon.git"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	]
 }

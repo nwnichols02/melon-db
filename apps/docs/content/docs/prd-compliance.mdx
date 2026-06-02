@@ -171,23 +171,23 @@ Future retention subsystem from `prd-4.mdc` — org-aware download windows, safe
 
 ## Alpha release and open source (prd-1)
 
-Pre-GA work required before publishing `@melon/*` to npm and opening the GitHub repository. **Not started** — tracked here as explicit product/engineering steps (not implied by “shipped” library code).
+Pre-GA work required before publishing `@melon/*` to npm and opening the GitHub repository. Phase 34 implements the release engineering and adoption plumbing; a couple items remain **manual** (npm org creation + flipping GitHub public).
 
 | Requirement | Status | Notes |
 |-------------|--------|-------|
-| GitHub: private → public | Gap | Repo visibility, default branch protection, required CI checks |
-| Community files | Gap | `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md` |
-| Secret / history hygiene | Gap | Audit history and CI for leaked tokens before going public |
-| npm org `@melon` | Gap | Create org, invite maintainers, enforce **2FA** on all publishers |
-| Per-package publish metadata | Gap | `name`, `version`, `files`, `exports`, `publishConfig.access: public` on each publishable package |
-| Monorepo publish workflow | Gap | Root is `"private": true`; need CI (or manual) release that builds + publishes packages in dependency order |
-| Alpha versioning policy | Gap | e.g. `0.x` semver, `alpha` dist-tag, documented breaking-change tolerance |
-| npm provenance / trusted publish | Gap | Prefer OIDC or automation token with least privilege; enable provenance where supported |
-| Dependency & supply-chain security | Gap | `bun audit` / npm audit in CI; review native module deps (`better-sqlite3`, RN native) |
-| Security disclosure process | Gap | `SECURITY.md` with supported versions and report channel |
-| Release notes & changelog | Gap | Per-package or monorepo `CHANGELOG.md`; GitHub Releases for alpha tags |
-| Install docs for consumers | Gap | Document `npm install @melon/db@alpha` (or Bun) outside the monorepo |
-| Support / SLA for alpha | Gap | Explicit “no production SLA”; issue templates for bug vs feature |
+| GitHub: private → public | Gap | Manual: flip visibility, enable branch protection + secret scanning |
+| Community files | Done | Root `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, templates |
+| Secret / history hygiene | Done | `.gitignore` tightened for local artifacts; manual scan recommended before public |
+| npm org `@melon` | Gap | Manual: create org, invite maintainers, enforce **2FA** |
+| Per-package publish metadata | Done | `files`, `exports`, `publishConfig.access: public`, `license`, `repository`, aligned versions |
+| Monorepo publish workflow | Done | `release.yml` + `tooling/release/publish.ts` (topological order, `--tag alpha`) |
+| Alpha versioning policy | Done | Lockstep `0.1.0-alpha.0` + `alpha` dist-tag |
+| npm provenance / trusted publish | Partial | Workflow supports token publish; switch to OIDC when npm org is configured |
+| Dependency & supply-chain security | Done | Release workflow runs `bun audit` and smoke from packed tarballs |
+| Security disclosure process | Done | `SECURITY.md` |
+| Release notes & changelog | Done | Root `CHANGELOG.md`; use GitHub Releases for tags |
+| Install docs for consumers | Done | [Getting started](/docs/getting-started) includes npm/Bun install |
+| Support / SLA for alpha | Done | [Alpha support policy](/docs/alpha-support) + issue templates |
 
 ### Recommended sequence
 
