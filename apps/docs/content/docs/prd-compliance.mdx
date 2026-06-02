@@ -16,7 +16,7 @@ This page tracks how Melon implementation compares to the product requirements i
 | **Done** | Core engine, SQLite, sync, codemods, `hasMany` includes, Q.on / `relationFilters`, observeQuery precision, walkthroughs |
 | **Partial** | Mango/Prisma surfaces, testkit helpers, devtools (Plan/params), `playground-web`, hook/schema typing |
 | **Deferred** | SQL `SELECT` JOIN shaping, full schema codemods, background sync |
-| **Gap** | `getChangedCollections`, sliding window (prd-4), Supabase/REST backends |
+| **Gap** | `getChangedCollections`, sliding window (prd-4), Supabase/REST backends, **npm alpha / open-source release** |
 
 ---
 
@@ -169,6 +169,57 @@ Future retention subsystem from `prd-4.mdc` — org-aware download windows, safe
 
 ---
 
+## Alpha release and open source (prd-1)
+
+Pre-GA work required before publishing `@melon/*` to npm and opening the GitHub repository. **Not started** — tracked here as explicit product/engineering steps (not implied by “shipped” library code).
+
+| Requirement | Status | Notes |
+|-------------|--------|-------|
+| GitHub: private → public | Gap | Repo visibility, default branch protection, required CI checks |
+| Community files | Gap | `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md` |
+| Secret / history hygiene | Gap | Audit history and CI for leaked tokens before going public |
+| npm org `@melon` | Gap | Create org, invite maintainers, enforce **2FA** on all publishers |
+| Per-package publish metadata | Gap | `name`, `version`, `files`, `exports`, `publishConfig.access: public` on each publishable package |
+| Monorepo publish workflow | Gap | Root is `"private": true`; need CI (or manual) release that builds + publishes packages in dependency order |
+| Alpha versioning policy | Gap | e.g. `0.x` semver, `alpha` dist-tag, documented breaking-change tolerance |
+| npm provenance / trusted publish | Gap | Prefer OIDC or automation token with least privilege; enable provenance where supported |
+| Dependency & supply-chain security | Gap | `bun audit` / npm audit in CI; review native module deps (`better-sqlite3`, RN native) |
+| Security disclosure process | Gap | `SECURITY.md` with supported versions and report channel |
+| Release notes & changelog | Gap | Per-package or monorepo `CHANGELOG.md`; GitHub Releases for alpha tags |
+| Install docs for consumers | Gap | Document `npm install @melon/db@alpha` (or Bun) outside the monorepo |
+| Support / SLA for alpha | Gap | Explicit “no production SLA”; issue templates for bug vs feature |
+
+### Recommended sequence
+
+1. **Legal & repo hygiene (before public GitHub)**
+   - Choose and add a **LICENSE**.
+   - Add `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md`.
+   - Enable branch protection, required status checks, and secret scanning / Dependabot.
+   - Confirm no credentials in git history, `.env` examples, or CI logs.
+
+2. **npm organization & package prep**
+   - Create npm org **`@melon`**; add maintainers with 2FA.
+   - For each publishable package under `packages/*`: verify `name`, `version`, `description`, `repository`, `license`, `files` / `exports`, and `"publishConfig": { "access": "public" }`.
+   - Run `bun run build` and smoke tests from **packed tarballs** (`npm pack` / `bun pm pack`) — not only workspace links.
+
+3. **Alpha release**
+   - Publish with dist-tag **`alpha`** (e.g. `@melon/db@0.1.0-alpha.0`).
+   - Tag monorepo release in GitHub; attach release notes listing packages and known limitations ([v1 limitations](/docs/roadmap#v1-limitations)).
+   - Update [Getting started](/docs/getting-started) and package pages with **non-workspace** install instructions.
+
+4. **Security hardening (ongoing)**
+   - CI: audit on PR + before publish.
+   - Document supported React Native / Expo versions and native setup boundaries.
+   - Review third-party native dependencies and pin where necessary.
+
+5. **Path to GA (post-alpha)**
+   - Stable `1.0.0` criteria aligned with [prd-1 Milestone 5](/docs/prd-compliance#prd-source-index) (API freeze, migration docs, benchmark publication).
+   - Promote dist-tag from `alpha` → `latest` only after acceptance criteria met.
+
+**Package home:** release automation likely lives in root CI + `tooling/` scripts; individual packages stay publishable units per [package-roles](/docs/architecture/decisions).
+
+---
+
 ## Phase 29+ decisions
 
 Product decisions recorded here (not blockers for phases 0–28):
@@ -183,6 +234,7 @@ Product decisions recorded here (not blockers for phases 0–28):
 | `playground-web` | **Partial** | In-memory Vite app; full web SQLite adapter still deferred |
 | Read-during-write blocking | **Defer** | Serialized writes sufficient for v1; revisit if readers observe torn state |
 | Sliding window subsystem (prd-4) | **Defer** | Phase 31+; policy foundation before prune executor |
+| Alpha / open-source release | **Next (Phase 34)** | Public GitHub + npm `@melon` alpha; see [Alpha release and open source](/docs/prd-compliance#alpha-release-and-open-source-prd-1) |
 
 ---
 
@@ -190,7 +242,7 @@ Product decisions recorded here (not blockers for phases 0–28):
 
 | File | Focus |
 |------|-------|
-| `prd-1.mdc` | Product vision, sync, RN, hooks, GA checklist |
+| `prd-1.mdc` | Product vision, sync, RN, hooks, GA checklist, **open source / npm alpha** |
 | `prd-2.mdc` | AST-first multi-surface queries |
 | `prd-3.mdc` | TypeScript interface contracts |
 | `prd-4.mdc` | **Future** sliding-window retention, prune ledger, org-aware scope |

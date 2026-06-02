@@ -134,6 +134,22 @@ Functional requirements:
 - Provide examples for React Native new architecture, Expo workflows, testing, and performance tuning.
 - Provide troubleshooting guides, error reference docs, and interactive examples.
 
+### 8. Open source and npm distribution
+The library stack is developed in a private monorepo today; adoption requires a deliberate path to **public GitHub**, **npm packages under `@melon/*`**, and a documented **alpha** channel before GA.
+
+Functional requirements:
+- Move the GitHub repository from private to public only after LICENSE, community files, and secret/history hygiene are complete.
+- Create and operate an npm organization (`@melon`) with maintainer 2FA and least-privilege publish credentials (automation token or OIDC; provenance where supported).
+- Publish each core package with correct `name`, `version`, `files`/`exports`, `repository`, `license`, and `"publishConfig": { "access": "public" }`.
+- Ship an **alpha** dist-tag first (e.g. `0.x` semver, `@alpha`), with release notes and explicit “no production SLA” support policy.
+- Provide non-workspace install documentation (`npm install @melon/db@alpha` or Bun equivalent).
+- Maintain supply-chain checks in CI (audit) and a `SECURITY.md` disclosure process before and after going public.
+- Automate or script monorepo releases so packages publish in dependency order after build + test + pack smoke checks.
+
+Non-goals for alpha:
+- Managed hosting or a Melon cloud service.
+- Stable semver `1.x` API freeze (alpha may break; document in changelog).
+
 ## Non-functional requirements
 
 | Category | Requirement |
@@ -230,6 +246,7 @@ Required backend assets:
 - As a platform engineer, the sync engine should be configurable without rewriting the local database layer.[2][3]
 - As a maintainer, the codebase should be split into testable, versioned modules with clear responsibilities.
 - As an enterprise team, conflicts and retries should be observable and policy-driven instead of ad hoc.[3]
+- As an external adopter, I should be able to install `@melon/db` from npm on an alpha dist-tag with clear security and support boundaries before GA.[1]
 
 ## Acceptance criteria
 
@@ -241,6 +258,13 @@ Required backend assets:
 - React Native new architecture support is documented and validated in CI.
 - At least one migration guide from existing WatermelonDB patterns is published.
 - Error codes, troubleshooting docs, and devtools diagnostics are available.
+
+### Alpha / open-source release acceptance
+- GitHub repository is public with LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, and SECURITY.md.
+- npm org `@melon` exists; all published maintainers use 2FA.
+- At least `@melon/db`, `@melon/db-sqlite`, and `@melon/db-react` are published on the `alpha` dist-tag with install docs outside the monorepo.
+- CI runs dependency audit before publish; release notes document known v1 limitations.
+- Packaged tarballs (not workspace links) pass smoke tests on a clean install.
 
 ### Performance acceptance
 - Large collection reads remain lazy and avoid loading all records into JS memory, preserving the current performance model.[1]
@@ -256,6 +280,7 @@ Required backend assets:
 | Sync becomes too opinionated | Limits adoption for custom backends | Keep protocol adapters and conflict resolvers pluggable.[2][3] |
 | Type inference becomes brittle | Poor developer experience | Use generated metadata and extensive TS test suites. |
 | Migration friction from current WatermelonDB apps | Adoption slows | Ship codemods, compatibility wrappers, and detailed migration examples.[4] |
+| Premature public release without security hygiene | Credential leak or unsupported consumers | Gate public GitHub and npm alpha on LICENSE, SECURITY.md, audit CI, and pack smoke tests. |
 
 ## Milestones
 
@@ -345,6 +370,24 @@ Exit criteria:
 - Troubleshooting docs cover setup, schema, sync, and migration failures.[2][3]
 - Devtools surface actionable diagnostics.
 
+### Milestone 4.5: Open source and npm alpha (3-4 weeks)
+Scope:
+- Prepare repository for public GitHub (LICENSE, community files, branch protection, secret scanning).
+- Create npm org `@melon`; configure publish metadata on all publishable packages.
+- Implement release workflow (manual or CI) with `alpha` dist-tag and GitHub Releases.
+- Document external install, alpha support policy, and security reporting.
+
+Deliverables:
+- Public GitHub repository
+- `@melon/*` packages on npm (`alpha` tag)
+- Release automation or documented publish runbook
+- SECURITY.md and audit gate in CI
+
+Exit criteria:
+- Clean install from npm tarballs works for documented quick-start paths.
+- No secrets in repo history; maintainers on 2FA.
+- Alpha release notes list scope and limitations.
+
 ### Milestone 5: v1 general availability (2-3 weeks)
 Scope:
 - Stabilize APIs, close critical bugs, complete docs QA, and finalize versioning and support policy.
@@ -370,7 +413,8 @@ Exit criteria:
 | React Native integration beta | 4-6 weeks | 4-4.5 months |
 | Sync engine beta | 6-8 weeks | 5.5-6.5 months |
 | Migration, docs, devtools RC | 4-6 weeks | 7-8 months |
-| GA stabilization | 2-3 weeks | 7.5-8.5 months |
+| Open source and npm alpha | 3-4 weeks | 8-8.5 months |
+| GA stabilization | 2-3 weeks | 8.5-9 months |
 
 ## Success metrics
 
@@ -390,6 +434,8 @@ Exit criteria:
 - Should sync checkpoints use timestamps only for v1, or support opaque cursors from day one?
 - Which reference backend should be treated as the canonical example: Node/Postgres or Supabase/Postgres?[7][3]
 - Should code generation be required for optimal typing, or optional for teams preferring pure code-first inference?
+- Which license (e.g. MIT, Apache-2.0) fits npm + native module redistribution?
+- Publish all packages in lockstep vs independent semver per package?
 
 ## Recommended next step
 The immediate next step is to turn this PRD into an implementation program with RFCs for schema design, adapter contracts, sync protocol contracts, and React hook ergonomics. That work should begin with a compatibility matrix against current WatermelonDB setup, CRUD, and sync expectations so the successor preserves the right behaviors while modernizing the right abstractions.[4][5][2]

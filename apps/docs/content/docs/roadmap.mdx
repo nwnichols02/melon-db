@@ -13,7 +13,7 @@ This page is the **living status** for Melon. Update it when features land or de
 | Example apps | 5 — `playground-node`, `playground-rn`, `playground-rn-dev`, `playground-web`, `docs` |
 | Implementation phases | **0–33 shipped** (see chronology below) |
 | Out-of-cycle | Fumadocs docs site, TypeDoc API, playgrounds (ongoing maintenance) |
-| Next | Phase 34+ deferred items |
+| Next | Phase 34+ deferred items; **Phase 34 = alpha / open-source release prep** |
 
 **Quick links:** [Architecture](/docs/architecture) · [Phase ADRs](/docs/architecture/decisions) · [Packages](/docs/packages/melon-db) · [Performance](/docs/performance-comparison)
 
@@ -82,6 +82,7 @@ Each phase was executed as a focused delivery increment. Phases 0–7 establishe
 | 31 | PRD compliance + DX | docs, devtools, `playground-web` | prd-4 matrix, walkthroughs, devtools Plan/SQL params, `AGENTS.md` + melon-dev skill, typing pass | Shipped |
 | 32 | Query engine — relations | `@melon/db`, `@melon/db-sqlite`, codemods | `hasMany` includes (post-fetch), `relationFilters` / Q.on via SQL `IN` subquery, Prisma include parity | Shipped |
 | 33 | observeQuery precision | `@melon/db`, `@melon/db-sqlite` | Cross-collection `relationFilters` invalidation, field-aware updates, trigger delete fix, schema-aware subscription fingerprint | Shipped |
+| 34+ | Alpha / open-source release | all publishable packages | npm `@melon` org, public GitHub, security & community files, alpha dist-tag publish CI | **Next** |
 
 ### Out-of-cycle: Documentation
 
@@ -113,6 +114,7 @@ See [PRD compliance — Phase 29+ decisions](/docs/prd-compliance#phase-29-decis
 | Sync `merging` state | Apply is synchronous in v1 |
 | `playground-web` SQLite | In-memory Vite app shipped; web SQLite adapter still deferred |
 | Sliding window (prd-4) | Org-aware retention, prune ledger, pressure modes — see prd-4.mdc |
+| **Alpha / open-source release** | npm `@melon` org, public GitHub, LICENSE/SECURITY, publish CI — see [PRD compliance — Alpha release](/docs/prd-compliance#alpha-release-and-open-source-prd-1) |
 
 ---
 
