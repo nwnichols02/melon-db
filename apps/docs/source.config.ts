@@ -1,3 +1,4 @@
+import { remarkMdxMermaid } from "fumadocs-core/mdx-plugins";
 import {
 	createFileSystemGeneratorCache,
 	createGenerator,
@@ -20,6 +21,9 @@ const typeGenerator = createGenerator({
 
 export default defineConfig({
 	mdxOptions: {
-		remarkPlugins: [[remarkAutoTypeTable, { generator: typeGenerator }]],
+		remarkPlugins: [
+			remarkMdxMermaid,
+			[remarkAutoTypeTable, { generator: typeGenerator }],
+		],
 	},
 });

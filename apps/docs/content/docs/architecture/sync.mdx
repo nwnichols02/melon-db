@@ -9,10 +9,26 @@ For usage examples see the [Sync guide](/docs/sync). For the split-package ratio
 
 ## Components
 
-<ArchitectureDiagram
-  alt="Sync components — client app, @melon/sync, and backend reference server"
-  src="/diagrams/architecture/sync-components.svg"
-/>
+```mermaid
+flowchart LR
+  subgraph client [Client app]
+    MDB[MelonDatabase sync]
+    Outbox["_melon_sync_outbox"]
+    Sync["@melon/sync"]
+    Hooks[useSync hooks]
+    MDB --> Sync
+    Outbox --> Sync
+    Sync --> Hooks
+  end
+
+  subgraph backend [Backend]
+    Server["@melon/sync-server"]
+    PG[PostgresSyncStore]
+    Server --> PG
+  end
+
+  Sync -->|pull / push HTTP| Server
+```
 
 | Piece | Owner | Role |
 |-------|-------|------|
@@ -25,19 +41,37 @@ For usage examples see the [Sync guide](/docs/sync). For the split-package ratio
 
 ## Pull/push sequence
 
-<ArchitectureDiagram
-  alt="Sync pull and push sequence between app, sync orchestrator, database, and backend"
-  src="/diagrams/architecture/sync-pull-push.svg"
-/>
+```mermaid
+sequenceDiagram
+  participant App
+  participant Sync as @melon/sync
+  participant DB as MelonDatabase
+  participant Backend
+
+  App->>Sync: synchronize()
+  Sync->>Backend: pullChanges
+  Backend-->>Sync: changes + timestamp
+  Sync->>DB: applyRemoteChanges
+  Sync->>DB: getLocalChanges
+  Sync->>Backend: pushChanges
+  Sync->>DB: markLocalChangesPushed + checkpoint
+```
 
 ## Conflict resolution flow
 
 When a remote row collides with a local row (or outbox entry), `applyRemoteChanges` dispatches by policy:
 
-<ArchitectureDiagram
-  alt="Conflict resolution decision flow by policy"
-  src="/diagrams/architecture/sync-conflicts.svg"
-/>
+```mermaid
+flowchart TD
+  Start[Remote change] --> Local{Local row?}
+  Local -->|no| Insert[Insert remote]
+  Local -->|yes| Outbox{Outbox?}
+  Outbox --> Policy{Policy?}
+  Policy --> SW[server-wins]
+  Policy --> CW[client-wins]
+  Policy --> MB[merge-by-field]
+  Policy --> Custom[custom]
+```
 
 Policies shipped in Phase 15–18:
 

@@ -37,13 +37,18 @@ Interactive demos live under `content/docs/playgrounds/` and import client-only 
 
 ## Architecture diagrams
 
-Diagrams are **SVG exports** in `apps/docs/public/diagrams/architecture/`, rendered via the `<ArchitectureDiagram />` MDX component (not mermaid). To edit:
+Author diagrams as fenced **mermaid** blocks in `.mdx` files:
 
-1. Import the SVG into [diagrams.net](https://app.diagrams.net/) (File → Import).
-2. Export updated SVG back to the same path.
-3. Reference with `<ArchitectureDiagram src="/diagrams/architecture/your-diagram.svg" alt="..." />`.
+````md
+```mermaid
+flowchart LR
+  A[Author] --> B[Engine]
+```
+````
 
-Do not use mermaid code blocks in docs — they are not wired in this site.
+The MDX pipeline uses `remarkMdxMermaid` from `fumadocs-core/mdx-plugins` (configured in `apps/docs/source.config.ts`). It must run **before** code-highlighting plugins so diagram source is not treated as a code block. At build time, fences become `<Mermaid chart="..." />`; the client component in `apps/docs/src/components/mdx/mermaid.tsx` renders SVG and respects light/dark theme.
+
+Optional captions: add italic prose directly below the fence.
 
 ## Phase tracking
 
