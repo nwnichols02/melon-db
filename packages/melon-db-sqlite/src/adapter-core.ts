@@ -19,6 +19,16 @@ import {
 import { SCHEMA_VERSION_KEY } from "@melon/db";
 import type { SqliteDriver } from "./driver.ts";
 import { createSqliteMigrationExecutor } from "./migration-executor.ts";
+import {
+	createQuerySubscriptionRegistry,
+	fetchRowByPrimaryKey,
+	invalidateForWrite,
+} from "./observe/index.ts";
+import {
+	drainObservationEvents,
+	ensureObservationTriggers,
+	resetObservationTriggerCache,
+} from "./observe/triggers.ts";
 import { generateDdl } from "./schema-ddl.ts";
 import { toSqlParams } from "./sql/bindings.ts";
 import { compileQuery } from "./sql/compile-query.ts";
@@ -47,6 +57,7 @@ export function createSqliteAdapterFromDriver(
 	let lastQueryDebug: QueryExecutionDebug | undefined;
 	let syncOutboxStore: SyncOutboxStore | undefined;
 	let metaStore: MetaStore | undefined;
+	const subscriptionRegistry = createQuerySubscriptionRegistry();
 
 	function emitDebug(debugInfo: QueryExecutionDebug): void {
 		lastQueryDebug = debugInfo;
@@ -73,6 +84,33 @@ export function createSqliteAdapterFromDriver(
 		return schema;
 	}
 
+	async function afterWriteInvalidation(
+		sqlite: SqliteDriver,
+		s: MelonSchema,
+		operation: AdapterWriteOperation,
+		context: {
+			oldRow?: Record<string, unknown> | null;
+			newRow?: Record<string, unknown> | null;
+		},
+	): Promise<void> {
+		if (
+			operation.type !== "batch" &&
+			subscriptionRegistry.getSubscriptionsForCollection(operation.collection)
+				.length > 0
+		) {
+			await ensureObservationTriggers(sqlite, s, operation.collection);
+		}
+
+		await invalidateForWrite(
+			sqlite,
+			s,
+			subscriptionRegistry,
+			operation,
+			context,
+		);
+		await drainObservationEvents(sqlite);
+	}
+
 	async function writeOperation(
 		operation: AdapterWriteOperation,
 	): Promise<void> {
@@ -88,6 +126,7 @@ export function createSqliteAdapterFromDriver(
 
 		const meta = s.getCollection(operation.collection);
 		const table = `"${operation.collection}"`;
+		const pk = meta.primaryKey;
 
 		if (operation.type === "insert") {
 			const keys = Object.keys(operation.values);
@@ -96,26 +135,61 @@ export function createSqliteAdapterFromDriver(
 			const sql = `INSERT INTO ${table} (${cols}) VALUES (${placeholders})`;
 			emitDebug({ sql, params: keys.map((k) => operation.values[k]) });
 			await sqlite.run(sql, toSqlParams(keys.map((k) => operation.values[k])));
+
+			const id = operation.values[pk] as string | number | undefined;
+			const newRow =
+				id !== undefined
+					? await fetchRowByPrimaryKey(sqlite, operation.collection, pk, id)
+					: (operation.values as Record<string, unknown>);
+
+			await afterWriteInvalidation(sqlite, s, operation, {
+				newRow: newRow ?? operation.values,
+			});
 			return;
 		}
 
 		if (operation.type === "update") {
+			const oldRow = await fetchRowByPrimaryKey(
+				sqlite,
+				operation.collection,
+				pk,
+				operation.primaryKey,
+			);
+
 			const keys = Object.keys(operation.values);
 			const setClause = keys.map((k) => `"${k}" = ?`).join(", ");
-			const sql = `UPDATE ${table} SET ${setClause} WHERE "${meta.primaryKey}" = ?`;
+			const sql = `UPDATE ${table} SET ${setClause} WHERE "${pk}" = ?`;
 			const params = [
 				...keys.map((k) => operation.values[k]),
 				operation.primaryKey,
 			];
 			emitDebug({ sql, params });
 			await sqlite.run(sql, toSqlParams(params));
+
+			const newRow = await fetchRowByPrimaryKey(
+				sqlite,
+				operation.collection,
+				pk,
+				operation.primaryKey,
+			);
+
+			await afterWriteInvalidation(sqlite, s, operation, { oldRow, newRow });
 			return;
 		}
 
 		if (operation.type === "delete") {
-			const sql = `DELETE FROM ${table} WHERE "${meta.primaryKey}" = ?`;
+			const oldRow = await fetchRowByPrimaryKey(
+				sqlite,
+				operation.collection,
+				pk,
+				operation.id,
+			);
+
+			const sql = `DELETE FROM ${table} WHERE "${pk}" = ?`;
 			emitDebug({ sql, params: [operation.id] });
 			await sqlite.run(sql, toSqlParams([operation.id]));
+
+			await afterWriteInvalidation(sqlite, s, operation, { oldRow });
 		}
 	}
 
@@ -123,7 +197,7 @@ export function createSqliteAdapterFromDriver(
 		name: "sqlite",
 		capabilities: {
 			transactions: true,
-			reactiveSubscriptions: false,
+			reactiveSubscriptions: true,
 			jsonFields: true,
 			joins: false,
 			partialSelect: false,
@@ -226,11 +300,23 @@ export function createSqliteAdapterFromDriver(
 			return requireDriver().transaction(fn);
 		},
 
+		observeQuery(prepared, onChange) {
+			const collection = prepared.ast.collection;
+			if (driver !== null && schema !== null) {
+				void ensureObservationTriggers(driver, schema, collection).catch(() => {
+					// Triggers are best-effort; direct invalidation remains primary.
+				});
+			}
+			return subscriptionRegistry.subscribe(prepared, onChange);
+		},
+
 		getLastQueryDebug(): QueryExecutionDebug | undefined {
 			return lastQueryDebug;
 		},
 
 		async close(): Promise<void> {
+			subscriptionRegistry.clear();
+			resetObservationTriggerCache();
 			await driver?.close();
 			driver = null;
 			schema = null;

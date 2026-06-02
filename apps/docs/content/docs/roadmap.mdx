@@ -11,7 +11,7 @@ This page is the **living status** for Melon. Update it when features land or de
 |------|----------------|
 | Packages | 12 under `packages/*` (core through sync-server + native) |
 | Example apps | 4 — `playground-node`, `playground-rn`, `playground-rn-dev`, `docs` |
-| Implementation phases | **0–26 shipped** (see chronology below) |
+| Implementation phases | **0–27 shipped** (see chronology below) |
 | Out-of-cycle | Fumadocs docs site, TypeDoc API, playgrounds (ongoing maintenance) |
 | Next | Phase 27+ deferred items |
 
@@ -75,6 +75,7 @@ Each phase was executed as a focused delivery increment. Phases 0–7 establishe
 | 24 | WDB benchmarks | `@melon/db-sqlite`, docs | `bench:compare`, CI `bench-compare`, performance comparison docs | Shipped |
 | 25 | C++ JSI (iOS) | native | `MelonSQLiteHostObject`, native DB thread, `global.melonSqliteJsi` | Shipped |
 | 26 | C++ JSI (Android) | native | NDK/JNI, `libmelon_sqlite`, Android worker thread parity | Shipped |
+| 27 | Native `observeQuery` | `@melon/db-sqlite` | Predicate-aware invalidation, SQLite triggers foundation, `reactiveSubscriptions: true` | Shipped |
 
 ### Out-of-cycle: Documentation
 
@@ -87,15 +88,14 @@ Each phase was executed as a focused delivery increment. Phases 0–7 establishe
 
 ## Shipped at a glance
 
-Core engine, all three query surfaces, React/sync hooks, devtools, codemods, full sync stack (HTTP + Postgres), dual RN SQLite paths (Expo + native JSI on iOS/Android), WatermelonDB benchmark harness, and CI (test, typecheck, biome, bench-smoke, bench-compare, postgres-sync, docs build).
+Core engine, all three query surfaces, React/sync hooks, devtools, codemods, full sync stack (HTTP + Postgres), dual RN SQLite paths (Expo + native JSI on iOS/Android), predicate-aware `observeQuery` on SQLite, WatermelonDB benchmark harness, and CI (test, typecheck, biome, bench-smoke, bench-compare, postgres-sync, docs build).
 
 ---
 
-## Deferred (Phase 27+)
+## Deferred (Phase 28+)
 
 | Area | Notes |
 |------|-------|
-| Native `observeQuery` / SQLite triggers | Engine ChangeEmitter used today — see [ADR-007](/docs/architecture/decisions#adr-007-changeemitter-fallback-vs-native-observequery) |
 | RN on-device benchmark harness | Node `bench:compare` ships; native throughput benchmarks deferred |
 | EAS Build CI | Release automation for dev client artifacts |
 | Full multi-file schema codemods | Beyond single-model `migrate-schema` spike |
@@ -111,7 +111,7 @@ Core engine, all three query surfaces, React/sync hooks, devtools, codemods, ful
 - All mutations must run inside `db.write()`.
 - SQLite migrations: add-column and create-table only.
 - Relation includes: `belongsTo` only (no `hasMany` in queries).
-- Native SQLite `observeQuery` triggers not implemented (engine change emitter used).
+- `observeQuery` invalidates on WHERE match (may over-invalidate for `orderBy`/`limit` edge cases).
 
 ---
 

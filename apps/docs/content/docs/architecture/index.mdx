@@ -75,7 +75,11 @@ Collection `insert`, `update`, and `delete` throw if called outside a write cont
 
 ## Subscriptions
 
-When the adapter does not implement native `observeQuery`, the engine uses an internal **ChangeEmitter**: writes emit collection-level changes, and query handles re-fetch on invalidation. See [ADR-007](/docs/architecture/decisions#adr-007-changeemitter-fallback-vs-native-observequery).
+**SQLite adapters** (`@melon/db-sqlite`) implement **`observeQuery`**: after each write, subscriptions are invalidated only when the changed row can affect the query’s WHERE clause (predicate-aware). Per-table triggers record writes to `_melon_observation_events` for future external-write polling.
+
+**Other adapters** (in-memory, etc.) use the engine **ChangeEmitter**: any write to a collection re-fetches all active queries on that table.
+
+The engine `observeQuery` helper prefers `adapter.observeQuery` when present. See [ADR-007](/docs/architecture/decisions#adr-007-changeemitter-fallback-vs-native-observequery).
 
 ## Related
 

@@ -95,11 +95,13 @@ These ADRs capture the main architectural choices made during Phases 0–26. Eac
 
 **Context:** Fine-grained SQLite triggers for query invalidation are complex; v1 needed reactive hooks quickly.
 
-**Decision:** Engine **ChangeEmitter** re-runs queries on collection changes. Native `observeQuery` / SQLite triggers deferred to Phase 27+.
+**Decision (Phase 0–26):** Engine **ChangeEmitter** re-runs queries on collection changes when the adapter has no `observeQuery`.
 
-**Pros:** Works on all adapters today; React hooks ship without native trigger work.
+**Amendment (Phase 27):** `@melon/db-sqlite` implements **`observeQuery`** with predicate-aware post-write invalidation (`rowMatchesWhere` + subscription registry). Per-table SQLite triggers append to `_melon_observation_events` for future external-write detection. In-memory and other adapters still use ChangeEmitter.
 
-**Cons:** Coarser invalidation than row-level triggers; extra re-fetch work on large tables.
+**Pros:** SQLite reactive queries skip irrelevant writes; hooks unchanged (`observe.ts` prefers adapter when present).
+
+**Cons:** v1 invalidates on WHERE match only (not perfect `LIMIT`/`ORDER BY` membership); trigger path is foundation-only for Melon writes today.
 
 **Alternatives:** Block reactive APIs until native triggers (rejected — delayed RN playground and hooks).
 

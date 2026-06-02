@@ -52,7 +52,7 @@ When JSI is present, `getMelonSQLiteNativeMode()` returns `jsi-sync`; otherwise 
 ## v1 native limitations
 
 - No BLOB round-trip on the native JSI path
-- No native `observeQuery` / SQLite triggers (engine ChangeEmitter used — Phase 27+)
+- Predicate-aware `observeQuery` in `@melon/db-sqlite` (all paths including native JSI)
 - RN on-device benchmark harness deferred (Node `bench:compare` vs WatermelonDB ships today)
 
 ## Related

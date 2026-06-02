@@ -20,7 +20,7 @@ Native SQLite module used by [`@melon/db-sqlite/rn`](/docs/packages/melon-db-sql
 ## Limitations
 
 - **BLOB / `bytes` fields** are not round-tripped (returned as `null`).
-- No native `observeQuery` triggers.
+- Reactive invalidation is handled by `@melon/db-sqlite` `observeQuery` (predicate-aware; same on native and Expo paths).
 
 ## Setup
 

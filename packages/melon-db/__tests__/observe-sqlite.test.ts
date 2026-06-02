@@ -69,4 +69,51 @@ describe("observe with sqlite adapter", () => {
 		unsub();
 		await db.adapter.close();
 	});
+
+	test("irrelevant write does not re-fetch filtered query", async () => {
+		const { createSqliteAdapter } = await import("@melon/db-sqlite");
+		const db = createDatabase({
+			schema: taskSchema,
+			adapter: createSqliteAdapter({ filename: ":memory:" }),
+		});
+		const values: string[][] = [];
+
+		const query = db
+			.collection("tasks")
+			.query(queryAst("tasks", { where: predicate("status", "eq", "open") }));
+
+		const unsub = query.observe((rows) => {
+			values.push(rows.map((r) => r.id as string));
+		});
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "open-1",
+				title: "Open",
+				status: "open",
+				priority: 1,
+				updatedAt: new Date(),
+			});
+		});
+
+		await new Promise((r) => setTimeout(r, 10));
+		const lengthAfterOpen = values.length;
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "closed-1",
+				title: "Closed",
+				status: "closed",
+				priority: 1,
+				updatedAt: new Date(),
+			});
+		});
+
+		await new Promise((r) => setTimeout(r, 10));
+		expect(values.length).toBe(lengthAfterOpen);
+		expect(values.at(-1)).toEqual(["open-1"]);
+
+		unsub();
+		await db.adapter.close();
+	});
 });

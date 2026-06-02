@@ -48,7 +48,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<HeadContent />
 			</head>
 			<body className="flex min-h-screen flex-col font-sans">
-				<RootProvider>{children}</RootProvider>
+				<RootProvider>
+					<div className="flex min-h-screen flex-1 flex-col">{children}</div>
+				</RootProvider>
 				<Scripts />
 			</body>
 		</html>

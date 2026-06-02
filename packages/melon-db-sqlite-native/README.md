@@ -26,7 +26,7 @@ Melon-owned SQLite native module for React Native **development builds**.
 
 - Kotlin TurboModule `exec()` routes `PRAGMA` through `rawQuery` on the async fallback path only (C++ JSI uses `sqlite3_exec`).
 - **BLOB / `bytes` fields** are not round-tripped on the native path (returned as `null`).
-- No native `observeQuery` triggers — the engine uses its change emitter fallback.
+- Predicate-aware `observeQuery` ships in `@melon/db-sqlite` (shared adapter-core); native path uses the same invalidation.
 - Sync JSI calls block the JS thread until the native DB queue completes (intentional for throughput; keep queries bounded).
 
 ## Requirements
@@ -141,4 +141,4 @@ After `expo prebuild --clean` + `bun run dev:rn:dev:android` then `bun run dev:r
 - **Fallback:** `MelonSQLite` TurboModule (`MelonSQLiteSpec` codegen) with async promises on both platforms.
 - **JS:** `MelonSQLiteJsi.ts` reads `global.melonSqliteJsi`; `MelonSQLiteBridge.ts` reports `jsi-sync` | `turbo` | `bridge`.
 
-**Phase 27+:** native `observeQuery` triggers; RN on-device benchmark harness.
+**Phase 28+:** RN on-device benchmark harness; native `sqlite3_update_hook` for zero-poll invalidation.

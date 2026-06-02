@@ -46,6 +46,16 @@ bun run bench           # from monorepo root — Melon-only harness
 bun run bench:compare   # Melon vs WatermelonDB parity (dev deps)
 ```
 
+## Reactive queries (`observeQuery`)
+
+All SQLite adapters set `capabilities.reactiveSubscriptions: true` and implement **`observeQuery`**.
+
+- Subscriptions dedupe by compiled query fingerprint.
+- After each write, only subscriptions whose WHERE clause can be affected by the changed row are notified (predicate-aware invalidation).
+- Queries with `orderBy` / `limit` / `skip` invalidate when WHERE matches (v1 may over-invalidate vs perfect top-N detection).
+- Per-table SQLite triggers write to `_melon_observation_events` (foundation for future external-write detection).
+- In-memory adapter still uses engine ChangeEmitter (collection-wide invalidation).
+
 ## Comparison with WatermelonDB
 
 `bench:compare` runs the same scenarios as `bench` for **melon-node** (`better-sqlite3`) and **WatermelonDB** (`@nozbe/watermelondb` on the Node SQLite adapter), plus optional **melon-bun** (`bun:sqlite`) for reference.

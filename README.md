@@ -154,17 +154,18 @@ await synchronize({
 - All mutations must run inside `db.write()`.
 - SQLite migrations support add-column and create-table only.
 - Relation includes support `belongsTo` only (no `hasMany` includes in queries).
-- Native SQLite `observeQuery` triggers not implemented (engine change emitter used instead).
+- SQLite `observeQuery` invalidates on WHERE match (not perfect top-N / order membership).
 
 ## Completed vs roadmap
 
-Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun run dev:docs`). Phases **0–26** are shipped; see the docs for full phase history, [architecture ADRs](/docs/architecture/decisions), and [About](/docs/about).
+Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun run dev:docs`). Phases **0–27** are shipped; see the docs for full phase history, [architecture ADRs](/docs/architecture/decisions), and [About](/docs/about).
 
-| Done (Phases 0–26) | Deferred (Phase 27+) |
+| Done (Phases 0–27) | Deferred (Phase 28+) |
 |------|----------|
-| Core engine M0–M2 | Native `observeQuery` / SQLite triggers |
+| Core engine M0–M2 | RN on-device benchmark harness |
 | SQLite SQL compiler + Bun/Node/Expo adapters | EAS Build CI |
-| `@melon/db-sqlite-native` — iOS + Android TurboModule + C++ JSI | RN on-device benchmark harness |
+| `@melon/db-sqlite-native` — iOS + Android TurboModule + C++ JSI | |
+| Predicate-aware SQLite `observeQuery` | |
 | Dual RN path: Expo Go + dev build (`/rn`, `mode: 'auto'`) | Full multi-file schema codemods |
 | WatermelonDB benchmark comparison (`bench:compare`, CI) | Background sync service |
 | Query / Mango / Prisma surfaces + React/sync hooks | Per-field timestamps / three-way merge |
