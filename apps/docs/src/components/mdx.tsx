@@ -1,4 +1,5 @@
 import { BenchCompareResultsTable } from "@/components/bench-compare-results-table";
+import { BenchRnMelonWdbResultsTable } from "@/components/bench-rn-melon-wdb-results-table";
 import { BenchRnResultsTable } from "@/components/bench-rn-results-table";
 import { DocsLink } from "@/components/docs-link";
 import {
@@ -38,6 +39,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		a: DocsLink,
 		AutoTypeTable,
 		BenchCompareResultsTable,
+		BenchRnMelonWdbResultsTable,
 		BenchRnResultsTable,
 		Mermaid,
 		pre: DocsPre,

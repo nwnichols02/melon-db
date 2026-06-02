@@ -1,24 +1,24 @@
 import latestArtifact from "@/data/bench-rn-latest.json";
 
-interface RnCompareRow {
+interface RnMelonVsWdbRow {
 	scenario: string;
 	scale: number;
-	jsiSyncMs: number;
-	turboMs: number;
+	melonMs: number;
+	watermelonMs: number;
 	ratio: number;
-	winner: "jsi-sync" | "turbo" | "tie";
+	winner: "melon" | "watermelon" | "tie";
 }
 
-interface RnParityReport {
+interface RnMelonVsWdbReport {
 	timestamp: string;
 	scale: number;
 	platform: string;
-	modes: string[];
-	comparisons: RnCompareRow[];
+	melonEngine: string;
+	comparisons: RnMelonVsWdbRow[];
 	notes?: string[];
 }
 
-interface BenchRnLatestArtifact {
+interface BenchRnMelonWdbArtifact {
 	generatedAt: string;
 	updatedBy: string;
 	note?: string;
@@ -26,10 +26,10 @@ interface BenchRnLatestArtifact {
 		platform: string;
 		label: string;
 	};
-	report?: RnParityReport;
+	melonVsWdb?: RnMelonVsWdbReport;
 }
 
-const artifact = latestArtifact as BenchRnLatestArtifact;
+const artifact = latestArtifact as BenchRnMelonWdbArtifact;
 
 const SCENARIO_LABELS: Record<string, string> = {
 	"row-insert": "Row insert",
@@ -55,31 +55,32 @@ function formatGeneratedAt(iso: string): string {
 	});
 }
 
-interface RnWinnerBadgeProps {
-	winner: RnCompareRow["winner"];
+interface MelonWdbWinnerBadgeProps {
+	winner: RnMelonVsWdbRow["winner"];
 }
 
-function RnWinnerBadge({ winner }: RnWinnerBadgeProps) {
+function MelonWdbWinnerBadge({ winner }: MelonWdbWinnerBadgeProps) {
 	const className =
-		winner === "jsi-sync"
+		winner === "melon"
 			? "rounded-md bg-fd-primary/15 px-2 py-0.5 text-xs font-medium text-fd-primary"
-			: winner === "turbo"
-				? "rounded-md bg-violet-500/15 px-2 py-0.5 text-xs font-medium text-violet-800 dark:text-violet-300"
+			: winner === "watermelon"
+				? "rounded-md bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-800 dark:text-amber-300"
 				: "rounded-md bg-fd-muted px-2 py-0.5 text-xs font-medium text-fd-muted-foreground";
 
 	return <span className={className}>{winner}</span>;
 }
 
-interface RnResultsTableProps {
-	rows: RnCompareRow[];
+interface MelonWdbResultsTableProps {
+	rows: RnMelonVsWdbRow[];
+	melonEngine: string;
 }
 
-function RnResultsTable({ rows }: RnResultsTableProps) {
+function MelonWdbResultsTable({ rows, melonEngine }: MelonWdbResultsTableProps) {
 	if (rows.length === 0) {
 		return (
 			<p className="text-fd-muted-foreground text-sm">
-				No on-device results in the artifact. Run{" "}
-				<strong>jsi-sync + turbo</strong> in{" "}
+				No Melon vs WatermelonDB results in the artifact. Run{" "}
+				<strong>jsi-sync + Watermelon</strong> in{" "}
 				<code className="text-fd-foreground">playground-rn-dev</code> →
 				Benchmarks and update{" "}
 				<code className="text-fd-foreground">bench-rn-latest.json</code>.
@@ -93,8 +94,8 @@ function RnResultsTable({ rows }: RnResultsTableProps) {
 				<thead>
 					<tr className="border-b border-fd-border bg-fd-muted/50 text-left">
 						<th className="px-4 py-2 font-medium">Scenario</th>
-						<th className="px-4 py-2 font-medium text-right">jsi-sync</th>
-						<th className="px-4 py-2 font-medium text-right">turbo</th>
+						<th className="px-4 py-2 font-medium text-right">{melonEngine}</th>
+						<th className="px-4 py-2 font-medium text-right">watermelon</th>
 						<th className="px-4 py-2 font-medium text-right">Ratio</th>
 						<th className="px-4 py-2 font-medium">Winner</th>
 					</tr>
@@ -109,16 +110,16 @@ function RnResultsTable({ rows }: RnResultsTableProps) {
 								{SCENARIO_LABELS[row.scenario] ?? row.scenario}
 							</td>
 							<td className="px-4 py-2 text-right tabular-nums">
-								{formatMs(row.jsiSyncMs)}
+								{formatMs(row.melonMs)}
 							</td>
 							<td className="px-4 py-2 text-right tabular-nums">
-								{formatMs(row.turboMs)}
+								{formatMs(row.watermelonMs)}
 							</td>
 							<td className="px-4 py-2 text-right tabular-nums">
 								{row.ratio.toFixed(4)}
 							</td>
 							<td className="px-4 py-2">
-								<RnWinnerBadge winner={row.winner} />
+								<MelonWdbWinnerBadge winner={row.winner} />
 							</td>
 						</tr>
 					))}
@@ -129,42 +130,48 @@ function RnResultsTable({ rows }: RnResultsTableProps) {
 }
 
 /**
- * Renders on-device jsi-sync vs turbo metrics from bench-rn-latest.json.
+ * Renders on-device melon-jsi-sync vs WatermelonDB metrics from bench-rn-latest.json.
  */
-export function BenchRnResultsTable() {
-	const { report, device } = artifact;
+export function BenchRnMelonWdbResultsTable() {
+	const melonVsWdb = artifact.melonVsWdb;
+	const { device } = artifact;
 
-	if (!report) {
-		return null;
+	if (!melonVsWdb) {
+		return (
+			<p className="text-fd-muted-foreground not-prose text-sm">
+				No <code className="text-fd-foreground">melonVsWdb</code> block in{" "}
+				<code className="text-fd-foreground">bench-rn-latest.json</code> yet.
+			</p>
+		);
 	}
 
 	return (
 		<div className="not-prose flex flex-col gap-4">
 			<p className="text-fd-muted-foreground text-sm">
 				Captured{" "}
-				<time dateTime={artifact.generatedAt}>
-					{formatGeneratedAt(artifact.generatedAt)} UTC
-				</time>{" "}
-				via <code className="text-fd-foreground">{artifact.updatedBy}</code>.
+				<time dateTime={melonVsWdb.timestamp}>
+					{formatGeneratedAt(melonVsWdb.timestamp)} UTC
+				</time>
 				{device.label ? (
 					<>
 						{" "}
-						Device: <span className="text-fd-foreground">{device.label}</span> (
-						{device.platform}).
+						· Device: <span className="text-fd-foreground">{device.label}</span> (
+						{device.platform})
 					</>
-				) : null}{" "}
-				Ratio is jsi-sync ÷ turbo (&lt; 1 means jsi-sync faster).
+				) : null}
+				. Ratio is {melonVsWdb.melonEngine} ÷ watermelon (&lt; 1 means Melon
+				faster).
 			</p>
-
-			{artifact.note ? (
-				<p className="text-fd-muted-foreground text-sm">{artifact.note}</p>
-			) : null}
 
 			<section className="flex flex-col gap-3">
 				<h3 className="text-lg font-semibold">
-					{formatScale(report.scale)} rows · {report.modes.join(" vs ")}
+					{formatScale(melonVsWdb.scale)} rows · {melonVsWdb.melonEngine} vs
+					watermelon
 				</h3>
-				<RnResultsTable rows={report.comparisons} />
+				<MelonWdbResultsTable
+					rows={melonVsWdb.comparisons}
+					melonEngine={melonVsWdb.melonEngine}
+				/>
 			</section>
 		</div>
 	);
