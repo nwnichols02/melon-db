@@ -1,23 +1,31 @@
-import type { PreparedQuery, QueryBooleanNode } from "@melon/db";
+import type { MelonSchema, PreparedQuery } from "@melon/db";
 import { compileQuery } from "../sql/compile-query.ts";
+import { resolveRelatedCollections } from "./related-collections.ts";
 
 export interface QuerySubscriptionEntry {
 	readonly id: number;
 	readonly prepared: PreparedQuery;
 	readonly collection: string;
-	readonly where: QueryBooleanNode | undefined;
+	readonly relatedCollections: readonly string[];
 	readonly listeners: Set<() => void>;
 }
 
 export interface QuerySubscriptionRegistry {
+	setSchema(schema: MelonSchema): void;
 	subscribe(prepared: PreparedQuery, onChange: () => void): () => void;
 	getSubscriptionsForCollection(collection: string): QuerySubscriptionEntry[];
+	getSubscriptionsAffectedByCollection(
+		collection: string,
+	): QuerySubscriptionEntry[];
 	scheduleNotify(subscriptionId: number): void;
 	clear(): void;
 }
 
-function subscriptionFingerprint(prepared: PreparedQuery): string {
-	const compiled = compileQuery(prepared);
+function subscriptionFingerprint(
+	prepared: PreparedQuery,
+	schema: MelonSchema,
+): string {
+	const compiled = compileQuery(prepared, schema);
 	return `${prepared.ast.collection}\0${compiled.sql}\0${JSON.stringify(compiled.params)}`;
 }
 
@@ -26,10 +34,20 @@ function subscriptionFingerprint(prepared: PreparedQuery): string {
  */
 export function createQuerySubscriptionRegistry(): QuerySubscriptionRegistry {
 	let nextId = 1;
+	let schema: MelonSchema | null = null;
 	const byFingerprint = new Map<string, QuerySubscriptionEntry>();
 	const byId = new Map<number, QuerySubscriptionEntry>();
 	let pendingNotifyIds = new Set<number>();
 	let flushScheduled = false;
+
+	function requireSchema(): MelonSchema {
+		if (!schema) {
+			throw new Error(
+				"QuerySubscriptionRegistry: schema not set; call setSchema after initialize",
+			);
+		}
+		return schema;
+	}
 
 	function flushNotifications(): void {
 		const ids = pendingNotifyIds;
@@ -45,8 +63,13 @@ export function createQuerySubscriptionRegistry(): QuerySubscriptionRegistry {
 	}
 
 	return {
+		setSchema(s: MelonSchema) {
+			schema = s;
+		},
+
 		subscribe(prepared, onChange) {
-			const fingerprint = subscriptionFingerprint(prepared);
+			const s = requireSchema();
+			const fingerprint = subscriptionFingerprint(prepared, s);
 			let entry = byFingerprint.get(fingerprint);
 
 			if (!entry) {
@@ -55,7 +78,7 @@ export function createQuerySubscriptionRegistry(): QuerySubscriptionRegistry {
 					id,
 					prepared,
 					collection: prepared.ast.collection,
-					where: prepared.ast.where,
+					relatedCollections: resolveRelatedCollections(prepared.ast, s),
 					listeners: new Set(),
 				};
 				byFingerprint.set(fingerprint, entry);
@@ -77,6 +100,14 @@ export function createQuerySubscriptionRegistry(): QuerySubscriptionRegistry {
 			return [...byId.values()].filter((e) => e.collection === collection);
 		},
 
+		getSubscriptionsAffectedByCollection(collection) {
+			return [...byId.values()].filter(
+				(e) =>
+					e.collection === collection ||
+					e.relatedCollections.includes(collection),
+			);
+		},
+
 		scheduleNotify(subscriptionId) {
 			pendingNotifyIds.add(subscriptionId);
 			if (!flushScheduled) {
@@ -93,3 +124,5 @@ export function createQuerySubscriptionRegistry(): QuerySubscriptionRegistry {
 		},
 	};
 }
+
+export { subscriptionFingerprint };

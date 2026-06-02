@@ -13,7 +13,7 @@ This page tracks how Melon implementation compares to the product requirements i
 
 | Bucket | Examples |
 |--------|----------|
-| **Done** | Core engine, SQLite, sync, codemods, `hasMany` includes, Q.on / `relationFilters`, walkthroughs |
+| **Done** | Core engine, SQLite, sync, codemods, `hasMany` includes, Q.on / `relationFilters`, observeQuery precision, walkthroughs |
 | **Partial** | Mango/Prisma surfaces, testkit helpers, devtools (Plan/params), `playground-web`, hook/schema typing |
 | **Deferred** | SQL `SELECT` JOIN shaping, full schema codemods, background sync |
 | **Gap** | `getChangedCollections`, sliding window (prd-4), Supabase/REST backends |
@@ -48,7 +48,7 @@ This page tracks how Melon implementation compares to the product requirements i
 | AST → SQL | Done | |
 | Node / Bun / Expo / RN | Done | |
 | Transactions | Done | |
-| `observeQuery` + triggers | Done | Phase 27 |
+| `observeQuery` + triggers | Done | Phase 27–29; Phase 33 cross-collection relationFilters + field-aware invalidation |
 | Benchmarks | Done | |
 | iOS/Android JSI + TurboModule | Done | |
 | SQL joins / partial select | Deferred | `capabilities.joins: false`; includes via post-fetch |

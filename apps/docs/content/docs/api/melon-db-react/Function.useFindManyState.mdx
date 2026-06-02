@@ -1,0 +1,35 @@
+---
+title: "useFindManyState"
+description: "@melon/db-react — useFindManyState"
+---
+
+[**@melon/db-react API Reference**](/docs/api/melon-db-react)
+
+***
+
+# Function: useFindManyState()
+
+> **useFindManyState**\<`T`, `U`\>(`collection`, `args?`, `options?`): [`QueryAsyncState`](/docs/api/melon-db-react/TypeAlias.QueryAsyncState)\<`U`\>
+
+Defined in: [hooks.ts:281](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-react/src/hooks.ts#L281)
+
+Reactive Prisma-style findMany hook with loading and error state.
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `T` *extends* `Record`\<`string`, `unknown`\> | `Record`\<`string`, `unknown`\> |
+| `U` | `T`[] |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `collection` | `string` |
+| `args?` | `PrismaFindManyArgs` |
+| `options?` | [`UseQueryOptions`](/docs/api/melon-db-react/Interface.UseQueryOptions)\<`T`, `U`\> |
+
+## Returns
+
+[`QueryAsyncState`](/docs/api/melon-db-react/TypeAlias.QueryAsyncState)\<`U`\>

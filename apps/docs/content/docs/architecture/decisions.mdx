@@ -99,11 +99,13 @@ These ADRs capture the main architectural choices made during Phases 0–26. Eac
 
 **Amendment (Phase 27):** `@melon/db-sqlite` implements **`observeQuery`** with predicate-aware post-write invalidation (`rowMatchesWhere` + subscription registry). Per-table SQLite triggers append to `_melon_observation_events`. In-memory and other adapters still use ChangeEmitter.
 
-**Amendment (Phase 29):** `flushObservationQueue()` drains trigger events into the same invalidation path (covers raw SQL / external writes). Native **jsi-sync** installs `sqlite3_update_hook` → `setObservationFlushCallback` on the JS thread (CallInvoker on iOS, RuntimeExecutor on Android). Delete events conservatively invalidate all subscriptions on the affected collection.
+**Amendment (Phase 29):** `flushObservationQueue()` drains trigger events into the same invalidation path (covers raw SQL / external writes). Native **jsi-sync** installs `sqlite3_update_hook` → `setObservationFlushCallback` on the JS thread (CallInvoker on iOS, RuntimeExecutor on Android). External delete events without a fetchable row conservatively invalidate affected subscriptions.
 
-**Pros:** SQLite reactive queries skip irrelevant writes; hooks unchanged (`observe.ts` prefers adapter when present); external mutations can refresh observers without polling.
+**Amendment (Phase 33):** Unified `shouldInvalidateSubscription` evaluates full AST (WHERE + `relationFilters` + field-aware updates). Subscriptions index **related collections** from `relationFilters`; writes to related tables (e.g. `projects`) invalidate parent queries (e.g. `tasks` with Q.on). Field-aware UPDATE narrowing skips notify when predicate membership unchanged and changed fields are not in observation fields (WHERE, orderBy, FK). Adapter writes drain trigger events after direct invalidation (no double-notify). `QueryPlan.postFilter` is set when limit/skip/orderBy/relationFilters present.
 
-**Cons:** v1 invalidates on WHERE match only (not perfect `LIMIT`/`ORDER BY` membership); turbo native path has no update hook in v1; delete events over-invalidate filtered queries.
+**Pros:** SQLite reactive queries skip irrelevant writes; hooks unchanged (`observe.ts` prefers adapter when present); external mutations can refresh observers without polling; Q.on reactive queries refresh when related rows change.
+
+**Cons:** `orderBy`+`limit` top-N membership is not exact (sort-field changes notify; boundary edge cases may still over-invalidate); turbo native path has no update hook in v1; in-memory ChangeEmitter remains collection-wide; external SQL deletes without row snapshot conservatively invalidate.
 
 **Alternatives:** Block reactive APIs until native triggers (rejected — delayed RN playground and hooks).
 
@@ -163,6 +165,6 @@ These ADRs capture the main architectural choices made during Phases 0–26. Eac
 
 **Pros:** Works on all adapters with one engine path; predictable SQL; easier tests.
 
-**Cons:** Extra round-trips for includes; `include.limit` is global on the child query, not per-parent; `observeQuery` may over-invalidate for subquery filters.
+**Cons:** Extra round-trips for includes; `include.limit` is global on the child query, not per-parent; `observeQuery` with `orderBy`+`limit` may still over-invalidate at top-N boundaries (Phase 33 improved relationFilters + field-aware updates).
 
 **Alternatives:** SQL JOIN in adapter (deferred — revisit if post-fetch becomes a bottleneck).

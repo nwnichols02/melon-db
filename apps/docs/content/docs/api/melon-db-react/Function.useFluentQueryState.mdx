@@ -1,0 +1,35 @@
+---
+title: "useFluentQueryState"
+description: "@melon/db-react — useFluentQueryState"
+---
+
+[**@melon/db-react API Reference**](/docs/api/melon-db-react)
+
+***
+
+# Function: useFluentQueryState()
+
+> **useFluentQueryState**\<`T`, `U`\>(`collection`, `builder`, `options?`): [`QueryAsyncState`](/docs/api/melon-db-react/TypeAlias.QueryAsyncState)\<`U`\>
+
+Defined in: [hooks.ts:341](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-react/src/hooks.ts#L341)
+
+Reactive fluent builder hook with loading and error state.
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `T` *extends* `Record`\<`string`, `unknown`\> | `Record`\<`string`, `unknown`\> |
+| `U` | `T`[] |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `collection` | `string` |
+| `builder` | (`q`) => `QueryBuilder`\<`T`\> |
+| `options?` | [`UseQueryOptions`](/docs/api/melon-db-react/Interface.UseQueryOptions)\<`T`, `U`\> |
+
+## Returns
+
+[`QueryAsyncState`](/docs/api/melon-db-react/TypeAlias.QueryAsyncState)\<`U`\>

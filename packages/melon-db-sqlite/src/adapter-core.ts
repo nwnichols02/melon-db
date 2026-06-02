@@ -21,6 +21,7 @@ import type { SqliteDriver } from "./driver.ts";
 import { createSqliteMigrationExecutor } from "./migration-executor.ts";
 import {
 	createQuerySubscriptionRegistry,
+	drainObservationEventsOnly,
 	fetchRowByPrimaryKey,
 	flushObservationQueue as flushObservationQueueFromEvents,
 	invalidateForWrite,
@@ -100,8 +101,9 @@ export function createSqliteAdapterFromDriver(
 	): Promise<void> {
 		if (
 			operation.type !== "batch" &&
-			subscriptionRegistry.getSubscriptionsForCollection(operation.collection)
-				.length > 0
+			subscriptionRegistry.getSubscriptionsAffectedByCollection(
+				operation.collection,
+			).length > 0
 		) {
 			await ensureObservationTriggers(sqlite, s, operation.collection);
 		}
@@ -113,7 +115,7 @@ export function createSqliteAdapterFromDriver(
 			operation,
 			context,
 		);
-		await flushObservationQueueFromEvents(sqlite, s, subscriptionRegistry);
+		await drainObservationEventsOnly(sqlite);
 	}
 
 	async function writeOperation(
@@ -222,6 +224,7 @@ export function createSqliteAdapterFromDriver(
 		): Promise<void> {
 			const isFirstInit = driver === null;
 			schema = s;
+			subscriptionRegistry.setSchema(s);
 			if (isFirstInit) {
 				driver = await driverFactory();
 				registerSqliteDriverForTests(adapter, driver);

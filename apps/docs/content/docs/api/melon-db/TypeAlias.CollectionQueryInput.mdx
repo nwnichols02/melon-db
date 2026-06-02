@@ -1,0 +1,22 @@
+---
+title: "Type Alias: CollectionQueryInputRecordShape"
+description: "@melon/db — Type Alias: CollectionQueryInputRecordShape"
+---
+
+[**@melon/db API Reference**](/docs/api/melon-db)
+
+***
+
+# Type Alias: CollectionQueryInput\<RecordShape\>
+
+> **CollectionQueryInput**\<`RecordShape`\> = [`QueryAst`](/docs/api/melon-db/Interface.QueryAst) \| (() => [`QueryAst`](/docs/api/melon-db/Interface.QueryAst)) \| ((`builder`) => `QueryBuilderLike`\<`RecordShape`\>)
+
+Defined in: [packages/melon-db/src/database/query-input.ts:6](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db/src/database/query-input.ts#L6)
+
+Fluent builder callback shape (implemented by @melon/db-query QueryBuilder).
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `RecordShape` | `Record`\<`string`, `unknown`\> |

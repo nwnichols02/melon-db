@@ -9,7 +9,7 @@ description: "@melon/db-sqlite-native — MelonSqliteJsiHostObject"
 
 # Interface: MelonSqliteJsiHostObject
 
-Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:10](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L10)
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:10](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L10)
 
 Sync C++ JSI host object installed as global.melonSqliteJsi (iOS dev build).
 
@@ -19,7 +19,7 @@ Sync C++ JSI host object installed as global.melonSqliteJsi (iOS dev build).
 
 > **closeSync**(): `void`
 
-Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:12](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L12)
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:12](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L12)
 
 #### Returns
 
@@ -31,7 +31,7 @@ Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:12](https://g
 
 > **execSync**(`sql`): `void`
 
-Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:13](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L13)
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:13](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L13)
 
 #### Parameters
 
@@ -49,7 +49,7 @@ Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:13](https://g
 
 > **openSync**(`path`): `void`
 
-Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:11](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L11)
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:11](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L11)
 
 #### Parameters
 
@@ -67,7 +67,7 @@ Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:11](https://g
 
 > **queryAllSync**(`sql`, `params?`): readonly `Record`\<`string`, `unknown`\>[]
 
-Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:14](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L14)
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:14](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L14)
 
 #### Parameters
 
@@ -86,7 +86,7 @@ readonly `Record`\<`string`, `unknown`\>[]
 
 > **queryFirstSync**(`sql`, `params?`): `Record`\<`string`, `unknown`\> \| `null`
 
-Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:18](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L18)
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:18](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L18)
 
 #### Parameters
 
@@ -101,11 +101,23 @@ Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:18](https://g
 
 ***
 
+### removeObservationFlushCallback()
+
+> **removeObservationFlushCallback**(): `void`
+
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:25](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L25)
+
+#### Returns
+
+`void`
+
+***
+
 ### runSync()
 
 > **runSync**(`sql`, `params?`): `void`
 
-Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:22](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L22)
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:22](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L22)
 
 #### Parameters
 
@@ -113,6 +125,26 @@ Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:22](https://g
 | ------ | ------ |
 | `sql` | `string` |
 | `params?` | readonly [`SqlParam`](/docs/api/melon-db-sqlite-native/TypeAlias.SqlParam)[] |
+
+#### Returns
+
+`void`
+
+***
+
+### setObservationFlushCallback()
+
+> **setObservationFlushCallback**(`callback`): `void`
+
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts:24](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-sqlite-native/src/MelonSQLiteJsi.ts#L24)
+
+Native sqlite3_update_hook schedules this on the JS thread to flush observation events.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `callback` | () => `void` |
 
 #### Returns
 

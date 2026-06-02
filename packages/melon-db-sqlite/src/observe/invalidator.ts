@@ -1,7 +1,11 @@
 import type { AdapterWriteOperation, MelonSchema } from "@melon/db";
 import type { SqliteDriver } from "../driver.ts";
+import {
+	type InvalidationEvent,
+	type RelatedRowLookup,
+	shouldInvalidateSubscription,
+} from "./invalidation.ts";
 import type { QuerySubscriptionRegistry } from "./registry.ts";
-import { rowMatchesWhere } from "./row-match.ts";
 
 export interface WriteInvalidationContext {
 	oldRow?: Record<string, unknown> | null;
@@ -16,20 +20,57 @@ function quoteColumn(name: string): string {
 	return `"${name.replace(/"/g, '""')}"`;
 }
 
-function rowMatchesSubscription(
-	collection: string,
-	row: Record<string, unknown> | null | undefined,
-	where: import("@melon/db").QueryBooleanNode | undefined,
-): boolean {
-	if (!row) return false;
-	return rowMatchesWhere(collection, row, where);
+function createRelatedRowLookup(
+	driver: SqliteDriver,
+	schema: MelonSchema,
+): RelatedRowLookup {
+	const cache = new Map<string, Record<string, unknown> | null>();
+
+	return async (collection, primaryKey) => {
+		const cacheKey = `${collection}:${String(primaryKey)}`;
+		if (cache.has(cacheKey)) {
+			return cache.get(cacheKey) ?? null;
+		}
+
+		const row = await fetchRowByPrimaryKey(
+			driver,
+			collection,
+			schema.getCollection(collection).primaryKey,
+			primaryKey,
+		);
+		cache.set(cacheKey, row);
+		return row;
+	};
+}
+
+async function invalidateSubscriptionsForEvent(
+	registry: QuerySubscriptionRegistry,
+	schema: MelonSchema,
+	event: InvalidationEvent,
+	lookupRelatedRow: RelatedRowLookup,
+): Promise<void> {
+	const subscriptions = registry.getSubscriptionsAffectedByCollection(
+		event.collection,
+	);
+
+	for (const entry of subscriptions) {
+		const shouldInvalidate = await shouldInvalidateSubscription(
+			entry,
+			event,
+			schema,
+			lookupRelatedRow,
+		);
+		if (shouldInvalidate) {
+			registry.scheduleNotify(entry.id);
+		}
+	}
 }
 
 /**
  * Invalidates observeQuery subscriptions affected by a write operation.
  */
 export async function invalidateForWrite(
-	_driver: SqliteDriver,
+	driver: SqliteDriver,
 	schema: MelonSchema,
 	registry: QuerySubscriptionRegistry,
 	operation: AdapterWriteOperation,
@@ -39,64 +80,63 @@ export async function invalidateForWrite(
 		return;
 	}
 
-	const collection = operation.collection;
-	const subscriptions = registry.getSubscriptionsForCollection(collection);
-	if (subscriptions.length === 0) {
+	const lookupRelatedRow = createRelatedRowLookup(driver, schema);
+
+	if (operation.type === "insert") {
+		await invalidateSubscriptionsForEvent(
+			registry,
+			schema,
+			{
+				collection: operation.collection,
+				operation: "insert",
+				newRow: context.newRow ?? operation.values,
+			},
+			lookupRelatedRow,
+		);
 		return;
 	}
 
-	for (const entry of subscriptions) {
-		if (operation.type === "insert") {
-			const newRow = context.newRow ?? operation.values;
-			if (
-				rowMatchesSubscription(
-					collection,
-					newRow as Record<string, unknown>,
-					entry.where,
-				)
-			) {
-				registry.scheduleNotify(entry.id);
-			}
-			continue;
-		}
+	if (operation.type === "delete") {
+		await invalidateSubscriptionsForEvent(
+			registry,
+			schema,
+			{
+				collection: operation.collection,
+				operation: "delete",
+				oldRow: context.oldRow ?? null,
+			},
+			lookupRelatedRow,
+		);
+		return;
+	}
 
-		if (operation.type === "delete") {
-			if (rowMatchesSubscription(collection, context.oldRow, entry.where)) {
-				registry.scheduleNotify(entry.id);
-			}
-			continue;
-		}
+	if (operation.type === "update") {
+		const meta = schema.getCollection(operation.collection);
+		const primaryKey = meta.primaryKey;
+		const newRow =
+			context.newRow ??
+			(context.oldRow
+				? {
+						...context.oldRow,
+						...operation.values,
+						[primaryKey]: operation.primaryKey,
+					}
+				: {
+						...operation.values,
+						[primaryKey]: operation.primaryKey,
+					});
 
-		if (operation.type === "update") {
-			const meta = schema.getCollection(collection);
-			const primaryKey = meta.primaryKey;
-			const newRow =
-				context.newRow ??
-				(context.oldRow
-					? {
-							...context.oldRow,
-							...operation.values,
-							[primaryKey]: operation.primaryKey,
-						}
-					: {
-							...operation.values,
-							[primaryKey]: operation.primaryKey,
-						});
-
-			const oldMatches = rowMatchesSubscription(
-				collection,
-				context.oldRow,
-				entry.where,
-			);
-			const newMatches = rowMatchesSubscription(
-				collection,
+		await invalidateSubscriptionsForEvent(
+			registry,
+			schema,
+			{
+				collection: operation.collection,
+				operation: "update",
+				oldRow: context.oldRow ?? null,
 				newRow,
-				entry.where,
-			);
-			if (oldMatches || newMatches) {
-				registry.scheduleNotify(entry.id);
-			}
-		}
+			},
+			lookupRelatedRow,
+		);
 	}
 }
 

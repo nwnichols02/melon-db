@@ -7,8 +7,8 @@ import {
 } from "@melon/db";
 import { taskSchemaDefinition } from "../../../melon-db/__fixtures__/task-schema.ts";
 import type { SqliteDriver } from "../driver.ts";
-import { createQuerySubscriptionRegistry } from "./registry.ts";
 import { invalidateForObservationEvents } from "./invalidate-events.ts";
+import { createQuerySubscriptionRegistry } from "./registry.ts";
 import type { ObservationEvent } from "./triggers.ts";
 
 const schema = createMelonSchema(taskSchemaDefinition);
@@ -32,9 +32,15 @@ function createMockDriver(rows: Record<string, Record<string, unknown>>): Sqlite
 	};
 }
 
+function createRegistry() {
+	const registry = createQuerySubscriptionRegistry();
+	registry.setSchema(schema);
+	return registry;
+}
+
 describe("invalidateForObservationEvents", () => {
 	test("insert event notifies matching subscription", async () => {
-		const registry = createQuerySubscriptionRegistry();
+		const registry = createRegistry();
 		let notified = false;
 		registry.subscribe(
 			prepareQuery(
@@ -47,7 +53,7 @@ describe("invalidateForObservationEvents", () => {
 		);
 
 		const driver = createMockDriver({
-			"t1": {
+			t1: {
 				id: "t1",
 				title: "Open",
 				status: "open",
@@ -66,7 +72,7 @@ describe("invalidateForObservationEvents", () => {
 	});
 
 	test("insert event skips irrelevant subscription", async () => {
-		const registry = createQuerySubscriptionRegistry();
+		const registry = createRegistry();
 		let notified = false;
 		registry.subscribe(
 			prepareQuery(
@@ -79,7 +85,7 @@ describe("invalidateForObservationEvents", () => {
 		);
 
 		const driver = createMockDriver({
-			"t1": {
+			t1: {
 				id: "t1",
 				title: "Closed",
 				status: "closed",
@@ -95,8 +101,49 @@ describe("invalidateForObservationEvents", () => {
 		expect(notified).toBe(false);
 	});
 
-	test("delete event notifies all subscriptions on collection", async () => {
-		const registry = createQuerySubscriptionRegistry();
+	test("delete event notifies only matching subscription when row known", async () => {
+		const registry = createRegistry();
+		let openNotified = false;
+		let closedNotified = false;
+		registry.subscribe(
+			prepareQuery(
+				queryAst("tasks", { where: predicate("status", "eq", "open") }),
+				schema,
+			),
+			() => {
+				openNotified = true;
+			},
+		);
+		registry.subscribe(
+			prepareQuery(
+				queryAst("tasks", { where: predicate("status", "eq", "closed") }),
+				schema,
+			),
+			() => {
+				closedNotified = true;
+			},
+		);
+
+		const driver = createMockDriver({
+			t1: {
+				id: "t1",
+				title: "Open",
+				status: "open",
+				priority: 1,
+				updatedAt: new Date(),
+			},
+		});
+
+		await invalidateForObservationEvents(driver, schema, registry, [
+			{ collection: "tasks", recordId: "t1", operation: "delete" },
+		]);
+		await new Promise((r) => setTimeout(r, 0));
+		expect(openNotified).toBe(true);
+		expect(closedNotified).toBe(false);
+	});
+
+	test("delete event notifies all subscriptions when row unavailable", async () => {
+		const registry = createRegistry();
 		let openNotified = false;
 		let closedNotified = false;
 		registry.subscribe(

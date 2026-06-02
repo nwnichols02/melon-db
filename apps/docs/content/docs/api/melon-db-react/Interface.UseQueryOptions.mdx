@@ -1,25 +1,26 @@
 ---
-title: "UseQueryOptionsT"
-description: "@melon/db-react — UseQueryOptionsT"
+title: "UseQueryOptionsT, U"
+description: "@melon/db-react — UseQueryOptionsT, U"
 ---
 
 [**@melon/db-react API Reference**](/docs/api/melon-db-react)
 
 ***
 
-# Interface: UseQueryOptions\<T\>
+# Interface: UseQueryOptions\<T, U\>
 
-Defined in: [hooks.ts:17](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-react/src/hooks.ts#L17)
+Defined in: [hooks.ts:25](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-react/src/hooks.ts#L25)
 
 ## Type Parameters
 
-| Type Parameter |
-| ------ |
-| `T` |
+| Type Parameter | Default type |
+| ------ | ------ |
+| `T` *extends* `Record`\<`string`, `unknown`\> | `Record`\<`string`, `unknown`\> |
+| `U` | `T`[] |
 
 ## Properties
 
 | Property | Type | Defined in |
 | ------ | ------ | ------ |
-| <a id="property-enabled"></a> `enabled?` | `boolean` | [hooks.ts:18](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-react/src/hooks.ts#L18) |
-| <a id="property-select"></a> `select?` | (`rows`) => `unknown` | [hooks.ts:19](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-react/src/hooks.ts#L19) |
+| <a id="property-enabled"></a> `enabled?` | `boolean` | [hooks.ts:29](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-react/src/hooks.ts#L29) |
+| <a id="property-select"></a> `select?` | (`rows`) => `U` | [hooks.ts:30](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-react/src/hooks.ts#L30) |

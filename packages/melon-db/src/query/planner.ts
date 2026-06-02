@@ -17,9 +17,16 @@ export function planQuery(ast: QueryAst, schema: MelonSchema): QueryPlan {
 		}
 	}
 
+	const postFilter =
+		Boolean(ast.where) ||
+		Boolean(ast.relationFilters?.length) ||
+		Boolean(ast.orderBy?.length) ||
+		ast.limit !== undefined ||
+		ast.skip !== undefined;
+
 	return {
 		indexHint,
-		postFilter: Boolean(ast.where),
+		postFilter,
 		stableSort,
 	};
 }

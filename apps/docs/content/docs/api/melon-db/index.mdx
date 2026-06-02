@@ -47,6 +47,7 @@ Core schema, query AST, adapter contract, runtime engine, migrations, and sync p
 - [QueryExecutionDebug](/docs/api/melon-db/Interface.QueryExecutionDebug)
 - [QueryPlan](/docs/api/melon-db/Interface.QueryPlan)
 - [QueryPredicate](/docs/api/melon-db/Interface.QueryPredicate)
+- [QueryRelationFilter](/docs/api/melon-db/Interface.QueryRelationFilter)
 - [QueryRelationInclude](/docs/api/melon-db/Interface.QueryRelationInclude)
 - [QuerySelect](/docs/api/melon-db/Interface.QuerySelect)
 - [QuerySort](/docs/api/melon-db/Interface.QuerySort)
@@ -65,6 +66,7 @@ Core schema, query AST, adapter contract, runtime engine, migrations, and sync p
 
 - [AdapterRecord](/docs/api/melon-db/TypeAlias.AdapterRecord)
 - [AdapterWriteOperation](/docs/api/melon-db/TypeAlias.AdapterWriteOperation)
+- [CollectionQueryInput](/docs/api/melon-db/TypeAlias.CollectionQueryInput)
 - [CollectionRecord](/docs/api/melon-db/TypeAlias.CollectionRecord)
 - [ConflictResolver](/docs/api/melon-db/TypeAlias.ConflictResolver)
 - [ConflictResolverResult](/docs/api/melon-db/TypeAlias.ConflictResolverResult)
@@ -78,7 +80,7 @@ Core schema, query AST, adapter contract, runtime engine, migrations, and sync p
 - [RemoteSyncOperation](/docs/api/melon-db/TypeAlias.RemoteSyncOperation)
 - [SyncDebugPhase](/docs/api/melon-db/TypeAlias.SyncDebugPhase)
 - [SyncOutboxOperation](/docs/api/melon-db/TypeAlias.SyncOutboxOperation)
-- [SyncOutboxOperation](/docs/api/melon-db/TypeAlias.SyncOutboxOperation-1)
+- [SyncOutboxOperation](/docs/api/melon-db/TypeAlias.SyncOutboxOperation__typedoc1)
 - [SyncRecord](/docs/api/melon-db/TypeAlias.SyncRecord)
 - [UpdateInput](/docs/api/melon-db/TypeAlias.UpdateInput)
 
@@ -95,6 +97,7 @@ Core schema, query AST, adapter contract, runtime engine, migrations, and sync p
 ## Functions
 
 - [and](/docs/api/melon-db/Function.and)
+- [applyRelationFilters](/docs/api/melon-db/Function.applyRelationFilters)
 - [createDatabase](/docs/api/melon-db/Function.createDatabase)
 - [createInMemoryAdapter](/docs/api/melon-db/Function.createInMemoryAdapter)
 - [createInMemoryMigrationExecutor](/docs/api/melon-db/Function.createInMemoryMigrationExecutor)

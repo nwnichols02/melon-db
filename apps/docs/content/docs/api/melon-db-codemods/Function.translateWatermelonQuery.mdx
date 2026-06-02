@@ -9,9 +9,9 @@ description: "@melon/db-codemods — translateWatermelonQuery"
 
 # Function: translateWatermelonQuery()
 
-> **translateWatermelonQuery**(`collection`, `clauses`): `QueryAst`
+> **translateWatermelonQuery**(`collection`, `clauses`, `schema?`): `QueryAst`
 
-Defined in: [compat/translate-query.ts:110](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-codemods/src/compat/translate-query.ts#L110)
+Defined in: [compat/translate-query.ts:189](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-codemods/src/compat/translate-query.ts#L189)
 
 Translates serializable Watermelon Q clauses into a Melon QueryAst.
 
@@ -21,6 +21,7 @@ Translates serializable Watermelon Q clauses into a Melon QueryAst.
 | ------ | ------ |
 | `collection` | `string` |
 | `clauses` | [`WatermelonQueryClause`](/docs/api/melon-db-codemods/TypeAlias.WatermelonQueryClause)[] |
+| `schema?` | `MelonSchema`\<`Record`\<`string`, `CollectionMetadata`\<`Record`\<`string`, `unknown`\>\>\>\> |
 
 ## Returns
 

@@ -1,7 +1,7 @@
 /**
  * Normalizes TypeDoc markdown output for Fumadocs routing and frontmatter.
  */
-import { readdir, readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
 	API_PACKAGES,
@@ -11,6 +11,57 @@ import {
 } from "./api-package-meta.ts";
 
 const apiRoot = path.join(import.meta.dir, "../content/docs/api");
+
+const TYPEDOC_DISAMBIGUATION =
+	/^(Class|Function|Interface|TypeAlias|Variable)\.(.+)-(\d+)$/;
+
+/**
+ * TypeDoc uses `-N` suffixes for duplicate symbol names. Fumadocs search assigns
+ * sub-document ids as `{pageUrl}-{counter}`, so numeric suffixes can collide.
+ */
+function toTypedocSafeSlug(basename: string): string | null {
+	const match = basename.match(TYPEDOC_DISAMBIGUATION);
+	if (!match) {
+		return null;
+	}
+
+	const [, kind, name, index] = match;
+	return `${kind}.${name}__typedoc${index}`;
+}
+
+async function renameDisambiguationSlugs(
+	files: string[],
+): Promise<Map<string, string>> {
+	const slugRenameMap = new Map<string, string>();
+
+	for (const file of files) {
+		const basename = path.basename(file, path.extname(file));
+		const safeSlug = toTypedocSafeSlug(basename);
+		if (!safeSlug) {
+			continue;
+		}
+
+		const newFile = path.join(path.dirname(file), `${safeSlug}.mdx`);
+		await rename(file, newFile);
+		slugRenameMap.set(basename, safeSlug);
+		console.log(`Renamed API slug: ${basename} -> ${safeSlug}`);
+	}
+
+	return slugRenameMap;
+}
+
+function rewriteDisambiguationLinks(
+	body: string,
+	slugRenameMap: Map<string, string>,
+): string {
+	let updated = body;
+
+	for (const [oldSlug, newSlug] of slugRenameMap) {
+		updated = updated.replaceAll(oldSlug, newSlug);
+	}
+
+	return updated;
+}
 
 async function walk(dir: string): Promise<string[]> {
 	const entries = await readdir(dir, { withFileTypes: true });
@@ -142,7 +193,11 @@ function normalizeIndexBody(file: string, body: string): string {
 	return updated;
 }
 
-const files = await walk(apiRoot);
+let files = await walk(apiRoot);
+const slugRenameMap = await renameDisambiguationSlugs(files);
+if (slugRenameMap.size > 0) {
+	files = await walk(apiRoot);
+}
 
 for (const file of files) {
 	let content = await readFile(file, "utf8");
@@ -153,6 +208,7 @@ for (const file of files) {
 
 	const bodyOnly = content.replace(/^---[\s\S]*?---\s*/u, "");
 	let normalizedBody = normalizeIndexBody(file, bodyOnly);
+	normalizedBody = rewriteDisambiguationLinks(normalizedBody, slugRenameMap);
 	normalizedBody = rewriteApiLinks(normalizedBody, pkg);
 	content = normalizeFrontmatter(file, normalizedBody, pkg);
 

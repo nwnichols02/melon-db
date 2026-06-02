@@ -5,10 +5,10 @@
 	"sideEffects": false,
 	"scripts": {
 		"dev": "fumadocs-mdx && vite dev",
-		"build": "vite build",
+		"build": "fumadocs-mdx && vite build",
 		"preview": "vite preview",
 		"typecheck": "fumadocs-mdx && tsc --noEmit",
-		"docs:api": "bun run scripts/generate-api.ts && bun run scripts/fix-typedoc-links.ts"
+		"docs:api": "bun run scripts/generate-api.ts && bun run scripts/fix-typedoc-links.ts && bun run scripts/verify-search-index.ts"
 	},
 	"dependencies": {
 		"@melon/db": "workspace:*",

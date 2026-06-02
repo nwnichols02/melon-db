@@ -1,32 +1,34 @@
-import type { MelonSchema, QueryBooleanNode } from "@melon/db";
+import type { MelonSchema } from "@melon/db";
 import type { SqliteDriver } from "../driver.ts";
+import {
+	type RelatedRowLookup,
+	shouldInvalidateSubscription,
+} from "./invalidation.ts";
 import { fetchRowByPrimaryKey } from "./invalidator.ts";
 import type { QuerySubscriptionRegistry } from "./registry.ts";
-import { rowMatchesWhere } from "./row-match.ts";
 import type { ObservationEvent } from "./triggers.ts";
 
-function rowMatchesSubscription(
-	collection: string,
-	row: Record<string, unknown> | null | undefined,
-	where: QueryBooleanNode | undefined,
-): boolean {
-	if (!row) {
-		return false;
-	}
-	return rowMatchesWhere(collection, row, where);
-}
+function createRelatedRowLookup(
+	driver: SqliteDriver,
+	schema: MelonSchema,
+): RelatedRowLookup {
+	const cache = new Map<string, Record<string, unknown> | null>();
 
-function scheduleForRow(
-	collection: string,
-	row: Record<string, unknown> | null | undefined,
-	registry: QuerySubscriptionRegistry,
-): void {
-	const subscriptions = registry.getSubscriptionsForCollection(collection);
-	for (const entry of subscriptions) {
-		if (rowMatchesSubscription(collection, row, entry.where)) {
-			registry.scheduleNotify(entry.id);
+	return async (collection, primaryKey) => {
+		const cacheKey = `${collection}:${String(primaryKey)}`;
+		if (cache.has(cacheKey)) {
+			return cache.get(cacheKey) ?? null;
 		}
-	}
+
+		const row = await fetchRowByPrimaryKey(
+			driver,
+			collection,
+			schema.getCollection(collection).primaryKey,
+			primaryKey,
+		);
+		cache.set(cacheKey, row);
+		return row;
+	};
 }
 
 /**
@@ -42,8 +44,10 @@ export async function invalidateForObservationEvents(
 		return;
 	}
 
+	const lookupRelatedRow = createRelatedRowLookup(driver, schema);
+
 	for (const event of events) {
-		const subscriptions = registry.getSubscriptionsForCollection(
+		const subscriptions = registry.getSubscriptionsAffectedByCollection(
 			event.collection,
 		);
 		if (subscriptions.length === 0) {
@@ -54,8 +58,34 @@ export async function invalidateForObservationEvents(
 		const primaryKey = meta.primaryKey;
 
 		if (event.operation === "delete") {
+			const oldRow = await fetchRowByPrimaryKey(
+				driver,
+				event.collection,
+				primaryKey,
+				event.recordId,
+			);
+
+			if (!oldRow) {
+				for (const entry of subscriptions) {
+					registry.scheduleNotify(entry.id);
+				}
+				continue;
+			}
+
 			for (const entry of subscriptions) {
-				registry.scheduleNotify(entry.id);
+				const shouldInvalidate = await shouldInvalidateSubscription(
+					entry,
+					{
+						collection: event.collection,
+						operation: "delete",
+						oldRow,
+					},
+					schema,
+					lookupRelatedRow,
+				);
+				if (shouldInvalidate) {
+					registry.scheduleNotify(entry.id);
+				}
 			}
 			continue;
 		}
@@ -66,6 +96,21 @@ export async function invalidateForObservationEvents(
 			primaryKey,
 			event.recordId,
 		);
-		scheduleForRow(event.collection, row, registry);
+
+		for (const entry of subscriptions) {
+			const shouldInvalidate = await shouldInvalidateSubscription(
+				entry,
+				{
+					collection: event.collection,
+					operation: event.operation,
+					newRow: row ?? undefined,
+				},
+				schema,
+				lookupRelatedRow,
+			);
+			if (shouldInvalidate) {
+				registry.scheduleNotify(entry.id);
+			}
+		}
 	}
 }

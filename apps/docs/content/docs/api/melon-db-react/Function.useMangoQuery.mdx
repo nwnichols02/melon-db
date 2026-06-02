@@ -9,9 +9,9 @@ description: "@melon/db-react — useMangoQuery"
 
 # Function: useMangoQuery()
 
-> **useMangoQuery**\<`T`\>(`collection`, `query`, `options?`): `T`[]
+> **useMangoQuery**\<`T`, `U`\>(`collection`, `query`, `options?`): `U`
 
-Defined in: [hooks.ts:128](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-react/src/hooks.ts#L128)
+Defined in: [hooks.ts:361](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-react/src/hooks.ts#L361)
 
 Reactive Mango-style query hook.
 
@@ -19,7 +19,8 @@ Reactive Mango-style query hook.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `T` | `Record`\<`string`, `unknown`\> |
+| `T` *extends* `Record`\<`string`, `unknown`\> | `Record`\<`string`, `unknown`\> |
+| `U` | `T`[] |
 
 ## Parameters
 
@@ -27,8 +28,8 @@ Reactive Mango-style query hook.
 | ------ | ------ |
 | `collection` | `string` |
 | `query` | `MangoQuery` |
-| `options?` | [`UseQueryOptions`](/docs/api/melon-db-react/Interface.UseQueryOptions)\<`T`\> |
+| `options?` | [`UseQueryOptions`](/docs/api/melon-db-react/Interface.UseQueryOptions)\<`T`, `U`\> |
 
 ## Returns
 
-`T`[]
+`U`

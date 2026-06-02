@@ -333,4 +333,130 @@ describe("sqlite observeQuery", () => {
 		unsub();
 		await db.adapter.close();
 	});
+
+	test("project rename notifies task query with relationFilters", async () => {
+		const adapter = createSqliteAdapter({ filename: ":memory:" });
+		const db = createDatabase({ schema: taskSchema, adapter });
+		await db.adapter.initialize(taskSchema);
+
+		await db.write(async (tx) => {
+			await tx.collection("projects").insert({ id: "p1", name: "Acme" });
+			await tx.collection("tasks").insert({
+				id: "t1",
+				title: "A",
+				status: "open",
+				priority: 1,
+				projectId: "p1",
+				updatedAt: new Date(),
+			});
+		});
+
+		const acmeTasksQuery = prepareQuery(
+			queryAst("tasks", {
+				where: predicate("status", "eq", "open"),
+				relationFilters: [
+					{
+						relation: "project",
+						where: predicate("name", "eq", "Acme"),
+					},
+				],
+			}),
+			taskSchema,
+		);
+
+		let notifyCount = 0;
+		const unsub = subscribeObserve(adapter, acmeTasksQuery, () => {
+			notifyCount += 1;
+		});
+
+		await new Promise((r) => setTimeout(r, 10));
+		const countAfterSubscribe = notifyCount;
+
+		await db.write(async (tx) => {
+			await tx.collection("projects").update("p1", { name: "Renamed" });
+		});
+
+		await new Promise((r) => setTimeout(r, 10));
+		expect(notifyCount).toBeGreaterThan(countAfterSubscribe);
+
+		unsub();
+		await db.adapter.close();
+	});
+
+	test("task priority update does not notify status-only open query", async () => {
+		const adapter = createSqliteAdapter({ filename: ":memory:" });
+		const db = createDatabase({ schema: taskSchema, adapter });
+		await db.adapter.initialize(taskSchema);
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "t1",
+				title: "A",
+				status: "open",
+				priority: 1,
+				updatedAt: new Date(),
+			});
+		});
+
+		let notifyCount = 0;
+		const unsub = subscribeObserve(adapter, openTasksQuery, () => {
+			notifyCount += 1;
+		});
+
+		await new Promise((r) => setTimeout(r, 10));
+		const countAfterSubscribe = notifyCount;
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").update("t1", { priority: 5 });
+		});
+
+		await new Promise((r) => setTimeout(r, 10));
+		expect(notifyCount).toBe(countAfterSubscribe);
+
+		unsub();
+		await db.adapter.close();
+	});
+
+	test("orderBy limit query notifies when sort field changes", async () => {
+		const adapter = createSqliteAdapter({ filename: ":memory:" });
+		const db = createDatabase({ schema: taskSchema, adapter });
+		await db.adapter.initialize(taskSchema);
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "t1",
+				title: "A",
+				status: "open",
+				priority: 1,
+				updatedAt: new Date(),
+			});
+		});
+
+		const topOpenQuery = prepareQuery(
+			queryAst("tasks", {
+				where: predicate("status", "eq", "open"),
+				orderBy: [{ field: "priority", direction: "desc" }],
+				limit: 1,
+			}),
+			taskSchema,
+		);
+
+		let notifyCount = 0;
+		const unsub = subscribeObserve(adapter, topOpenQuery, () => {
+			notifyCount += 1;
+		});
+
+		await new Promise((r) => setTimeout(r, 10));
+		const countAfterSubscribe = notifyCount;
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").update("t1", { priority: 10 });
+		});
+
+		await new Promise((r) => setTimeout(r, 10));
+		expect(notifyCount).toBeGreaterThan(countAfterSubscribe);
+
+		unsub();
+		await db.adapter.close();
+	});
 });

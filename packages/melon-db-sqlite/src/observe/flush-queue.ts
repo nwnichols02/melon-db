@@ -5,6 +5,15 @@ import type { QuerySubscriptionRegistry } from "./registry.ts";
 import { drainObservationEvents } from "./triggers.ts";
 
 /**
+ * Clears pending trigger events without invalidating (after direct write invalidation).
+ */
+export async function drainObservationEventsOnly(
+	driver: SqliteDriver,
+): Promise<void> {
+	await drainObservationEvents(driver);
+}
+
+/**
  * Drains trigger events and invalidates matching observeQuery subscriptions.
  */
 export async function flushObservationQueue(

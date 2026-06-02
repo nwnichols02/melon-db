@@ -9,9 +9,9 @@ description: "@melon/db-react — useQuery"
 
 # Function: useQuery()
 
-> **useQuery**\<`T`\>(`query`, `options?`): `T`[]
+> **useQuery**\<`T`, `U`\>(`query`, `options?`): `U`
 
-Defined in: [hooks.ts:25](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-react/src/hooks.ts#L25)
+Defined in: [hooks.ts:159](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-react/src/hooks.ts#L159)
 
 Reactive query hook backed by MelonQueryHandle.observe.
 
@@ -19,15 +19,16 @@ Reactive query hook backed by MelonQueryHandle.observe.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `T` | `Record`\<`string`, `unknown`\> |
+| `T` *extends* `Record`\<`string`, `unknown`\> | `Record`\<`string`, `unknown`\> |
+| `U` | `T`[] |
 
 ## Parameters
 
 | Parameter | Type |
 | ------ | ------ |
 | `query` | `QueryAst` \| `PreparedQuery` |
-| `options?` | [`UseQueryOptions`](/docs/api/melon-db-react/Interface.UseQueryOptions)\<`T`\> |
+| `options?` | [`UseQueryOptions`](/docs/api/melon-db-react/Interface.UseQueryOptions)\<`T`, `U`\> |
 
 ## Returns
 
-`T`[]
+`U`

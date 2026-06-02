@@ -1,0 +1,35 @@
+---
+title: "useRecord"
+description: "@melon/db-react — useRecord"
+---
+
+[**@melon/db-react API Reference**](/docs/api/melon-db-react)
+
+***
+
+# Function: useRecord()
+
+> **useRecord**\<`T`\>(`collection`, `id`, `options?`): `T` \| `null`
+
+Defined in: [hooks.ts:381](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-react/src/hooks.ts#L381)
+
+Reactive hook for a single record by primary key.
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `T` *extends* `Record`\<`string`, `unknown`\> | `Record`\<`string`, `unknown`\> |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `collection` | `string` |
+| `id` | `string` \| `number` \| `null` \| `undefined` |
+| `options?` | \{ `enabled?`: `boolean`; \} |
+| `options.enabled?` | `boolean` |
+
+## Returns
+
+`T` \| `null`

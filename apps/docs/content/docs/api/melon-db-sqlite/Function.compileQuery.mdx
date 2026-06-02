@@ -9,9 +9,9 @@ description: "@melon/db-sqlite — compileQuery"
 
 # Function: compileQuery()
 
-> **compileQuery**(`prepared`): [`CompiledSql`](/docs/api/melon-db-sqlite/Interface.CompiledSql)
+> **compileQuery**(`prepared`, `schema?`): [`CompiledSql`](/docs/api/melon-db-sqlite/Interface.CompiledSql)
 
-Defined in: [sql/compile-query.ts:16](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-sqlite/src/sql/compile-query.ts#L16)
+Defined in: [sql/compile-query.ts:53](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-sqlite/src/sql/compile-query.ts#L53)
 
 Compiles a prepared query into parameterized SQLite SQL.
 
@@ -20,6 +20,7 @@ Compiles a prepared query into parameterized SQLite SQL.
 | Parameter | Type |
 | ------ | ------ |
 | `prepared` | `PreparedQuery` |
+| `schema?` | `MelonSchema`\<`Record`\<`string`, `CollectionMetadata`\<`Record`\<`string`, `unknown`\>\>\>\> |
 
 ## Returns
 

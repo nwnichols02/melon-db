@@ -1,0 +1,34 @@
+---
+title: "useQueryState"
+description: "@melon/db-react — useQueryState"
+---
+
+[**@melon/db-react API Reference**](/docs/api/melon-db-react)
+
+***
+
+# Function: useQueryState()
+
+> **useQueryState**\<`T`, `U`\>(`query`, `options?`): [`QueryAsyncState`](/docs/api/melon-db-react/TypeAlias.QueryAsyncState)\<`U`\>
+
+Defined in: [hooks.ts:188](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-react/src/hooks.ts#L188)
+
+Reactive query hook with loading and error state.
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `T` *extends* `Record`\<`string`, `unknown`\> | `Record`\<`string`, `unknown`\> |
+| `U` | `T`[] |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `query` | `QueryAst` \| `PreparedQuery` |
+| `options?` | [`UseQueryOptions`](/docs/api/melon-db-react/Interface.UseQueryOptions)\<`T`, `U`\> |
+
+## Returns
+
+[`QueryAsyncState`](/docs/api/melon-db-react/TypeAlias.QueryAsyncState)\<`U`\>

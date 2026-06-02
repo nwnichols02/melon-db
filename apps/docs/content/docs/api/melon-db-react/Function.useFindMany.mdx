@@ -9,9 +9,9 @@ description: "@melon/db-react — useFindMany"
 
 # Function: useFindMany()
 
-> **useFindMany**\<`T`\>(`collection`, `args?`, `options?`): `T`[]
+> **useFindMany**\<`T`, `U`\>(`collection`, `args?`, `options?`): `U`
 
-Defined in: [hooks.ts:95](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-react/src/hooks.ts#L95)
+Defined in: [hooks.ts:261](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-react/src/hooks.ts#L261)
 
 Reactive Prisma-style findMany hook.
 
@@ -19,7 +19,8 @@ Reactive Prisma-style findMany hook.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `T` | `Record`\<`string`, `unknown`\> |
+| `T` *extends* `Record`\<`string`, `unknown`\> | `Record`\<`string`, `unknown`\> |
+| `U` | `T`[] |
 
 ## Parameters
 
@@ -27,8 +28,8 @@ Reactive Prisma-style findMany hook.
 | ------ | ------ |
 | `collection` | `string` |
 | `args?` | `PrismaFindManyArgs` |
-| `options?` | [`UseQueryOptions`](/docs/api/melon-db-react/Interface.UseQueryOptions)\<`T`\> |
+| `options?` | [`UseQueryOptions`](/docs/api/melon-db-react/Interface.UseQueryOptions)\<`T`, `U`\> |
 
 ## Returns
 
-`T`[]
+`U`

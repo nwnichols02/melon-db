@@ -9,7 +9,7 @@ description: "@melon/db-query — QueryBuilderRecordShape"
 
 # Class: QueryBuilder\<RecordShape\>
 
-Defined in: [query-builder.ts:12](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-query/src/query-builder.ts#L12)
+Defined in: [query-builder.ts:12](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-query/src/query-builder.ts#L12)
 
 Fluent query builder that produces QueryAst.
 
@@ -25,7 +25,7 @@ Fluent query builder that produces QueryAst.
 
 > **new QueryBuilder**\<`RecordShape`\>(`collection`): `QueryBuilder`\<`RecordShape`\>
 
-Defined in: [query-builder.ts:21](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-query/src/query-builder.ts#L21)
+Defined in: [query-builder.ts:21](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-query/src/query-builder.ts#L21)
 
 #### Parameters
 
@@ -43,7 +43,7 @@ Defined in: [query-builder.ts:21](https://github.com/nwnichols02/melon/blob/b776
 
 > **and**(`group`): `this`
 
-Defined in: [query-builder.ts:40](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-query/src/query-builder.ts#L40)
+Defined in: [query-builder.ts:40](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-query/src/query-builder.ts#L40)
 
 #### Parameters
 
@@ -61,7 +61,7 @@ Defined in: [query-builder.ts:40](https://github.com/nwnichols02/melon/blob/b776
 
 > **include**(`relation`, `config?`): `this`
 
-Defined in: [query-builder.ts:84](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-query/src/query-builder.ts#L84)
+Defined in: [query-builder.ts:99](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-query/src/query-builder.ts#L99)
 
 #### Parameters
 
@@ -80,7 +80,7 @@ Defined in: [query-builder.ts:84](https://github.com/nwnichols02/melon/blob/b776
 
 > **limit**(`value`): `this`
 
-Defined in: [query-builder.ts:74](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-query/src/query-builder.ts#L74)
+Defined in: [query-builder.ts:89](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-query/src/query-builder.ts#L89)
 
 #### Parameters
 
@@ -94,11 +94,29 @@ Defined in: [query-builder.ts:74](https://github.com/nwnichols02/melon/blob/b776
 
 ***
 
+### not()
+
+> **not**(`group`): `this`
+
+Defined in: [query-builder.ts:66](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-query/src/query-builder.ts#L66)
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `group` | (`q`) => `QueryBuilder`\<`RecordShape`\> |
+
+#### Returns
+
+`this`
+
+***
+
 ### or()
 
 > **or**(`group`): `this`
 
-Defined in: [query-builder.ts:54](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-query/src/query-builder.ts#L54)
+Defined in: [query-builder.ts:54](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-query/src/query-builder.ts#L54)
 
 #### Parameters
 
@@ -116,7 +134,7 @@ Defined in: [query-builder.ts:54](https://github.com/nwnichols02/melon/blob/b776
 
 > **orderBy**(`field`, `direction?`): `this`
 
-Defined in: [query-builder.ts:66](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-query/src/query-builder.ts#L66)
+Defined in: [query-builder.ts:81](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-query/src/query-builder.ts#L81)
 
 #### Parameters
 
@@ -135,7 +153,7 @@ Defined in: [query-builder.ts:66](https://github.com/nwnichols02/melon/blob/b776
 
 > **skip**(`value`): `this`
 
-Defined in: [query-builder.ts:79](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-query/src/query-builder.ts#L79)
+Defined in: [query-builder.ts:94](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-query/src/query-builder.ts#L94)
 
 #### Parameters
 
@@ -153,7 +171,7 @@ Defined in: [query-builder.ts:79](https://github.com/nwnichols02/melon/blob/b776
 
 > **toAst**(`mode?`): `QueryAst`
 
-Defined in: [query-builder.ts:92](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-query/src/query-builder.ts#L92)
+Defined in: [query-builder.ts:107](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-query/src/query-builder.ts#L107)
 
 #### Parameters
 
@@ -171,7 +189,7 @@ Defined in: [query-builder.ts:92](https://github.com/nwnichols02/melon/blob/b776
 
 > **where**(`field`, `op`, `value?`): `this`
 
-Defined in: [query-builder.ts:25](https://github.com/nwnichols02/melon/blob/b776ec5afa108dd27990ea3b9e65fbefee91310c/packages/melon-db-query/src/query-builder.ts#L25)
+Defined in: [query-builder.ts:25](https://github.com/nwnichols02/melon/blob/bc73d14fbe43130aeee8efcd7b78ec79b499898b/packages/melon-db-query/src/query-builder.ts#L25)
 
 #### Parameters
 
