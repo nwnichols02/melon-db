@@ -9,7 +9,11 @@ function loadBelongsToInclude(
 	result: AdapterRecord[],
 	relationName: string,
 	relation: RelationDefinition,
-	includeSpec: { where?: QueryAst["where"]; orderBy?: QueryAst["orderBy"]; limit?: number },
+	includeSpec: {
+		where?: QueryAst["where"];
+		orderBy?: QueryAst["orderBy"];
+		limit?: number;
+	},
 	schema: MelonSchema,
 	adapter: StorageAdapter,
 ): Promise<void> {
@@ -65,7 +69,11 @@ function loadHasManyInclude(
 	result: AdapterRecord[],
 	relationName: string,
 	relation: RelationDefinition,
-	includeSpec: { where?: QueryAst["where"]; orderBy?: QueryAst["orderBy"]; limit?: number },
+	includeSpec: {
+		where?: QueryAst["where"];
+		orderBy?: QueryAst["orderBy"];
+		limit?: number;
+	},
 	parentMeta: ReturnType<MelonSchema["getCollection"]>,
 	schema: MelonSchema,
 	adapter: StorageAdapter,
@@ -155,7 +163,14 @@ export async function loadIncludes(
 
 		if (relation.kind === "belongsTo") {
 			loaders.push(
-				loadBelongsToInclude(result, relationName, relation, includeSpec, schema, adapter),
+				loadBelongsToInclude(
+					result,
+					relationName,
+					relation,
+					includeSpec,
+					schema,
+					adapter,
+				),
 			);
 			continue;
 		}

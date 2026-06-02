@@ -67,8 +67,7 @@ function clauseToBooleanNode(clause: WatermelonQueryClause): QueryBooleanNode {
 			"Nested Q.on is not supported inside filter expressions",
 			{
 				code: MelonErrorCode.QUERY_INVALID,
-				remediation:
-					"Use Q.on only at the top level of a query description.",
+				remediation: "Use Q.on only at the top level of a query description.",
 			},
 		);
 	}
@@ -102,9 +101,12 @@ function parseOnCondition(condition: unknown): QueryBooleanNode {
 		if (nodes.length === 1) {
 			const single = nodes[0];
 			if (!single) {
-				throw new MelonError("Q.on condition must include at least one filter", {
-					code: MelonErrorCode.QUERY_INVALID,
-				});
+				throw new MelonError(
+					"Q.on condition must include at least one filter",
+					{
+						code: MelonErrorCode.QUERY_INVALID,
+					},
+				);
 			}
 			return single;
 		}
@@ -251,8 +253,7 @@ export function translateWatermelonQuery(
 		orderBy: orderBy.length > 0 ? orderBy : undefined,
 		skip,
 		limit,
-		relationFilters:
-			relationFilters.length > 0 ? relationFilters : undefined,
+		relationFilters: relationFilters.length > 0 ? relationFilters : undefined,
 		mode: "many",
 	});
 }

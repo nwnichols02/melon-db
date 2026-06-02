@@ -85,9 +85,7 @@ describe("relationFilters", () => {
 				relationFilters: [
 					{
 						relation: "project",
-						where: and(
-							predicate("name", "eq", "Acme"),
-						),
+						where: and(predicate("name", "eq", "Acme")),
 					},
 				],
 			}),
