@@ -23,6 +23,8 @@
     "@melon/db-sqlite": "workspace:*",
     "@melon/db-sqlite-native": "workspace:*",
     "@melon/sync": "workspace:*",
+    "@morrowdigital/watermelondb-expo-plugin": "2.4.0-beta.0",
+    "@nozbe/watermelondb": "0.27.1",
     "@shopify/flash-list": "2.0.2",
     "babel-preset-expo": "~54.0.10",
     "expo": "~54.0.5",

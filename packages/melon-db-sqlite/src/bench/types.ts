@@ -56,3 +56,22 @@ export interface RnParityReport {
 	raw?: BenchResult[];
 	notes: string[];
 }
+
+export interface RnMelonVsWdbRow {
+	scenario: string;
+	scale: number;
+	melonMs: number;
+	watermelonMs: number;
+	ratio: number;
+	winner: "melon" | "watermelon" | "tie";
+}
+
+export interface RnMelonVsWdbReport {
+	timestamp: string;
+	scale: number;
+	platform: string;
+	melonEngine: string;
+	comparisons: RnMelonVsWdbRow[];
+	raw?: BenchResult[];
+	notes: string[];
+}

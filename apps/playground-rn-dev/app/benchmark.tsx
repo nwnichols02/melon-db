@@ -3,7 +3,11 @@ import {
 	type DeviceBenchScale,
 	runDeviceBenchmark,
 } from "@/bench/run-device-benchmark";
-import type { BenchResult, RnParityReport } from "@melon/db-sqlite/bench";
+import type {
+	BenchResult,
+	RnMelonVsWdbReport,
+	RnParityReport,
+} from "@melon/db-sqlite/bench";
 import { getMelonSQLiteNativeMode } from "@melon/db-sqlite-native";
 import { Paths } from "expo-file-system";
 import { Redirect, useRouter } from "expo-router";
@@ -28,7 +32,7 @@ function toFilesystemPath(uri: string): string {
 }
 
 /**
- * Dev-only on-device benchmark screen (jsi-sync vs turbo).
+ * Dev-only on-device benchmark screen (Melon native vs WatermelonDB).
  */
 export default function BenchmarkScreen(): React.ReactElement {
 	const router = useRouter();
@@ -37,6 +41,7 @@ export default function BenchmarkScreen(): React.ReactElement {
 	const [progress, setProgress] = useState<string | null>(null);
 	const [results, setResults] = useState<BenchResult[]>([]);
 	const [report, setReport] = useState<RnParityReport | null>(null);
+	const [melonVsWdb, setMelonVsWdb] = useState<RnMelonVsWdbReport | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [lastRunAt, setLastRunAt] = useState<string | null>(null);
 
@@ -66,6 +71,7 @@ export default function BenchmarkScreen(): React.ReactElement {
 				});
 				setResults(output.results);
 				setReport(output.report);
+				setMelonVsWdb(output.melonVsWdb);
 				setLastRunAt(new Date().toLocaleTimeString());
 			} catch (err) {
 				setError(err instanceof Error ? err.message : "Benchmark failed");
@@ -78,17 +84,20 @@ export default function BenchmarkScreen(): React.ReactElement {
 	);
 
 	const handleShare = useCallback(async () => {
-		if (!report) {
+		if (!report && !melonVsWdb) {
 			return;
 		}
 		const payload = {
-			...report,
+			...(melonVsWdb ? { melonVsWdb } : {}),
+			...(report ? { report } : {}),
 			raw: results,
 		};
 		await Share.share({
 			message: JSON.stringify(payload, null, 2),
 		});
-	}, [report, results]);
+	}, [report, melonVsWdb, results]);
+
+	const canShare = report != null || melonVsWdb != null;
 
 	if (!__DEV__) {
 		return <Redirect href="/" />;
@@ -111,9 +120,10 @@ export default function BenchmarkScreen(): React.ReactElement {
 					Platform: {Platform.OS} · App mode: {currentModeLabel}
 				</Text>
 				<Text style={styles.hint}>
-					Native runs (jsi-sync / turbo) briefly close the task-list database
-					because the native module supports one open file at a time. It
-					reopens when the run finishes.
+					jsi-sync runs briefly close the Melon task-list database (one native
+					SQLite file at a time). WatermelonDB uses a separate native stack and
+					its own bench files. Rebuild the dev client after adding the WDB Expo
+					plugin.
 				</Text>
 			</View>
 
@@ -152,10 +162,26 @@ export default function BenchmarkScreen(): React.ReactElement {
 			<View style={styles.actions}>
 				<Pressable
 					disabled={running}
-					onPress={() => runBenchmark(["jsi-sync", "turbo"])}
+					onPress={() => runBenchmark(["jsi-sync", "watermelon"])}
 					style={[styles.primaryButton, running && styles.buttonDisabled]}
 				>
-					<Text style={styles.primaryButtonText}>Run jsi-sync + turbo</Text>
+					<Text style={styles.primaryButtonText}>
+						Run jsi-sync + Watermelon
+					</Text>
+				</Pressable>
+				<Pressable
+					disabled={running}
+					onPress={() => runBenchmark(["watermelon"])}
+					style={[styles.secondaryButton, running && styles.buttonDisabled]}
+				>
+					<Text style={styles.secondaryButtonText}>Run WatermelonDB</Text>
+				</Pressable>
+				<Pressable
+					disabled={running}
+					onPress={() => runBenchmark(["jsi-sync", "turbo"])}
+					style={[styles.secondaryButton, running && styles.buttonDisabled]}
+				>
+					<Text style={styles.secondaryButtonText}>Run jsi-sync + turbo</Text>
 				</Pressable>
 				<Pressable
 					disabled={running}
@@ -194,6 +220,27 @@ export default function BenchmarkScreen(): React.ReactElement {
 				<Text style={styles.lastRun}>Last run: {lastRunAt}</Text>
 			) : null}
 
+			{melonVsWdb && melonVsWdb.comparisons.length > 0 ? (
+				<View style={styles.paritySection}>
+					<Text style={styles.sectionTitle}>jsi-sync vs WatermelonDB</Text>
+					{melonVsWdb.comparisons.map((row) => (
+						<View key={`wdb-${row.scenario}`} style={styles.parityRow}>
+							<Text style={styles.scenarioName}>{row.scenario}</Text>
+							<Text
+								style={[
+									styles.winner,
+									row.winner === "melon" && styles.winnerMelon,
+									row.winner === "watermelon" && styles.winnerWdb,
+								]}
+							>
+								{row.melonMs.toFixed(1)}ms / {row.watermelonMs.toFixed(1)}ms ·{" "}
+								{row.winner}
+							</Text>
+						</View>
+					))}
+				</View>
+			) : null}
+
 			{report && report.comparisons.length > 0 ? (
 				<View style={styles.paritySection}>
 					<Text style={styles.sectionTitle}>jsi-sync vs turbo</Text>
@@ -212,6 +259,11 @@ export default function BenchmarkScreen(): React.ReactElement {
 							</Text>
 						</View>
 					))}
+				</View>
+			) : null}
+
+			{canShare ? (
+				<View style={styles.paritySection}>
 					<Pressable onPress={handleShare} style={styles.shareButton}>
 						<Text style={styles.shareButtonText}>Share JSON report</Text>
 					</Pressable>
@@ -379,6 +431,12 @@ const styles = StyleSheet.create({
 	},
 	winnerTurbo: {
 		color: "#2e7d32",
+	},
+	winnerMelon: {
+		color: "#1a5fb4",
+	},
+	winnerWdb: {
+		color: "#c2410c",
 	},
 	shareButton: {
 		marginTop: 8,

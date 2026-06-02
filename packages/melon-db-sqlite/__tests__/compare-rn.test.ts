@@ -67,3 +67,31 @@ describe("buildRnParityReport", () => {
 		expect(report.comparisons[0]?.winner).toBe("tie");
 	});
 });
+
+describe("buildRnMelonVsWdbReport", () => {
+	test("computes ratio and winner when melon is faster", async () => {
+		const { buildRnMelonVsWdbReport } = await import(
+			"../src/bench/compare-rn-melon-wdb.ts"
+		);
+		const results = [
+			{
+				engine: "melon-jsi-sync",
+				scale: 10_000,
+				scenario: "row-insert",
+				durationMs: 100,
+			},
+			{
+				engine: "watermelon",
+				scale: 10_000,
+				scenario: "row-insert",
+				durationMs: 250,
+			},
+		];
+
+		const report = buildRnMelonVsWdbReport(results, 10_000, "ios");
+		expect(report.comparisons).toHaveLength(1);
+		expect(report.comparisons[0]?.ratio).toBe(0.4);
+		expect(report.comparisons[0]?.winner).toBe("melon");
+		expect(report.melonEngine).toBe("melon-jsi-sync");
+	});
+});

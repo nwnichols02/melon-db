@@ -19,11 +19,15 @@
 	},
 	"peerDependencies": {
 		"@melon/db-sqlite-native": "workspace:*",
+		"@nozbe/watermelondb": "0.27.1",
 		"better-sqlite3": "12.10.0",
 		"expo-sqlite": ">=15.0.0",
 		"react-native": "*"
 	},
 	"peerDependenciesMeta": {
+		"@nozbe/watermelondb": {
+			"optional": true
+		},
 		"@melon/db-sqlite-native": {
 			"optional": true
 		},

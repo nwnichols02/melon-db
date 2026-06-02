@@ -63,8 +63,10 @@ Phase 28 adds a **dev-only benchmark screen** in `apps/playground-rn-dev` that r
 2. Start Metro (`bun run dev:rn:dev:start`).
 3. On the task list, tap **Benchmarks** (dev builds only) or open `/benchmark`.
 4. Choose scale **1k** (quick) or **10k** (full).
-5. Tap **Run jsi-sync + turbo** — uses separate bench DB files; does not touch the main app database.
-6. Tap **Share JSON report** to export timings and parity ratios.
+5. Tap **Run jsi-sync + Watermelon** for on-device Melon vs WatermelonDB parity (primary), or **Run jsi-sync + turbo** for native binding comparison.
+6. Tap **Share JSON report** to export timings and parity (`melonVsWdb` and/or `report`).
+
+**WatermelonDB on device** requires `@morrowdigital/watermelondb-expo-plugin` in `playground-rn-dev`. Re-run `install:ios` / `install:android` (prebuild) after plugin changes before benchmarking.
 
 ### Engine labels
 
@@ -73,14 +75,15 @@ Phase 28 adds a **dev-only benchmark screen** in `apps/playground-rn-dev` that r
 | `melon-jsi-sync` | `createJsiSqliteAdapter({ mode: 'jsi-sync' })` | C++ JSI sync host object |
 | `melon-turbo` | `createJsiSqliteAdapter({ mode: 'turbo' })` | Async TurboModule path |
 | `melon-expo` | `createExpoSqliteAdapter` | Optional leg from benchmark screen |
+| `watermelon` | WatermelonDB `SQLiteAdapter` + JSI (`jsi: true`) | Same scenarios as Node `bench:compare` |
 
-Parity JSON uses `ratio = jsiSyncMs / turboMs` (same shape as Node `buildRnParityReport`). See [sample device run](/docs/performance-comparison/latest-results#react-native-sample) when committed.
+On-device Melon vs WDB parity uses `ratio = melonMs / watermelonMs` (`buildRnMelonVsWdbReport`, default melon leg `melon-jsi-sync`). jsi-sync vs turbo uses `buildRnParityReport`. See [React Native sample](/docs/performance-comparison/latest-results#react-native-sample).
 
 ### Limitations
 
 - Manual only — no CI device farm; plug in device and disable background apps for stable numbers.
 - Scales capped at **10k** on device (50k/100k remain Node-only).
-- WatermelonDB is not run on RN in this harness (Node `bench:compare` remains the WDB baseline).
+- WDB and Melon native use different SQLite stacks; jsi-sync still suspends the app Melon DB during its leg.
 
 ## Non-goals
 

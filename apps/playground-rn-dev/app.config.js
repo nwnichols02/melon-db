@@ -15,7 +15,13 @@ module.exports = () => ({
 		android: {
 			package: "com.nate.nichols.playgroundrn.devbuild",
 		},
-		plugins: ["expo-dev-client", "expo-router", "expo-sqlite", "expo-asset"],
+		plugins: [
+			"expo-dev-client",
+			"expo-router",
+			"expo-sqlite",
+			"expo-asset",
+			["@morrowdigital/watermelondb-expo-plugin", { disableJsi: false }],
+		],
 		experiments: {
 			typedRoutes: true,
 		},

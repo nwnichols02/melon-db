@@ -15,14 +15,16 @@ Commit the updated JSON with your PR when timings should be reflected on the doc
 
 ## React Native sample
 
-On-device **jsi-sync vs turbo** parity from `playground-rn-dev` (development build with `@melon/db-sqlite-native`):
+On-device benchmarks from `playground-rn-dev` (development build with `@melon/db-sqlite-native` and WatermelonDB via `@morrowdigital/watermelondb-expo-plugin`).
+
+The table below shows **jsi-sync vs turbo** from committed JSON. For **Melon vs WatermelonDB**, run **jsi-sync + Watermelon** on device and use the `melonVsWdb` object in the shared JSON (docs table for that axis can be added when a run is committed).
 
 <BenchRnResultsTable />
 
 The table is generated from [`apps/docs/src/data/bench-rn-latest.json`](https://github.com/melon/melon/blob/main/apps/docs/src/data/bench-rn-latest.json). To refresh after a new device run:
 
-1. In `apps/playground-rn-dev`, open **Benchmarks** and run **jsi-sync + turbo** at **10k** (or **1k** for a quicker smoke test).
-2. Tap **Share JSON report** and merge the `report` object (plus `generatedAt`, `device`) into `bench-rn-latest.json`.
+1. In `apps/playground-rn-dev`, open **Benchmarks** and run **jsi-sync + Watermelon** at **10k** (or **1k** for smoke).
+2. Tap **Share JSON report** and merge `melonVsWdb` (and optionally `report` for jsi vs turbo) plus `generatedAt` / `device` into `bench-rn-latest.json`.
 3. Commit the updated JSON with your PR so the docs site picks up the new timings.
 
-Same scenarios as the Node harness: row insert, batch insert, filtered query, count, and find-by-id. Writes tend to favor sync JSI; reads are sub-millisecond on both paths at these scales.
+Same scenarios as the Node harness: row insert, batch insert, filtered query, count, and find-by-id. Ratio for Melon vs WDB is `melonMs / watermelonMs` (&lt; 1 means Melon faster).

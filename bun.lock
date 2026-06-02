@@ -98,6 +98,8 @@
         "@melon/db-sqlite": "workspace:*",
         "@melon/db-sqlite-native": "workspace:*",
         "@melon/sync": "workspace:*",
+        "@morrowdigital/watermelondb-expo-plugin": "2.4.0-beta.0",
+        "@nozbe/watermelondb": "0.27.1",
         "@shopify/flash-list": "2.0.2",
         "babel-preset-expo": "~54.0.10",
         "expo": "~54.0.5",
@@ -235,12 +237,14 @@
       },
       "peerDependencies": {
         "@melon/db-sqlite-native": "workspace:*",
+        "@nozbe/watermelondb": "0.27.1",
         "better-sqlite3": "12.10.0",
         "expo-sqlite": ">=15.0.0",
         "react-native": "*",
       },
       "optionalPeers": [
         "@melon/db-sqlite-native",
+        "@nozbe/watermelondb",
         "better-sqlite3",
         "expo-sqlite",
         "react-native",
@@ -702,6 +706,8 @@
     "@melon/sync-server": ["@melon/sync-server@workspace:packages/melon-sync-server"],
 
     "@mermaid-js/parser": ["@mermaid-js/parser@1.1.1", "", { "dependencies": { "@chevrotain/types": "~11.1.1" } }, "sha512-VuHdsYMK1bT6X2JbcAaWAhugTRvRBRyuZgd+c22swUeI9g/ntaxF7CY7dYarhZovofCbUNO0G7JesfmNtjYOCw=="],
+
+    "@morrowdigital/watermelondb-expo-plugin": ["@morrowdigital/watermelondb-expo-plugin@2.4.0-beta.0", "", {}, "sha512-pSZGv71W4s88ibYfxiUwjwo5TvEfl55CzqQDLqguzU4XxanZ5s3UEQwXWTWfl0AFb0pjAtNje7q73edlwKNxFw=="],
 
     "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@1.1.4", "", { "dependencies": { "@tybys/wasm-util": "^0.10.1" }, "peerDependencies": { "@emnapi/core": "^1.7.1", "@emnapi/runtime": "^1.7.1" } }, "sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow=="],
 

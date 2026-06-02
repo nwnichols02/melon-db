@@ -37,6 +37,7 @@ config.resolver.extraNodeModules = {
 		"packages/melon-db-sqlite-native",
 	),
 	"@melon/sync": path.resolve(workspaceRoot, "packages/melon-sync"),
+	"@nozbe/watermelondb": resolvePackageDir("@nozbe/watermelondb"),
 	"expo-sqlite": resolvePackageDir("expo-sqlite"),
 };
 

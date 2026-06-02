@@ -6,6 +6,7 @@ Development-build app for dogfooding `@melon/db-sqlite-native` (native SQLite). 
 |---|---|
 | SQLite (default) | `@melon/db-sqlite/rn` + `@melon/db-sqlite-native` |
 | SQLite (optional) | `EXPO_PUBLIC_MELON_SQLITE=expo` → `@melon/db-sqlite/expo` |
+| Benchmarks | Melon native modes + optional `@nozbe/watermelondb` on-device compare |
 | DB file | `melon-playground-dev.db` |
 | Bundle id | `com.nate.nichols.playgroundrn.devbuild` |
 
@@ -67,7 +68,7 @@ bun run start
 2. Seeded tasks appear.
 3. Add / complete tasks persist across restart.
 4. Sync demo works against `bun run sync-server`.
-5. **Benchmarks:** tap **Benchmarks** on the task screen → **Run jsi-sync + turbo** @ 10k completes → **Share JSON report** includes both engines and five scenarios.
+5. **Benchmarks:** **Run jsi-sync + Watermelon** @ 10k completes → **Share JSON report** includes `melonVsWdb` parity and five scenarios per engine.
 
 ### Android
 
@@ -75,9 +76,11 @@ bun run start
 2. Seeded tasks appear.
 3. Add / complete tasks persist across restart.
 4. Sync demo works against `bun run sync-server`.
-5. **Benchmarks:** same as iOS — `/benchmark`, jsi-sync + turbo @ 10k, share JSON.
+5. **Benchmarks:** same as iOS — **Run jsi-sync + Watermelon** @ 10k, share JSON.
 
-Bench runs use separate `melon-bench-*.db` files under the app documents directory; the main `melon-playground-dev.db` is untouched.
+Bench runs use separate `melon-bench-*.db` and `melon-bench-wdb-*.db` files under the app documents directory; the main `melon-playground-dev.db` is untouched.
+
+**WatermelonDB benchmarks** require native linking via `@morrowdigital/watermelondb-expo-plugin`. After adding or updating that plugin, re-run `bun run install:ios` or `install:android` (prebuild) before using **Run WatermelonDB** or **Run jsi-sync + Watermelon**.
 
 ## Troubleshooting
 
