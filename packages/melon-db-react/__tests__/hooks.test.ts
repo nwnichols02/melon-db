@@ -83,6 +83,48 @@ describe("db-react exports", () => {
 		expect(updates.at(-1)).toBe(1);
 	});
 
+	test("useRecordState contract: findById + observeCollections", async () => {
+		const schema = createMelonSchema({
+			version: 1,
+			collections: {
+				tasks: {
+					name: "tasks",
+					primaryKey: "id",
+					fields: {
+						id: { kind: "string" },
+						status: { kind: "string" },
+					},
+				},
+			},
+		});
+		const db = createDatabase({ schema, adapter: createInMemoryAdapter() });
+		const statuses: Array<string | null> = [];
+
+		const load = async (): Promise<void> => {
+			const row = await db.collection("tasks").findById("1");
+			statuses.push((row as { status?: string } | null)?.status ?? null);
+		};
+
+		await load();
+		const unsub = db.observeCollections(["tasks"], () => {
+			void load();
+		});
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({ id: "1", status: "open" });
+		});
+		await new Promise((r) => setTimeout(r, 15));
+		expect(statuses.at(-1)).toBe("open");
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").update("1", { status: "done" });
+		});
+		await new Promise((r) => setTimeout(r, 15));
+		expect(statuses.at(-1)).toBe("done");
+
+		unsub();
+	});
+
 	test("useRecord observe contract via primary-key query", async () => {
 		const schema = createMelonSchema({
 			version: 1,

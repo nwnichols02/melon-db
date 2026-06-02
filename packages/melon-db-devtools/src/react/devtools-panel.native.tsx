@@ -7,7 +7,7 @@ import {
 	Text,
 	View,
 } from "react-native";
-import { useMelonDevtools } from "./devtools-context.tsx";
+import { useMelonDevtools, useMelonDevtoolsLog } from "./devtools-context.tsx";
 import { ErrorsTab } from "./tabs/errors-tab";
 import { QueriesTab } from "./tabs/queries-tab";
 import { SubscriptionsTab } from "./tabs/subscriptions-tab";
@@ -36,7 +36,8 @@ const TABS: Array<{ id: TabKind; label: string }> = [
  * React Native devtools overlay with floating button and modal inspector.
  */
 export function MelonDevtoolsPanel(): ReactElement | null {
-	const { bridge, log } = useMelonDevtools();
+	const { bridge } = useMelonDevtools();
+	const log = useMelonDevtoolsLog();
 	const [open, setOpen] = useState(false);
 	const [activeTab, setActiveTab] = useState<TabKind>(TabKind.Queries);
 

@@ -1,6 +1,7 @@
 export {
 	MelonDevtoolsProvider,
 	useMelonDevtools,
+	useMelonDevtoolsLog,
 	type MelonDevtoolsContextValue,
 	type MelonDevtoolsProviderProps,
 } from "./devtools-context.tsx";

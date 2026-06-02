@@ -1,5 +1,5 @@
 import { type ReactElement, useState } from "react";
-import { useMelonDevtools } from "./devtools-context.tsx";
+import { useMelonDevtools, useMelonDevtoolsLog } from "./devtools-context.tsx";
 import { ErrorsTab } from "./tabs/errors-tab";
 import { QueriesTab } from "./tabs/queries-tab";
 import { SubscriptionsTab } from "./tabs/subscriptions-tab";
@@ -28,7 +28,8 @@ const TABS: Array<{ id: TabKind; label: string }> = [
  * Web devtools inspector drawer for query, write, and sync diagnostics.
  */
 export function MelonDevtoolsPanel(): ReactElement {
-	const { bridge, log } = useMelonDevtools();
+	const { bridge } = useMelonDevtools();
+	const log = useMelonDevtoolsLog();
 	const [open, setOpen] = useState(false);
 	const [activeTab, setActiveTab] = useState<TabKind>(TabKind.Queries);
 

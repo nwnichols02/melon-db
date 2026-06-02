@@ -4,7 +4,7 @@ import type {
 	QueryAst,
 	WriteContext,
 } from "@melon/db";
-import { predicate, prepareQuery } from "@melon/db";
+import { prepareQuery } from "@melon/db";
 import { compilePrismaQuery } from "@melon/db-prisma";
 import type { PrismaFindManyArgs } from "@melon/db-prisma";
 import { type QueryBuilder, resolveCollectionQuery } from "@melon/db-query";
@@ -107,8 +107,13 @@ function useObserveRecordState<T>(
 		setState({ status: "loading" });
 		let cancelled = false;
 		const col = db.collection(collection) as MelonCollection<T>;
+		const loadInFlight = { current: false };
 
 		const load = async (): Promise<void> => {
+			if (loadInFlight.current) {
+				return;
+			}
+			loadInFlight.current = true;
 			try {
 				const row = await col.findById(id);
 				if (!cancelled) {
@@ -118,19 +123,14 @@ function useObserveRecordState<T>(
 				if (!cancelled) {
 					setState({ status: "error", error: toError(err) });
 				}
+			} finally {
+				loadInFlight.current = false;
 			}
 		};
 
 		void load();
 
-		const meta = db.schema.getCollection(collection);
-		const ast: QueryAst = {
-			collection,
-			mode: "one",
-			where: predicate(meta.primaryKey, "eq", id),
-			limit: 1,
-		};
-		const unsub = col.query(ast).observe(() => {
+		const unsub = db.observeCollections([collection], () => {
 			void load();
 		});
 

@@ -12,7 +12,6 @@ import type {
 
 export interface MelonDevtoolsContextValue {
 	bridge: ReactiveDevtoolsBridge;
-	log: DevtoolsEventLog;
 }
 
 const DevtoolsContext = createContext<MelonDevtoolsContextValue | null>(null);
@@ -23,27 +22,22 @@ export interface MelonDevtoolsProviderProps {
 }
 
 /**
- * Provides reactive devtools event log to inspector UI components.
+ * Provides the devtools bridge without subscribing app children to query events.
+ * Use {@link useMelonDevtoolsLog} in inspector UI so list screens do not re-render on every query.
  */
 export function MelonDevtoolsProvider({
 	bridge,
 	children,
 }: MelonDevtoolsProviderProps): ReactElement {
-	const log = useSyncExternalStore(
-		bridge.subscribe,
-		bridge.getSnapshot,
-		bridge.getSnapshot,
-	);
-
 	return (
-		<DevtoolsContext.Provider value={{ bridge, log }}>
+		<DevtoolsContext.Provider value={{ bridge }}>
 			{children}
 		</DevtoolsContext.Provider>
 	);
 }
 
 /**
- * Returns devtools bridge and current event log snapshot.
+ * Returns the devtools bridge (stable; does not subscribe to the event log).
  */
 export function useMelonDevtools(): MelonDevtoolsContextValue {
 	const context = useContext(DevtoolsContext);
@@ -53,4 +47,16 @@ export function useMelonDevtools(): MelonDevtoolsContextValue {
 		);
 	}
 	return context;
+}
+
+/**
+ * Subscribes to the reactive devtools event log. Use only in inspector UI, not on data screens.
+ */
+export function useMelonDevtoolsLog(): DevtoolsEventLog {
+	const { bridge } = useMelonDevtools();
+	return useSyncExternalStore(
+		bridge.subscribe,
+		bridge.getSnapshot,
+		bridge.getSnapshot,
+	);
 }

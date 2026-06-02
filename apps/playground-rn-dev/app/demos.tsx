@@ -110,7 +110,7 @@ export default function DemosScreen(): React.ReactElement {
 						>
 							<Text style={styles.row}>
 								{task.title} (p{task.priority})
-								{selectedId === task.id ? " · selected" : ""}
+								{selectedId === String(task.id) ? " · selected" : ""}
 							</Text>
 						</Pressable>
 					))}
@@ -138,7 +138,13 @@ export default function DemosScreen(): React.ReactElement {
 				<DemoSection title="useRecord">
 					<Text style={styles.hint}>
 						Tap a Mango row above. Status: {selectedState.status}
+						{selectedId != null ? ` · id=${selectedId}` : ""}
 					</Text>
+					{selectedState.status === "error" ? (
+						<Text style={styles.error}>
+							{selectedState.error.message}
+						</Text>
+					) : null}
 					{selectedTask != null ? (
 						<Text style={styles.row}>
 							{selectedTask.title} — {selectedTask.status}
@@ -206,6 +212,10 @@ const styles = StyleSheet.create({
 	hint: {
 		fontSize: 13,
 		color: "#666",
+	},
+	error: {
+		fontSize: 13,
+		color: "#b00020",
 	},
 	mono: {
 		fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace",
