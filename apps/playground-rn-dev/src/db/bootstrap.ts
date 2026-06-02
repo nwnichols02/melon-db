@@ -13,6 +13,44 @@ export const devtoolsBridge = createReactiveDevtoolsBridge();
 
 let databasePromise: Promise<MelonDatabase<typeof taskSchema>> | null = null;
 
+type DatabaseLifecycleListener = () => void;
+const databaseResumeListeners = new Set<DatabaseLifecycleListener>();
+const databaseSuspendedListeners = new Set<DatabaseLifecycleListener>();
+
+/**
+ * Subscribe when the app database is reopened after a native benchmark run.
+ */
+export function onDatabaseResumed(listener: DatabaseLifecycleListener): () => void {
+	databaseResumeListeners.add(listener);
+	return () => {
+		databaseResumeListeners.delete(listener);
+	};
+}
+
+/**
+ * Subscribe when the app database is closed for native benchmarks.
+ */
+export function onDatabaseSuspended(
+	listener: DatabaseLifecycleListener,
+): () => void {
+	databaseSuspendedListeners.add(listener);
+	return () => {
+		databaseSuspendedListeners.delete(listener);
+	};
+}
+
+function notifyDatabaseResumed(): void {
+	for (const listener of databaseResumeListeners) {
+		listener();
+	}
+}
+
+function notifyDatabaseSuspended(): void {
+	for (const listener of databaseSuspendedListeners) {
+		listener();
+	}
+}
+
 /**
  * Opens the local Melon database and seeds demo tasks when empty.
  */
@@ -21,6 +59,35 @@ export async function getDatabase(): Promise<MelonDatabase<typeof taskSchema>> {
 		databasePromise = bootstrap();
 	}
 	return databasePromise;
+}
+
+/**
+ * Closes the app database so native bench can use the single global SQLite connection.
+ * Required for jsi-sync / turbo benchmarks while the main screen is mounted.
+ */
+export async function suspendDatabaseForNativeBench(): Promise<void> {
+	const pending = databasePromise;
+	databasePromise = null;
+	if (pending) {
+		try {
+			const db = await pending;
+			await db.adapter.close();
+		} catch {
+			// Bootstrap may have failed; still release the bench slot.
+		}
+	}
+	notifyDatabaseSuspended();
+}
+
+/**
+ * Reopens the app database after native benchmarks complete.
+ */
+export async function resumeDatabaseAfterNativeBench(): Promise<
+	MelonDatabase<typeof taskSchema>
+> {
+	const db = await getDatabase();
+	notifyDatabaseResumed();
+	return db;
 }
 
 /**

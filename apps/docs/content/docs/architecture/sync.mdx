@@ -11,23 +11,23 @@ For usage examples see the [Sync guide](/docs/sync). For the split-package ratio
 
 ```mermaid
 flowchart LR
-  subgraph client [Client app]
-    MDB[MelonDatabase sync]
+  subgraph clientApp ["Client app"]
+    MDB["MelonDatabase sync"]
     Outbox["_melon_sync_outbox"]
     Sync["@melon/sync"]
-    Hooks[useSync hooks]
+    Hooks["useSync hooks"]
     MDB --> Sync
     Outbox --> Sync
     Sync --> Hooks
   end
 
-  subgraph backend [Backend]
+  subgraph backend ["Backend"]
     Server["@melon/sync-server"]
-    PG[PostgresSyncStore]
+    PG["PostgresSyncStore"]
     Server --> PG
   end
 
-  Sync -->|pull / push HTTP| Server
+  Sync -->|"pull / push HTTP"| Server
 ```
 
 | Piece | Owner | Role |
@@ -44,7 +44,7 @@ flowchart LR
 ```mermaid
 sequenceDiagram
   participant App
-  participant Sync as @melon/sync
+  participant Sync as "melon/sync"
   participant DB as MelonDatabase
   participant Backend
 

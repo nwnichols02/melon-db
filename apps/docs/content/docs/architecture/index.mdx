@@ -9,7 +9,7 @@ Melon uses an **AST-first** query architecture: every query surface compiles int
 
 ```mermaid
 flowchart LR
-  subgraph authoring [Query authoring]
+  subgraph authoring ["Query authoring"]
     Q["@melon/db-query"]
     M["@melon/db-query-mango"]
     P["@melon/db-prisma"]
@@ -18,8 +18,8 @@ flowchart LR
     AST[QueryAst]
     DB[MelonDatabase]
   end
-  subgraph adapters [Adapters]
-    IM[In-memory]
+  subgraph adapters ["Adapters"]
+    IM["In-memory"]
     EX["Bun / Node / Expo SQLite"]
     JSI["@melon/db-sqlite-native JSI"]
   end
@@ -57,13 +57,13 @@ See [Packages](/docs/packages/melon-db) for per-package guides and [Architectura
 
 ```mermaid
 sequenceDiagram
-  participant Author as Query author
-  participant Compiler as Query compiler
+  participant Author as "Query author"
+  participant Compiler as "Query compiler"
   participant DB as MelonDatabase
   participant Adapter as StorageAdapter
   participant Sub as Subscribers
 
-  Author->>Compiler: fluent / Mango / Prisma
+  Author->>Compiler: "fluent / Mango / Prisma"
   Compiler->>Compiler: compile to QueryAst
   Compiler->>DB: validate + plan + prepare
   DB->>Adapter: PreparedQuery
@@ -132,12 +132,8 @@ stateDiagram-v2
   [*] --> Idle
   Idle --> Writing: db.write()
   Writing --> Idle: complete
-  Idle --> Reading: db.read / queries
+  Idle --> Reading: "db.read / queries"
   Reading --> Idle: complete
-
-  note right of Writing
-    No concurrent writers during Writing
-  end note
 ```
 
 Collection `insert`, `update`, and `delete` throw if called outside a write context.

@@ -1,3 +1,11 @@
+import {
+	cleanupBenchDatabaseFiles,
+	createBenchFilenameAllocator,
+} from "@/bench/bench-db";
+import {
+	resumeDatabaseAfterNativeBench,
+	suspendDatabaseForNativeBench,
+} from "@/db/bootstrap";
 import type { StorageAdapter } from "@melon/db";
 import {
 	type BenchResult,
@@ -14,7 +22,13 @@ import { Platform } from "react-native";
 export type DeviceBenchMode = "jsi-sync" | "turbo" | "expo";
 export type DeviceBenchScale = 1_000 | 10_000;
 
-const BENCH_DB_PREFIX = "melon-bench";
+function usesNativeSqliteSingleton(mode: DeviceBenchMode): boolean {
+	return mode === "jsi-sync" || mode === "turbo";
+}
+
+function needsNativeExclusiveAccess(modes: DeviceBenchMode[]): boolean {
+	return modes.some(usesNativeSqliteSingleton);
+}
 
 function engineLabelForMode(mode: DeviceBenchMode): string {
 	if (mode === "jsi-sync") {
@@ -29,6 +43,7 @@ function engineLabelForMode(mode: DeviceBenchMode): string {
 function createNativeAdapter(
 	mode: "jsi-sync" | "turbo",
 	basePath: string,
+	filename: string,
 ): StorageAdapter {
 	if (!isJsiSqliteAvailable()) {
 		throw new Error(
@@ -36,21 +51,16 @@ function createNativeAdapter(
 		);
 	}
 	return createJsiSqliteAdapter({
-		filename: `${BENCH_DB_PREFIX}-${mode}.db`,
+		filename,
 		basePath,
 		mode,
 	});
 }
 
-let expoBenchCounter = 0;
-
-async function createExpoBenchAdapter(): Promise<StorageAdapter> {
+async function createExpoBenchAdapter(filename: string): Promise<StorageAdapter> {
 	const SQLite = await import("expo-sqlite");
 	const { createExpoSqliteAdapter } = await import("@melon/db-sqlite/expo");
-	expoBenchCounter += 1;
-	const database = await SQLite.openDatabaseAsync(
-		`${BENCH_DB_PREFIX}-expo-${expoBenchCounter}.db`,
-	);
+	const database = await SQLite.openDatabaseAsync(filename);
 	return createExpoSqliteAdapter({ database });
 }
 
@@ -58,17 +68,18 @@ async function runModeScenarios(
 	mode: DeviceBenchMode,
 	scale: DeviceBenchScale,
 	basePath: string,
+	nextBenchFilename: (label: string) => string,
 ): Promise<BenchResult[]> {
 	if (mode === "expo") {
 		return runScenariosForAdapter(
-			() => createExpoBenchAdapter(),
+			() => createExpoBenchAdapter(nextBenchFilename("expo")),
 			scale,
 			engineLabelForMode(mode),
 		);
 	}
 
 	return runScenariosForAdapter(
-		() => createNativeAdapter(mode, basePath),
+		() => createNativeAdapter(mode, basePath, nextBenchFilename(mode)),
 		scale,
 		engineLabelForMode(mode),
 	);
@@ -85,19 +96,43 @@ export async function runDeviceBenchmark(options: {
 }): Promise<{ results: BenchResult[]; report: RnParityReport }> {
 	const { modes, scale, basePath, onProgress } = options;
 	const allResults: BenchResult[] = [];
+	const exclusiveNative = needsNativeExclusiveAccess(modes);
 
-	for (const mode of modes) {
-		onProgress?.(`Running ${mode} @ ${scale.toLocaleString()}…`);
-		const results = await runModeScenarios(mode, scale, basePath);
-		allResults.push(...results);
+	onProgress?.("Cleaning prior benchmark databases…");
+	await cleanupBenchDatabaseFiles();
+
+	const runId = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+	const { next: nextBenchFilename } = createBenchFilenameAllocator(runId);
+
+	if (exclusiveNative) {
+		onProgress?.("Releasing app database for native bench…");
+		await suspendDatabaseForNativeBench();
 	}
 
-	const report = buildRnParityReport(
-		allResults,
-		scale,
-		Platform.OS,
-		modes.map((m) => (m === "expo" ? "expo" : m)),
-	);
+	try {
+		for (const mode of modes) {
+			onProgress?.(`Running ${mode} @ ${scale.toLocaleString()}…`);
+			const results = await runModeScenarios(
+				mode,
+				scale,
+				basePath,
+				nextBenchFilename,
+			);
+			allResults.push(...results);
+		}
 
-	return { results: allResults, report };
+		const report = buildRnParityReport(
+			allResults,
+			scale,
+			Platform.OS,
+			modes.map((m) => (m === "expo" ? "expo" : m)),
+		);
+
+		return { results: allResults, report };
+	} finally {
+		if (exclusiveNative) {
+			onProgress?.("Restoring app database…");
+			await resumeDatabaseAfterNativeBench();
+		}
+	}
 }

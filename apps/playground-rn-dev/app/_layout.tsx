@@ -1,4 +1,9 @@
-import { devtoolsBridge, getDatabase } from "@/db/bootstrap";
+import {
+	devtoolsBridge,
+	getDatabase,
+	onDatabaseResumed,
+	onDatabaseSuspended,
+} from "@/db/bootstrap";
 import type { taskSchema } from "@/db/schema";
 import { createHttpSyncBackend } from "@/sync/client";
 import { devNetworkMonitor } from "@/sync/network-monitor";
@@ -9,7 +14,7 @@ import {
 } from "@melon/db-devtools/react";
 import { MelonDbProvider, MelonSyncProvider } from "@melon/db-react";
 import { DEFAULT_RETRY_POLICY } from "@melon/sync";
-import { Stack } from "expo-router";
+import { Stack, usePathname } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -17,28 +22,73 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 /**
  * Root layout: bootstraps Melon DB then provides it to the app tree.
  */
+function isBenchmarkPathname(pathname: string): boolean {
+	return pathname === "/benchmark" || pathname.startsWith("/benchmark/");
+}
+
+function DevStack(): React.ReactElement {
+	return __DEV__ ? (
+		<MelonDevtoolsProvider bridge={devtoolsBridge}>
+			<Stack>
+				<Stack.Screen name="index" options={{ title: "Open Tasks" }} />
+				<Stack.Screen name="benchmark" options={{ title: "Benchmarks" }} />
+			</Stack>
+			<MelonDevtoolsPanel />
+		</MelonDevtoolsProvider>
+	) : (
+		<Stack>
+			<Stack.Screen name="index" options={{ title: "Open Tasks" }} />
+		</Stack>
+	);
+}
+
 export default function RootLayout(): React.ReactElement {
+	const pathname = usePathname();
+	const onBenchmarkRoute = isBenchmarkPathname(pathname);
 	const [db, setDb] = useState<MelonDatabase<typeof taskSchema> | null>(null);
 	const [bootError, setBootError] = useState<string | null>(null);
 	const syncBackend = useMemo(() => createHttpSyncBackend(), []);
 
 	useEffect(() => {
 		let cancelled = false;
-		void getDatabase()
-			.then((database) => {
-				if (!cancelled) {
-					setDb(database);
-				}
-			})
-			.catch((error: unknown) => {
-				if (!cancelled) {
-					setBootError(
-						error instanceof Error ? error.message : "Database bootstrap failed",
-					);
-				}
-			});
+
+		function loadDatabase(): void {
+			void getDatabase()
+				.then((database) => {
+					if (!cancelled) {
+						setDb(database);
+						setBootError(null);
+					}
+				})
+				.catch((error: unknown) => {
+					if (!cancelled) {
+						setBootError(
+							error instanceof Error
+								? error.message
+								: "Database bootstrap failed",
+						);
+					}
+				});
+		}
+
+		loadDatabase();
+
+		const unsubscribeResume = onDatabaseResumed(() => {
+			if (!cancelled) {
+				loadDatabase();
+			}
+		});
+
+		const unsubscribeSuspend = onDatabaseSuspended(() => {
+			if (!cancelled) {
+				setDb(null);
+			}
+		});
+
 		return () => {
 			cancelled = true;
+			unsubscribeResume();
+			unsubscribeSuspend();
 		};
 	}, []);
 
@@ -53,6 +103,14 @@ export default function RootLayout(): React.ReactElement {
 	}
 
 	if (!db) {
+		if (onBenchmarkRoute) {
+			return (
+				<SafeAreaProvider>
+					<DevStack />
+				</SafeAreaProvider>
+			);
+		}
+
 		return (
 			<SafeAreaProvider>
 				<View style={styles.loading}>
@@ -75,22 +133,7 @@ export default function RootLayout(): React.ReactElement {
 					pushChanges={syncBackend.pushChanges}
 					retryPolicy={DEFAULT_RETRY_POLICY}
 				>
-					{__DEV__ ? (
-						<MelonDevtoolsProvider bridge={devtoolsBridge}>
-							<Stack>
-								<Stack.Screen name="index" options={{ title: "Open Tasks" }} />
-								<Stack.Screen
-									name="benchmark"
-									options={{ title: "Benchmarks" }}
-								/>
-							</Stack>
-							<MelonDevtoolsPanel />
-						</MelonDevtoolsProvider>
-					) : (
-						<Stack>
-							<Stack.Screen name="index" options={{ title: "Open Tasks" }} />
-						</Stack>
-					)}
+					<DevStack />
 				</MelonSyncProvider>
 			</MelonDbProvider>
 		</SafeAreaProvider>

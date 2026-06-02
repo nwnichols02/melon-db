@@ -104,6 +104,11 @@ export default function BenchmarkScreen(): React.ReactElement {
 				<Text style={styles.subtitle}>
 					Platform: {Platform.OS} · App mode: {currentModeLabel}
 				</Text>
+				<Text style={styles.hint}>
+					Native runs (jsi-sync / turbo) briefly close the task-list database
+					because the native module supports one open file at a time. It
+					reopens when the run finishes.
+				</Text>
 			</View>
 
 			<View style={styles.scaleRow}>
@@ -252,6 +257,12 @@ const styles = StyleSheet.create({
 		fontSize: 13,
 		color: "#666",
 		marginTop: 4,
+	},
+	hint: {
+		fontSize: 12,
+		color: "#666",
+		marginTop: 8,
+		lineHeight: 17,
 	},
 	scaleRow: {
 		flexDirection: "row",

@@ -11,12 +11,12 @@ See [@melon/db-sqlite-native](/docs/packages/melon-db-sqlite-native) for setup a
 
 ```mermaid
 flowchart TD
-  Start[createSqliteAdapter on RN] --> Expo{Expo Go?}
+  Start["createSqliteAdapter on RN"] --> Expo{"Expo Go?"}
   Expo -->|yes| ExpoPkg["@melon/db-sqlite/expo"]
-  Expo -->|no / dev build| RnPkg["@melon/db-sqlite/rn"]
-  RnPkg --> Auto[mode: auto]
-  Auto --> JSI[jsi-sync melonSqliteJsi]
-  RnPkg -->|JSI unavailable| Turbo[TurboModule fallback]
+  Expo -->|"no / dev build"| RnPkg["@melon/db-sqlite/rn"]
+  RnPkg --> Auto["mode: auto"]
+  Auto --> JSI["jsi-sync melonSqliteJsi"]
+  RnPkg -->|JSI unavailable| Turbo["TurboModule fallback"]
 ```
 
 | Environment | Package / entry | Native module |
@@ -37,22 +37,22 @@ Phases 20–26 built a layered native module:
 
 ```mermaid
 flowchart TB
-  subgraph js [JavaScript]
+  subgraph js ["JavaScript"]
     RN["@melon/db-sqlite/rn"]
-    Bridge[MelonSQLiteBridge.ts]
-    JsiTs[MelonSQLiteJsi.ts]
+    Bridge["MelonSQLiteBridge.ts"]
+    JsiTs["MelonSQLiteJsi.ts"]
   end
 
-  subgraph turbo [TurboModule codegen]
-    NativeTs[NativeMelonSQLite.ts]
-    iOS[iOS TurboModule.mm]
-    Android[Android MelonSQLiteModule.kt]
+  subgraph turbo ["TurboModule codegen"]
+    NativeTs["NativeMelonSQLite.ts"]
+    iOS["iOS TurboModule.mm"]
+    Android["Android MelonSQLiteModule.kt"]
   end
 
-  subgraph cpp [C++ JSI + native DB thread]
-    Host[MelonSQLiteHostObject.cpp]
+  subgraph cpp ["C++ JSI + native DB thread"]
+    Host["MelonSQLiteHostObject.cpp"]
     Lib["libmelon_sqlite.so / iOS"]
-    Queue[DB worker queue]
+    Queue["DB worker queue"]
   end
 
   RN --> Bridge

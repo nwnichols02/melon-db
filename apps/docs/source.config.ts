@@ -21,7 +21,8 @@ const typeGenerator = createGenerator({
 
 export default defineConfig({
 	mdxOptions: {
-		remarkPlugins: [
+		remarkPlugins: (plugins) => [
+			...plugins,
 			remarkMdxMermaid,
 			[remarkAutoTypeTable, { generator: typeGenerator }],
 		],
