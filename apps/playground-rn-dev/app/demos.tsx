@@ -87,7 +87,9 @@ export default function DemosScreen(): React.ReactElement {
 	);
 	const mangoOpenCount = useQueryCount(mangoCountQuery);
 
-	const selectedState = useRecordState<Task>("tasks", selectedId);
+	const selectedState = useRecordState<Task>("tasks", selectedId, {
+		enabled: selectedId != null,
+	});
 	const selectedTask =
 		selectedState.status === "ready" ? selectedState.data : null;
 
@@ -102,7 +104,10 @@ export default function DemosScreen(): React.ReactElement {
 				<Text style={styles.heading}>Query surface demos</Text>
 				<DemoSection title="Mango findMany">
 					{mangoOpen.map((task) => (
-						<Pressable key={task.id} onPress={() => setSelectedId(task.id)}>
+						<Pressable
+							key={task.id}
+							onPress={() => setSelectedId(String(task.id))}
+						>
 							<Text style={styles.row}>
 								{task.title} (p{task.priority})
 								{selectedId === task.id ? " · selected" : ""}

@@ -43,6 +43,7 @@ function useObserveListState<T>(
 ): QueryAsyncState<T[]> {
 	const db = useDatabase();
 	const enabled = options?.enabled ?? true;
+	const preparedKey = queryInputKey(prepared);
 	const [state, setState] = useState<QueryAsyncState<T[]>>(() =>
 		enabled ? { status: "loading" } : { status: "idle" },
 	);
@@ -81,13 +82,15 @@ function useObserveListState<T>(
 			cancelled = true;
 			unsub();
 		};
-	}, [db, prepared, enabled, options?.select]);
+	}, [db, prepared.ast.collection, preparedKey, enabled, options?.select]);
 
 	return state;
 }
 
 function useObserveRecordState<T>(
-	prepared: PreparedQuery,
+	collection: string,
+	id: string | number,
+	recordKey: string,
 	options?: { enabled?: boolean },
 ): QueryAsyncState<T | null> {
 	const db = useDatabase();
@@ -97,37 +100,45 @@ function useObserveRecordState<T>(
 	);
 
 	useEffect(() => {
-		if (!enabled) {
+		if (!enabled || recordKey === "") {
 			setState({ status: "idle" });
 			return;
 		}
 		setState({ status: "loading" });
-		const handle = db.collection(prepared.ast.collection).query(prepared.ast);
 		let cancelled = false;
+		const col = db.collection(collection) as MelonCollection<T>;
 
-		const applyRecord = (row: Record<string, unknown> | null) => {
-			if (cancelled) return;
-			setState({ status: "ready", data: row as T | null });
-		};
-
-		void handle.fetchOne().then(
-			(row) => applyRecord(row as Record<string, unknown> | null),
-			(err) => {
+		const load = async (): Promise<void> => {
+			try {
+				const row = await col.findById(id);
+				if (!cancelled) {
+					setState({ status: "ready", data: row as T | null });
+				}
+			} catch (err) {
 				if (!cancelled) {
 					setState({ status: "error", error: toError(err) });
 				}
-			},
-		);
+			}
+		};
 
-		const unsub = handle.observe((rows) =>
-			applyRecord((rows[0] as Record<string, unknown>) ?? null),
-		);
+		void load();
+
+		const meta = db.schema.getCollection(collection);
+		const ast: QueryAst = {
+			collection,
+			mode: "one",
+			where: predicate(meta.primaryKey, "eq", id),
+			limit: 1,
+		};
+		const unsub = col.query(ast).observe(() => {
+			void load();
+		});
 
 		return () => {
 			cancelled = true;
 			unsub();
 		};
-	}, [db, prepared, enabled]);
+	}, [db, collection, id, recordKey, enabled]);
 
 	return state;
 }
@@ -157,7 +168,7 @@ export function useQuery<T = Record<string, unknown>>(
 				: (value as T[]);
 			setRows(next);
 		});
-	}, [db, prepared, enabled, options?.select]);
+	}, [db, prepared.ast.collection, key, enabled, options?.select]);
 
 	return rows;
 }
@@ -212,10 +223,21 @@ export function useQueryCount(query: QueryAst | PreparedQuery): number {
 
 	useEffect(() => {
 		const handle = db.collection(prepared.ast.collection).query(prepared.ast);
-		return handle.observe(() => {
-			void handle.fetchCount().then(setCount);
-		});
-	}, [db, prepared]);
+		let cancelled = false;
+		const refresh = (): void => {
+			void handle.fetchCount().then((value) => {
+				if (!cancelled) {
+					setCount(value);
+				}
+			});
+		};
+		refresh();
+		const unsub = handle.observe(refresh);
+		return () => {
+			cancelled = true;
+			unsub();
+		};
+	}, [db, prepared.ast.collection, key]);
 
 	return count;
 }
@@ -346,7 +368,6 @@ export function useRecordState<T = Record<string, unknown>>(
 	id: string | number | null | undefined,
 	options?: { enabled?: boolean },
 ): QueryAsyncState<T | null> {
-	const db = useDatabase();
 	const enabled = (options?.enabled ?? true) && id !== null && id !== undefined;
 
 	const recordKey =
@@ -354,16 +375,10 @@ export function useRecordState<T = Record<string, unknown>>(
 			? `${collection}:${String(id)}`
 			: "";
 
-	const prepared = useMemo(() => {
-		const meta = db.schema.getCollection(collection);
-		const ast: QueryAst = {
-			collection,
-			mode: "one",
-			where: predicate(meta.primaryKey, "eq", id ?? ""),
-			limit: 1,
-		};
-		return prepareQuery(ast, db.schema);
-	}, [db.schema, collection, recordKey]);
-
-	return useObserveRecordState<T>(prepared, { enabled });
+	return useObserveRecordState<T>(
+		collection,
+		enabled ? (id as string | number) : "",
+		recordKey,
+		{ enabled },
+	);
 }

@@ -155,6 +155,71 @@ describe("db-react exports", () => {
 		expect(lengths.at(-1)).toBe(1);
 	});
 
+	test("mango list + record-by-id observe without runaway notifications", async () => {
+		const schema = createMelonSchema({
+			version: 1,
+			collections: {
+				tasks: {
+					name: "tasks",
+					primaryKey: "id",
+					fields: {
+						id: { kind: "string" },
+						status: { kind: "string" },
+						priority: { kind: "number" },
+					},
+				},
+			},
+		});
+		const db = createDatabase({ schema, adapter: createInMemoryAdapter() });
+		const listPrepared = mangoCompiler.compile(
+			{
+				selector: { status: "open" },
+				sort: [{ priority: "desc" }],
+				limit: 5,
+			},
+			"tasks",
+			schema,
+		);
+		const listUpdates: number[] = [];
+		const listHandle = db.collection("tasks").query(listPrepared.ast);
+		listHandle.observe((rows) => listUpdates.push(rows.length));
+
+		const recordPrepared = prepareQuery(
+			{
+				collection: "tasks",
+				mode: "one",
+				where: predicate("id", "eq", "1"),
+				limit: 1,
+			},
+			schema,
+		);
+		const recordUpdates: Array<string | null> = [];
+		const recordHandle = db.collection("tasks").query(recordPrepared.ast);
+		recordHandle.observe((rows) =>
+			recordUpdates.push(
+				(rows[0] as { status?: string } | undefined)?.status ?? null,
+			),
+		);
+
+		await new Promise((r) => setTimeout(r, 5));
+		const listCountAfterSubscribe = listUpdates.length;
+		const recordCountAfterSubscribe = recordUpdates.length;
+
+		await db.write(async (tx) => {
+			await tx.collection("tasks").insert({
+				id: "1",
+				status: "open",
+				priority: 2,
+			});
+		});
+		await new Promise((r) => setTimeout(r, 15));
+
+		expect(listUpdates.length).toBeGreaterThan(listCountAfterSubscribe);
+		expect(recordUpdates.length).toBeGreaterThan(recordCountAfterSubscribe);
+		expect(listUpdates.length).toBeLessThan(20);
+		expect(recordUpdates.length).toBeLessThan(20);
+	});
+
 	test("useMangoQuery observe contract via mango compiler", async () => {
 		const schema = createMelonSchema({
 			version: 1,
