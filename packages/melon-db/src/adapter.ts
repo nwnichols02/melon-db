@@ -78,6 +78,8 @@ export interface StorageAdapter {
 	transaction<T>(fn: () => Promise<T>): Promise<T>;
 	getChangedCollections?(sinceVersion: number): Promise<AdapterChangeSet>;
 	observeQuery?(query: PreparedQuery, onChange: () => void): () => void;
+	/** Drains SQLite observation trigger events and invalidates matching queries. */
+	flushObservationQueue?(): Promise<void>;
 	getLastQueryDebug?(): QueryExecutionDebug | undefined;
 	close(): Promise<void>;
 }

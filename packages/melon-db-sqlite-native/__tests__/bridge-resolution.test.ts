@@ -3,6 +3,7 @@ import { afterEach, describe, expect, mock, test } from "bun:test";
 describe("MelonSQLite bridge resolution", () => {
 	afterEach(() => {
 		mock.restore();
+		globalThis.melonSqliteJsi = undefined;
 	});
 
 	test("prefers jsi-sync when host object is installed", async () => {
@@ -18,6 +19,8 @@ describe("MelonSQLite bridge resolution", () => {
 			queryAllSync: () => [],
 			queryFirstSync: () => null,
 			runSync: () => {},
+			setObservationFlushCallback: () => {},
+			removeObservationFlushCallback: () => {},
 		};
 
 		const { getMelonSQLiteNativeMode } = await import(

@@ -1,6 +1,12 @@
 #import "MelonSQLiteTurboModule.h"
 
 #import "../cpp/MelonSQLiteInstaller.h"
+#import "../cpp/MelonSQLiteScheduler.h"
+
+#if __has_include(<ReactCommon/CallInvoker.h>)
+#import <ReactCommon/CallInvoker.h>
+#define MELON_HAS_CALL_INVOKER 1
+#endif
 
 namespace facebook::react {
 namespace {
@@ -63,6 +69,16 @@ Value hostRun(Runtime &runtime, TurboModule &turboModule, const Value *args, siz
 MelonSQLiteTurboModuleJSI::MelonSQLiteTurboModuleJSI(
     const ObjCTurboModule::InitParams &params)
     : NativeMelonSQLiteSpecJSI(params) {
+#if MELON_HAS_CALL_INVOKER
+  if (params.jsInvoker != nullptr) {
+    auto invoker = params.jsInvoker;
+    melon::setMelonJsScheduler([invoker](
+                                   std::function<void(facebook::jsi::Runtime &)> work) {
+      invoker->invokeAsync(
+          [work = std::move(work)](facebook::jsi::Runtime &runtime) { work(runtime); });
+    });
+  }
+#endif
   methodMap_["open"] = MethodMetadata{1, hostOpen};
   methodMap_["close"] = MethodMetadata{0, hostClose};
   methodMap_["exec"] = MethodMetadata{1, hostExec};

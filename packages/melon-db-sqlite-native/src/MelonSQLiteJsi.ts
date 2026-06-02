@@ -20,6 +20,9 @@ export interface MelonSqliteJsiHostObject {
 		params?: ReadonlyArray<SqlParam>,
 	): Record<string, unknown> | null;
 	runSync(sql: string, params?: ReadonlyArray<SqlParam>): void;
+	/** Native sqlite3_update_hook schedules this on the JS thread to flush observation events. */
+	setObservationFlushCallback(callback: () => void): void;
+	removeObservationFlushCallback(): void;
 }
 
 /**

@@ -20,14 +20,16 @@ type MelonSqliteJsiHostObject = {
 		sql: string,
 		params?: ReadonlyArray<string | number | boolean | null>,
 	): void;
+	setObservationFlushCallback(callback: () => void): void;
+	removeObservationFlushCallback(): void;
 };
 
-declare global {
-	var melonSqliteJsi: MelonSqliteJsiHostObject | undefined;
-}
-
 function getJsiHostObject(): MelonSqliteJsiHostObject {
-	const jsi = globalThis.melonSqliteJsi;
+	const jsi = (
+		globalThis as typeof globalThis & {
+			melonSqliteJsi?: MelonSqliteJsiHostObject;
+		}
+	).melonSqliteJsi;
 	if (jsi == null || typeof jsi.openSync !== "function") {
 		throw new Error(JSI_SYNC_SQLITE_MESSAGE);
 	}

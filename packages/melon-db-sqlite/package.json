@@ -7,7 +7,8 @@
 		"./bench": "./src/bench/index.ts",
 		"./expo": "./src/expo.ts",
 		"./node": "./src/node.ts",
-		"./rn": "./src/rn.ts"
+		"./rn": "./src/rn.ts",
+		"./testing": "./src/testing.ts"
 	},
 	"scripts": {
 		"test": "bun test",

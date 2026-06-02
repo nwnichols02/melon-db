@@ -11,9 +11,9 @@ This page is the **living status** for Melon. Update it when features land or de
 |------|----------------|
 | Packages | 12 under `packages/*` (core through sync-server + native) |
 | Example apps | 4 — `playground-node`, `playground-rn`, `playground-rn-dev`, `docs` |
-| Implementation phases | **0–28 shipped** (see chronology below) |
+| Implementation phases | **0–29 shipped** (see chronology below) |
 | Out-of-cycle | Fumadocs docs site, TypeDoc API, playgrounds (ongoing maintenance) |
-| Next | Phase 29+ deferred items |
+| Next | Phase 30+ deferred items |
 
 **Quick links:** [Architecture](/docs/architecture) · [Phase ADRs](/docs/architecture/decisions) · [Packages](/docs/packages/melon-db) · [Performance](/docs/performance-comparison)
 
@@ -77,6 +77,7 @@ Each phase was executed as a focused delivery increment. Phases 0–7 establishe
 | 26 | C++ JSI (Android) | native | NDK/JNI, `libmelon_sqlite`, Android worker thread parity | Shipped |
 | 27 | Native `observeQuery` | `@melon/db-sqlite` | Predicate-aware invalidation, SQLite triggers foundation, `reactiveSubscriptions: true` | Shipped |
 | 28 | RN on-device benchmarks | `@melon/db-sqlite/bench`, `playground-rn-dev` | Dev benchmark screen, jsi-sync vs turbo JSON report, shared scenario lib | Shipped |
+| 29 | Trigger-driven observation | `@melon/db-sqlite`, `@melon/db-sqlite-native` | Process `_melon_observation_events`, `flushObservationQueue`, native `sqlite3_update_hook` on JSI | Shipped |
 
 ### Out-of-cycle: Documentation
 
@@ -89,11 +90,11 @@ Each phase was executed as a focused delivery increment. Phases 0–7 establishe
 
 ## Shipped at a glance
 
-Core engine, all three query surfaces, React/sync hooks, devtools, codemods, full sync stack (HTTP + Postgres), dual RN SQLite paths (Expo + native JSI on iOS/Android), predicate-aware `observeQuery` on SQLite, Node + on-device benchmark harnesses, and CI (test, typecheck, biome, bench-smoke, bench-compare, postgres-sync, docs build).
+Core engine, all three query surfaces, React/sync hooks, devtools, codemods, full sync stack (HTTP + Postgres), dual RN SQLite paths (Expo + native JSI on iOS/Android), predicate-aware `observeQuery` with trigger-event processing and JSI `update_hook`, Node + on-device benchmark harnesses, and CI (test, typecheck, biome, bench-smoke, bench-compare, postgres-sync, docs build).
 
 ---
 
-## Deferred (Phase 29+)
+## Deferred (Phase 30+)
 
 | Area | Notes |
 |------|-------|

@@ -1,9 +1,13 @@
 #include "MelonSQLiteHostObject.h"
 
+#include "MelonSQLiteScheduler.h"
+
 #include <sqlite3.h>
 
+#include <atomic>
 #include <cstdint>
 #include <cstring>
+#include <memory>
 #include <functional>
 #include <map>
 #include <memory>
@@ -127,10 +131,12 @@ class MelonSQLiteHostObject : public HostObject {
   ~MelonSQLiteHostObject() override {
     runOnDbQueue([this]() {
       if (db_ != nullptr) {
+        clearUpdateHook();
         sqlite3_close(db_);
         db_ = nullptr;
       }
     });
+    clearObservationCallback();
 #ifdef __APPLE__
     if (dbQueue_ != nullptr) {
       dispatch_release(dbQueue_);
@@ -181,10 +187,12 @@ class MelonSQLiteHostObject : public HostObject {
             try {
               runOnDbQueue([this]() {
                 if (db_ != nullptr) {
+                  clearUpdateHook();
                   sqlite3_close(db_);
                   db_ = nullptr;
                 }
               });
+              clearObservationCallback();
               return Value::undefined();
             } catch (const JSError &) {
               throw;
@@ -307,6 +315,58 @@ class MelonSQLiteHostObject : public HostObject {
           });
     }
 
+    if (prop == "setObservationFlushCallback") {
+      return Function::createFromHostFunction(
+          rt,
+          name,
+          1,
+          [this](Runtime &runtime,
+                 const Value &thisValue,
+                 const Value *args,
+                 size_t count) -> Value {
+            try {
+              if (count < 1 || !args[0].isObject() ||
+                  !args[0].asObject(runtime).isFunction(runtime)) {
+                throw JSError(
+                    runtime,
+                    "setObservationFlushCallback requires a function");
+              }
+              observationFlush_ = std::make_shared<Function>(
+                  args[0].asObject(runtime).asFunction(runtime));
+              observationRuntime_ = &runtime;
+              return Value::undefined();
+            } catch (const JSError &) {
+              throw;
+            } catch (const std::exception &error) {
+              throw JSError(runtime, error.what());
+            }
+          });
+    }
+
+    if (prop == "removeObservationFlushCallback") {
+      return Function::createFromHostFunction(
+          rt,
+          name,
+          0,
+          [this](Runtime &runtime,
+                 const Value &thisValue,
+                 const Value *args,
+                 size_t count) -> Value {
+            try {
+              (void)runtime;
+              (void)thisValue;
+              (void)args;
+              (void)count;
+              clearObservationCallback();
+              return Value::undefined();
+            } catch (const JSError &) {
+              throw;
+            } catch (const std::exception &error) {
+              throw JSError(runtime, error.what());
+            }
+          });
+    }
+
     return Value::undefined();
   }
 
@@ -314,6 +374,9 @@ class MelonSQLiteHostObject : public HostObject {
   static void *dbQueueKey_;
 
   sqlite3 *db_ = nullptr;
+  std::shared_ptr<Function> observationFlush_;
+  Runtime *observationRuntime_ = nullptr;
+  std::atomic<bool> pendingObservationFlush_{false};
 #ifdef __APPLE__
   dispatch_queue_t dbQueue_ = nullptr;
   void *queueKey_ = nullptr;
@@ -322,6 +385,56 @@ class MelonSQLiteHostObject : public HostObject {
   std::unique_ptr<AndroidDbSerialQueue> androidDbQueue_ =
       std::make_unique<AndroidDbSerialQueue>();
 #endif
+
+  void clearObservationCallback() {
+    observationFlush_.reset();
+    observationRuntime_ = nullptr;
+    pendingObservationFlush_.store(false);
+  }
+
+  void invokeObservationFlush(Runtime &runtime) {
+    if (!observationFlush_) {
+      return;
+    }
+    observationFlush_->call(runtime);
+  }
+
+  void scheduleObservationFlush() {
+    if (!MelonSQLiteScheduler::instance().hasScheduler()) {
+      return;
+    }
+    if (pendingObservationFlush_.exchange(true)) {
+      return;
+    }
+    MelonSQLiteScheduler::instance().schedule([this](Runtime &runtime) {
+      pendingObservationFlush_.store(false);
+      invokeObservationFlush(runtime);
+    });
+  }
+
+  static void updateHook(
+      void *self,
+      int /* op */,
+      const char * /* dbName */,
+      const char * /* table */,
+      sqlite3_int64 /* rowid */) {
+    auto *host = static_cast<MelonSQLiteHostObject *>(self);
+    host->scheduleObservationFlush();
+  }
+
+  void installUpdateHook() {
+    if (db_ == nullptr) {
+      return;
+    }
+    sqlite3_update_hook(db_, &MelonSQLiteHostObject::updateHook, this);
+  }
+
+  void clearUpdateHook() {
+    if (db_ == nullptr) {
+      return;
+    }
+    sqlite3_update_hook(db_, nullptr, nullptr);
+  }
 
   void runOnDbQueue(const std::function<void()> &fn) {
 #ifdef __APPLE__
@@ -364,6 +477,7 @@ class MelonSQLiteHostObject : public HostObject {
       throw std::runtime_error(message);
     }
     sqlite3_busy_timeout(db_, 5000);
+    installUpdateHook();
   }
 
   void execSql(const std::string &sql) {

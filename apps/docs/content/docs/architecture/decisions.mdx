@@ -97,11 +97,13 @@ These ADRs capture the main architectural choices made during Phases 0–26. Eac
 
 **Decision (Phase 0–26):** Engine **ChangeEmitter** re-runs queries on collection changes when the adapter has no `observeQuery`.
 
-**Amendment (Phase 27):** `@melon/db-sqlite` implements **`observeQuery`** with predicate-aware post-write invalidation (`rowMatchesWhere` + subscription registry). Per-table SQLite triggers append to `_melon_observation_events` for future external-write detection. In-memory and other adapters still use ChangeEmitter.
+**Amendment (Phase 27):** `@melon/db-sqlite` implements **`observeQuery`** with predicate-aware post-write invalidation (`rowMatchesWhere` + subscription registry). Per-table SQLite triggers append to `_melon_observation_events`. In-memory and other adapters still use ChangeEmitter.
 
-**Pros:** SQLite reactive queries skip irrelevant writes; hooks unchanged (`observe.ts` prefers adapter when present).
+**Amendment (Phase 29):** `flushObservationQueue()` drains trigger events into the same invalidation path (covers raw SQL / external writes). Native **jsi-sync** installs `sqlite3_update_hook` → `setObservationFlushCallback` on the JS thread (CallInvoker on iOS, RuntimeExecutor on Android). Delete events conservatively invalidate all subscriptions on the affected collection.
 
-**Cons:** v1 invalidates on WHERE match only (not perfect `LIMIT`/`ORDER BY` membership); trigger path is foundation-only for Melon writes today.
+**Pros:** SQLite reactive queries skip irrelevant writes; hooks unchanged (`observe.ts` prefers adapter when present); external mutations can refresh observers without polling.
+
+**Cons:** v1 invalidates on WHERE match only (not perfect `LIMIT`/`ORDER BY` membership); turbo native path has no update hook in v1; delete events over-invalidate filtered queries.
 
 **Alternatives:** Block reactive APIs until native triggers (rejected — delayed RN playground and hooks).
 

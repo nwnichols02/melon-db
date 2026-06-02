@@ -9,6 +9,8 @@ export {
 	invalidateForWrite,
 	type WriteInvalidationContext,
 } from "./invalidator.ts";
+export { invalidateForObservationEvents } from "./invalidate-events.ts";
+export { flushObservationQueue } from "./flush-queue.ts";
 export {
 	drainObservationEvents,
 	ensureCollectionTriggers,

@@ -3,6 +3,7 @@ import type { PreparedQuery, StorageAdapter } from "@melon/db";
 import { createDatabase, predicate, prepareQuery, queryAst } from "@melon/db";
 import { taskSchema } from "../../melon-db/__fixtures__/task-schema.ts";
 import { createSqliteAdapter } from "../src/adapter.ts";
+import { getSqliteDriverForTests } from "../src/testing.ts";
 
 function subscribeObserve(
 	adapter: StorageAdapter,
@@ -257,6 +258,77 @@ describe("sqlite observeQuery", () => {
 
 		await new Promise((r) => setTimeout(r, 10));
 		expect(notifyCount).toBeGreaterThanOrEqual(1);
+
+		unsub();
+		await db.adapter.close();
+	});
+
+	test("external insert via raw SQL notifies after flushObservationQueue", async () => {
+		const adapter = createSqliteAdapter({ filename: ":memory:" });
+		const db = createDatabase({ schema: taskSchema, adapter });
+		await db.adapter.initialize(taskSchema);
+
+		const driver = getSqliteDriverForTests(adapter);
+		if (!driver) {
+			throw new Error("test driver not registered");
+		}
+
+		let notifyCount = 0;
+		const unsub = subscribeObserve(adapter, openTasksQuery, () => {
+			notifyCount += 1;
+		});
+
+		await new Promise((r) => setTimeout(r, 10));
+		const countAfterSubscribe = notifyCount;
+
+		await driver.exec(`
+			INSERT INTO "tasks" ("id", "title", "status", "priority", "updatedAt")
+			VALUES ('ext-open-1', 'External', 'open', 1, ${Date.now()})
+		`);
+
+		await new Promise((r) => setTimeout(r, 10));
+		expect(notifyCount).toBe(countAfterSubscribe);
+
+		if (!adapter.flushObservationQueue) {
+			throw new Error("flushObservationQueue not implemented");
+		}
+		await adapter.flushObservationQueue();
+		await new Promise((r) => setTimeout(r, 10));
+		expect(notifyCount).toBeGreaterThan(countAfterSubscribe);
+
+		unsub();
+		await db.adapter.close();
+	});
+
+	test("external irrelevant insert does not notify after flush", async () => {
+		const adapter = createSqliteAdapter({ filename: ":memory:" });
+		const db = createDatabase({ schema: taskSchema, adapter });
+		await db.adapter.initialize(taskSchema);
+
+		const driver = getSqliteDriverForTests(adapter);
+		if (!driver) {
+			throw new Error("test driver not registered");
+		}
+
+		let notifyCount = 0;
+		const unsub = subscribeObserve(adapter, openTasksQuery, () => {
+			notifyCount += 1;
+		});
+
+		await new Promise((r) => setTimeout(r, 10));
+		const countAfterSubscribe = notifyCount;
+
+		await driver.exec(`
+			INSERT INTO "tasks" ("id", "title", "status", "priority", "updatedAt")
+			VALUES ('ext-closed-1', 'External', 'closed', 1, ${Date.now()})
+		`);
+
+		if (!adapter.flushObservationQueue) {
+			throw new Error("flushObservationQueue not implemented");
+		}
+		await adapter.flushObservationQueue();
+		await new Promise((r) => setTimeout(r, 10));
+		expect(notifyCount).toBe(countAfterSubscribe);
 
 		unsub();
 		await db.adapter.close();

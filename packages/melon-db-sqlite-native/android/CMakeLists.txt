@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_library(melon_sqlite SHARED
   ../cpp/MelonSQLiteHostObject.cpp
   ../cpp/MelonSQLiteInstaller.cpp
+  ../cpp/MelonSQLiteScheduler.cpp
   src/main/jni/MelonSQLiteJni.cpp
   src/main/jni/OnLoad.cpp
 )

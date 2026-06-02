@@ -18,6 +18,8 @@ describe("createNativeJsiSyncDriver with mocked host object", () => {
 		runSync: (sql: string) => {
 			calls.push(`run:${sql}`);
 		},
+		setObservationFlushCallback: () => {},
+		removeObservationFlushCallback: () => {},
 	};
 
 	afterEach(() => {
@@ -60,6 +62,8 @@ describe("createJsiSqliteAdapter mode selection", () => {
 			queryAllSync: () => [],
 			queryFirstSync: () => null,
 			runSync: () => {},
+			setObservationFlushCallback: () => {},
+			removeObservationFlushCallback: () => {},
 		};
 
 		mock.module("react-native", () => ({

@@ -56,7 +56,9 @@ All SQLite adapters set `capabilities.reactiveSubscriptions: true` and implement
 - Subscriptions dedupe by compiled query fingerprint.
 - After each write, only subscriptions whose WHERE clause can be affected by the changed row are notified (predicate-aware invalidation).
 - Queries with `orderBy` / `limit` / `skip` invalidate when WHERE matches (v1 may over-invalidate vs perfect top-N detection).
-- Per-table SQLite triggers write to `_melon_observation_events` (foundation for future external-write detection).
+- Per-table SQLite triggers append to `_melon_observation_events`; `flushObservationQueue()` drains events and applies predicate-aware invalidation (including SQL that bypasses `adapter.write`).
+- Native **jsi-sync** registers `sqlite3_update_hook` → `setObservationFlushCallback` so external writes schedule a flush on the JS thread (iOS CallInvoker, Android RuntimeExecutor). **Turbo** path still flushes on Melon writes only.
+- `adapter.flushObservationQueue()` is public for tests and manual tooling.
 - In-memory adapter still uses engine ChangeEmitter (collection-wide invalidation).
 
 ## Comparison with WatermelonDB

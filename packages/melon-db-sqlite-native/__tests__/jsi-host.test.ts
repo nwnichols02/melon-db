@@ -21,6 +21,8 @@ describe("MelonSQLite JSI host object", () => {
 			queryAllSync: () => [],
 			queryFirstSync: () => null,
 			runSync: () => {},
+			setObservationFlushCallback: () => {},
+			removeObservationFlushCallback: () => {},
 		};
 
 		mock.module("react-native", () => ({

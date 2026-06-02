@@ -22,13 +22,18 @@ import { createSqliteMigrationExecutor } from "./migration-executor.ts";
 import {
 	createQuerySubscriptionRegistry,
 	fetchRowByPrimaryKey,
+	flushObservationQueue as flushObservationQueueFromEvents,
 	invalidateForWrite,
 } from "./observe/index.ts";
 import {
-	drainObservationEvents,
+	registerNativeObservationFlush,
+	unregisterNativeObservationFlush,
+} from "./observe/observation-callback.ts";
+import {
 	ensureObservationTriggers,
 	resetObservationTriggerCache,
 } from "./observe/triggers.ts";
+import { registerSqliteDriverForTests } from "./testing.ts";
 import { generateDdl } from "./schema-ddl.ts";
 import { toSqlParams } from "./sql/bindings.ts";
 import { compileQuery } from "./sql/compile-query.ts";
@@ -108,7 +113,7 @@ export function createSqliteAdapterFromDriver(
 			operation,
 			context,
 		);
-		await drainObservationEvents(sqlite);
+		await flushObservationQueueFromEvents(sqlite, s, subscriptionRegistry);
 	}
 
 	async function writeOperation(
@@ -193,7 +198,7 @@ export function createSqliteAdapterFromDriver(
 		}
 	}
 
-	return {
+	const adapter: StorageAdapter = {
 		name: "sqlite",
 		capabilities: {
 			transactions: true,
@@ -219,6 +224,7 @@ export function createSqliteAdapterFromDriver(
 			schema = s;
 			if (isFirstInit) {
 				driver = await driverFactory();
+				registerSqliteDriverForTests(adapter, driver);
 				await driver.exec("PRAGMA foreign_keys = ON");
 				await driver.exec("PRAGMA journal_mode = WAL");
 			}
@@ -303,6 +309,7 @@ export function createSqliteAdapterFromDriver(
 		observeQuery(prepared, onChange) {
 			const collection = prepared.ast.collection;
 			if (driver !== null && schema !== null) {
+				registerNativeObservationFlush(driver, schema, subscriptionRegistry);
 				void ensureObservationTriggers(driver, schema, collection).catch(() => {
 					// Triggers are best-effort; direct invalidation remains primary.
 				});
@@ -310,11 +317,25 @@ export function createSqliteAdapterFromDriver(
 			return subscriptionRegistry.subscribe(prepared, onChange);
 		},
 
+		async flushObservationQueue(): Promise<void> {
+			const sqlite = driver;
+			const s = schema;
+			if (sqlite === null || s === null) {
+				throw new MelonError("Adapter not initialized", {
+					code: MelonErrorCode.NOT_INITIALIZED,
+				});
+			}
+			await flushObservationQueueFromEvents(sqlite, s, subscriptionRegistry);
+		},
+
 		getLastQueryDebug(): QueryExecutionDebug | undefined {
 			return lastQueryDebug;
 		},
 
 		async close(): Promise<void> {
+			if (driver !== null) {
+				unregisterNativeObservationFlush(driver);
+			}
 			subscriptionRegistry.clear();
 			resetObservationTriggerCache();
 			await driver?.close();
@@ -325,4 +346,6 @@ export function createSqliteAdapterFromDriver(
 			lastQueryDebug = undefined;
 		},
 	};
+
+	return adapter;
 }
