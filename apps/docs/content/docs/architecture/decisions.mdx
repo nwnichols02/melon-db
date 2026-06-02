@@ -148,3 +148,21 @@ These ADRs capture the main architectural choices made during Phases 0–26. Eac
 **Cons:** Core is no longer free of other `melon-*` packages; tree-shaking cannot drop `@melon/db-query` if you use fluent collection APIs.
 
 **Alternatives:** Optional peer dependency with runtime error (rejected — poor DX in the common case).
+
+---
+
+## ADR-011: Post-fetch includes and `relationFilters` (no SQL JOIN SELECT)
+
+**Context:** Watermelon and Prisma apps expect nested `include` / `Q.on` filters. SQLite adapters already compile single-table `SELECT`s; adding JOIN-shaped result sets would complicate adapters, observation, and partial select.
+
+**Decision:**
+
+- **`belongsTo` and `hasMany` includes** load via `loadIncludes` after the parent `find` (batch `IN` queries on related collections).
+- **`Q.on` parity** uses `QueryAst.relationFilters` compiled to `WHERE fk IN (SELECT pk FROM related WHERE …)` on SQLite and `applyRelationFilters` in-memory.
+- **`capabilities.joins` stays `false`**; no `SELECT … JOIN` result shaping in v1.
+
+**Pros:** Works on all adapters with one engine path; predictable SQL; easier tests.
+
+**Cons:** Extra round-trips for includes; `include.limit` is global on the child query, not per-parent; `observeQuery` may over-invalidate for subquery filters.
+
+**Alternatives:** SQL JOIN in adapter (deferred — revisit if post-fetch becomes a bottleneck).

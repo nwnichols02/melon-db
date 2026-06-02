@@ -22,7 +22,7 @@ Add `--dry-run` to preview without writing files. `migrate-schema` prints JSON t
 | `database.get('x').query(Q.*)` | `db.collection('x').findMany(q.from(...))` | Shipped |
 | `Q.and` / `Q.or` | `.and(q2 => …)` / `.or(q2 => …)` | Shipped (Phase 19) |
 | `.query(...).fetch()` / `.observe()` | `.query(q.from(...).toAst()).fetch()` | Shipped (Phase 19) |
-| `Q.on` (joins) | Recipe comment + docs | Manual rewrite required |
+| `Q.on` (joins) | `relationFilters` when schema passed to translator | Codemod recipe if schema unknown |
 | `database.write` + create/update | `db.write(tx => …)` | Shipped |
 | `record.destroyPermanently` | `tx.collection(...).delete(id)` | Shipped (Phase 19) |
 | `database.batch` inside write | `tx.batch(...)` | Partial — verify ops |
@@ -30,4 +30,4 @@ Add `--dry-run` to preview without writing files. `migrate-schema` prints JSON t
 | `withObservables` | Hook migration comment | Shipped (Phase 19) |
 | `@field` Model class | `migrate-schema` JSON spike | Single-file extraction |
 
-Runtime `translateWatermelonQuery` converts serializable `Q` clauses to `QueryAst` (`source: 'compat'`). Joins (`Q.on`) still throw at runtime — use migration recipes.
+Runtime `translateWatermelonQuery(collection, clauses, schema?)` converts serializable `Q` clauses to `QueryAst`. Pass `MelonSchema` to compile `Q.on` into `relationFilters` (belongsTo only). Experimental Watermelon join tables are unsupported.

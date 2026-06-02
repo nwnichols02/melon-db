@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { predicate, prepareQuery, queryAst } from "@melon/db";
 import { type DatabaseSchemaDefinition, createMelonSchema } from "@melon/db";
+import { taskSchema } from "../../melon-db/__fixtures__/task-schema.ts";
 import { compileQuery } from "../src/sql/compile-query.ts";
 
 const def: DatabaseSchemaDefinition = {
@@ -87,5 +88,23 @@ describe("compileQuery", () => {
 			'SELECT * FROM "tasks" WHERE "status" = ? ORDER BY "priority" DESC LIMIT ? OFFSET ?',
 		);
 		expect(params).toEqual(["open", 20, 5]);
+	});
+
+	test("compiles relationFilters as IN subquery", () => {
+		const prepared = prepareQuery(
+			queryAst("tasks", {
+				relationFilters: [
+					{
+						relation: "project",
+						where: predicate("name", "eq", "Acme"),
+					},
+				],
+			}),
+			taskSchema,
+		);
+		const { sql, params } = compileQuery(prepared, taskSchema);
+		expect(sql).toContain('"projectId" IN (SELECT "id" FROM "projects"');
+		expect(sql).toContain('"name" = ?');
+		expect(params).toEqual(["Acme"]);
 	});
 });

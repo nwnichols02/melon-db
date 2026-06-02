@@ -1,11 +1,16 @@
 import { describe, expect, test } from "bun:test";
 import { MelonError, MelonErrorCode } from "@melon/db";
-import { withTestDatabase } from "@melon/db-testkit";
+import {
+	taskSchema,
+	taskSchemaDefinition,
+	withTestDatabase,
+} from "@melon/db-testkit";
 import {
 	queryDescriptionToAst,
 	translateWatermelonQuery,
 } from "../src/compat/translate-query.ts";
 import type { WatermelonQueryClause } from "../src/compat/types.ts";
+
 
 describe("translateWatermelonQuery", () => {
 	test("translates shorthand eq where", () => {
@@ -62,19 +67,86 @@ describe("translateWatermelonQuery", () => {
 		expect(ast.limit).toBe(100);
 	});
 
-	test("rejects Q.on with remediation", () => {
+	test("rejects Q.on without schema", () => {
 		const clauses: WatermelonQueryClause[] = [
-			{ type: "on", table: "posts", condition: { author_id: "john" } },
+			{
+				type: "on",
+				table: "projects",
+				condition: { type: "where", field: "name", value: "Acme" },
+			},
 		];
 		try {
-			translateWatermelonQuery("comments", clauses);
+			translateWatermelonQuery("tasks", clauses);
 			expect.unreachable();
 		} catch (error) {
 			expect(error).toBeInstanceOf(MelonError);
 			const melonError = error as MelonError;
 			expect(melonError.code).toBe(MelonErrorCode.QUERY_INVALID);
-			expect(melonError.remediation).toContain("Q.on");
+			expect(melonError.remediation).toContain("MelonSchema");
 		}
+	});
+
+	test("translates Q.on to relationFilters with schema", () => {
+		const clauses: WatermelonQueryClause[] = [
+			{
+				type: "on",
+				table: "projects",
+				condition: { type: "where", field: "name", value: "Acme" },
+			},
+			{ type: "where", field: "status", value: "open" },
+		];
+		const ast = translateWatermelonQuery("tasks", clauses, taskSchema);
+		expect(ast.relationFilters).toEqual([
+			{
+				relation: "project",
+				where: {
+					type: "predicate",
+					predicate: { field: "name", op: "eq", value: "Acme" },
+				},
+			},
+		]);
+		expect(ast.where?.type).toBe("predicate");
+	});
+
+	test("executes Q.on translation on in-memory adapter", async () => {
+		await withTestDatabase(taskSchemaDefinition, async ({ db }) => {
+			await db.write(async (tx) => {
+				await tx.collection("projects").insert({ id: "p1", name: "Acme" });
+				await tx.collection("projects").insert({ id: "p2", name: "Other" });
+				await tx.collection("tasks").insert({
+					id: "t1",
+					title: "A",
+					status: "open",
+					priority: 1,
+					projectId: "p1",
+					updatedAt: new Date(),
+				});
+				await tx.collection("tasks").insert({
+					id: "t2",
+					title: "B",
+					status: "open",
+					priority: 1,
+					projectId: "p2",
+					updatedAt: new Date(),
+				});
+			});
+
+			const ast = translateWatermelonQuery(
+				"tasks",
+				[
+					{
+						type: "on",
+						table: "projects",
+						condition: { type: "where", field: "name", value: "Acme" },
+					},
+					{ type: "where", field: "status", value: "open" },
+				],
+				taskSchema,
+			);
+			const rows = await db.collection("tasks").findMany(ast);
+			expect(rows).toHaveLength(1);
+			expect(rows[0]?.id).toBe("t1");
+		});
 	});
 
 	test("queryDescriptionToAst parses clause arrays", () => {

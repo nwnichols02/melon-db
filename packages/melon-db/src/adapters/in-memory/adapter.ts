@@ -13,6 +13,7 @@ import {
 	runMigrationsWithExecutor,
 } from "../../migrations/runner.ts";
 import { SCHEMA_VERSION_KEY } from "../../migrations/types.ts";
+import { applyRelationFilters } from "../../query/apply-relation-filters.ts";
 import { evaluateQuery } from "../../query/evaluate.ts";
 import type { MelonSchema } from "../../schema.ts";
 import { createMemorySyncOutboxStore } from "../../sync/outbox-store.ts";
@@ -162,7 +163,16 @@ export function createInMemoryAdapter(): StorageAdapter & {
 				return { rows: [] };
 			}
 			const rows = [...store.values()];
-			const filtered = evaluateQuery(query.ast, rows);
+			const afterRelationFilters = applyRelationFilters(
+				rows,
+				query.ast,
+				s,
+				(collection) => {
+					const relatedStore = data.get(collection);
+					return relatedStore ? [...relatedStore.values()] : [];
+				},
+			);
+			const filtered = evaluateQuery(query.ast, afterRelationFilters);
 			const meta = s.getCollection(query.ast.collection);
 			if (query.ast.select?.fields) {
 				const fields = new Set([meta.primaryKey, ...query.ast.select.fields]);

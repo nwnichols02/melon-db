@@ -1,4 +1,4 @@
-import type { PreparedQuery, QueryAst } from "@melon/db";
+import type { MelonSchema, PreparedQuery, QueryAst } from "@melon/db";
 import { compileWhere } from "./compile-predicate.ts";
 
 export interface CompiledSql {
@@ -10,15 +10,60 @@ function quoteTable(name: string): string {
 	return `"${name.replace(/"/g, '""')}"`;
 }
 
+function quoteColumn(name: string): string {
+	return `"${name.replace(/"/g, '""')}"`;
+}
+
+function compileRelationFilters(
+	ast: QueryAst,
+	schema: MelonSchema,
+	params: unknown[],
+): string[] {
+	if (!ast.relationFilters || ast.relationFilters.length === 0) {
+		return [];
+	}
+
+	const meta = schema.getCollection(ast.collection);
+	const parts: string[] = [];
+
+	for (const relationFilter of ast.relationFilters) {
+		const relation = meta.relations[relationFilter.relation];
+		if (!relation || relation.kind !== "belongsTo") {
+			continue;
+		}
+
+		const fkColumn = quoteColumn(relation.foreignKey);
+		const targetTable = quoteTable(relation.target);
+		const targetMeta = schema.getCollection(relation.target);
+		const pkColumn = quoteColumn(targetMeta.primaryKey);
+		const relatedWhere = compileWhere(relationFilter.where);
+		const subWhere = relatedWhere.sql ? ` WHERE ${relatedWhere.sql}` : "";
+		params.push(...relatedWhere.params);
+		parts.push(
+			`${fkColumn} IN (SELECT ${pkColumn} FROM ${targetTable}${subWhere})`,
+		);
+	}
+
+	return parts;
+}
+
 /**
  * Compiles a prepared query into parameterized SQLite SQL.
  */
-export function compileQuery(prepared: PreparedQuery): CompiledSql {
+export function compileQuery(
+	prepared: PreparedQuery,
+	schema?: MelonSchema,
+): CompiledSql {
 	const ast: QueryAst = prepared.ast;
 	const table = quoteTable(ast.collection);
 	const where = compileWhere(ast.where);
-	const whereClause = where.sql ? ` WHERE ${where.sql}` : "";
 	const params = [...where.params];
+	const relationParts = schema ? compileRelationFilters(ast, schema, params) : [];
+	const whereParts = [where.sql, ...relationParts].filter(
+		(part): part is string => part.length > 0,
+	);
+	const whereClause =
+		whereParts.length > 0 ? ` WHERE ${whereParts.join(" AND ")}` : "";
 
 	if (ast.mode === "count") {
 		return {

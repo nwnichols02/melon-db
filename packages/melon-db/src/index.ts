@@ -18,6 +18,7 @@ export {
 	type QueryBooleanNode,
 	type QuerySort,
 	type QueryRelationInclude,
+	type QueryRelationFilter,
 	type QuerySelect,
 	type QueryAst,
 	type QueryPlan,
@@ -48,6 +49,7 @@ export { planQuery } from "./query/planner.ts";
 export { prepareQuery } from "./query/prepare.ts";
 export { evaluateQuery } from "./query/evaluate.ts";
 export { loadIncludes } from "./query/load-includes.ts";
+export { applyRelationFilters } from "./query/apply-relation-filters.ts";
 
 export type {
 	DevtoolsBridge,

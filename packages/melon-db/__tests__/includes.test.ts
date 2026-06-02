@@ -41,4 +41,44 @@ describe("loadIncludes", () => {
 		expect(rows).toHaveLength(1);
 		expect(rows[0]?.project).toEqual({ id: "p1", name: "Melon" });
 	});
+
+	test("loads hasMany tasks on projects", async () => {
+		const db = createDatabase({
+			schema: taskSchema,
+			adapter: createInMemoryAdapter(),
+		});
+
+		await db.write(async (tx) => {
+			await tx.collection("projects").insert({ id: "p1", name: "Melon" });
+			await tx.collection("tasks").insert({
+				id: "t1",
+				title: "Ship includes",
+				status: "open",
+				priority: 1,
+				projectId: "p1",
+				updatedAt: new Date(),
+			});
+			await tx.collection("tasks").insert({
+				id: "t2",
+				title: "Docs",
+				status: "open",
+				priority: 2,
+				projectId: "p1",
+				updatedAt: new Date(),
+			});
+		});
+
+		const rows = await db.collection("projects").findMany(
+			queryAst("projects", {
+				select: {
+					include: {
+						tasks: { relation: "tasks" },
+					},
+				},
+			}),
+		);
+
+		expect(rows).toHaveLength(1);
+		expect(rows[0]?.tasks).toHaveLength(2);
+	});
 });

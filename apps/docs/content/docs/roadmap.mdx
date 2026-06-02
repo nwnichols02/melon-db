@@ -11,9 +11,9 @@ This page is the **living status** for Melon. Update it when features land or de
 |------|----------------|
 | Packages | 12 under `packages/*` (core through sync-server + native) |
 | Example apps | 5 — `playground-node`, `playground-rn`, `playground-rn-dev`, `playground-web`, `docs` |
-| Implementation phases | **0–30 shipped** (see chronology below) |
+| Implementation phases | **0–32 shipped** (see chronology below) |
 | Out-of-cycle | Fumadocs docs site, TypeDoc API, playgrounds (ongoing maintenance) |
-| Next | Phase 31+ deferred items |
+| Next | Phase 33+ deferred items |
 
 **Quick links:** [Architecture](/docs/architecture) · [Phase ADRs](/docs/architecture/decisions) · [Packages](/docs/packages/melon-db) · [Performance](/docs/performance-comparison)
 
@@ -79,6 +79,8 @@ Each phase was executed as a focused delivery increment. Phases 0–7 establishe
 | 28 | RN on-device benchmarks | `@melon/db-sqlite/bench`, `playground-rn-dev` | Dev benchmark screen, jsi-sync vs turbo JSON report, shared scenario lib | Shipped |
 | 29 | Trigger-driven observation | `@melon/db-sqlite`, `@melon/db-sqlite-native` | Process `_melon_observation_events`, `flushObservationQueue`, native `sqlite3_update_hook` on JSI | Shipped |
 | 30 | Query + React DX | `@melon/db`, `@melon/db-query`, `@melon/db-react` | `collection.query(builder)`, `findMany`/`count` builder input, `QueryBuilder.not()`, `useRecord`, `*State` hooks, ADR-010 | Shipped |
+| 31 | PRD compliance + DX | docs, devtools, `playground-web` | prd-4 matrix, walkthroughs, devtools Plan/SQL params, `AGENTS.md` + melon-dev skill, typing pass | Shipped |
+| 32 | Query engine — relations | `@melon/db`, `@melon/db-sqlite`, codemods | `hasMany` includes (post-fetch), `relationFilters` / Q.on via SQL `IN` subquery, Prisma include parity | Shipped |
 
 ### Out-of-cycle: Documentation
 
@@ -95,7 +97,7 @@ Core engine, all three query surfaces, React/sync hooks, devtools, codemods, ful
 
 ---
 
-## Deferred (Phase 31+)
+## Deferred (Phase 33+)
 
 See [PRD compliance — Phase 29+ decisions](/docs/prd-compliance#phase-29-decisions) for rationale.
 
@@ -105,11 +107,10 @@ See [PRD compliance — Phase 29+ decisions](/docs/prd-compliance#phase-29-decis
 | Full multi-file schema codemods | Beyond single-model `migrate-schema` spike |
 | Background sync service | OS-level scheduling |
 | Per-field timestamps / three-way merge | Advanced conflict resolution |
-| `hasMany` relation includes in queries | `belongsTo` only in v1 |
-| `Q.on` join queries | Codemod recipes only; no engine join support yet |
+| SQL `SELECT` JOIN result shaping | Includes use post-fetch; `capabilities.joins` stays false |
 | `getChangedCollections` on adapters | Sync uses outbox today |
 | Sync `merging` state | Apply is synchronous in v1 |
-| `playground-web` | In-memory Vite app shipped; web SQLite adapter still deferred |
+| `playground-web` SQLite | In-memory Vite app shipped; web SQLite adapter still deferred |
 | Sliding window (prd-4) | Org-aware retention, prune ledger, pressure modes — see prd-4.mdc |
 
 ---
@@ -118,8 +119,9 @@ See [PRD compliance — Phase 29+ decisions](/docs/prd-compliance#phase-29-decis
 
 - All mutations must run inside `db.write()`.
 - SQLite migrations: add-column and create-table only.
-- Relation includes: `belongsTo` only (no `hasMany` in queries).
-- `observeQuery` invalidates on WHERE match (may over-invalidate for `orderBy`/`limit` edge cases).
+- Relation includes: `belongsTo` + `hasMany` via post-fetch (not SQL JOIN); nested includes and per-parent `take` deferred.
+- `Q.on` / `relationFilters`: `belongsTo` only; experimental Watermelon join tables unsupported.
+- `observeQuery` invalidates on WHERE match (may over-invalidate for `orderBy`/`limit` / subquery edge cases).
 
 ---
 

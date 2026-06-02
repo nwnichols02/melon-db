@@ -83,16 +83,40 @@ export function validateQuery(ast: QueryAst, schema: MelonSchema): void {
 					{ code: MelonErrorCode.QUERY_INVALID },
 				);
 			}
-			if (relation.kind !== "belongsTo") {
+			if (relation.kind !== "belongsTo" && relation.kind !== "hasMany") {
 				throw new MelonError(
-					`Relation include "${relationName}" is not supported in v1 (belongsTo only)`,
+					`Relation include "${relationName}" uses unsupported kind "${relation.kind}"`,
 					{
 						code: MelonErrorCode.QUERY_INVALID,
 						remediation:
-							"Use belongsTo relations only, or fetch hasMany relations separately.",
+							"Only belongsTo and hasMany relation includes are supported.",
 					},
 				);
 			}
+		}
+	}
+
+	if (ast.relationFilters && ast.relationFilters.length > 0) {
+		const meta = schema.getCollection(ast.collection);
+		for (const relationFilter of ast.relationFilters) {
+			const relation = meta.relations[relationFilter.relation];
+			if (!relation) {
+				throw new MelonError(
+					`Unknown relation "${relationFilter.relation}" on collection "${ast.collection}"`,
+					{ code: MelonErrorCode.QUERY_INVALID },
+				);
+			}
+			if (relation.kind !== "belongsTo") {
+				throw new MelonError(
+					`Relation filter "${relationFilter.relation}" must be belongsTo (Q.on / subquery filters)`,
+					{
+						code: MelonErrorCode.QUERY_INVALID,
+						remediation:
+							"Use a belongsTo relation for relation-scoped filters.",
+					},
+				);
+			}
+			validateBooleanNode(relationFilter.where, schema, relation.target);
 		}
 	}
 

@@ -40,6 +40,12 @@ export interface QuerySelect {
 	include?: Record<string, QueryRelationInclude>;
 }
 
+/** Filters parent rows via a belongsTo relation (Watermelon Q.on parity). */
+export interface QueryRelationFilter {
+	relation: string;
+	where: QueryBooleanNode;
+}
+
 export interface QueryAst {
 	collection: string;
 	where?: QueryBooleanNode;
@@ -47,6 +53,7 @@ export interface QueryAst {
 	skip?: number;
 	limit?: number;
 	select?: QuerySelect;
+	relationFilters?: QueryRelationFilter[];
 	mode: "many" | "one" | "count";
 }
 
@@ -110,6 +117,7 @@ export function queryAst(
 		skip: options.skip,
 		limit: options.limit,
 		select: options.select,
+		relationFilters: options.relationFilters,
 		mode: options.mode ?? "many",
 	};
 }

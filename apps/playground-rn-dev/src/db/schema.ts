@@ -10,6 +10,13 @@ export const taskSchemaDefinition: DatabaseSchemaDefinition = {
 				id: { kind: "string" },
 				name: { kind: "string" },
 			},
+			relations: {
+				tasks: {
+					kind: "hasMany",
+					target: "tasks",
+					foreignKey: "projectId",
+				},
+			},
 		},
 		tasks: {
 			name: "tasks",
@@ -54,9 +61,10 @@ export const playgroundMigrations = [
 
 export const taskSchema = createMelonSchema(taskSchemaDefinition);
 
-export interface Project {
+export interface Project extends Record<string, unknown> {
 	id: string;
 	name: string;
+	tasks?: Task[];
 }
 
 export interface Task extends Record<string, unknown> {

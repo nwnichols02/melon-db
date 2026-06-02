@@ -33,6 +33,13 @@ export const taskSchemaDefinition: DatabaseSchemaDefinition = {
 				id: { kind: "string" },
 				name: { kind: "string" },
 			},
+			relations: {
+				tasks: {
+					kind: "hasMany",
+					target: "tasks",
+					foreignKey: "projectId",
+				},
+			},
 		},
 	},
 };

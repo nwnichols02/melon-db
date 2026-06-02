@@ -1,4 +1,4 @@
-import { type Task, taskSchema } from "@/db/schema";
+import { type Project, type Task, taskSchema } from "@/db/schema";
 import { type QueryBuilder, createQueryFactory } from "@melon/db-query";
 import { createMangoCompiler } from "@melon/db-query-mango";
 import {
@@ -98,6 +98,15 @@ export default function DemosScreen(): React.ReactElement {
 		collectionFluentBuilder,
 	);
 
+	const projectsWithTasksBuilder = useCallback(
+		(b: QueryBuilder<Project>) => b.include("tasks").orderBy("name", "asc"),
+		[],
+	);
+	const projectsWithTasks = useFluentQuery<Project>(
+		"projects",
+		projectsWithTasksBuilder,
+	);
+
 	return (
 		<SafeAreaView style={styles.container} edges={["bottom"]}>
 			<ScrollView contentContainerStyle={styles.content}>
@@ -157,6 +166,13 @@ export default function DemosScreen(): React.ReactElement {
 					{collectionFluent.map((task) => (
 						<Text key={task.id} style={styles.row}>
 							{task.title}
+						</Text>
+					))}
+				</DemoSection>
+				<DemoSection title="hasMany include (projects → tasks)">
+					{projectsWithTasks.map((project) => (
+						<Text key={project.id} style={styles.row}>
+							{project.name}: {(project.tasks ?? []).length} task(s)
 						</Text>
 					))}
 				</DemoSection>

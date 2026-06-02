@@ -275,7 +275,7 @@ export function createSqliteAdapterFromDriver(
 
 		async find(query: PreparedQuery): Promise<AdapterFindResult> {
 			const sqlite = requireDriver();
-			const compiled = compileQuery(query);
+			const compiled = compileQuery(query, requireSchema());
 			emitDebug({ sql: compiled.sql, params: compiled.params });
 			const rows = await sqlite.queryAll(
 				compiled.sql,
@@ -286,10 +286,14 @@ export function createSqliteAdapterFromDriver(
 
 		async count(query: PreparedQuery): Promise<AdapterCountResult> {
 			const sqlite = requireDriver();
-			const compiled = compileQuery({
-				...query,
-				ast: { ...query.ast, mode: "count" },
-			});
+			const s = requireSchema();
+			const compiled = compileQuery(
+				{
+					...query,
+					ast: { ...query.ast, mode: "count" },
+				},
+				s,
+			);
 			emitDebug({ sql: compiled.sql, params: compiled.params });
 			const row = await sqlite.queryFirst(
 				compiled.sql,

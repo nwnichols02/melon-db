@@ -13,9 +13,9 @@ This page tracks how Melon implementation compares to the product requirements i
 
 | Bucket | Examples |
 |--------|----------|
-| **Done** | Core engine, SQLite (Node/Bun/Expo/native), sync pull/push, codemods, RN benchmarks, `useRecord`, walkthroughs |
+| **Done** | Core engine, SQLite, sync, codemods, `hasMany` includes, Q.on / `relationFilters`, walkthroughs |
 | **Partial** | Mango/Prisma surfaces, testkit helpers, devtools (Plan/params), `playground-web`, hook/schema typing |
-| **Deferred** | SQL joins, `hasMany` includes, `Q.on`, full schema codemods, background sync |
+| **Deferred** | SQL `SELECT` JOIN shaping, full schema codemods, background sync |
 | **Gap** | `getChangedCollections`, sliding window (prd-4), Supabase/REST backends |
 
 ---
@@ -31,6 +31,8 @@ This page tracks how Melon implementation compares to the product requirements i
 | In-memory adapter | Done | In core; re-exported from testkit |
 | Serialized `write` queue | Done | |
 | `belongsTo` includes (engine) | Done | `loadIncludes` |
+| `hasMany` includes (engine) | Done | Post-fetch batch load; global `limit` on child query |
+| `relationFilters` / Q.on filters | Done | SQLite `IN` subquery; in-memory `applyRelationFilters` |
 | Sync APIs on DB | Done | Beyond minimal db-core |
 | `collection.query(builder => …)` | Done | Via `@melon/db-query` bridge |
 | `observeQuery` on in-memory | Partial | Engine `ChangeEmitter` fallback |
@@ -49,7 +51,7 @@ This page tracks how Melon implementation compares to the product requirements i
 | `observeQuery` + triggers | Done | Phase 27 |
 | Benchmarks | Done | |
 | iOS/Android JSI + TurboModule | Done | |
-| SQL joins / partial select | Deferred | `capabilities.joins: false`; engine post-fetch for `belongsTo` |
+| SQL joins / partial select | Deferred | `capabilities.joins: false`; includes via post-fetch |
 | `getChangedCollections` | Gap | |
 | Unified `createSqliteAdapter({ jsi })` | Partial | JSI via `createJsiSqliteAdapter` export |
 
@@ -115,7 +117,7 @@ This page tracks how Melon implementation compares to the product requirements i
 |---------|--------|----------|
 | devtools | Partial | Plan + SQL params in UI; Retention tab stub (prd-4) |
 | testkit | Partial | No Jest helpers / fake clock |
-| codemods | Done | `migrate-schema` spike; `Q.on` recipes only |
+| codemods | Done | `migrate-schema` spike; `Q.on` → `relationFilters` when schema passed to translator |
 
 ---
 
@@ -174,7 +176,8 @@ Product decisions recorded here (not blockers for phases 0–28):
 | Item | Decision | Rationale |
 |------|----------|-----------|
 | `getChangedCollections` | **Defer** | Sync uses outbox + `getLocalChanges`; adapter hook when sync needs incremental adapter scans |
-| SQL JOIN / `hasMany` / `Q.on` | **Defer** | Documented v1 limits on [Roadmap](/docs/roadmap) |
+| SQL `SELECT` JOIN / partial select | **Defer** | Includes remain post-fetch; see ADR-011 |
+| Per-parent nested `take` on includes | **Defer** | Global child `limit` only in v1 |
 | Sync `merging` state | **Defer** | Apply path is synchronous; add when merge UI needs distinct phase |
 | `@melon/db-react` → `@melon/sync` dep | **Accept** | DX for `useSync`; split only if publishing react without sync |
 | `playground-web` | **Partial** | In-memory Vite app; full web SQLite adapter still deferred |

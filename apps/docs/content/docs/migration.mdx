@@ -22,22 +22,43 @@ The compatibility layer converts serializable Watermelon `Q` clauses to Melon `Q
 
 <h2 id="q-on">Q.on (join) queries</h2>
 
-Melon v1 does **not** support Watermelon-style join queries at runtime. The codemod detects `Q.on`, inserts a migration recipe comment, and migrates any non-join clauses it can.
+Melon supports **`Q.on` at runtime** when the parent schema defines a matching **`belongsTo` relation**. The compat translator maps `Q.on` to `QueryAst.relationFilters` (SQLite compiles an `IN` subquery). The codemod still emits a recipe comment when it cannot auto-translate; pass schema to `translateWatermelonQuery` for full translation.
 
-**Recommended rewrite:**
-
-1. Add a `belongsTo` relation on the parent collection (e.g. `tasks` → `projects` via `project_id`).
-2. Use the fluent builder `.include('project', { where: … })` when filtering on related fields.
-3. Or run a two-step query: fetch matching related ids, then filter the parent with `.where('project_id', 'in', ids)`.
+**Runtime (preferred when schema has `tasks.project` → `projects`):**
 
 ```ts
-// Before (WatermelonDB)
-database.get('tasks').query(
-  Q.on('projects', Q.where('name', 'Acme')),
-  Q.where('status', 'open'),
-);
+import { translateWatermelonQuery } from '@melon/db-codemods';
+import { taskSchema } from './schema';
 
-// After (Melon — two-step)
+const ast = translateWatermelonQuery(
+  'tasks',
+  [
+    { type: 'on', table: 'projects', condition: { type: 'where', field: 'name', value: 'Acme' } },
+    { type: 'where', field: 'status', value: 'open' },
+  ],
+  taskSchema,
+);
+const tasks = await db.collection('tasks').findMany(ast);
+```
+
+**Manual AST (`relationFilters`):**
+
+```ts
+const tasks = await db.collection('tasks').findMany(
+  queryAst('tasks', {
+    where: predicate('status', 'eq', 'open'),
+    relationFilters: [
+      { relation: 'project', where: predicate('name', 'eq', 'Acme') },
+    ],
+  }),
+);
+```
+
+**Includes vs filters:** use `.include('project', { where: … })` when you need nested related **rows on each parent**. Use `relationFilters` / `Q.on` when you only need to **filter parents** by related fields.
+
+**Two-step fallback** (no relation metadata):
+
+```ts
 const projects = await db.collection('projects').findMany(
   q.from('projects').where('name', 'eq', 'Acme').toAst(),
 );
@@ -45,7 +66,7 @@ const projectIds = projects.map((p) => p.id);
 const tasks = await db.collection('tasks').findMany(
   q.from('tasks')
     .where('status', 'eq', 'open')
-    .where('project_id', 'in', projectIds)
+    .where('projectId', 'in', projectIds)
     .toAst(),
 );
 ```
@@ -81,7 +102,7 @@ These patterns still require manual work:
 
 - Full multi-file schema / migration codegen
 - Complex `database.batch` operation mapping
-- `Q.on` join semantics (use recipes above)
+- `Q.experimentalJoinTables` / nested join tables (use `relationFilters` or includes)
 
 See [`@melon/db-codemods`](/docs/packages/melon-db-codemods) for the full compatibility matrix.
 

@@ -36,7 +36,7 @@ function compileSelect(
 				continue;
 			}
 			const relation = collectionMeta.relations[relationName];
-			if (!relation || relation.kind !== "belongsTo") {
+			if (!relation || (relation.kind !== "belongsTo" && relation.kind !== "hasMany")) {
 				continue;
 			}
 			const nestedArgs =
