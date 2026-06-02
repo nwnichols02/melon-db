@@ -15,4 +15,14 @@ Commit the updated JSON with your PR when timings should be reflected on the doc
 
 ## React Native sample
 
-On-device benchmarks use [`apps/docs/src/data/bench-rn-latest.json`](https://github.com/melon/melon/blob/main/apps/docs/src/data/bench-rn-latest.json). After running **jsi-sync + turbo** @ 10k in `playground-rn-dev` → **Benchmarks** → **Share JSON report**, paste the payload into that file (or commit a maintainer-captured run). The committed file may be a placeholder until the first real device capture lands.
+On-device **jsi-sync vs turbo** parity from `playground-rn-dev` (development build with `@melon/db-sqlite-native`):
+
+<BenchRnResultsTable />
+
+The table is generated from [`apps/docs/src/data/bench-rn-latest.json`](https://github.com/melon/melon/blob/main/apps/docs/src/data/bench-rn-latest.json). To refresh after a new device run:
+
+1. In `apps/playground-rn-dev`, open **Benchmarks** and run **jsi-sync + turbo** at **10k** (or **1k** for a quicker smoke test).
+2. Tap **Share JSON report** and merge the `report` object (plus `generatedAt`, `device`) into `bench-rn-latest.json`.
+3. Commit the updated JSON with your PR so the docs site picks up the new timings.
+
+Same scenarios as the Node harness: row insert, batch insert, filtered query, count, and find-by-id. Writes tend to favor sync JSI; reads are sub-millisecond on both paths at these scales.

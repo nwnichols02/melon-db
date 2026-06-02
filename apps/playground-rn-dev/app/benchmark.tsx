@@ -97,8 +97,14 @@ export default function BenchmarkScreen(): React.ReactElement {
 	return (
 		<SafeAreaView style={styles.container} edges={["bottom"]}>
 			<View style={styles.header}>
-				<Pressable onPress={() => router.back()} style={styles.backButton}>
-					<Text style={styles.backButtonText}>← Tasks</Text>
+				<Pressable
+					disabled={running}
+					onPress={() => router.back()}
+					style={styles.backButton}
+				>
+					<Text style={[styles.backButtonText, running && styles.textMuted]}>
+						← Tasks
+					</Text>
 				</Pressable>
 				<Text style={styles.title}>On-device benchmarks</Text>
 				<Text style={styles.subtitle}>
@@ -248,6 +254,9 @@ const styles = StyleSheet.create({
 	backButtonText: {
 		fontSize: 15,
 		color: "#1a5fb4",
+	},
+	textMuted: {
+		color: "#999",
 	},
 	title: {
 		fontSize: 20,

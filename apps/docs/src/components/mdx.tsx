@@ -1,4 +1,5 @@
 import { BenchCompareResultsTable } from "@/components/bench-compare-results-table";
+import { BenchRnResultsTable } from "@/components/bench-rn-results-table";
 import { DocsLink } from "@/components/docs-link";
 import {
 	extractMermaidChart,
@@ -37,6 +38,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
 		a: DocsLink,
 		AutoTypeTable,
 		BenchCompareResultsTable,
+		BenchRnResultsTable,
 		Mermaid,
 		pre: DocsPre,
 		LivePlayground: ClientLivePlayground,

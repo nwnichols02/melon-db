@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-06-02T00:00:00.000Z",
-  "updatedBy": "manual-sample",
-  "note": "Placeholder sample structure — replace with Share JSON output from playground-rn-dev /benchmark after a real device run.",
+  "generatedAt": "2026-06-02T02:56:11.463Z",
+  "updatedBy": "playground-rn-dev manual run",
+  "note": "Captured from playground-rn-dev → Benchmarks → jsi-sync + turbo @ 10k (iOS dev client).",
   "device": {
     "platform": "ios",
-    "label": "Replace with device model after manual run"
+    "label": "iOS (playground-rn-dev dev client)"
   },
   "report": {
-    "timestamp": "2026-06-02T00:00:00.000Z",
+    "timestamp": "2026-06-02T02:56:11.463Z",
     "scale": 10000,
     "platform": "ios",
     "modes": ["jsi-sync", "turbo"],
@@ -15,10 +15,110 @@
       {
         "scenario": "row-insert",
         "scale": 10000,
-        "jsiSyncMs": 0,
-        "turboMs": 0,
-        "ratio": 1,
+        "jsiSyncMs": 905.338415980339,
+        "turboMs": 2259.536792039871,
+        "ratio": 0.4007,
+        "winner": "jsi-sync"
+      },
+      {
+        "scenario": "batch-insert",
+        "scale": 10000,
+        "jsiSyncMs": 449.82362508773804,
+        "turboMs": 1680.5503749847412,
+        "ratio": 0.2677,
+        "winner": "jsi-sync"
+      },
+      {
+        "scenario": "filtered-query",
+        "scale": 10000,
+        "jsiSyncMs": 0.718040943145752,
+        "turboMs": 0.7064579725265503,
+        "ratio": 1.0164,
+        "winner": "turbo"
+      },
+      {
+        "scenario": "count-query",
+        "scale": 10000,
+        "jsiSyncMs": 0.1266249418258667,
+        "turboMs": 0.1358339786529541,
+        "ratio": 0.9322,
         "winner": "tie"
+      },
+      {
+        "scenario": "find-by-id",
+        "scale": 10000,
+        "jsiSyncMs": 0.03945803642272949,
+        "turboMs": 0.0749579668045044,
+        "ratio": 0.5264,
+        "winner": "jsi-sync"
+      }
+    ],
+    "raw": [
+      {
+        "engine": "melon-jsi-sync",
+        "scale": 10000,
+        "scenario": "row-insert",
+        "durationMs": 905.338415980339,
+        "rowCount": 10000
+      },
+      {
+        "engine": "melon-jsi-sync",
+        "scale": 10000,
+        "scenario": "filtered-query",
+        "durationMs": 0.718040943145752,
+        "resultCount": 20
+      },
+      {
+        "engine": "melon-jsi-sync",
+        "scale": 10000,
+        "scenario": "count-query",
+        "durationMs": 0.1266249418258667
+      },
+      {
+        "engine": "melon-jsi-sync",
+        "scale": 10000,
+        "scenario": "find-by-id",
+        "durationMs": 0.03945803642272949
+      },
+      {
+        "engine": "melon-jsi-sync",
+        "scale": 10000,
+        "scenario": "batch-insert",
+        "durationMs": 449.82362508773804,
+        "rowCount": 10000
+      },
+      {
+        "engine": "melon-turbo",
+        "scale": 10000,
+        "scenario": "row-insert",
+        "durationMs": 2259.536792039871,
+        "rowCount": 10000
+      },
+      {
+        "engine": "melon-turbo",
+        "scale": 10000,
+        "scenario": "filtered-query",
+        "durationMs": 0.7064579725265503,
+        "resultCount": 20
+      },
+      {
+        "engine": "melon-turbo",
+        "scale": 10000,
+        "scenario": "count-query",
+        "durationMs": 0.1358339786529541
+      },
+      {
+        "engine": "melon-turbo",
+        "scale": 10000,
+        "scenario": "find-by-id",
+        "durationMs": 0.0749579668045044
+      },
+      {
+        "engine": "melon-turbo",
+        "scale": 10000,
+        "scenario": "batch-insert",
+        "durationMs": 1680.5503749847412,
+        "rowCount": 10000
       }
     ],
     "notes": [

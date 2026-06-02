@@ -14,17 +14,10 @@ import {
 } from "@melon/db-devtools/react";
 import { MelonDbProvider, MelonSyncProvider } from "@melon/db-react";
 import { DEFAULT_RETRY_POLICY } from "@melon/sync";
-import { Stack, usePathname } from "expo-router";
+import { Stack } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-
-/**
- * Root layout: bootstraps Melon DB then provides it to the app tree.
- */
-function isBenchmarkPathname(pathname: string): boolean {
-	return pathname === "/benchmark" || pathname.startsWith("/benchmark/");
-}
 
 function DevStack(): React.ReactElement {
 	return __DEV__ ? (
@@ -43,21 +36,23 @@ function DevStack(): React.ReactElement {
 }
 
 export default function RootLayout(): React.ReactElement {
-	const pathname = usePathname();
-	const onBenchmarkRoute = isBenchmarkPathname(pathname);
 	const [db, setDb] = useState<MelonDatabase<typeof taskSchema> | null>(null);
+	const [nativeBenchActive, setNativeBenchActive] = useState(false);
 	const [bootError, setBootError] = useState<string | null>(null);
 	const syncBackend = useMemo(() => createHttpSyncBackend(), []);
 
 	useEffect(() => {
 		let cancelled = false;
 
-		function loadDatabase(): void {
+		function loadDatabase(options?: { clearNativeBench?: boolean }): void {
 			void getDatabase()
 				.then((database) => {
 					if (!cancelled) {
 						setDb(database);
 						setBootError(null);
+						if (options?.clearNativeBench) {
+							setNativeBenchActive(false);
+						}
 					}
 				})
 				.catch((error: unknown) => {
@@ -75,13 +70,13 @@ export default function RootLayout(): React.ReactElement {
 
 		const unsubscribeResume = onDatabaseResumed(() => {
 			if (!cancelled) {
-				loadDatabase();
+				loadDatabase({ clearNativeBench: true });
 			}
 		});
 
 		const unsubscribeSuspend = onDatabaseSuspended(() => {
 			if (!cancelled) {
-				setDb(null);
+				setNativeBenchActive(true);
 			}
 		});
 
@@ -103,14 +98,6 @@ export default function RootLayout(): React.ReactElement {
 	}
 
 	if (!db) {
-		if (onBenchmarkRoute) {
-			return (
-				<SafeAreaProvider>
-					<DevStack />
-				</SafeAreaProvider>
-			);
-		}
-
 		return (
 			<SafeAreaProvider>
 				<View style={styles.loading}>
@@ -123,9 +110,8 @@ export default function RootLayout(): React.ReactElement {
 	return (
 		<SafeAreaProvider>
 			<MelonDbProvider db={db}>
-				{/* Default merge-by-field; Phase 18 also supports conflictPolicy="custom" + conflictResolver */}
 				<MelonSyncProvider
-					autoSyncOnReconnect
+					autoSyncOnReconnect={!nativeBenchActive}
 					conflictPolicy="merge-by-field"
 					mergeProtectedFields={["updatedAt"]}
 					networkMonitor={devNetworkMonitor}
