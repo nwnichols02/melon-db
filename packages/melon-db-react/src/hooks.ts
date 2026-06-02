@@ -12,6 +12,13 @@ import { createMangoCompiler } from "@melon/db-query-mango";
 import type { MangoQuery } from "@melon/db-query-mango";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDatabase } from "./context.tsx";
+import {
+	fluentBuilderKey,
+	mangoQueryKey,
+	prismaArgsKey,
+	queryInputKey,
+	resolvePreparedQuery,
+} from "./query-deps.ts";
 
 const mangoCompiler = createMangoCompiler();
 
@@ -135,13 +142,14 @@ export function useQuery<T = Record<string, unknown>>(
 	const db = useDatabase();
 	const enabled = options?.enabled ?? true;
 	const [rows, setRows] = useState<T[]>([]);
+	const key = queryInputKey(query);
+	const prepared = useMemo(
+		() => resolvePreparedQuery(query, db.schema),
+		[db.schema, key],
+	);
 
 	useEffect(() => {
 		if (!enabled) return;
-		const prepared =
-			"ast" in query && "plan" in query
-				? (query as PreparedQuery)
-				: prepareQuery(query as QueryAst, db.schema);
 		const handle = db.collection(prepared.ast.collection).query(prepared.ast);
 		return handle.observe((value) => {
 			const next = options?.select
@@ -149,7 +157,7 @@ export function useQuery<T = Record<string, unknown>>(
 				: (value as T[]);
 			setRows(next);
 		});
-	}, [db, query, enabled, options?.select]);
+	}, [db, prepared, enabled, options?.select]);
 
 	return rows;
 }
@@ -162,12 +170,10 @@ export function useQueryState<T = Record<string, unknown>>(
 	options?: UseQueryOptions<T>,
 ): QueryAsyncState<T[]> {
 	const db = useDatabase();
+	const key = queryInputKey(query);
 	const prepared = useMemo(
-		() =>
-			"ast" in query && "plan" in query
-				? (query as PreparedQuery)
-				: prepareQuery(query as QueryAst, db.schema),
-		[db.schema, query],
+		() => resolvePreparedQuery(query, db.schema),
+		[db.schema, key],
 	);
 	return useObserveListState<T>(prepared, options);
 }
@@ -198,17 +204,18 @@ export function useWriter(): <T>(
 export function useQueryCount(query: QueryAst | PreparedQuery): number {
 	const db = useDatabase();
 	const [count, setCount] = useState(0);
+	const key = queryInputKey(query);
+	const prepared = useMemo(
+		() => resolvePreparedQuery(query, db.schema),
+		[db.schema, key],
+	);
 
 	useEffect(() => {
-		const prepared =
-			"ast" in query && "plan" in query
-				? (query as PreparedQuery)
-				: prepareQuery(query as QueryAst, db.schema);
 		const handle = db.collection(prepared.ast.collection).query(prepared.ast);
 		return handle.observe(() => {
 			void handle.fetchCount().then(setCount);
 		});
-	}, [db, query]);
+	}, [db, prepared]);
 
 	return count;
 }
@@ -222,9 +229,10 @@ export function useFindMany<T = Record<string, unknown>>(
 	options?: UseQueryOptions<T>,
 ): T[] {
 	const db = useDatabase();
+	const argsKey = prismaArgsKey(args);
 	const prepared = useMemo(
 		() => compilePrismaQuery(collection, args, db.schema),
-		[db.schema, collection, args],
+		[db.schema, collection, argsKey],
 	);
 	return useQuery<T>(prepared, options);
 }
@@ -238,9 +246,10 @@ export function useFindManyState<T = Record<string, unknown>>(
 	options?: UseQueryOptions<T>,
 ): QueryAsyncState<T[]> {
 	const db = useDatabase();
+	const argsKey = prismaArgsKey(args);
 	const prepared = useMemo(
 		() => compilePrismaQuery(collection, args, db.schema),
-		[db.schema, collection, args],
+		[db.schema, collection, argsKey],
 	);
 	return useObserveListState<T>(prepared, options);
 }
@@ -254,9 +263,10 @@ export function useFindFirst<T = Record<string, unknown>>(
 	options?: UseQueryOptions<T>,
 ): T | null {
 	const db = useDatabase();
+	const argsKey = prismaArgsKey(args);
 	const prepared = useMemo(
 		() => compilePrismaQuery(collection, args, db.schema, "one"),
-		[db.schema, collection, args],
+		[db.schema, collection, argsKey],
 	);
 	const rows = useQuery<T>(prepared, options);
 	return rows[0] ?? null;
@@ -271,10 +281,11 @@ export function useFluentQuery<T = Record<string, unknown>>(
 	options?: UseQueryOptions<T>,
 ): T[] {
 	const db = useDatabase();
+	const builderKey = fluentBuilderKey(collection, builder);
 	const prepared = useMemo(() => {
 		const ast = resolveCollectionQuery<T>(collection, builder);
 		return prepareQuery(ast, db.schema);
-	}, [db.schema, collection, builder]);
+	}, [db.schema, collection, builderKey]);
 	return useQuery<T>(prepared, options);
 }
 
@@ -287,10 +298,11 @@ export function useFluentQueryState<T = Record<string, unknown>>(
 	options?: UseQueryOptions<T>,
 ): QueryAsyncState<T[]> {
 	const db = useDatabase();
+	const builderKey = fluentBuilderKey(collection, builder);
 	const prepared = useMemo(() => {
 		const ast = resolveCollectionQuery<T>(collection, builder);
 		return prepareQuery(ast, db.schema);
-	}, [db.schema, collection, builder]);
+	}, [db.schema, collection, builderKey]);
 	return useObserveListState<T>(prepared, options);
 }
 
@@ -303,9 +315,10 @@ export function useMangoQuery<T = Record<string, unknown>>(
 	options?: UseQueryOptions<T>,
 ): T[] {
 	const db = useDatabase();
+	const queryKey = mangoQueryKey(query);
 	const prepared = useMemo(
 		() => mangoCompiler.compile(query, collection, db.schema),
-		[db.schema, collection, query],
+		[db.schema, collection, queryKey],
 	);
 	return useQuery<T>(prepared, options);
 }
@@ -336,6 +349,11 @@ export function useRecordState<T = Record<string, unknown>>(
 	const db = useDatabase();
 	const enabled = (options?.enabled ?? true) && id !== null && id !== undefined;
 
+	const recordKey =
+		enabled && id !== undefined && id !== null
+			? `${collection}:${String(id)}`
+			: "";
+
 	const prepared = useMemo(() => {
 		const meta = db.schema.getCollection(collection);
 		const ast: QueryAst = {
@@ -345,7 +363,7 @@ export function useRecordState<T = Record<string, unknown>>(
 			limit: 1,
 		};
 		return prepareQuery(ast, db.schema);
-	}, [db.schema, collection, id]);
+	}, [db.schema, collection, recordKey]);
 
 	return useObserveRecordState<T>(prepared, { enabled });
 }

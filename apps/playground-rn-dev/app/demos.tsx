@@ -1,5 +1,5 @@
 import { type Task, taskSchema } from "@/db/schema";
-import { createQueryFactory } from "@melon/db-query";
+import { type QueryBuilder, createQueryFactory } from "@melon/db-query";
 import { createMangoCompiler } from "@melon/db-query-mango";
 import {
 	useDatabase,
@@ -7,10 +7,9 @@ import {
 	useFluentQuery,
 	useMangoQuery,
 	useQueryCount,
-	useRecord,
 	useRecordState,
 } from "@melon/db-react";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Pressable } from "react-native";
 import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,25 +24,49 @@ export default function DemosScreen(): React.ReactElement {
 	const db = useDatabase();
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 
-	const mangoOpen = useMangoQuery<Task>("tasks", {
-		selector: { status: "open" },
-		sort: [{ priority: "desc" }],
-		limit: 5,
-	});
+	const mangoQuery = useMemo(
+		() => ({
+			selector: { status: "open" },
+			sort: [{ priority: "desc" as const }],
+			limit: 5,
+		}),
+		[],
+	);
+	const mangoOpen = useMangoQuery<Task>("tasks", mangoQuery);
 
-	const prismaOpen = useFindMany<Task>("tasks", {
-		where: { status: "open" },
-		orderBy: { priority: "desc" },
-		take: 5,
-		include: { project: true },
-	});
+	const prismaArgs = useMemo(
+		() => ({
+			where: { status: "open" },
+			orderBy: { priority: "desc" as const },
+			take: 5,
+			include: { project: true },
+		}),
+		[],
+	);
+	const prismaOpen = useFindMany<Task>("tasks", prismaArgs);
 
-	const fluentWithProject = useFluentQuery<Task>("tasks", (b) =>
-		b
-			.where("status", "eq", "open")
-			.include("project")
-			.orderBy("priority", "desc")
-			.limit(5),
+	const fluentWithProjectBuilder = useCallback(
+		(b: QueryBuilder<Task>) =>
+			b
+				.where("status", "eq", "open")
+				.include("project")
+				.orderBy("priority", "desc")
+				.limit(5),
+		[],
+	);
+	const fluentWithProject = useFluentQuery<Task>(
+		"tasks",
+		fluentWithProjectBuilder,
+	);
+
+	const collectionFluentBuilder = useCallback(
+		(b: QueryBuilder<Task>) =>
+			b
+				.where("status", "eq", "open")
+				.not((inner) => inner.where("status", "eq", "done"))
+				.orderBy("priority", "desc")
+				.limit(3),
+		[],
 	);
 
 	const openCount = useQueryCount(
@@ -64,15 +87,13 @@ export default function DemosScreen(): React.ReactElement {
 	);
 	const mangoOpenCount = useQueryCount(mangoCountQuery);
 
-	const selectedTask = useRecord<Task>("tasks", selectedId);
 	const selectedState = useRecordState<Task>("tasks", selectedId);
+	const selectedTask =
+		selectedState.status === "ready" ? selectedState.data : null;
 
-	const collectionFluent = useFluentQuery<Task>("tasks", (b) =>
-		b
-			.where("status", "eq", "open")
-			.not((inner) => inner.where("status", "eq", "done"))
-			.orderBy("priority", "desc")
-			.limit(3),
+	const collectionFluent = useFluentQuery<Task>(
+		"tasks",
+		collectionFluentBuilder,
 	);
 
 	return (
@@ -113,7 +134,7 @@ export default function DemosScreen(): React.ReactElement {
 					<Text style={styles.hint}>
 						Tap a Mango row above. Status: {selectedState.status}
 					</Text>
-					{selectedTask ? (
+					{selectedTask != null ? (
 						<Text style={styles.row}>
 							{selectedTask.title} — {selectedTask.status}
 						</Text>

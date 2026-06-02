@@ -5,5 +5,17 @@
   },
   "organizeImports": { "enabled": true },
   "linter": { "enabled": true },
-  "formatter": { "enabled": true }
+  "formatter": { "enabled": true },
+  "overrides": [
+    {
+      "include": ["packages/melon-db-react/src/hooks.ts"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "useExhaustiveDependencies": "off"
+          }
+        }
+      }
+    }
+  ]
 }
