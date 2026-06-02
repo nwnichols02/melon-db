@@ -7,6 +7,7 @@ export interface QueryDebugSnapshot {
 	ast: QueryAst;
 	plan: QueryPlan;
 	sql?: string;
+	params?: unknown[];
 	durationMs?: number;
 }
 

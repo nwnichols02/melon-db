@@ -35,6 +35,7 @@ export function createQueryHandle<RecordShape = Record<string, unknown>>(
 			ast: prepared.ast,
 			plan: prepared.plan,
 			sql: queryDebug?.sql,
+			params: queryDebug?.params,
 			durationMs: performance.now() - start,
 		});
 		const rows = await loadIncludes(result.rows, prepared.ast, schema, adapter);
@@ -64,6 +65,7 @@ export function createQueryHandle<RecordShape = Record<string, unknown>>(
 					ast: prepared.ast,
 					plan: prepared.plan,
 					sql: queryDebug?.sql,
+					params: queryDebug?.params,
 				});
 				return result.count;
 			}

@@ -7,6 +7,20 @@ import { normalizeMangoQuery } from "@melon/db-query-mango";
 import type { MangoQuery } from "@melon/db-query-mango";
 
 /**
+ * Type guard for PreparedQuery vs bare QueryAst.
+ */
+export function isPreparedQuery(
+	query: QueryAst | PreparedQuery,
+): query is PreparedQuery {
+	return (
+		typeof query === "object" &&
+		query !== null &&
+		"ast" in query &&
+		"plan" in query
+	);
+}
+
+/**
  * Stable JSON key for a query AST (avoids effect churn from new object identities).
  */
 export function queryAstKey(ast: QueryAst): string {
@@ -17,10 +31,7 @@ export function queryAstKey(ast: QueryAst): string {
  * Stable key for QueryAst or PreparedQuery hook inputs.
  */
 export function queryInputKey(query: QueryAst | PreparedQuery): string {
-	const ast =
-		"ast" in query && "plan" in query
-			? (query as PreparedQuery).ast
-			: (query as QueryAst);
+	const ast = isPreparedQuery(query) ? query.ast : query;
 	return queryAstKey(ast);
 }
 
@@ -31,10 +42,10 @@ export function resolvePreparedQuery(
 	query: QueryAst | PreparedQuery,
 	schema: MelonSchema,
 ): PreparedQuery {
-	if ("ast" in query && "plan" in query) {
-		return query as PreparedQuery;
+	if (isPreparedQuery(query)) {
+		return query;
 	}
-	return prepareQuery(query as QueryAst, schema);
+	return prepareQuery(query, schema);
 }
 
 /**

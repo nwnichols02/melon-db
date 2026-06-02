@@ -1,0 +1,45 @@
+---
+title: TypeScript
+description: Typing conventions for Melon packages and apps.
+---
+
+## Rules
+
+- `strict: true` in all `tsconfig.json` files.
+- Prefer **`interface`** for object shapes; **`type`** for unions.
+- No `enum` — use `as const` objects and derived union types.
+- Avoid **`as` type assertions** in `packages/melon-db*` production code. Exceptions:
+  - Tests and benchmarks (`__tests__`, `bench/`)
+  - Third-party interop where a guard is impossible (document why in a short comment)
+
+## Prefer
+
+| Instead of | Use |
+|------------|-----|
+| `x as PreparedQuery` | `isPreparedQuery(x)` type guard |
+| `metadata as Record<...>` | `createMelonSchema<const T>(def)` preserving keys |
+| `value as T[]` in hooks | Caller generic `useQuery<Task>(...)` + narrow at boundary |
+| `!` non-null assertion | Early return or optional chaining |
+
+## Schema generics
+
+```ts
+export const taskSchema = createMelonSchema({
+  version: 1,
+  collections: {
+    tasks: { /* ... */ },
+  },
+});
+
+export type TaskSchema = typeof taskSchema;
+```
+
+Use `typeof taskSchema` with `MelonDatabase<typeof taskSchema>` for typed `collection()` names.
+
+## Runtime validation
+
+Use **Zod** at API boundaries (sync payloads, config), not inside hot query paths.
+
+## PRD tracking
+
+Typing maturity is tracked in [PRD compliance](/docs/prd-compliance) under `@melon/db-react` and `@melon/db-query`.

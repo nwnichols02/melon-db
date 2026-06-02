@@ -20,7 +20,7 @@ export const taskSchemaDefinition: DatabaseSchemaDefinition = {
 
 export const taskSchema = createMelonSchema(taskSchemaDefinition);
 
-export interface Task {
+export interface Task extends Record<string, unknown> {
 	id: string;
 	title: string;
 	status: string;

@@ -1,0 +1,19 @@
+---
+title: React Native (Expo Go)
+description: Expo SQLite adapter and task list in playground-rn.
+---
+
+## Steps
+
+1. `bun install` from the monorepo root.
+2. Start Expo: `bun run dev:rn`.
+3. Open the app in Expo Go (see `apps/playground-rn/README.md`).
+4. Add tasks, complete items, and optionally exercise sync if a backend is running.
+
+Adapter: `@melon/db-sqlite` with `expo-sqlite`.
+
+## Verify
+
+- [ ] App boots without native build (Expo Go).
+- [ ] Open tasks list updates when you add or complete a task.
+- [ ] Sync client code in `apps/playground-rn/src/sync/` matches your backend URL if testing pull/push.

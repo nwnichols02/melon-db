@@ -22,9 +22,18 @@ import {
 
 const mangoCompiler = createMangoCompiler();
 
-export interface UseQueryOptions<T> {
+export interface UseQueryOptions<
+	T extends Record<string, unknown> = Record<string, unknown>,
+	U = T[],
+> {
 	enabled?: boolean;
-	select?: (rows: T[]) => unknown;
+	select?: (rows: T[]) => U;
+}
+
+function rowsFromAdapter<T extends Record<string, unknown>>(
+	value: Record<string, unknown>[],
+): T[] {
+	return value as T[];
 }
 
 export type QueryAsyncState<T> =
@@ -37,14 +46,17 @@ function toError(err: unknown): Error {
 	return err instanceof Error ? err : new Error(String(err));
 }
 
-function useObserveListState<T>(
+function useObserveListState<
+	T extends Record<string, unknown>,
+	U = T[],
+>(
 	prepared: PreparedQuery,
-	options?: UseQueryOptions<T>,
-): QueryAsyncState<T[]> {
+	options?: UseQueryOptions<T, U>,
+): QueryAsyncState<U> {
 	const db = useDatabase();
 	const enabled = options?.enabled ?? true;
 	const preparedKey = queryInputKey(prepared);
-	const [state, setState] = useState<QueryAsyncState<T[]>>(() =>
+	const [state, setState] = useState<QueryAsyncState<U>>(() =>
 		enabled ? { status: "loading" } : { status: "idle" },
 	);
 
@@ -59,14 +71,13 @@ function useObserveListState<T>(
 
 		const applyRows = (value: Record<string, unknown>[]) => {
 			if (cancelled) return;
-			const next = options?.select
-				? (options.select(value as T[]) as T[])
-				: (value as T[]);
+			const typed = rowsFromAdapter<T>(value);
+			const next = options?.select ? options.select(typed) : (typed as U);
 			setState({ status: "ready", data: next });
 		};
 
 		void handle.fetch().then(
-			(rows) => applyRows(rows as Record<string, unknown>[]),
+			(rows) => applyRows(rows),
 			(err) => {
 				if (!cancelled) {
 					setState({ status: "error", error: toError(err) });
@@ -74,9 +85,7 @@ function useObserveListState<T>(
 			},
 		);
 
-		const unsub = handle.observe((value) =>
-			applyRows(value as Record<string, unknown>[]),
-		);
+		const unsub = handle.observe((value) => applyRows(value));
 
 		return () => {
 			cancelled = true;
@@ -87,7 +96,7 @@ function useObserveListState<T>(
 	return state;
 }
 
-function useObserveRecordState<T>(
+function useObserveRecordState<T extends Record<string, unknown>>(
 	collection: string,
 	id: string | number,
 	recordKey: string,
@@ -106,7 +115,7 @@ function useObserveRecordState<T>(
 		}
 		setState({ status: "loading" });
 		let cancelled = false;
-		const col = db.collection(collection) as MelonCollection<T>;
+		const col = db.collection(collection);
 		const loadInFlight = { current: false };
 
 		const load = async (): Promise<void> => {
@@ -117,7 +126,8 @@ function useObserveRecordState<T>(
 			try {
 				const row = await col.findById(id);
 				if (!cancelled) {
-					setState({ status: "ready", data: row as T | null });
+					const data: T | null = row === null ? null : (row as T);
+					setState({ status: "ready", data });
 				}
 			} catch (err) {
 				if (!cancelled) {
@@ -146,13 +156,13 @@ function useObserveRecordState<T>(
 /**
  * Reactive query hook backed by MelonQueryHandle.observe.
  */
-export function useQuery<T = Record<string, unknown>>(
-	query: QueryAst | PreparedQuery,
-	options?: UseQueryOptions<T>,
-): T[] {
+export function useQuery<
+	T extends Record<string, unknown> = Record<string, unknown>,
+	U = T[],
+>(query: QueryAst | PreparedQuery, options?: UseQueryOptions<T, U>): U {
 	const db = useDatabase();
 	const enabled = options?.enabled ?? true;
-	const [rows, setRows] = useState<T[]>([]);
+	const [rows, setRows] = useState<U>([] as U);
 	const key = queryInputKey(query);
 	const prepared = useMemo(
 		() => resolvePreparedQuery(query, db.schema),
@@ -163,9 +173,8 @@ export function useQuery<T = Record<string, unknown>>(
 		if (!enabled) return;
 		const handle = db.collection(prepared.ast.collection).query(prepared.ast);
 		return handle.observe((value) => {
-			const next = options?.select
-				? (options.select(value as T[]) as T[])
-				: (value as T[]);
+			const typed = rowsFromAdapter<T>(value);
+			const next = options?.select ? options.select(typed) : (typed as U);
 			setRows(next);
 		});
 	}, [db, prepared.ast.collection, key, enabled, options?.select]);
@@ -176,25 +185,29 @@ export function useQuery<T = Record<string, unknown>>(
 /**
  * Reactive query hook with loading and error state.
  */
-export function useQueryState<T = Record<string, unknown>>(
+export function useQueryState<
+	T extends Record<string, unknown> = Record<string, unknown>,
+	U = T[],
+>(
 	query: QueryAst | PreparedQuery,
-	options?: UseQueryOptions<T>,
-): QueryAsyncState<T[]> {
+	options?: UseQueryOptions<T, U>,
+): QueryAsyncState<U> {
 	const db = useDatabase();
 	const key = queryInputKey(query);
 	const prepared = useMemo(
 		() => resolvePreparedQuery(query, db.schema),
 		[db.schema, key],
 	);
-	return useObserveListState<T>(prepared, options);
+	return useObserveListState<T, U>(prepared, options);
 }
 
 /**
  * Returns a collection by name from the database context.
  */
-export function useCollection<T = Record<string, unknown>>(
-	name: string,
-): MelonCollection<T> {
+export function useCollection<T extends Record<string, unknown> = Record<
+	string,
+	unknown
+>>(name: string): MelonCollection<T> {
 	const db = useDatabase();
 	return db.collection(name) as MelonCollection<T>;
 }
@@ -245,44 +258,52 @@ export function useQueryCount(query: QueryAst | PreparedQuery): number {
 /**
  * Reactive Prisma-style findMany hook.
  */
-export function useFindMany<T = Record<string, unknown>>(
+export function useFindMany<
+	T extends Record<string, unknown> = Record<string, unknown>,
+	U = T[],
+>(
 	collection: string,
 	args?: PrismaFindManyArgs,
-	options?: UseQueryOptions<T>,
-): T[] {
+	options?: UseQueryOptions<T, U>,
+): U {
 	const db = useDatabase();
 	const argsKey = prismaArgsKey(args);
 	const prepared = useMemo(
 		() => compilePrismaQuery(collection, args, db.schema),
 		[db.schema, collection, argsKey],
 	);
-	return useQuery<T>(prepared, options);
+	return useQuery<T, U>(prepared, options);
 }
 
 /**
  * Reactive Prisma-style findMany hook with loading and error state.
  */
-export function useFindManyState<T = Record<string, unknown>>(
+export function useFindManyState<
+	T extends Record<string, unknown> = Record<string, unknown>,
+	U = T[],
+>(
 	collection: string,
 	args?: PrismaFindManyArgs,
-	options?: UseQueryOptions<T>,
-): QueryAsyncState<T[]> {
+	options?: UseQueryOptions<T, U>,
+): QueryAsyncState<U> {
 	const db = useDatabase();
 	const argsKey = prismaArgsKey(args);
 	const prepared = useMemo(
 		() => compilePrismaQuery(collection, args, db.schema),
 		[db.schema, collection, argsKey],
 	);
-	return useObserveListState<T>(prepared, options);
+	return useObserveListState<T, U>(prepared, options);
 }
 
 /**
  * Reactive Prisma-style findFirst hook.
  */
-export function useFindFirst<T = Record<string, unknown>>(
+export function useFindFirst<
+	T extends Record<string, unknown> = Record<string, unknown>,
+>(
 	collection: string,
 	args?: PrismaFindManyArgs,
-	options?: UseQueryOptions<T>,
+	options?: UseQueryOptions<T, T[]>,
 ): T | null {
 	const db = useDatabase();
 	const argsKey = prismaArgsKey(args);
@@ -290,65 +311,77 @@ export function useFindFirst<T = Record<string, unknown>>(
 		() => compilePrismaQuery(collection, args, db.schema, "one"),
 		[db.schema, collection, argsKey],
 	);
-	const rows = useQuery<T>(prepared, options);
+	const rows = useQuery<T, T[]>(prepared, options);
 	return rows[0] ?? null;
 }
 
 /**
  * Reactive hook for a fluent {@link QueryBuilder} callback on a collection.
  */
-export function useFluentQuery<T = Record<string, unknown>>(
+export function useFluentQuery<
+	T extends Record<string, unknown> = Record<string, unknown>,
+	U = T[],
+>(
 	collection: string,
 	builder: (q: QueryBuilder<T>) => QueryBuilder<T>,
-	options?: UseQueryOptions<T>,
-): T[] {
+	options?: UseQueryOptions<T, U>,
+): U {
 	const db = useDatabase();
 	const builderKey = fluentBuilderKey(collection, builder);
 	const prepared = useMemo(() => {
 		const ast = resolveCollectionQuery<T>(collection, builder);
 		return prepareQuery(ast, db.schema);
 	}, [db.schema, collection, builderKey]);
-	return useQuery<T>(prepared, options);
+	return useQuery<T, U>(prepared, options);
 }
 
 /**
  * Reactive fluent builder hook with loading and error state.
  */
-export function useFluentQueryState<T = Record<string, unknown>>(
+export function useFluentQueryState<
+	T extends Record<string, unknown> = Record<string, unknown>,
+	U = T[],
+>(
 	collection: string,
 	builder: (q: QueryBuilder<T>) => QueryBuilder<T>,
-	options?: UseQueryOptions<T>,
-): QueryAsyncState<T[]> {
+	options?: UseQueryOptions<T, U>,
+): QueryAsyncState<U> {
 	const db = useDatabase();
 	const builderKey = fluentBuilderKey(collection, builder);
 	const prepared = useMemo(() => {
 		const ast = resolveCollectionQuery<T>(collection, builder);
 		return prepareQuery(ast, db.schema);
 	}, [db.schema, collection, builderKey]);
-	return useObserveListState<T>(prepared, options);
+	return useObserveListState<T, U>(prepared, options);
 }
 
 /**
  * Reactive Mango-style query hook.
  */
-export function useMangoQuery<T = Record<string, unknown>>(
+export function useMangoQuery<
+	T extends Record<string, unknown> = Record<string, unknown>,
+	U = T[],
+>(
 	collection: string,
 	query: MangoQuery,
-	options?: UseQueryOptions<T>,
-): T[] {
+	options?: UseQueryOptions<T, U>,
+): U {
 	const db = useDatabase();
 	const queryKey = mangoQueryKey(query);
 	const prepared = useMemo(
 		() => mangoCompiler.compile(query, collection, db.schema),
 		[db.schema, collection, queryKey],
 	);
-	return useQuery<T>(prepared, options);
+	return useQuery<T, U>(prepared, options);
 }
 
 /**
  * Reactive hook for a single record by primary key.
  */
-export function useRecord<T = Record<string, unknown>>(
+export function useRecord<T extends Record<string, unknown> = Record<
+	string,
+	unknown
+>>(
 	collection: string,
 	id: string | number | null | undefined,
 	options?: { enabled?: boolean },
@@ -363,22 +396,25 @@ export function useRecord<T = Record<string, unknown>>(
 /**
  * Reactive single-record hook with loading and error state.
  */
-export function useRecordState<T = Record<string, unknown>>(
+export function useRecordState<T extends Record<string, unknown> = Record<
+	string,
+	unknown
+>>(
 	collection: string,
 	id: string | number | null | undefined,
 	options?: { enabled?: boolean },
 ): QueryAsyncState<T | null> {
-	const enabled = (options?.enabled ?? true) && id !== null && id !== undefined;
+	const hasId = id !== null && id !== undefined;
+	const enabled = (options?.enabled ?? true) && hasId;
 
-	const recordKey =
-		enabled && id !== undefined && id !== null
-			? `${collection}:${String(id)}`
-			: "";
+	if (!enabled || !hasId) {
+		return useObserveRecordState<T>(collection, "", "", { enabled: false });
+	}
 
 	return useObserveRecordState<T>(
 		collection,
-		enabled ? (id as string | number) : "",
-		recordKey,
-		{ enabled },
+		id,
+		`${collection}:${String(id)}`,
+		options,
 	);
 }

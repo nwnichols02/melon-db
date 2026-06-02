@@ -9,8 +9,9 @@ describe("MelonDevtoolsPanel contract", () => {
 			source: "melon",
 			input: {},
 			ast: { collection: "tasks", mode: "many" },
-			plan: { stableSort: [] },
+			plan: { stableSort: [], postFilter: false },
 			sql: "SELECT * FROM tasks WHERE status = ?",
+			params: ["open"],
 			durationMs: 2.5,
 		});
 
@@ -19,6 +20,8 @@ describe("MelonDevtoolsPanel contract", () => {
 		expect(snapshot.queries[0]?.sql).toBe(
 			"SELECT * FROM tasks WHERE status = ?",
 		);
+		expect(snapshot.queries[0]?.params).toEqual(["open"]);
+		expect(snapshot.queries[0]?.plan.stableSort).toEqual([]);
 	});
 
 	test("bridge emits sync phase events", () => {

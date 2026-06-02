@@ -6,6 +6,20 @@ export type CollectionQueryInput<RecordShape = Record<string, unknown>> =
 	| (() => QueryAst)
 	| ((builder: QueryBuilder<RecordShape>) => QueryBuilder<RecordShape>);
 
+function isAstFactory(
+	input: CollectionQueryInput<unknown>,
+): input is () => QueryAst {
+	return typeof input === "function" && input.length === 0;
+}
+
+function isBuilderFactory<RecordShape>(
+	input: CollectionQueryInput<RecordShape>,
+): input is (
+	builder: QueryBuilder<RecordShape>,
+) => QueryBuilder<RecordShape> {
+	return typeof input === "function" && input.length > 0;
+}
+
 /**
  * Resolves a collection query from either a QueryAst or a fluent builder callback.
  */
@@ -18,15 +32,14 @@ export function resolveCollectionQuery<RecordShape = Record<string, unknown>>(
 		return { collection, mode: defaultMode };
 	}
 	if (typeof input === "function") {
-		if (input.length === 0) {
-			return (input as () => QueryAst)();
+		if (isAstFactory(input)) {
+			return input();
 		}
-		const builderFn = input as (
-			builder: QueryBuilder<RecordShape>,
-		) => QueryBuilder<RecordShape>;
-		return builderFn(new QueryBuilder<RecordShape>(collection)).toAst(
-			defaultMode,
-		);
+		if (isBuilderFactory(input)) {
+			return input(new QueryBuilder<RecordShape>(collection)).toAst(
+				defaultMode,
+			);
+		}
 	}
 	return { ...input, collection };
 }

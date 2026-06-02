@@ -27,7 +27,7 @@ const demoSchema = createMelonSchema({
 	},
 });
 
-interface Task {
+interface Task extends Record<string, unknown> {
 	id: string;
 	title: string;
 	status: string;
@@ -97,7 +97,7 @@ function DemoTaskList(): ReactElement {
 			<h2 className="mt-0 text-xl font-semibold">Live playground</h2>
 			<p className="text-fd-muted-foreground">
 				In-memory Melon database with reactive queries. Open the Melon DB
-				devtools panel (bottom-right) to inspect AST and writes.
+				devtools panel (bottom-right) to inspect Plan, AST, and writes.
 			</p>
 			<div className="mb-4 flex gap-2">
 				<input

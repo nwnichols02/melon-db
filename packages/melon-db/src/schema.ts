@@ -57,10 +57,30 @@ export interface MelonSchema<
 	): Collections[Name];
 }
 
+type SchemaCollectionsFromDef<T extends DatabaseSchemaDefinition> = {
+	[K in keyof T["collections"]]: CollectionMetadata;
+};
+
+function buildCollectionMetadata(
+	collection: CollectionSchemaDefinition,
+): CollectionMetadata {
+	const primaryKey = collection.primaryKey ?? "id";
+	return {
+		name: collection.name,
+		primaryKey,
+		fields: collection.fields,
+		relations: collection.relations ?? {},
+		indexes: collection.indexes ?? [],
+		localOnly: collection.localOnly,
+	};
+}
+
 /**
  * Validates schema invariants and builds a runtime MelonSchema.
  */
-export function createMelonSchema(def: DatabaseSchemaDefinition): MelonSchema {
+export function createMelonSchema<const T extends DatabaseSchemaDefinition>(
+	def: T,
+): MelonSchema<SchemaCollectionsFromDef<T>> {
 	const collectionNames = Object.keys(def.collections);
 	const uniqueNames = new Set(collectionNames);
 	if (uniqueNames.size !== collectionNames.length) {
@@ -70,7 +90,7 @@ export function createMelonSchema(def: DatabaseSchemaDefinition): MelonSchema {
 		});
 	}
 
-	const metadata: Record<string, CollectionMetadata> = {};
+	const metadata = {} as SchemaCollectionsFromDef<T>;
 
 	for (const [key, collection] of Object.entries(def.collections)) {
 		if (collection.name !== key) {
@@ -97,27 +117,23 @@ export function createMelonSchema(def: DatabaseSchemaDefinition): MelonSchema {
 				if (!def.collections[relation.target]) {
 					throw new MelonError(
 						`Relation "${relName}" on "${collection.name}" targets unknown collection "${relation.target}"`,
-						{ code: MelonErrorCode.SCHEMA_INVALID },
+						{
+							code: MelonErrorCode.SCHEMA_INVALID,
+						},
 					);
 				}
 			}
 		}
 
-		metadata[key] = {
-			name: collection.name,
-			primaryKey: primaryKey as string,
-			fields: collection.fields,
-			relations: collection.relations ?? {},
-			indexes: collection.indexes ?? [],
-			localOnly: collection.localOnly,
-		};
+		metadata[key as keyof SchemaCollectionsFromDef<T>] =
+			buildCollectionMetadata(collection);
 	}
 
 	return {
 		version: def.version,
-		collections: metadata as Record<string, CollectionMetadata>,
+		collections: metadata,
 		getCollection(name) {
-			const collection = metadata[name];
+			const collection = metadata[name as keyof SchemaCollectionsFromDef<T>];
 			if (!collection) {
 				throw new MelonError(`Unknown collection "${name}"`, {
 					code: MelonErrorCode.SCHEMA_INVALID,

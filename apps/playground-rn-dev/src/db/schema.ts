@@ -59,7 +59,7 @@ export interface Project {
 	name: string;
 }
 
-export interface Task {
+export interface Task extends Record<string, unknown> {
 	id: string;
 	title: string;
 	status: string;

@@ -1,6 +1,22 @@
 import { describe, expect, test } from "bun:test";
-import { queryAst } from "@melon/db";
-import { mangoQueryKey, prismaArgsKey } from "../src/query-deps.ts";
+import { createMelonSchema, prepareQuery, queryAst } from "@melon/db";
+import {
+	isPreparedQuery,
+	mangoQueryKey,
+	prismaArgsKey,
+	queryInputKey,
+} from "../src/query-deps.ts";
+
+const testSchema = createMelonSchema({
+	version: 1,
+	collections: {
+		tasks: {
+			name: "tasks",
+			primaryKey: "id",
+			fields: { id: { kind: "string" } },
+		},
+	},
+});
 
 describe("query-deps", () => {
 	test("mangoQueryKey is stable for equivalent queries", () => {
@@ -20,6 +36,14 @@ describe("query-deps", () => {
 	test("prismaArgsKey is stable for equivalent args", () => {
 		const args = { where: { status: "open" }, take: 5 };
 		expect(prismaArgsKey(args)).toBe(prismaArgsKey({ ...args }));
+	});
+
+	test("isPreparedQuery distinguishes ast from prepared", () => {
+		const ast = queryAst("tasks", { mode: "many" });
+		const prepared = prepareQuery(ast, testSchema);
+		expect(isPreparedQuery(ast)).toBe(false);
+		expect(isPreparedQuery(prepared)).toBe(true);
+		expect(queryInputKey(prepared)).toBe(queryInputKey(ast));
 	});
 
 	test("queryAstKey ignores object identity", () => {

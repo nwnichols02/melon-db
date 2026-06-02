@@ -37,13 +37,23 @@ await db.write(async (tx) => {
 });
 ```
 
+Follow the [Local-first walkthrough](/docs/walkthroughs/local-first) for a full checklist.
+
 ## SQLite (Bun / Node)
 
 ```bash
 bun run demo
 ```
 
-See `apps/playground-node/src/demo.ts`.
+See [Node and Bun walkthrough](/docs/walkthroughs/node-and-bun) and `apps/playground-node/README.md`.
+
+## Web (browser)
+
+```bash
+bun run dev:web
+```
+
+Or use the [CRUD playground](/docs/playgrounds/crud) in the docs site. See [Web walkthrough](/docs/walkthroughs/web-local).
 
 ## React Native / Expo
 
@@ -53,13 +63,7 @@ See `apps/playground-node/src/demo.ts`.
 bun run dev:rn
 ```
 
-See `apps/playground-rn/README.md`.
-
-## Next steps
-
-- [Setup](/docs/setup) — schema, models, migrations, adapters
-- [Usage](/docs/usage) — CRUD, queries, React hooks, writers
-- [Sync](/docs/sync) — pull/push, backend contract, FAQ
+See [React Native (Expo) walkthrough](/docs/walkthroughs/react-native-expo).
 
 **Development build** (JSI native SQLite):
 
@@ -68,16 +72,31 @@ bun run dev:rn:dev
 bun run dev:rn:dev:start
 ```
 
-See `apps/playground-rn-dev/README.md`.
+See [React Native (JSI) walkthrough](/docs/walkthroughs/react-native-jsi).
 
-## Sync
+## Walkthroughs
+
+| Guide | Topic |
+|-------|--------|
+| [Walkthroughs index](/docs/walkthroughs) | All guides |
+| [Full-stack sync](/docs/walkthroughs/full-stack-sync) | HTTP + Postgres backends |
+| [Query surfaces](/docs/walkthroughs/query-surfaces) | Fluent, Mango, Prisma-style |
+| [Devtools tour](/docs/walkthroughs/devtools-tour) | Plan, SQL, AST inspector |
+
+## Setup and usage docs
+
+- [Setup](/docs/setup) — schema, models, migrations, adapters
+- [Usage](/docs/usage) — CRUD, queries, React hooks, writers
+- [Sync](/docs/sync) — pull/push, backend contract, FAQ
+
+## Sync quick commands
 
 ```bash
 bun run demo:sync
 bun run sync-server
 ```
 
-See [Sync](/docs/sync) and [`@melon/sync`](/docs/packages/melon-sync).
+See [Full-stack sync walkthrough](/docs/walkthroughs/full-stack-sync).
 
 ## Devtools
 
@@ -88,4 +107,4 @@ const devtools = createReactiveDevtoolsBridge();
 const db = createDatabase({ schema, adapter, devtools });
 ```
 
-Try the [CRUD playground](/docs/playgrounds/crud) for a live demo.
+Try the [CRUD playground](/docs/playgrounds/crud) or [Devtools tour](/docs/walkthroughs/devtools-tour).

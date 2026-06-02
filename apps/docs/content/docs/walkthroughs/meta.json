@@ -1,0 +1,14 @@
+{
+	"title": "Walkthroughs",
+	"pages": [
+		"index",
+		"local-first",
+		"web-local",
+		"react-native-expo",
+		"react-native-jsi",
+		"node-and-bun",
+		"full-stack-sync",
+		"query-surfaces",
+		"devtools-tour"
+	]
+}

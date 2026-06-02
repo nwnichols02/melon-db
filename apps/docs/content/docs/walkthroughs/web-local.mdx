@@ -1,0 +1,26 @@
+---
+title: Web (in-memory)
+description: Browser example app and docs playground without a web SQLite adapter.
+---
+
+v1 web examples use the **in-memory adapter**. A dedicated web SQLite adapter is still deferred on the [roadmap](/docs/roadmap).
+
+## Docs playground
+
+1. Run `bun run dev:docs`.
+2. Open [CRUD playground](/docs/playgrounds/crud).
+3. Open **Melon DB** (bottom-right) after adding or querying tasks.
+
+## Full app clone
+
+```bash
+bun run dev:web
+```
+
+Source: `apps/playground-web/` — Vite + React with `@melon/db-react` and devtools.
+
+## Verify
+
+- [ ] Docs playground loads and lists open tasks.
+- [ ] Devtools **Queries** tab shows **Plan** and **AST** after a fetch.
+- [ ] `playground-web` runs locally and mirrors CRUD behavior.

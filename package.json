@@ -20,6 +20,7 @@
     "dev:rn:dev": "bun run --filter playground-rn-dev install:ios",
     "dev:rn:dev:android": "bun run --filter playground-rn-dev install:android",
     "dev:rn:dev:start": "bun run --filter playground-rn-dev start",
+    "dev:web": "bun run --filter playground-web dev",
     "dev:docs": "bun run --filter docs dev",
     "build:docs": "bun run docs:api && bun run --filter docs build",
     "ios:rn": "bun run --filter playground-rn ios",
@@ -31,7 +32,7 @@
     "bench:compare:docs": "bun run packages/melon-db-sqlite/__benchmarks__/write-docs-artifact.ts",
     "melon-codemod": "bun run packages/melon-db-codemods/src/bin/melon-codemod.ts",
     "docs:api": "bun run --filter docs docs:api",
-    "typecheck:apps": "bun run --filter playground-rn typecheck && bun run --filter playground-rn-dev typecheck && bun run --filter docs typecheck",
+    "typecheck:apps": "bun run --filter playground-rn typecheck && bun run --filter playground-rn-dev typecheck && bun run --filter playground-web typecheck && bun run --filter docs typecheck",
     "melon-prisma": "bun run packages/melon-db-prisma/src/bin/melon-prisma.ts"
   },
   "devDependencies": {

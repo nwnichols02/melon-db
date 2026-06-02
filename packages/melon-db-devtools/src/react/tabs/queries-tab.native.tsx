@@ -2,13 +2,18 @@ import type { QueryDebugSnapshot } from "@melon/db";
 import { type ReactElement, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { formatJson } from "../format-json.ts";
+import {
+	formatQueryParams,
+	formatQueryPlan,
+	hasSqlSection,
+} from "../query-snapshot-sections.ts";
 
 export interface QueriesTabProps {
 	queries: QueryDebugSnapshot[];
 }
 
 /**
- * Lists query debug snapshots with expandable AST and SQL details.
+ * Lists query debug snapshots with expandable Plan, SQL, params, and AST details.
  */
 export function QueriesTab({ queries }: QueriesTabProps): ReactElement {
 	const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
@@ -23,6 +28,7 @@ export function QueriesTab({ queries }: QueriesTabProps): ReactElement {
 			{items.map((query, index) => {
 				const isExpanded = expandedIndex === index;
 				const label = `${query.ast.collection} (${query.ast.mode})${query.durationMs !== undefined ? ` — ${query.durationMs.toFixed(1)}ms` : ""}`;
+				const paramsText = formatQueryParams(query);
 
 				return (
 					<View key={`${index}-${query.ast.collection}`} style={styles.row}>
@@ -33,12 +39,20 @@ export function QueriesTab({ queries }: QueriesTabProps): ReactElement {
 						</Pressable>
 						{isExpanded ? (
 							<ScrollView style={styles.details}>
-								{query.sql ? (
+								{hasSqlSection(query) ? (
 									<>
 										<Text style={styles.sectionTitle}>SQL</Text>
 										<Text style={styles.code}>{query.sql}</Text>
 									</>
 								) : null}
+								{paramsText ? (
+									<>
+										<Text style={styles.sectionTitle}>Params</Text>
+										<Text style={styles.code}>{paramsText}</Text>
+									</>
+								) : null}
+								<Text style={styles.sectionTitle}>Plan</Text>
+								<Text style={styles.code}>{formatQueryPlan(query)}</Text>
 								<Text style={styles.sectionTitle}>AST</Text>
 								<Text style={styles.code}>{formatJson(query.ast)}</Text>
 							</ScrollView>
@@ -64,7 +78,7 @@ const styles = StyleSheet.create({
 	},
 	details: {
 		marginTop: 8,
-		maxHeight: 240,
+		maxHeight: 280,
 	},
 	sectionTitle: {
 		fontWeight: "600",

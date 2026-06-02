@@ -1,0 +1,21 @@
+---
+title: React Native (JSI dev client)
+description: Native SQLite, query demos, benchmarks, and devtools in playground-rn-dev.
+---
+
+## Steps
+
+1. Install native deps: `bun run dev:rn:dev` (iOS) or `bun run dev:rn:dev:android`.
+2. Start Metro: `bun run dev:rn:dev:start`.
+3. Open **Open Tasks** — CRUD with JSI SQLite.
+4. Open **Query demos** — fluent, Mango, and Prisma-style hooks side by side.
+5. Open **Benchmarks** — on-device comparison harness (dev only).
+
+In `__DEV__`, the **DB** floating button opens devtools with **Plan**, **SQL**, **Params**, and **AST** for SQLite queries.
+
+## Verify
+
+- [ ] Dev client builds on device or simulator.
+- [ ] Query demos screen shows three surfaces returning open tasks.
+- [ ] Devtools Queries tab shows SQL + params for filtered queries.
+- [ ] Benchmark screen produces a report (optional).

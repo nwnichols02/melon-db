@@ -1,0 +1,21 @@
+---
+title: Node and Bun
+description: SQLite CRUD and benchmarks from playground-node.
+---
+
+## Steps
+
+See `apps/playground-node/README.md` for full commands.
+
+| Command | Script |
+|---------|--------|
+| `bun run demo` | Local SQLite CRUD |
+| `bun run demo:sync` | In-process sync smoke test |
+| `bun run demo:sync:http` | HTTP sync server + client |
+| `bun run demo:sync:postgres` | Postgres reference backend |
+
+## Verify
+
+- [ ] `bun run demo` prints task rows without errors.
+- [ ] `bun run demo:sync:http` completes pull/push against the embedded server.
+- [ ] With Docker: `bun run postgres:up` then `bun run demo:sync:postgres` succeeds.

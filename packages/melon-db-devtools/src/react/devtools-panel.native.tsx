@@ -12,6 +12,7 @@ import { ErrorsTab } from "./tabs/errors-tab";
 import { QueriesTab } from "./tabs/queries-tab";
 import { SubscriptionsTab } from "./tabs/subscriptions-tab";
 import { SyncTab } from "./tabs/sync-tab";
+import { RetentionTab } from "./tabs/retention-tab";
 import { WritesTab } from "./tabs/writes-tab";
 
 const TabKind = {
@@ -20,6 +21,7 @@ const TabKind = {
 	Sync: "sync",
 	Subs: "subs",
 	Errors: "errors",
+	Retention: "retention",
 } as const;
 
 type TabKind = (typeof TabKind)[keyof typeof TabKind];
@@ -30,6 +32,7 @@ const TABS: Array<{ id: TabKind; label: string }> = [
 	{ id: TabKind.Sync, label: "Sync" },
 	{ id: TabKind.Subs, label: "Subs" },
 	{ id: TabKind.Errors, label: "Errors" },
+	{ id: TabKind.Retention, label: "Retention" },
 ];
 
 /**
@@ -102,6 +105,7 @@ export function MelonDevtoolsPanel(): ReactElement | null {
 						{activeTab === TabKind.Errors ? (
 							<ErrorsTab errors={log.errors} />
 						) : null}
+						{activeTab === TabKind.Retention ? <RetentionTab /> : null}
 					</ScrollView>
 				</View>
 			</Modal>

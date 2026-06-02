@@ -1,0 +1,49 @@
+---
+title: Devtools tour
+description: Inspect Plan, SQL, AST, writes, sync, and subscriptions.
+---
+
+## Setup
+
+```ts
+import { createReactiveDevtoolsBridge } from '@melon/db-devtools';
+import { MelonDevtoolsProvider, MelonDevtoolsPanel } from '@melon/db-devtools/react';
+
+const bridge = createReactiveDevtoolsBridge();
+const db = createDatabase({ schema, adapter, devtools: bridge });
+
+// Wrap app:
+<MelonDbProvider db={db}>
+  <MelonDevtoolsProvider bridge={bridge}>
+  <App />
+  <MelonDevtoolsPanel />
+  </MelonDevtoolsProvider>
+</MelonDbProvider>
+```
+
+Use `useMelonDevtoolsLog()` only inside the panel — not on data screens — to avoid re-renders on every query.
+
+## Tabs
+
+| Tab | Shows |
+|-----|--------|
+| **Queries** | Plan (`indexHint`, `postFilter`, `stableSort`), SQL, bind **params**, AST, duration |
+| **Writes** | Insert/update/delete operations |
+| **Sync** | Pull/apply/push phases and change summaries |
+| **Subs** | Active collection subscriptions |
+| **Errors** | Engine and adapter errors |
+| **Retention** | Placeholder for prd-4 sliding window (Phase 31+) |
+
+SQLite adapters populate SQL via `getLastQueryDebug()`. In-memory adapters show Plan + AST; SQL appears when using `@melon/db-sqlite`.
+
+## Try it
+
+- [CRUD playground](/docs/playgrounds/crud) (web)
+- `playground-rn-dev` in `__DEV__` (native modal)
+- `bun run dev:web`
+
+## Verify
+
+- [ ] After a query, **Plan** and **AST** expand in the Queries tab.
+- [ ] On rn-dev or Node SQLite, **SQL** and **Params** appear.
+- [ ] A write inside `db.write()` shows on the Writes tab.

@@ -1,0 +1,18 @@
+---
+title: Local-first quick start
+description: In-memory database, writes, and reactive reads without native code.
+---
+
+## Steps
+
+1. From the monorepo root: `bun install` and `bun test`.
+2. Use the snippet from [Getting started](/docs/getting-started#in-memory-quick-start) or open the [CRUD playground](/docs/playgrounds/crud).
+3. Insert a row inside `db.write()` and read with `collection.findMany()` or `useQuery` in React.
+
+All mutations must run inside `db.write()` — see [Read/write](/docs/usage/read-write).
+
+## Verify
+
+- [ ] `bun test` passes for `@melon/db`.
+- [ ] You can insert and list a task without a network call.
+- [ ] Completing a task in the playground updates the open-tasks list reactively.

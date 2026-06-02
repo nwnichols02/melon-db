@@ -10,7 +10,7 @@ This page is the **living status** for Melon. Update it when features land or de
 | Area | Count / status |
 |------|----------------|
 | Packages | 12 under `packages/*` (core through sync-server + native) |
-| Example apps | 4 — `playground-node`, `playground-rn`, `playground-rn-dev`, `docs` |
+| Example apps | 5 — `playground-node`, `playground-rn`, `playground-rn-dev`, `playground-web`, `docs` |
 | Implementation phases | **0–30 shipped** (see chronology below) |
 | Out-of-cycle | Fumadocs docs site, TypeDoc API, playgrounds (ongoing maintenance) |
 | Next | Phase 31+ deferred items |
@@ -109,7 +109,8 @@ See [PRD compliance — Phase 29+ decisions](/docs/prd-compliance#phase-29-decis
 | `Q.on` join queries | Codemod recipes only; no engine join support yet |
 | `getChangedCollections` on adapters | Sync uses outbox today |
 | Sync `merging` state | Apply is synchronous in v1 |
-| `playground-web` | No web adapter package yet |
+| `playground-web` | In-memory Vite app shipped; web SQLite adapter still deferred |
+| Sliding window (prd-4) | Org-aware retention, prune ledger, pressure modes — see prd-4.mdc |
 
 ---
 

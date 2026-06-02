@@ -1,0 +1,34 @@
+---
+description: TanStack Start and Router conventions for apps/docs only
+globs:
+  - apps/docs/**
+---
+
+# Melon docs — TanStack Start
+
+The docs site (`apps/docs`) uses **Fumadocs** on **TanStack Start** with **TanStack Router**. Do not add `@tanstack/react-query` to `@melon/db` packages.
+
+## Stack
+
+- Vite + `@tanstack/react-start` plugin (`vite.config.ts`)
+- File routes under `apps/docs/src/routes/`
+- MDX content under `apps/docs/content/docs/`
+- `DocsLink` (`apps/docs/src/components/docs-link.tsx`) for internal `/docs/*` navigation
+
+## Patterns
+
+- Use `createFileRoute` / `createServerFn` from TanStack Start for API routes and loaders.
+- Keep MDX pages free of direct DB imports — use client playgrounds (`'use client'` components in `src/components/playgrounds/`).
+- Sidebar order: edit `meta.json` next to each MDX folder.
+- Mermaid: fenced `mermaid` blocks; plugin order in `source.config.ts` matters (mermaid before highlight).
+
+## When adding docs features
+
+1. Update walkthroughs under `content/docs/walkthroughs/` when example apps change.
+2. Update `prd-compliance.mdx` when `.cursor/rules/prd-*.mdc` changes.
+3. Run `bun run docs:api` before release builds for TypeDoc pages.
+
+## Non-goals
+
+- No TanStack Query integration in core Melon packages.
+- `playground-web` uses plain Vite + React, not TanStack Start.

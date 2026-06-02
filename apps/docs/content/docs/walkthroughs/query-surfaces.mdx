@@ -1,0 +1,49 @@
+---
+title: Query surfaces
+description: Fluent builder, Mango, and Prisma-style queries on one engine.
+---
+
+All surfaces compile to the same **QueryAst** and execute through `@melon/db`.
+
+## Where to try
+
+| Surface | Example location |
+|---------|------------------|
+| Fluent (`@melon/db-query`) | `playground-rn-dev` Query demos, `playground-web` |
+| Mango (`@melon/db-query-mango`) | `playground-rn-dev` Demos screen |
+| Prisma-style (`@melon/db-prisma`) | `useFindMany` with `where` / `orderBy` / `include` in rn-dev |
+
+## Fluent
+
+```ts
+const q = createQueryFactory(schema);
+const ast = q.from<Task>('tasks').where('status', 'eq', 'open').toAst();
+await db.collection('tasks').query(ast).fetch();
+```
+
+## Mango
+
+```ts
+const compiler = createMangoCompiler();
+const prepared = compiler.compile(
+  { selector: { status: 'open' }, limit: 10 },
+  schema,
+  'tasks',
+);
+```
+
+## Prisma-style
+
+```ts
+const rows = await useFindMany<Task>('tasks', {
+  where: { status: 'open' },
+  orderBy: { priority: 'desc' },
+  take: 5,
+});
+```
+
+## Verify
+
+- [ ] Open tasks from fluent and Mango hooks match in rn-dev demos.
+- [ ] Devtools shows `source: melon` | `mango` | `prisma` on query snapshots.
+- [ ] Unsupported operators fail at compile time (see Mango package README).

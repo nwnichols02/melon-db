@@ -1,13 +1,18 @@
 import type { QueryDebugSnapshot } from "@melon/db";
 import { type ReactElement, useState } from "react";
 import { formatJson } from "../format-json.ts";
+import {
+	formatQueryParams,
+	formatQueryPlan,
+	hasSqlSection,
+} from "../query-snapshot-sections.ts";
 
 export interface QueriesTabProps {
 	queries: QueryDebugSnapshot[];
 }
 
 /**
- * Lists query debug snapshots with expandable AST and SQL details.
+ * Lists query debug snapshots with expandable Plan, SQL, params, and AST details.
  */
 export function QueriesTab({ queries }: QueriesTabProps): ReactElement {
 	const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
@@ -22,6 +27,7 @@ export function QueriesTab({ queries }: QueriesTabProps): ReactElement {
 			{items.map((query, index) => {
 				const isExpanded = expandedIndex === index;
 				const label = `${query.ast.collection} (${query.ast.mode})${query.durationMs !== undefined ? ` — ${query.durationMs.toFixed(1)}ms` : ""}`;
+				const paramsText = formatQueryParams(query);
 
 				return (
 					<div
@@ -48,7 +54,7 @@ export function QueriesTab({ queries }: QueriesTabProps): ReactElement {
 						</button>
 						{isExpanded ? (
 							<div style={{ marginTop: 8 }}>
-								{query.sql ? (
+								{hasSqlSection(query) ? (
 									<>
 										<strong>SQL</strong>
 										<pre
@@ -63,6 +69,32 @@ export function QueriesTab({ queries }: QueriesTabProps): ReactElement {
 										</pre>
 									</>
 								) : null}
+								{paramsText ? (
+									<>
+										<strong>Params</strong>
+										<pre
+											style={{
+												background: "#f5f5f5",
+												fontSize: 12,
+												overflow: "auto",
+												padding: 8,
+											}}
+										>
+											{paramsText}
+										</pre>
+									</>
+								) : null}
+								<strong>Plan</strong>
+								<pre
+									style={{
+										background: "#f5f5f5",
+										fontSize: 12,
+										overflow: "auto",
+										padding: 8,
+									}}
+								>
+									{formatQueryPlan(query)}
+								</pre>
 								<strong>AST</strong>
 								<pre
 									style={{

@@ -3,7 +3,7 @@ title: PRD compliance matrix
 description: Mapping workspace PRDs and RFCs to implementation status across packages and apps.
 ---
 
-This page tracks how Melon implementation compares to the product requirements in `.cursor/rules/` (prd-1 through prd-3, db-core, db-query, db-prisma, package-roles, file-layout). For shipped phase history see [Roadmap](/docs/roadmap).
+This page tracks how Melon implementation compares to the product requirements in `.cursor/rules/` (prd-1 through prd-4, db-core, db-query, db-prisma, package-roles, file-layout). **prd-4** describes a **future** sliding-window retention subsystem — not part of v1 core. For shipped phase history see [Roadmap](/docs/roadmap).
 
 **Legend:** **Done** · **Partial** · **Deferred** (intentional v1 limit) · **Gap** (not scheduled / needs decision)
 
@@ -13,10 +13,10 @@ This page tracks how Melon implementation compares to the product requirements i
 
 | Bucket | Examples |
 |--------|----------|
-| **Done** | Core engine, SQLite (Node/Bun/Expo/native), sync pull/push, codemods, devtools, RN benchmarks |
-| **Partial** | Mango/Prisma surfaces, testkit helpers, hook ergonomics |
+| **Done** | Core engine, SQLite (Node/Bun/Expo/native), sync pull/push, codemods, RN benchmarks, `useRecord`, walkthroughs |
+| **Partial** | Mango/Prisma surfaces, testkit helpers, devtools (Plan/params), `playground-web`, hook/schema typing |
 | **Deferred** | SQL joins, `hasMany` includes, `Q.on`, full schema codemods, background sync |
-| **Gap** | `getChangedCollections`, `useRecord`, Supabase/REST backends, `playground-web` |
+| **Gap** | `getChangedCollections`, sliding window (prd-4), Supabase/REST backends |
 
 ---
 
@@ -24,7 +24,7 @@ This page tracks how Melon implementation compares to the product requirements i
 
 | Requirement | Status | Notes |
 |-------------|--------|-------|
-| Schema + `createMelonSchema` | Done | |
+| Schema + `createMelonSchema` | Done | Generic schema preserves collection keys |
 | AST + prepare/validate/plan | Done | |
 | `StorageAdapter` contract | Done | |
 | `createDatabase`, collections, CRUD, `observe` | Done | |
@@ -65,6 +65,7 @@ This page tracks how Melon implementation compares to the product requirements i
 | `findMany` / `findFirst` / `count` + builder | Done | Same `CollectionQueryInput` as `query()` |
 | Schema-driven inference | Partial | Factory accepts schema; no field inference yet |
 | Builder `.not()` | Done | Mirrors `and` / `or` nesting |
+| Hook/schema typing without assertions | Partial | `resolveCollectionQuery` overloads; collection keys via generics |
 
 ---
 
@@ -90,7 +91,8 @@ This page tracks how Melon implementation compares to the product requirements i
 | `useFindMany` + fluent builder | Done | `useFluentQuery` helper |
 | `useRecord` | Done | Primary-key observe + `useRecordState` |
 | Hook loading/error state | Done | `useQueryState`, `useFindManyState`, `useFluentQueryState`, `useRecordState` |
-| Sync hooks in this package | Partial | Convenience; [package-roles](https://github.com) boundary drift |
+| Sync hooks in this package | Partial | Convenience; package-roles boundary drift |
+| Hook/schema typing without assertions | Partial | `isPreparedQuery` guards; `UseQueryOptions` select generic |
 
 ---
 
@@ -111,7 +113,7 @@ This page tracks how Melon implementation compares to the product requirements i
 
 | Package | Status | Main gap |
 |---------|--------|----------|
-| devtools | Done | Plan tab not in UI; SQL needs SQLite debug |
+| devtools | Partial | Plan + SQL params in UI; Retention tab stub (prd-4) |
 | testkit | Partial | No Jest helpers / fake clock |
 | codemods | Done | `migrate-schema` spike; `Q.on` recipes only |
 
@@ -126,19 +128,42 @@ This page tracks how Melon implementation compares to the product requirements i
 | `merging` sync state | Deferred | See [Phase 29+ decisions](#phase-29-decisions) |
 | Persistent multi-job queue | Deferred | |
 | Supabase / REST recipes | Gap | |
+| Sliding window / local prune (prd-4) | Gap | Builds on pull/push + outbox; not a sync-server replacement |
 | React hooks | N/A | In `@melon/db-react` |
+
+---
+
+## Sliding window (prd-4)
+
+Future retention subsystem from `prd-4.mdc` — org-aware download windows, safe local pruning, and diagnostics. **Not scheduled for v1.**
+
+| Requirement | Status | Notes |
+|-------------|--------|-------|
+| Window definition model (per org / entity) | Gap | Server-sourced config via app API |
+| Effective window computation | Gap | Pure-function policy engine |
+| Record eligibility (in-window / protected / prune-eligible) | Gap | Protect unsynced + relational deps |
+| Prune planner + executor | Gap | Post-sync + pressure modes |
+| `sync_window_state` + `local_prune_ledger` tables | Gap | Phase 1 in prd-4 |
+| Pressure modes (normal / low-storage / emergency) | Gap | |
+| Background maintenance (NetInfo, background fetch) | Gap | Opportunistic + resume |
+| Retention observability (devtools / support UI) | Gap | Devtools Retention tab stub only |
+| Devtools integration | Partial | Placeholder tab; full UI with Phase 31+ |
+
+**Package home (TBD):** `@melon/sync` extension or `@melon/sync-retention` — sync packages must not depend on query-layer packages per package-roles.
 
 ---
 
 ## Apps
 
-| Feature | playground-rn | playground-rn-dev | docs | playground-node |
-|---------|---------------|-------------------|------|-----------------|
-| SQLite | Expo | Native JSI | In-memory live UI | Node |
-| CRUD + reactive | Yes | Yes | Yes | Yes |
-| Delete in UI | Partial | Yes | Yes | — |
-| Mango / Prisma / relations demos | — | Demos screen | Docs only | — |
-| Benchmarks | No | Dev screen | Static JSON | Node benches |
+| Feature | playground-rn | playground-rn-dev | playground-web | docs | playground-node |
+|---------|---------------|-------------------|----------------|------|-----------------|
+| SQLite / storage | Expo | Native JSI | In-memory | In-memory live UI | Node SQLite |
+| CRUD + reactive | Yes | Yes | Yes | Yes | Yes |
+| Delete in UI | Partial | Yes | Yes | Yes | — |
+| Mango / Prisma / relations demos | — | Demos screen | Fluent query | Docs + walkthrough | — |
+| Devtools panel | — | Yes | Yes | Toggle in playground | — |
+| Benchmarks | No | Dev screen | — | Static JSON | Node benches |
+| Sync + backend demos | Client only | Client | — | Sync playground | HTTP + Postgres scripts |
 
 ---
 
@@ -152,8 +177,9 @@ Product decisions recorded here (not blockers for phases 0–28):
 | SQL JOIN / `hasMany` / `Q.on` | **Defer** | Documented v1 limits on [Roadmap](/docs/roadmap) |
 | Sync `merging` state | **Defer** | Apply path is synchronous; add when merge UI needs distinct phase |
 | `@melon/db-react` → `@melon/sync` dep | **Accept** | DX for `useSync`; split only if publishing react without sync |
-| `playground-web` | **Defer** | No web adapter package yet |
+| `playground-web` | **Partial** | In-memory Vite app; full web SQLite adapter still deferred |
 | Read-during-write blocking | **Defer** | Serialized writes sufficient for v1; revisit if readers observe torn state |
+| Sliding window subsystem (prd-4) | **Defer** | Phase 31+; policy foundation before prune executor |
 
 ---
 
@@ -164,6 +190,7 @@ Product decisions recorded here (not blockers for phases 0–28):
 | `prd-1.mdc` | Product vision, sync, RN, hooks, GA checklist |
 | `prd-2.mdc` | AST-first multi-surface queries |
 | `prd-3.mdc` | TypeScript interface contracts |
+| `prd-4.mdc` | **Future** sliding-window retention, prune ledger, org-aware scope |
 | `db-core.mdc` | `@melon/db` + `@melon/db-sqlite` |
 | `db-query.mdc` | Fluent builder + React |
 | `db-prisma.mdc` | Prisma layer |

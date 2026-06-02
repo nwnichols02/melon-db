@@ -1,0 +1,41 @@
+---
+title: Full-stack sync
+description: HTTP and Postgres reference backends with pull/push contract.
+---
+
+Melon sync follows a Watermelon-compatible pull/push protocol. See [Sync backend](/docs/sync/backend) for request/response shapes.
+
+## HTTP (in-process)
+
+```bash
+bun run demo:sync:http
+```
+
+Uses `@melon/sync-server` HTTP helpers and `playground-node` client code.
+
+## Standalone sync server
+
+```bash
+bun run sync-server
+```
+
+Point your app’s `pullChanges` / `pushChanges` at the server URL (see `playground-rn` sync client).
+
+## Postgres reference
+
+```bash
+bun run postgres:up
+bun run sync-server:postgres
+# separate terminal:
+bun run demo:sync:postgres
+```
+
+`PostgresSyncStore` in `@melon/sync-server` implements the same contract against Postgres.
+
+## Verify
+
+- [ ] Pull returns `changes` grouped by collection and a new `timestamp`.
+- [ ] Push applies local outbox entries and clears after acknowledgement.
+- [ ] [Sync playground](/docs/playgrounds/sync) demonstrates client-side flow in the browser.
+
+Future **sliding-window retention** (prd-4) layers on top of this sync stack — see [PRD compliance](/docs/prd-compliance#sliding-window-prd-4).

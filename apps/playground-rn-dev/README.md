@@ -94,6 +94,13 @@ The native package podspec must use `s.source = { :path => "." }` for monorepo i
 
 **`No development build … is installed`** — `bun run start` only starts Metro. Run `bun run install:ios` or `install:android` first, then open **Melon Playground (Dev)** (not Expo Go).
 
+## Walkthroughs
+
+- [React Native (JSI)](/docs/walkthroughs/react-native-jsi) — query demos, devtools, benchmarks
+- [Query surfaces](/docs/walkthroughs/query-surfaces) — fluent, Mango, Prisma-style on the Demos screen
+
+Run the docs site from the repo root: `bun run dev:docs`.
+
 ## Typecheck
 
 ```bash

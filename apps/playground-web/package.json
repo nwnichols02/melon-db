@@ -1,0 +1,26 @@
+{
+	"name": "playground-web",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@melon/db": "workspace:*",
+		"@melon/db-devtools": "workspace:*",
+		"@melon/db-query": "workspace:*",
+		"@melon/db-react": "workspace:*",
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0"
+	},
+	"devDependencies": {
+		"@types/react": "^19.1.10",
+		"@types/react-dom": "^19.1.6",
+		"@vitejs/plugin-react": "^4.7.0",
+		"typescript": "^5",
+		"vite": "^6.3.5"
+	}
+}
