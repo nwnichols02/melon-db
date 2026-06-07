@@ -39,7 +39,7 @@ export const PACKAGE_BLURBS: Record<ApiPackageId, string> = {
 	"melon-db-sqlite":
 		"SQLite StorageAdapter for Bun, Node, Expo Go, and React Native dev builds.",
 	"melon-db-sqlite-native":
-		"Melon-owned native SQLite module (TurboModule + C++ JSI) for RN dev builds.",
+		"Melon-db-owned native SQLite module (TurboModule + C++ JSI) for RN dev builds.",
 	"melon-db-query": "Fluent type-safe query builder that compiles to QueryAst.",
 	"melon-db-query-mango":
 		"Mango-style JSON query compiler (RxDB/CouchDB subset) to QueryAst.",

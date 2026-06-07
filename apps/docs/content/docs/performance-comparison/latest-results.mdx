@@ -1,6 +1,6 @@
 ---
 title: Latest results
-description: Most recent Melon vs WatermelonDB benchmark parity table from the committed harness artifact.
+description: Most recent Melon-db vs WatermelonDB benchmark parity table from the committed harness artifact.
 ---
 
 <BenchCompareResultsTable />
@@ -17,7 +17,7 @@ Commit the updated JSON with your PR when timings should be reflected on the doc
 
 On-device benchmarks from `playground-rn-dev` (development build with `@melon-db/db-sqlite-native` and WatermelonDB via `@morrowdigital/watermelondb-expo-plugin`).
 
-### Melon (jsi-sync) vs WatermelonDB
+### Melon-db (jsi-sync) vs WatermelonDB
 
 <BenchRnMelonWdbResultsTable />
 
@@ -31,4 +31,4 @@ The table is generated from [`apps/docs/src/data/bench-rn-latest.json`](https://
 2. Tap **Share JSON report** and merge `melonVsWdb` (and optionally `report` for jsi vs turbo) plus `generatedAt` / `device` into `bench-rn-latest.json`.
 3. Commit the updated JSON with your PR so the docs site picks up the new timings.
 
-Same scenarios as the Node harness: row insert, batch insert, filtered query, count, and find-by-id. Ratio for Melon vs WDB is `melonMs / watermelonMs` (&lt; 1 means Melon faster).
+Same scenarios as the Node harness: row insert, batch insert, filtered query, count, and find-by-id. Ratio for Melon-db vs WDB is `melonMs / watermelonMs` (&lt; 1 means Melon-db faster).

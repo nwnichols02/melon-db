@@ -52,7 +52,7 @@
       ],
       "notes": [
         "Primary axis: melon-node vs watermelon on better-sqlite3 :memory:",
-        "ratio = melonNodeMs / watermelonMs (< 1 means Melon faster)"
+        "ratio = melonNodeMs / watermelonMs (< 1 means Melon-db faster)"
       ]
     }
   ],

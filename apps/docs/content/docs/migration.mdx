@@ -1,6 +1,6 @@
 ---
 title: Migrating from WatermelonDB
-description: Codemods and concept mapping from WatermelonDB to Melon.
+description: Codemods and concept mapping from WatermelonDB to Melon-db.
 ---
 
 Use `@melon-db/db-codemods` for automated migration helpers.
@@ -18,11 +18,11 @@ Add `--dry-run` to preview changes. `migrate-schema` prints extracted `DatabaseS
 
 ## Runtime query translator
 
-The compatibility layer converts serializable Watermelon `Q` clauses to Melon `QueryAst` without a WatermelonDB dependency. Nested `Q.and` / `Q.or` are supported in the translator and in `migrate-queries`.
+The compatibility layer converts serializable Watermelon `Q` clauses to Melon-db `QueryAst` without a WatermelonDB dependency. Nested `Q.and` / `Q.or` are supported in the translator and in `migrate-queries`.
 
 <h2 id="q-on">Q.on (join) queries</h2>
 
-Melon supports **`Q.on` at runtime** when the parent schema defines a matching **`belongsTo` relation**. The compat translator maps `Q.on` to `QueryAst.relationFilters` (SQLite compiles an `IN` subquery). The codemod still emits a recipe comment when it cannot auto-translate; pass schema to `translateWatermelonQuery` for full translation.
+Melon-db supports **`Q.on` at runtime** when the parent schema defines a matching **`belongsTo` relation**. The compat translator maps `Q.on` to `QueryAst.relationFilters` (SQLite compiles an `IN` subquery). The codemod still emits a recipe comment when it cannot auto-translate; pass schema to `translateWatermelonQuery` for full translation.
 
 **Runtime (preferred when schema has `tasks.project` → `projects`):**
 
@@ -94,7 +94,7 @@ Complex HOC shapes still require manual migration.
 
 ## Schema extraction (spike)
 
-`migrate-schema` extracts a single Watermelon `Model` class file into Melon `DatabaseSchemaDefinition` JSON. Multi-file schema assembly and migration version mapping are not automated yet.
+`migrate-schema` extracts a single Watermelon `Model` class file into Melon-db `DatabaseSchemaDefinition` JSON. Multi-file schema assembly and migration version mapping are not automated yet.
 
 ## Manual migration
 
@@ -108,7 +108,7 @@ See [`@melon-db/db-codemods`](/docs/packages/melon-db-codemods) for the full com
 
 ## Concept mapping
 
-| WatermelonDB | Melon |
+| WatermelonDB | Melon-db |
 |--------------|-------|
 | `database.get('tasks')` | `db.collection('tasks')` |
 | `database.write()` | `db.write()` |

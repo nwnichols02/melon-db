@@ -107,9 +107,9 @@ Mark schema collections with `localOnly: true` to exclude them from `getLocalCha
 
 Provide a `NetworkMonitor` so sync pauses offline and `autoSyncOnReconnect` can resume.
 
-## What you implement vs what Melon provides
+## What you implement vs what Melon-db provides
 
-| You implement | Melon provides |
+| You implement | Melon-db provides |
 |---------------|----------------|
 | HTTP (or other transport) to your backend | Outbox, checkpoints, `synchronize()` orchestration |
 | `pullChanges` / `pushChanges` functions | `getLocalChanges`, `applyRemoteChanges`, conflict engines |

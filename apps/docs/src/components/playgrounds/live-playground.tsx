@@ -96,7 +96,7 @@ function DemoTaskList(): ReactElement {
 		<div className="rounded-xl border border-fd-border bg-fd-card p-5">
 			<h2 className="mt-0 text-xl font-semibold">Live playground</h2>
 			<p className="text-fd-muted-foreground">
-				In-memory Melon database with reactive queries. Open Melon devtools
+				In-memory Melon-db database with reactive queries. Open Melon-db devtools
 				(bottom-right) to inspect Plan, AST, and writes.
 			</p>
 			<div className="mb-4 flex gap-2">

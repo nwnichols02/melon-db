@@ -180,7 +180,7 @@ export function BenchCompareResultsTable() {
 					{formatGeneratedAt(artifact.generatedAt)} UTC
 				</time>{" "}
 				via <code className="text-fd-foreground">{artifact.updatedBy}</code>.
-				Ratio is melon-node ÷ watermelon (&lt; 1 means Melon faster).
+				Ratio is melon-node ÷ watermelon (&lt; 1 means Melon-db faster).
 			</p>
 
 			{artifact.reports.map((report) => (

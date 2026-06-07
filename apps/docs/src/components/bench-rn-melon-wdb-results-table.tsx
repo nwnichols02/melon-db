@@ -79,7 +79,7 @@ function MelonWdbResultsTable({ rows, melonEngine }: MelonWdbResultsTableProps) 
 	if (rows.length === 0) {
 		return (
 			<p className="text-fd-muted-foreground text-sm">
-				No Melon vs WatermelonDB results in the artifact. Run{" "}
+				No Melon-db vs WatermelonDB results in the artifact. Run{" "}
 				<strong>jsi-sync + Watermelon</strong> in{" "}
 				<code className="text-fd-foreground">playground-rn-dev</code> →
 				Benchmarks and update{" "}
@@ -159,7 +159,7 @@ export function BenchRnMelonWdbResultsTable() {
 						{device.platform})
 					</>
 				) : null}
-				. Ratio is {melonVsWdb.melonEngine} ÷ watermelon (&lt; 1 means Melon
+				. Ratio is {melonVsWdb.melonEngine} ÷ watermelon (&lt; 1 means Melon-db
 				faster).
 			</p>
 

@@ -56,7 +56,7 @@ export function MelonDevtoolsPanel(): ReactElement | null {
 			<Modal animationType="slide" visible={open}>
 				<View style={styles.container}>
 					<View style={styles.header}>
-						<Text style={styles.title}>Melon Devtools</Text>
+						<Text style={styles.title}>Melon-db Devtools</Text>
 						<View style={styles.headerActions}>
 							<Pressable
 								onPress={() => bridge.clear()}

@@ -12,7 +12,7 @@ export const Route = createRootRoute({
 		meta: [
 			{ charSet: "utf-8" },
 			{ name: "viewport", content: "width=device-width, initial-scale=1" },
-			{ title: "Melon — offline-first local database" },
+			{ title: "Melon-db — offline-first local database" },
 		],
 		links: [
 			{ rel: "preconnect", href: "https://fonts.googleapis.com" },

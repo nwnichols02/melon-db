@@ -1,6 +1,6 @@
-# Melon docs
+# Melon-db docs
 
-Documentation site for the Melon monorepo, built with [Fumadocs](https://www.fumadocs.dev/docs) on [TanStack Start](https://tanstack.com/start) (SSR).
+Documentation site for the Melon-db monorepo, built with [Fumadocs](https://www.fumadocs.dev/docs) on [TanStack Start](https://tanstack.com/start) (SSR).
 
 **Requires Node.js 22+** for Fumadocs tooling.
 

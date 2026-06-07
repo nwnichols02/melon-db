@@ -174,7 +174,7 @@ function normalizeIndexBody(file: string, body: string): string {
 	let updated = body;
 
 	updated = updated.replace(
-		/^#\s+Melon API\s*$/m,
+		/^#\s+Melon-db API\s*$/m,
 		`# ${label}`,
 	);
 	updated = updated.replace(

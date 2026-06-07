@@ -31,7 +31,7 @@ function DocsPre(props: ComponentProps<"pre">) {
 }
 
 /**
- * MDX component map for docs pages, including Melon playgrounds and type tables.
+ * MDX component map for docs pages, including Melon-db playgrounds and type tables.
  */
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
 	return {

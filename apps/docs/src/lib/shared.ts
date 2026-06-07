@@ -1,4 +1,4 @@
-export const appName = "Melon";
+export const appName = "Melon-db";
 export const docsRoute = "/docs";
 
 export const gitConfig = {

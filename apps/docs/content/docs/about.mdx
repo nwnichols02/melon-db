@@ -1,13 +1,13 @@
 ---
-title: About Melon
-description: Vision, inspiration, design principles, and what Melon is (and is not).
+title: About Melon-db
+description: Vision, inspiration, design principles, and what Melon-db is (and is not).
 ---
 
-Melon is a **local-first database stack** for React Native and TypeScript — a modern successor to [WatermelonDB](https://watermelon.dev/) with an AST-first query model, SQLite adapters, optional sync, and multiple query authoring surfaces.
+Melon-db is a **local-first database stack** for React Native and TypeScript — a modern successor to [WatermelonDB](https://watermelon.dev/) with an AST-first query model, SQLite adapters, optional sync, and multiple query authoring surfaces.
 
-## What Melon is
+## What Melon-db is
 
-Melon is two modular products that work together or independently:
+Melon-db is two modular products that work together or independently:
 
 1. **Storage and query engine** (`@melon-db/db` + adapters) — schema, query AST, runtime engine, reactive subscriptions, and migrations.
 2. **Sync engine** (`@melon-db/sync`) — Watermelon-compatible pull/push orchestration with conflict policies, retry, and checkpoints.
@@ -31,7 +31,7 @@ Become the default local-first data layer for React Native teams that want Water
 | **RxDB / CouchDB Mango** | Serializable JSON query DSL for tests, devtools, and config-driven screens |
 | **Prisma** | Schema-first typing, codegen ergonomics, and hook patterns — **not** the Prisma engine at runtime |
 
-Melon preserves WatermelonDB's strengths (offline-first, large datasets, reactivity) while modernizing setup for TypeScript, hooks, and React Native's new architecture.
+Melon-db preserves WatermelonDB's strengths (offline-first, large datasets, reactivity) while modernizing setup for TypeScript, hooks, and React Native's new architecture.
 
 ## Design principles
 
@@ -48,9 +48,9 @@ Melon preserves WatermelonDB's strengths (offline-first, large datasets, reactiv
 - **Platform engineers** — serializable Mango queries for policy layers, fixtures, and devtools.
 - **TypeScript-heavy product teams** — explicit write boundaries, structured errors, and testkit helpers.
 
-## What Melon is not
+## What Melon-db is not
 
-- **Not a remote ORM** — Melon executes locally; backends integrate via sync protocol, not query proxying.
+- **Not a remote ORM** — Melon-db executes locally; backends integrate via sync protocol, not query proxying.
 - **Not the full Prisma engine** — `@melon-db/db-prisma` is schema/codegen + client facade over `@melon-db/db`.
 - **Not CRDT-first** — conflict policies are configurable (server-wins, merge-by-field, custom), not automatic merge-by-default.
 - **Not native JSI in Expo Go** — managed Expo uses `@melon-db/db-sqlite/expo`; native JSI requires a dev build.
@@ -66,6 +66,6 @@ Melon preserves WatermelonDB's strengths (offline-first, large datasets, reactiv
 
 ## Author & license
 
-Copyright (c) 2026 [Nate Nichols](https://github.com/nwnichols02). Melon is released under the [MIT License](https://github.com/nwnichols02/melon/blob/main/LICENSE).
+Copyright (c) 2026 [Nate Nichols](https://github.com/nwnichols02). Melon-db is released under the [MIT License](https://github.com/nwnichols02/melon/blob/main/LICENSE).
 
 npm packages publish under the `@melon-db` scope with dist-tag `alpha`. See [RELEASING.md](https://github.com/nwnichols02/melon/blob/main/RELEASING.md) for maintainer release steps.

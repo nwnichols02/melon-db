@@ -3,7 +3,7 @@ title: Relations
 description: belongsTo and hasMany schema metadata, includes, and fetch patterns.
 ---
 
-Relations are declared in [schema metadata](/docs/setup/schema). Melon stores foreign keys as ordinary fields; relations describe how collections link together for validation and query `include`.
+Relations are declared in [schema metadata](/docs/setup/schema). Melon-db stores foreign keys as ordinary fields; relations describe how collections link together for validation and query `include`.
 
 ## belongsTo
 
@@ -45,7 +45,7 @@ Nested includes support filters on the relation:
 
 ```ts
 .include('project', {
-  where: { type: 'predicate', predicate: { field: 'name', op: 'eq', value: 'Melon' } },
+  where: { type: 'predicate', predicate: { field: 'name', op: 'eq', value: 'Melon-db' } },
 })
 ```
 

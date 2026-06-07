@@ -1,9 +1,9 @@
 ---
 title: Overview
-description: Melon vs WatermelonDB benchmark methodology and limitations.
+description: Melon-db vs WatermelonDB benchmark methodology and limitations.
 ---
 
-Melon ships an optional **WatermelonDB baseline** in the `@melon-db/db-sqlite` benchmark harness. This is a measurement tool only — not a performance guarantee or optimization target.
+Melon-db ships an optional **WatermelonDB baseline** in the `@melon-db/db-sqlite` benchmark harness. This is a measurement tool only — not a performance guarantee or optimization target.
 
 See **[Latest results](/docs/performance-comparison/latest-results)** for timings from the most recent committed benchmark run.
 
@@ -15,7 +15,7 @@ From the monorepo root:
 bun run bench:compare              # human-readable table
 bun run bench:compare --scale=10k --json
 bun run bench:compare --melon-engines=bun,node
-bun run bench:compare --skip-wdb   # Melon-only (no @nozbe/watermelondb leg)
+bun run bench:compare --skip-wdb   # Melon-db-only (no @nozbe/watermelondb leg)
 bun run bench:compare:docs         # refresh docs latest-results JSON
 ```
 
@@ -41,7 +41,7 @@ Both sides use the same row counts and query shapes:
 
 Parity JSON includes `ratio = melonNodeMs / watermelonMs`:
 
-- **&lt; 1** — Melon faster on that scenario at that scale (on that machine)
+- **&lt; 1** — Melon-db faster on that scenario at that scale (on that machine)
 - **&gt; 1** — WatermelonDB faster
 
 Timings vary by hardware and cold JIT; treat CI output as a trend signal, not a release gate.
@@ -63,7 +63,7 @@ Phase 28 adds a **dev-only benchmark screen** in `apps/playground-rn-dev` that r
 2. Start Metro (`bun run dev:rn:dev:start`).
 3. On the task list, tap **Benchmarks** (dev builds only) or open `/benchmark`.
 4. Choose scale **1k** (quick) or **10k** (full).
-5. Tap **Run jsi-sync + Watermelon** for on-device Melon vs WatermelonDB parity (primary), or **Run jsi-sync + turbo** for native binding comparison.
+5. Tap **Run jsi-sync + Watermelon** for on-device Melon-db vs WatermelonDB parity (primary), or **Run jsi-sync + turbo** for native binding comparison.
 6. Tap **Share JSON report** to export timings and parity (`melonVsWdb` and/or `report`).
 
 **WatermelonDB on device** requires `@morrowdigital/watermelondb-expo-plugin` in `playground-rn-dev`. Re-run `install:ios` / `install:android` (prebuild) after plugin changes before benchmarking.
@@ -77,13 +77,13 @@ Phase 28 adds a **dev-only benchmark screen** in `apps/playground-rn-dev` that r
 | `melon-expo` | `createExpoSqliteAdapter` | Optional leg from benchmark screen |
 | `watermelon` | WatermelonDB `SQLiteAdapter` + JSI (`jsi: true`) | Same scenarios as Node `bench:compare` |
 
-On-device Melon vs WDB parity uses `ratio = melonMs / watermelonMs` (`buildRnMelonVsWdbReport`, default melon leg `melon-jsi-sync`). jsi-sync vs turbo uses `buildRnParityReport`. See [React Native sample](/docs/performance-comparison/latest-results#react-native-sample).
+On-device Melon-db vs WDB parity uses `ratio = melonMs / watermelonMs` (`buildRnMelonVsWdbReport`, default melon leg `melon-jsi-sync`). jsi-sync vs turbo uses `buildRnParityReport`. See [React Native sample](/docs/performance-comparison/latest-results#react-native-sample).
 
 ### Limitations
 
 - Manual only — no CI device farm; plug in device and disable background apps for stable numbers.
 - Scales capped at **10k** on device (50k/100k remain Node-only).
-- WDB and Melon native use different SQLite stacks; jsi-sync still suspends Melon during its leg.
+- WDB and Melon-db native use different SQLite stacks; jsi-sync still suspends Melon-db during its leg.
 
 ## Non-goals
 

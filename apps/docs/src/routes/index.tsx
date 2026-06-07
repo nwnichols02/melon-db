@@ -18,7 +18,7 @@ function Home() {
 				/>
 				<div className="relative flex w-full max-w-2xl flex-col items-center gap-6 px-6 text-center">
 					<MelonLogo showWordmark={false} size="lg" />
-					<h1 className="text-4xl font-bold tracking-tight md:text-5xl">Melon</h1>
+					<h1 className="text-4xl font-bold tracking-tight md:text-5xl">Melon-db</h1>
 					<p className="max-w-lg text-fd-muted-foreground text-lg">
 						Offline-first local database for React Native and TypeScript — a
 						modern successor to WatermelonDB.{" "}
@@ -27,7 +27,7 @@ function Home() {
 							params={{ _splat: "about" }}
 							to="/docs/$"
 						>
-							About Melon
+							About Melon-db
 						</Link>
 					</p>
 					<div className="flex flex-wrap items-center justify-center gap-3">

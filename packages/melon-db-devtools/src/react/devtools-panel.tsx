@@ -56,7 +56,7 @@ export function MelonDevtoolsPanel(): ReactElement {
 					zIndex: 9999,
 				}}
 			>
-				Melon
+				Melon-db
 			</button>
 			{open ? (
 				<div
@@ -83,7 +83,7 @@ export function MelonDevtoolsPanel(): ReactElement {
 							padding: "12px 16px",
 						}}
 					>
-						<strong>Melon Devtools</strong>
+						<strong>Melon-db Devtools</strong>
 						<div style={{ display: "flex", gap: 8 }}>
 							<button
 								type="button"

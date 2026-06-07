@@ -54,8 +54,8 @@
       }
     ],
     "notes": [
-      "On-device Melon (melon-jsi-sync) vs WatermelonDB",
-      "ratio = melonMs / watermelonMs (< 1 means Melon faster)"
+      "On-device Melon-db (melon-jsi-sync) vs WatermelonDB",
+      "ratio = melonMs / watermelonMs (< 1 means Melon-db faster)"
     ]
   },
   "report": {
@@ -106,7 +106,7 @@
       }
     ],
     "notes": [
-      "On-device Melon native SQLite: jsi-sync vs turbo",
+      "On-device Melon-db native SQLite: jsi-sync vs turbo",
       "ratio = jsiSyncMs / turboMs (< 1 means jsi-sync faster)"
     ]
   }

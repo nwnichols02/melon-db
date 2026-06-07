@@ -5,13 +5,13 @@ description: Limitations, common questions, and troubleshooting.
 
 ## General
 
-### Do I need sync to use Melon?
+### Do I need sync to use Melon-db?
 
 No. Omit `sync` on `createDatabase` for local-only apps. Sync packages are optional.
 
 ### Is this compatible with WatermelonDB backends?
 
-The pull/push **shape** is Watermelon-compatible (`changes` grouped by table, `lastPulledAt`, schema version). You still need to map Melon field names and wire Melon’s outbox — see the [migration guide](/docs/migration).
+The pull/push **shape** is Watermelon-compatible (`changes` grouped by table, `lastPulledAt`, schema version). You still need to map Melon-db field names and wire Melon-db’s outbox — see the [migration guide](/docs/migration).
 
 ### Can I use Supabase / Postgres / REST?
 
@@ -53,7 +53,7 @@ Yes — throw from `pushChanges` handler; client surfaces `failed` status. Desig
 
 ### Are partial pulls supported?
 
-The core protocol assumes a single `changes` blob per pull. For very large datasets, implement custom pagination inside your `pullChanges` handler (e.g. per-collection cursors) while keeping Melon’s checkpoint model.
+The core protocol assumes a single `changes` blob per pull. For very large datasets, implement custom pagination inside your `pullChanges` handler (e.g. per-collection cursors) while keeping Melon-db’s checkpoint model.
 
 ## Data & queries
 
