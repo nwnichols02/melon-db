@@ -10,7 +10,13 @@
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { describeNpmPublishAuth, hasNpmPublishAuth, npmPublishEnv, publishAuthHelp } from "./auth.ts";
+import {
+  configureNpmRegistryAuth,
+  describeNpmPublishAuth,
+  hasNpmPublishAuth,
+  npmPublishEnv,
+  publishAuthHelp,
+} from "./auth.ts";
 import { publishExports } from "./export-map.ts";
 import { MELON_VERSION, PUBLISH_ORDER } from "./packages.ts";
 
@@ -27,9 +33,28 @@ if (!hasNpmPublishAuth()) {
 console.log(`npm publish auth: ${describeNpmPublishAuth()}`);
 if (process.env.MELON_PUBLISH_AUTH === "token" && process.env.GITHUB_ACTIONS === "true") {
   console.log(
-    "Bootstrap mode: NPM_TOKEN must be an npm Automation token (Access Tokens → Automation). " +
+    "NPM_TOKEN must be an npm Automation token (Access Tokens → Automation). " +
       "Granular tokens require browser 2FA and fail in CI with EOTP.",
   );
+}
+
+configureNpmRegistryAuth();
+
+if (process.env.MELON_PUBLISH_AUTH !== "oidc") {
+  const whoami = Bun.spawnSync(["npm", "whoami", "--registry", "https://registry.npmjs.org/"], {
+    stdout: "pipe",
+    stderr: "pipe",
+    env: npmPublishEnv(),
+  });
+  if (whoami.exitCode !== 0) {
+    const detail = new TextDecoder().decode(whoami.stderr).trim();
+    console.error(
+      "npm whoami failed — NPM_TOKEN may be missing, expired, or not an Automation token.\n" +
+        (detail ? `${detail}\n` : ""),
+    );
+    process.exit(1);
+  }
+  console.log(`npm whoami: ${new TextDecoder().decode(whoami.stdout).trim()}`);
 }
 
 for (const config of PUBLISH_ORDER) {

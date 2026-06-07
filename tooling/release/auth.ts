@@ -1,4 +1,10 @@
+import { writeFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
+
 export type PublishAuthMode = "oidc" | "token" | "auto";
+
+const NPM_REGISTRY = "https://registry.npmjs.org/";
 
 /**
  * Resolved publish auth mode from MELON_PUBLISH_AUTH or environment.
@@ -73,6 +79,35 @@ export function describeNpmPublishAuth(): string {
 	return "none";
 }
 
+function getNpmAuthToken(): string | undefined {
+	const token = process.env.NPM_TOKEN ?? process.env.NODE_AUTH_TOKEN;
+	return token && token.length > 0 ? token : undefined;
+}
+
+function shouldWriteNpmRegistryToken(): boolean {
+	const mode = resolvePublishAuthMode();
+	if (mode === "oidc") return false;
+	return Boolean(getNpmAuthToken());
+}
+
+/**
+ * Write ~/.npmrc so npm publish receives the Automation token.
+ * NODE_AUTH_TOKEN alone is not enough without registry-url / .npmrc config.
+ */
+export function configureNpmRegistryAuth(): void {
+	if (!shouldWriteNpmRegistryToken()) return;
+
+	const token = getNpmAuthToken();
+	if (!token) return;
+
+	const npmrcPath = join(homedir(), ".npmrc");
+	writeFileSync(
+		npmrcPath,
+		`registry=${NPM_REGISTRY}\n//registry.npmjs.org/:_authToken=${token}\n`,
+		"utf8",
+	);
+}
+
 /**
  * Environment for npm publish subprocess — strips tokens in OIDC mode so npm
  * CLI uses GitHub id-token exchange instead of a stale .npmrc token.
@@ -95,10 +130,7 @@ export function npmPublishEnv(): NodeJS.ProcessEnv {
 export function publishAuthHelp(): string {
 	return (
 		"No npm publish auth available.\n\n" +
-		"GitHub Actions — OIDC (after trusted publishers configured):\n" +
-		"  bootstrap_token: false\n\n" +
-		"GitHub Actions — bootstrap (first publish only):\n" +
-		"  bootstrap_token: true\n" +
+		"GitHub Actions:\n" +
 		"  NPM_TOKEN secret = npm Automation token (NOT Granular — Granular triggers EOTP/2FA)\n\n" +
 		"Local:\n" +
 		"  export NPM_TOKEN=npm_...  (Automation token)\n" +
