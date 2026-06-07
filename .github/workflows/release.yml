@@ -66,4 +66,4 @@ jobs:
             echo "::error::NPM_TOKEN secret is missing. Add a granular access token under Settings → Secrets and variables → Actions."
             exit 1
           fi
-          bun tooling/release/publish.ts --tag "${{ github.event.inputs.dist_tag }}"
+          bun tooling/release/publish.ts --tag "${{ github.event.inputs.dist_tag }}" --skip-published

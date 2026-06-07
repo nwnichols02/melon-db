@@ -24,6 +24,19 @@ const root = join(import.meta.dir, "../..");
 const tag = process.argv.includes("--tag")
   ? process.argv[process.argv.indexOf("--tag") + 1] ?? "alpha"
   : "alpha";
+const skipPublished = process.argv.includes("--skip-published");
+
+/**
+ * Returns true when the exact version is already on the npm registry.
+ */
+function isVersionPublished(packageName: string, version: string): boolean {
+  const proc = Bun.spawnSync(
+    ["npm", "view", `${packageName}@${version}`, "version", "--registry", "https://registry.npmjs.org/"],
+    { stdout: "pipe", stderr: "pipe", env: npmPublishEnv() },
+  );
+  if (proc.exitCode !== 0) return false;
+  return new TextDecoder().decode(proc.stdout).trim() === version;
+}
 
 if (!hasNpmPublishAuth()) {
   console.error(publishAuthHelp());
@@ -72,9 +85,15 @@ for (const config of PUBLISH_ORDER) {
 
   writeFileSync(pkgPath, `${JSON.stringify(pkg, null, "\t")}\n`);
 
+  if (skipPublished && isVersionPublished(config.name, MELON_VERSION)) {
+    console.log(`Skipping ${config.name}@${MELON_VERSION} (already on npm)`);
+    writeFileSync(pkgPath, original);
+    continue;
+  }
+
   console.log(`Publishing ${config.name}@${MELON_VERSION} (tag: ${tag})...`);
   const proc = Bun.spawnSync(
-    ["npm", "publish", "--access", "public", "--tag", tag],
+    ["npm", "publish", "--access", "public", "--tag", tag, "--ignore-scripts"],
     {
       cwd: packageDir,
       stdout: "inherit",

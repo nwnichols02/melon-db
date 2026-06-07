@@ -14,8 +14,7 @@
 	"scripts": {
 		"test": "bun test",
 		"typecheck": "bunx tsc -p tsconfig.json --noEmit",
-		"build": "bunx tsc -b tsconfig.build.json --force",
-		"prepublishOnly": "bunx tsc -b tsconfig.build.json --force"
+		"build": "bunx tsc -b tsconfig.build.json --force"
 	},
 	"dependencies": {
 		"@melon-db/db-query": "workspace:*"
