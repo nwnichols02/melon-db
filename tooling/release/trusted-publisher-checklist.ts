@@ -25,4 +25,4 @@ for (const config of PUBLISH_ORDER) {
 }
 
 console.log(`Total: ${PUBLISH_ORDER.length} packages`);
-console.log("\nAfter OIDC works, revoke the bootstrap Automation token and delete NPM_TOKEN from GitHub secrets.");
+console.log("\nAfter OIDC works, revoke the granular token and delete NPM_TOKEN from GitHub secrets.");

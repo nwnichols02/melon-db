@@ -64,7 +64,7 @@ export function describeNpmPublishAuth(): string {
 
 	if (mode === "token") {
 		return hasTokenAuth()
-			? "Automation token (NPM_TOKEN / NODE_AUTH_TOKEN)"
+			? "granular access token (NPM_TOKEN / NODE_AUTH_TOKEN)"
 			: "token (missing NPM_TOKEN secret)";
 	}
 
@@ -91,8 +91,8 @@ function shouldWriteNpmRegistryToken(): boolean {
 }
 
 /**
- * Write ~/.npmrc so npm publish receives the Automation token.
- * NODE_AUTH_TOKEN alone is not enough without registry-url / .npmrc config.
+ * Write ~/.npmrc so npm publish receives the token.
+ * Complements actions/setup-node registry-url + NODE_AUTH_TOKEN in CI.
  */
 export function configureNpmRegistryAuth(): void {
 	if (!shouldWriteNpmRegistryToken()) return;
@@ -131,9 +131,10 @@ export function publishAuthHelp(): string {
 	return (
 		"No npm publish auth available.\n\n" +
 		"GitHub Actions:\n" +
-		"  NPM_TOKEN secret = npm Automation token (NOT Granular — Granular triggers EOTP/2FA)\n\n" +
+		"  NPM_TOKEN secret = npm granular access token with Read and write for @melon-db/*\n" +
+		"  Enable Bypass 2FA on the token (required for CI when account 2FA is on)\n\n" +
 		"Local:\n" +
-		"  export NPM_TOKEN=npm_...  (Automation token)\n" +
+		"  export NPM_TOKEN=npm_...\n" +
 		"  or npm login"
 	);
 }

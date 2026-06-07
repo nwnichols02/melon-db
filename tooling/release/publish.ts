@@ -4,7 +4,7 @@
  *
  * Auth (pick one):
  * - OIDC trusted publishing in GitHub Actions (no secret; npm CLI uses id-token)
- * - NPM_TOKEN / NODE_AUTH_TOKEN for local or bootstrap publishes
+ * - NPM_TOKEN / NODE_AUTH_TOKEN (granular access token) for CI or local publish
  *
  * Requires prior `bun run build:packages`.
  */
@@ -31,12 +31,6 @@ if (!hasNpmPublishAuth()) {
 }
 
 console.log(`npm publish auth: ${describeNpmPublishAuth()}`);
-if (process.env.MELON_PUBLISH_AUTH === "token" && process.env.GITHUB_ACTIONS === "true") {
-  console.log(
-    "NPM_TOKEN must be an npm Automation token (Access Tokens → Automation). " +
-      "Granular tokens require browser 2FA and fail in CI with EOTP.",
-  );
-}
 
 configureNpmRegistryAuth();
 
@@ -49,7 +43,8 @@ if (process.env.MELON_PUBLISH_AUTH !== "oidc") {
   if (whoami.exitCode !== 0) {
     const detail = new TextDecoder().decode(whoami.stderr).trim();
     console.error(
-      "npm whoami failed — NPM_TOKEN may be missing, expired, or not an Automation token.\n" +
+      "npm whoami failed — check NPM_TOKEN is set, not expired, and is a granular token " +
+        "with Read and write + Bypass 2FA for @melon-db/*.\n" +
         (detail ? `${detail}\n` : ""),
     );
     process.exit(1);

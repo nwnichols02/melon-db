@@ -24,9 +24,8 @@ Publish metadata is centralized in [`tooling/release/metadata.ts`](./tooling/rel
 ### npm
 
 - [ ] npm org `@melon-db` exists; maintainers use 2FA
-- [ ] **Bootstrap:** `NPM_TOKEN` GitHub secret (Automation token) for first publish only
-- [ ] **Steady state:** Trusted Publisher configured on every `@melon-db/*` package; `NPM_TOKEN` secret removed
-- [ ] Packages not yet published: run first publish with `bootstrap_token: true`, then configure trusted publishers
+- [ ] **CI publish:** `NPM_TOKEN` GitHub secret (granular access token with Bypass 2FA)
+- [ ] **Steady state (later):** Trusted Publisher on every `@melon-db/*` package; remove `NPM_TOKEN` when using OIDC
 
 ### CI / quality gates
 
@@ -72,13 +71,13 @@ bun tooling/release/publish.ts --tag alpha
 3. Run with `dry_run: true` first (pack + smoke only)
 4. Run with `dry_run: false` to publish (uses **`NPM_TOKEN`** repository secret)
 
-The workflow runs package tests, package typecheck, audit (high/critical), build, export validation, smoke consumer install, then `publish.ts` with `NODE_AUTH_TOKEN` from the **`NPM_TOKEN`** secret.
+The workflow runs package tests, package typecheck, audit (high/critical), build, export validation, smoke consumer install, then `publish.ts` with `NPM_TOKEN` / `NODE_AUTH_TOKEN` from the **`NPM_TOKEN`** secret.
 
-> **Token type:** `NPM_TOKEN` must be an npm **Automation** token (not Granular — Granular triggers `EOTP` / browser 2FA in CI). After trusted publishers are configured, switch the workflow to OIDC and remove the secret (see [OIDC trusted publishing setup](#oidc-trusted-publishing-setup)).
+> **Token type:** npm no longer offers separate “Automation” tokens. Use a **granular access token** with **Read and write** for `@melon-db/*` and **Bypass 2FA** enabled. Without Bypass 2FA, CI fails with `EOTP`. After trusted publishers are configured, switch to OIDC and remove the secret (see [OIDC trusted publishing setup](#oidc-trusted-publishing-setup)).
 
 ## OIDC trusted publishing setup
 
-Use this walkthrough to move from bootstrap token → OIDC (no long-lived npm token in GitHub).
+Use this walkthrough to move from granular token → OIDC (no long-lived npm token in GitHub).
 
 ### Phase 0 — Prerequisites (one time)
 
@@ -88,34 +87,42 @@ Use this walkthrough to move from bootstrap token → OIDC (no long-lived npm to
 4. **GitHub repo** — public at `nwnichols02/melon-db` (trusted publishing + provenance require a public repo).
 5. **Repository URL** — every package already has `"repository": { "url": "git+https://github.com/nwnichols02/melon-db.git" }` via `tooling/release/metadata.ts`. npm validates this matches the GitHub repo.
 
-### Phase 1 — Bootstrap token (first publish only)
+### Phase 1 — Granular token (first publish / until OIDC)
 
-Trusted Publisher can only be added **after** a package exists on npm. The first publish uses a short-lived **Automation** token (not a granular token — granular tokens still require OTP / 2FA in CI).
+Trusted Publisher can only be added **after** a package exists on npm. Until then, publish via a **granular access token** in GitHub Actions.
 
-#### Step 1: Create an npm Automation token
+#### Step 1: Create a granular access token on npm
 
-1. npm → avatar → **Access Tokens** → **Generate New Token**
-2. Type: **Automation** (bypasses 2FA for CI — this is the correct token type for GitHub Actions bootstrap)
-3. Scope: packages under **`@melon-db`** with **Read and write**
-4. Expiration: 7–30 days (bootstrap only — revoke after OIDC works)
-5. Copy the token (`npm_…`) — shown once
+1. npm → avatar → **Access Tokens** → **Generate New Token** → **Granular Access Token**
+2. **Packages and scopes:** `@melon-db` org (or each package once they exist)
+3. **Permissions:** **Read and write**
+4. **2FA / automation:** enable **Bypass 2FA** (wording may vary — required so CI can publish without an interactive OTP)
+5. **Expiration:** 30–90 days (rotate periodically; revoke after OIDC works)
+6. Copy the token (`npm_…`) — shown once
 
-> Do **not** use a Granular Access Token for CI publish. Granular tokens trigger `EOTP` (“requires a one-time password”) when your account has publish 2FA enabled.
+> If CI fails with `EOTP`, the token does not have **Bypass 2FA**, or the package/org has not allowed token publish without 2FA.
+
+#### Step 1b: Allow token publish on packages (if needed)
+
+For each `@melon-db/*` package (after first publish creates it):
+
+1. npm → **Packages → @melon-db/… → Settings**
+2. **Publishing access** / **Access** — allow publish via granular tokens without interactive 2FA (exact label varies)
 
 #### Step 2: Add the token to GitHub
 
 1. GitHub repo → **Settings → Secrets and variables → Actions**
-2. **New repository secret**
+2. **Secrets** tab (not Variables) → **New repository secret**
 3. Name: **`NPM_TOKEN`**
-4. Value: paste the Automation token
+4. Value: paste the granular token
 
-#### Step 3: Run bootstrap publish in Actions
+#### Step 3: Run publish in Actions
 
 1. **Actions → Release → Run workflow**
 2. Inputs:
    - `dist_tag`: `alpha`
    - `dry_run`: `false`
-3. Wait for all 12 packages to publish (uses the **`NPM_TOKEN`** repository secret automatically)
+3. Log should show `npm whoami: <your-username>` then publish each package
 
 Verify locally:
 
@@ -167,8 +174,12 @@ npm does **not** validate these fields until the first OIDC publish — double-c
 2. Inputs:
    - `dist_tag`: `alpha`
    - `dry_run`: `false`
-3. Confirm the log shows `npm publish auth: Automation token (NPM_TOKEN / NODE_AUTH_TOKEN)`
+3. Confirm the log shows `npm publish auth: OIDC trusted publishing (GitHub Actions)`
 4. Confirm publish succeeds for all packages
+
+If you see `EOTP`:
+
+- Granular token missing **Bypass 2FA**, or package publishing access blocks token publish
 
 If you see `ENEEDAUTH` or `Unable to authenticate`:
 
@@ -180,7 +191,7 @@ If you see `ENEEDAUTH` or `Unable to authenticate`:
 
 ### Phase 4 — Lock down and clean up
 
-1. **Revoke bootstrap token** — npm → **Access Tokens** → delete the Automation token
+1. **Revoke granular token** — npm → **Access Tokens** → delete the CI token
 2. **Remove GitHub secret** — repo **Settings → Secrets → Actions** → delete `NPM_TOKEN`
 3. **Optional (recommended after OIDC verified)** — on each package: **Settings → Publishing access → Require two-factor authentication and disallow tokens**
    - OIDC trusted publishing keeps working; only long-lived tokens are blocked
@@ -196,7 +207,7 @@ If you see `ENEEDAUTH` or `Unable to authenticate`:
 
 | Phase | Auth | GitHub secret |
 |-------|------|---------------|
-| Now (bootstrap) | `NPM_TOKEN` → `NODE_AUTH_TOKEN` | **`NPM_TOKEN`** (Automation token) |
+| Now (token) | `NPM_TOKEN` → `NODE_AUTH_TOKEN` | **`NPM_TOKEN`** (granular, Bypass 2FA) |
 | Later (OIDC) | Trusted publishing | None — update workflow when ready |
 
 The workflow already includes:
@@ -390,7 +401,7 @@ Publish order is defined in `tooling/release/packages.ts` (`PUBLISH_ORDER`) — 
 
 1. Repo → **Settings → Secrets and variables → Actions → New repository secret**
 2. Name: **`NPM_TOKEN`**
-3. Value: granular token from npm (see 3e) **or** leave empty once OIDC works
+3. Value: granular token from npm (see 3e) **or** omit once OIDC works
 
 Your workflow maps it as:
 
@@ -416,7 +427,7 @@ Or use `npm login` and publish without exporting a token (uses `~/.npmrc`).
 
 #### OIDC trusted publishing (steady state — no GitHub secret)
 
-Configured per package on npm (see [OIDC setup walkthrough](#oidc-trusted-publishing-setup)). The Release workflow publishes with `bootstrap_token: false` and no `NPM_TOKEN`.
+Configured per package on npm (see [OIDC setup walkthrough](#oidc-trusted-publishing-setup)). Switch the Release workflow to OIDC and remove `NPM_TOKEN` when ready.
 
 Requirements (already in `.github/workflows/release.yml`):
 
@@ -434,17 +445,18 @@ List packages to configure:
 bun tooling/release/trusted-publisher-checklist.ts
 ```
 
-#### Bootstrap Automation token (first publish only)
+#### Granular access token (CI / first publish)
 
-Use until every package exists on npm and Trusted Publisher is configured.
+npm deprecated legacy Automation tokens; use **granular access tokens** for CI.
 
-1. npm → **Access Tokens → Generate New Token → Automation** (not Granular)
-2. Permissions: **Read and write** for `@melon-db/*`
-3. GitHub secret **`NPM_TOKEN`**
-4. Release workflow: `dry_run: false` (uses `NPM_TOKEN` secret)
-5. Revoke token and delete secret after OIDC is verified
+1. npm → **Access Tokens → Generate New Token → Granular Access Token**
+2. Scope: **Read and write** for `@melon-db/*`
+3. Enable **Bypass 2FA** on the token
+4. GitHub **secret** **`NPM_TOKEN`** (not Variables)
+5. Workflow passes `NPM_TOKEN` and `NODE_AUTH_TOKEN`; `setup-node` uses `registry-url`
+6. Revoke token and delete secret after OIDC is verified
 
-Granular tokens and publish tokens require OTP in CI (`EOTP` error) when 2FA is enabled — use **Automation** for bootstrap only.
+`EOTP` in CI → token lacks Bypass 2FA or package blocks token publish.
 
 ### 3f. First publish sequence
 
@@ -455,15 +467,15 @@ bun test && bun run typecheck:packages && bun run release:smoke
 # 2. Dry run in GitHub Actions
 # Actions → Release → dry_run: true, dist_tag: alpha
 
-# 3. Bootstrap first publish (Automation token in NPM_TOKEN secret)
+# 3. First publish (granular token with Bypass 2FA in NPM_TOKEN secret)
 # Actions → Release → dry_run: false, dist_tag: alpha
 
 # 4. Configure Trusted Publisher on all 12 packages
 bun tooling/release/trusted-publisher-checklist.ts
 
-# 5. Verify OIDC (after workflow is switched to OIDC — see RELEASING.md)
+# 5. Verify OIDC (after workflow is switched to OIDC — see above)
 
-# 6. Revoke Automation token; delete NPM_TOKEN secret
+# 6. Revoke granular token; delete NPM_TOKEN secret
 ```
 
 Verify on npm:
