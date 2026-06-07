@@ -32,6 +32,14 @@ const melonWorkspaceAliases = [
 		replacement: path.join(packagesDir, "melon-db-query/src/index.ts"),
 	},
 	{
+		find: "@melon/db-query-mango",
+		replacement: path.join(packagesDir, "melon-db-query-mango/src/index.ts"),
+	},
+	{
+		find: "@melon/db-prisma",
+		replacement: path.join(packagesDir, "melon-db-prisma/src/index.ts"),
+	},
+	{
 		find: "@melon/db-react",
 		replacement: path.join(packagesDir, "melon-db-react/src/index.ts"),
 	},
