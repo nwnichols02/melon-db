@@ -56,7 +56,7 @@ export function MelonDevtoolsPanel(): ReactElement {
 					zIndex: 9999,
 				}}
 			>
-				Melon DB
+				Melon
 			</button>
 			{open ? (
 				<div

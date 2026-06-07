@@ -11,4 +11,4 @@ description: "@melon-db/db — Type Alias: AdapterWriteOperation"
 
 > **AdapterWriteOperation** = \{ `collection`: `string`; `type`: `"insert"`; `values`: [`AdapterRecord`](/docs/api/melon-db/TypeAlias.AdapterRecord); \} \| \{ `collection`: `string`; `primaryKey`: `string`; `type`: `"update"`; `values`: [`AdapterRecord`](/docs/api/melon-db/TypeAlias.AdapterRecord); \} \| \{ `collection`: `string`; `id`: `string` \| `number`; `primaryKey`: `string`; `type`: `"delete"`; \} \| \{ `operations`: `AdapterWriteOperation`[]; `type`: `"batch"`; \}
 
-Defined in: [packages/melon-db/src/adapter.ts:25](https://github.com/nwnichols02/melon-db/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db/src/adapter.ts#L25)
+Defined in: [packages/melon-db/src/adapter.ts:25](https://github.com/nwnichols02/melon/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db/src/adapter.ts#L25)

@@ -210,6 +210,10 @@ for (const file of files) {
 	let normalizedBody = normalizeIndexBody(file, bodyOnly);
 	normalizedBody = rewriteDisambiguationLinks(normalizedBody, slugRenameMap);
 	normalizedBody = rewriteApiLinks(normalizedBody, pkg);
+	normalizedBody = normalizedBody.replaceAll(
+		"github.com/nwnichols02/melon-db",
+		"github.com/nwnichols02/melon",
+	);
 	content = normalizeFrontmatter(file, normalizedBody, pkg);
 
 	if (file.endsWith(".md")) {
