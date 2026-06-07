@@ -8,3 +8,7 @@ Core storage engine: schema, AST, adapter contract, runtime, migrations, in-memo
 bun test
 bun run typecheck
 ```
+
+## Author & license
+
+Copyright (c) 2026 Nate Nichols. See [LICENSE](../../LICENSE) for the full MIT license text.

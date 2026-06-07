@@ -46,3 +46,7 @@ bun run demo:sync:postgres     # terminal 2
 - [Node and Bun walkthrough](http://localhost:3000/docs/walkthroughs/node-and-bun) — run `bun run dev:docs` for the site
 - [Full-stack sync](http://localhost:3000/docs/walkthroughs/full-stack-sync)
 - [Sync backend contract](http://localhost:3000/docs/sync/backend)
+
+## Author & license
+
+Copyright (c) 2026 [Nate Nichols](https://github.com/nwnichols02). See [LICENSE](../../LICENSE) for the full MIT license text.

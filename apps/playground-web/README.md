@@ -20,3 +20,7 @@ Open http://localhost:5174
 - `@melon/db-devtools` panel (Plan, AST; SQL when using SQLite adapters)
 
 See [Web walkthrough](/docs/walkthroughs/web-local) on the docs site (`bun run dev:docs`).
+
+## Author & license
+
+Copyright (c) 2026 [Nate Nichols](https://github.com/nwnichols02). See [LICENSE](../../LICENSE) for the full MIT license text.

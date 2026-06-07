@@ -2,6 +2,16 @@
   "name": "melon-monorepo",
   "private": true,
   "type": "module",
+  "license": "MIT",
+  "author": "Nate Nichols <nwnichols02@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nwnichols02/melon.git"
+  },
+  "homepage": "https://github.com/nwnichols02/melon#readme",
+  "bugs": {
+    "url": "https://github.com/nwnichols02/melon/issues"
+  },
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "test": "bun run --filter './packages/*' test",
@@ -36,7 +46,8 @@
     "melon-prisma": "bun run packages/melon-db-prisma/src/bin/melon-prisma.ts",
     "build:packages": "bun tooling/release/build-all.ts",
     "pack:packages": "bun run build:packages && bun tooling/release/pack-all.ts",
-    "release:smoke": "bun tooling/release/smoke-consumer.ts"
+    "release:smoke": "bun tooling/release/smoke-consumer.ts",
+    "release:sync-metadata": "bun tooling/release/sync-package-json.ts && bun tooling/release/sync-readme-footers.ts && bun tooling/release/sync-docs-footers.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

@@ -7,3 +7,7 @@ Prisma schema import and Prisma-like local client over `@melon/db`.
 ```bash
 bun run melon-prisma generate --schema=./schema.prisma --out=./generated/melon
 ```
+
+## Author & license
+
+Copyright (c) 2026 Nate Nichols. See [LICENSE](../../LICENSE) for the full MIT license text.

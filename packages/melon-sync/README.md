@@ -10,3 +10,7 @@ Supports built-in conflict policies plus `conflictPolicy: 'custom'` with a `conf
 bun test
 bun run demo:sync   # from monorepo root
 ```
+
+## Author & license
+
+Copyright (c) 2026 Nate Nichols. See [LICENSE](../../LICENSE) for the full MIT license text.

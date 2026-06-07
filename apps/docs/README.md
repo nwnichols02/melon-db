@@ -40,3 +40,7 @@ In the Vercel dashboard, set **Framework Preset** to **TanStack Start** and leav
 - `meta.json` — sidebar structure per section
 
 See [`.cursor/phases/docs-fumadocs.md`](../../.cursor/phases/docs-fumadocs.md) for the out-of-cycle phase goals.
+
+## Author & license
+
+Copyright (c) 2026 [Nate Nichols](https://github.com/nwnichols02). See [LICENSE](../../LICENSE) for the full MIT license text.

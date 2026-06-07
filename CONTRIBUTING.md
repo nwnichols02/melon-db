@@ -5,12 +5,12 @@ Thank you for helping improve Melon. This monorepo uses [Bun](https://bun.sh/) w
 ## Prerequisites
 
 - [Bun](https://bun.sh/) (latest stable)
-- For React Native work: Xcode / Android SDK as in [React Native (JSI) walkthrough](https://github.com/melon/melon/blob/main/apps/docs/content/docs/walkthroughs/react-native-jsi.mdx) (paths may vary once docs are hosted)
+- For React Native work: Xcode / Android SDK as in [React Native (JSI) walkthrough](https://github.com/nwnichols02/melon/blob/main/apps/docs/content/docs/walkthroughs/react-native-jsi.mdx) (paths may vary once docs are hosted)
 
 ## Setup
 
 ```bash
-git clone https://github.com/melon/melon.git
+git clone https://github.com/nwnichols02/melon.git
 cd melon
 bun install
 ```
@@ -32,10 +32,13 @@ bun run build:docs
 For release-related changes:
 
 ```bash
+bun run release:sync-metadata
 bun run build:packages
 bun run pack:packages
 bun run release:smoke
 ```
+
+See [RELEASING.md](./RELEASING.md) for the public alpha checklist.
 
 ## Package boundaries
 

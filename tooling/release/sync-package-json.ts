@@ -6,6 +6,10 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { buildExports, defaultFilesList, nativeFilesList } from "./export-map.ts";
 import {
+  AUTHOR,
+  BUGS,
+  HOMEPAGE,
+  LICENSE,
   MELON_VERSION,
   PUBLISH_ORDER,
   REPOSITORY,
@@ -19,8 +23,11 @@ function syncOne(config: PackageBuildConfig): void {
   const pkg = JSON.parse(readFileSync(path, "utf8")) as Record<string, unknown>;
 
   pkg.version = MELON_VERSION;
-  pkg.license = "MIT";
+  pkg.author = AUTHOR;
+  pkg.license = LICENSE;
   pkg.repository = REPOSITORY;
+  pkg.homepage = HOMEPAGE;
+  pkg.bugs = { url: BUGS };
   pkg.publishConfig = { access: "public" };
   pkg.main = "./dist/index.js";
   pkg.types = "./dist/index.d.ts";

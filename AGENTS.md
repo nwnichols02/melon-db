@@ -38,6 +38,7 @@ bun run release:smoke        # packed-tarball consumer smoke
 - PRD matrix: `apps/docs/content/docs/prd-compliance.mdx`
 - Cursor rules: `.cursor/rules/` (including `prd-4.mdc` sliding window — **future**)
 - TanStack docs editing: `.cursor/rules/melon-tanstack.mdc`
+- License: [MIT](./LICENSE) · Author: Nate Nichols · Release runbook: [RELEASING.md](./RELEASING.md)
 
 ## TypeScript
 

@@ -78,3 +78,7 @@ row-insert             4200ms      5100ms      0.82       melon
 ```
 
 See [/docs/performance-comparison](http://localhost:3000/docs/performance-comparison) (methodology) and [/docs/performance-comparison/latest-results](http://localhost:3000/docs/performance-comparison/latest-results) (committed timings). Compare legs use **better-sqlite3@12.10.0** (workspace devDependency; install with root `bun install` and `trustedDependencies`). The harness starts with **Bun**; melon-node/watermelon run in a **Node** subprocess when Bun cannot load the native addon.
+
+## Author & license
+
+Copyright (c) 2026 Nate Nichols. See [LICENSE](../../LICENSE) for the full MIT license text.

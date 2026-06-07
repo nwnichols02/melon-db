@@ -2,6 +2,8 @@
 
 Next-generation offline-first local database for React Native and TypeScript (WatermelonDB successor).
 
+**License:** [MIT](./LICENSE) · **Author:** [Nate Nichols](https://github.com/nwnichols02)
+
 ## Packages
 
 | Package | Description |
@@ -188,6 +190,12 @@ Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun r
 | Full sync stack (HTTP + Postgres, retry, merge-by-field, custom resolver) | |
 | `@melon/db-codemods` v1 + v2 | |
 | CI (test, typecheck, biome, bench-smoke, bench-compare, postgres-sync, docs, release-smoke) | |
+
+## Author & license
+
+Copyright (c) 2026 [Nate Nichols](https://github.com/nwnichols02). See [LICENSE](./LICENSE) for the full MIT license text.
+
+Alpha npm packages use dist-tag `alpha` with **no production SLA**. See [Alpha support policy](apps/docs/content/docs/alpha-support.mdx) and [RELEASING.md](./RELEASING.md).
 
 ## Development
 

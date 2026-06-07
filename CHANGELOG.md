@@ -27,7 +27,7 @@ First public **alpha** release on npm (dist-tag `alpha`). Not recommended for pr
 npm install @melon/db@alpha @melon/db-sqlite@alpha @melon/db-react@alpha
 ```
 
-See [Getting started](https://github.com/melon/melon/blob/main/apps/docs/content/docs/getting-started.mdx) and [v1 limitations](https://github.com/melon/melon/blob/main/apps/docs/content/docs/roadmap.mdx#v1-limitations).
+See [Getting started](https://github.com/nwnichols02/melon/blob/main/apps/docs/content/docs/getting-started.mdx) and [v1 limitations](https://github.com/nwnichols02/melon/blob/main/apps/docs/content/docs/roadmap.mdx#v1-limitations).
 
 ### Known limitations
 

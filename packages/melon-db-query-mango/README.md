@@ -7,3 +7,7 @@ Mango-style JSON query compiler → `QueryAst`.
 ```bash
 bun test
 ```
+
+## Author & license
+
+Copyright (c) 2026 Nate Nichols. See [LICENSE](../../LICENSE) for the full MIT license text.

@@ -8,3 +8,7 @@ HTTP reference sync backend (in-memory and Postgres).
 bun run sync-server
 bun run sync-server:postgres
 ```
+
+## Author & license
+
+Copyright (c) 2026 Nate Nichols. See [LICENSE](../../LICENSE) for the full MIT license text.

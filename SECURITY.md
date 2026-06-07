@@ -13,7 +13,7 @@ Melon alpha releases have **no production SLA**. Do not use alpha builds for reg
 
 **Please do not open a public GitHub issue for security vulnerabilities.**
 
-Report privately by emailing the maintainers (use the contact on the GitHub organization or repository once public). Include:
+Report privately by emailing **nwnichols02@gmail.com** or using [GitHub private vulnerability reporting](https://github.com/nwnichols02/melon/security/advisories/new) once the repository is public. Include:
 
 - A description of the issue and impact
 - Steps to reproduce

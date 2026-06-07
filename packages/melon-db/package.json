@@ -28,7 +28,7 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/melon/melon.git"
+		"url": "git+https://github.com/nwnichols02/melon.git"
 	},
 	"publishConfig": {
 		"access": "public"
@@ -38,5 +38,10 @@
 	"files": [
 		"dist",
 		"README.md"
-	]
+	],
+	"author": "Nate Nichols <nwnichols02@gmail.com>",
+	"homepage": "https://github.com/nwnichols02/melon#readme",
+	"bugs": {
+		"url": "https://github.com/nwnichols02/melon/issues"
+	}
 }

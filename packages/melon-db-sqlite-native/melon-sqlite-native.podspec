@@ -6,9 +6,9 @@ Pod::Spec.new do |s|
   s.name         = "melon-sqlite-native"
   s.version      = package["version"]
   s.summary      = "Melon SQLite TurboModule for React Native"
-  s.homepage     = "https://github.com/melon/melon"
+  s.homepage     = "https://github.com/nwnichols02/melon"
   s.license      = "MIT"
-  s.author       = "Melon"
+  s.author       = { "Nate Nichols" => "nwnichols02@gmail.com" }
   s.platforms    = { :ios => "15.1" }
   # Local monorepo installs use :path in the Podfile; avoid a remote :git :tag that does not exist.
   s.source       = { :path => "." }

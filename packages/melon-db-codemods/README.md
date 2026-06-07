@@ -31,3 +31,7 @@ Add `--dry-run` to preview without writing files. `migrate-schema` prints JSON t
 | `@field` Model class | `migrate-schema` JSON spike | Single-file extraction |
 
 Runtime `translateWatermelonQuery(collection, clauses, schema?)` converts serializable `Q` clauses to `QueryAst`. Pass `MelonSchema` to compile `Q.on` into `relationFilters` (belongsTo only). Experimental Watermelon join tables are unsupported.
+
+## Author & license
+
+Copyright (c) 2026 Nate Nichols. See [LICENSE](../../LICENSE) for the full MIT license text.

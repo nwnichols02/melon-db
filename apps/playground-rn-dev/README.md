@@ -106,3 +106,7 @@ Run the docs site from the repo root: `bun run dev:docs`.
 ```bash
 bun run typecheck
 ```
+
+## Author & license
+
+Copyright (c) 2026 [Nate Nichols](https://github.com/nwnichols02). See [LICENSE](../../LICENSE) for the full MIT license text.

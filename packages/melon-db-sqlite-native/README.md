@@ -142,3 +142,7 @@ After `expo prebuild --clean` + `bun run dev:rn:dev:android` then `bun run dev:r
 - **JS:** `MelonSQLiteJsi.ts` reads `global.melonSqliteJsi`; `MelonSQLiteBridge.ts` reports `jsi-sync` | `turbo` | `bridge`.
 
 **Observation (Phase 29):** `sqlite3_update_hook` on JSI `openSync` schedules `setObservationFlushCallback` on the JS thread (coalesced). Pair with `@melon/db-sqlite` `flushObservationQueue` to process `_melon_observation_events`. Turbo/async native path does not install the hook in v1.
+
+## Author & license
+
+Copyright (c) 2026 Nate Nichols. See [LICENSE](../../LICENSE) for the full MIT license text.

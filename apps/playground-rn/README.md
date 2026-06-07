@@ -33,3 +33,7 @@ Scan the QR code with **Expo Go** on your device or simulator.
 ```bash
 bun run typecheck
 ```
+
+## Author & license
+
+Copyright (c) 2026 [Nate Nichols](https://github.com/nwnichols02). See [LICENSE](../../LICENSE) for the full MIT license text.

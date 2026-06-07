@@ -5,7 +5,7 @@ description: Most recent Melon vs WatermelonDB benchmark parity table from the c
 
 <BenchCompareResultsTable />
 
-The table above is generated from [`apps/docs/src/data/bench-compare-latest.json`](https://github.com/melon/melon/blob/main/apps/docs/src/data/bench-compare-latest.json). Refresh it after benchmark changes:
+The table above is generated from [`apps/docs/src/data/bench-compare-latest.json`](https://github.com/nwnichols02/melon/blob/main/apps/docs/src/data/bench-compare-latest.json). Refresh it after benchmark changes:
 
 ```bash
 COMPARE_RUNNER_BIN=node bun run bench:compare:docs
@@ -25,7 +25,7 @@ On-device benchmarks from `playground-rn-dev` (development build with `@melon/db
 
 <BenchRnResultsTable />
 
-The table is generated from [`apps/docs/src/data/bench-rn-latest.json`](https://github.com/melon/melon/blob/main/apps/docs/src/data/bench-rn-latest.json). To refresh after a new device run:
+The table is generated from [`apps/docs/src/data/bench-rn-latest.json`](https://github.com/nwnichols02/melon/blob/main/apps/docs/src/data/bench-rn-latest.json). To refresh after a new device run:
 
 1. In `apps/playground-rn-dev`, open **Benchmarks** and run **jsi-sync + Watermelon** at **10k** (or **1k** for smoke).
 2. Tap **Share JSON report** and merge `melonVsWdb` (and optionally `report` for jsi vs turbo) plus `generatedAt` / `device` into `bench-rn-latest.json`.

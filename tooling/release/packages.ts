@@ -1,12 +1,21 @@
 /**
  * Publish order and build entrypoints for @melon/* packages.
  */
+import {
+  MELON_AUTHOR,
+  MELON_BUGS,
+  MELON_HOMEPAGE,
+  MELON_LICENSE,
+  MELON_REPOSITORY,
+} from "./metadata.ts";
+
 export const MELON_VERSION = "0.1.0-alpha.0";
 
-export const REPOSITORY = {
-  type: "git" as const,
-  url: "git+https://github.com/melon/melon.git",
-};
+export const AUTHOR = MELON_AUTHOR;
+export const LICENSE = MELON_LICENSE;
+export const REPOSITORY = MELON_REPOSITORY;
+export const HOMEPAGE = MELON_HOMEPAGE;
+export const BUGS = MELON_BUGS;
 
 export interface PackageBuildConfig {
   readonly name: string;
