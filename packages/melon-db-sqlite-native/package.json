@@ -54,7 +54,10 @@
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js"
+			"bun": "./src/index.ts",
+			"development": "./src/index.ts",
+			"import": "./dist/index.js",
+			"default": "./src/index.ts"
 		}
 	},
 	"author": "Nate Nichols <nwnichols02@gmail.com>",
