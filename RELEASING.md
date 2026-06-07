@@ -71,7 +71,7 @@ bun tooling/release/publish.ts --tag alpha
 3. Run with `dry_run: true` first (pack + smoke only)
 4. Re-run with `dry_run: false` to publish
 
-The workflow runs tests, typecheck, audit (high/critical), build, export validation, smoke consumer install, then `publish.ts`.
+The workflow runs package tests, package typecheck (not example apps), audit (high/critical), build, export validation, smoke consumer install, then `publish.ts`. Full monorepo typecheck (apps included) remains on the main CI workflow.
 
 ## Version bumps
 

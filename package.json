@@ -15,7 +15,8 @@
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "test": "bun run --filter './packages/*' test",
-    "typecheck": "bun run --filter './packages/*' typecheck && bun run typecheck:apps",
+    "typecheck": "bun run typecheck:packages && bun run typecheck:apps",
+    "typecheck:packages": "bun run --filter './packages/*' typecheck",
     "build": "bun run --filter './packages/*' build",
     "check": "bunx biome check packages",
     "demo": "bun run --filter playground-node demo",

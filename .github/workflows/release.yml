@@ -36,8 +36,8 @@ jobs:
       - name: Test
         run: bun test
 
-      - name: Typecheck
-        run: bun run typecheck
+      - name: Typecheck packages
+        run: bun run typecheck:packages
 
       - name: Audit (high/critical)
         run: bun audit --audit-level=high || test "${{ github.event.inputs.dry_run }}" = "true"

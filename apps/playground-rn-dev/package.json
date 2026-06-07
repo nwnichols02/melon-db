@@ -18,9 +18,9 @@
   "dependencies": {
     "@melon-db/db": "workspace:*",
     "@melon-db/db-devtools": "workspace:*",
+    "@melon-db/db-prisma": "workspace:*",
     "@melon-db/db-query": "workspace:*",
     "@melon-db/db-query-mango": "workspace:*",
-    "@melon-db/db-prisma": "workspace:*",
     "@melon-db/db-react": "workspace:*",
     "@melon-db/db-sqlite": "workspace:*",
     "@melon-db/db-sqlite-native": "workspace:*",
@@ -33,6 +33,7 @@
     "expo-asset": "~12.0.13",
     "expo-constants": "~18.0.13",
     "expo-dev-client": "~6.0.20",
+    "expo-file-system": "^56.0.7",
     "expo-linking": "~8.0.12",
     "expo-router": "~6.0.24",
     "expo-sqlite": "~16.0.10",
