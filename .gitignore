@@ -52,3 +52,5 @@ tooling/release/artifacts/
 # Prisma codegen output
 **/__generated__/
 **/.tmp/
+
+.env

@@ -13,8 +13,9 @@ const tag = process.argv.includes("--tag")
   ? process.argv[process.argv.indexOf("--tag") + 1] ?? "alpha"
   : "alpha";
 
-if (!process.env.NPM_TOKEN) {
-  console.error("NPM_TOKEN is required to publish.");
+const authToken = process.env.NPM_TOKEN ?? process.env.NODE_AUTH_TOKEN;
+if (!authToken) {
+  console.error("NPM_TOKEN or NODE_AUTH_TOKEN is required to publish.");
   process.exit(1);
 }
 

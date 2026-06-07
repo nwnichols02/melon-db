@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./apps/docs/public/melon-no-bg.png" alt="Melon logo" width="160" />
+</p>
+
 # Melon
 
 Next-generation offline-first local database for React Native and TypeScript (WatermelonDB successor).
