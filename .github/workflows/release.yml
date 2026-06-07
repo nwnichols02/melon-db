@@ -11,6 +11,10 @@ on:
         description: Dry run (pack only, no npm publish)
         type: boolean
         default: true
+      bootstrap_token:
+        description: Use NPM_TOKEN secret (first publish only — before trusted publishers exist)
+        type: boolean
+        default: false
 
 jobs:
   publish:
@@ -51,8 +55,16 @@ jobs:
       - name: Pack smoke
         run: bun run release:smoke
 
-      - name: Publish to npm
+      - name: Ensure npm CLI supports OIDC trusted publishing
         if: github.event.inputs.dry_run != 'true'
+        run: npm install -g npm@latest && npm --version
+
+      - name: Publish to npm (OIDC trusted publishing)
+        if: github.event.inputs.dry_run != 'true' && github.event.inputs.bootstrap_token != 'true'
+        run: bun tooling/release/publish.ts --tag "${{ github.event.inputs.dist_tag }}"
+
+      - name: Publish to npm (bootstrap Automation token)
+        if: github.event.inputs.dry_run != 'true' && github.event.inputs.bootstrap_token == 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: bun tooling/release/publish.ts --tag "${{ github.event.inputs.dist_tag }}"

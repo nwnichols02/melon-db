@@ -1,10 +1,16 @@
 #!/usr/bin/env bun
 /**
  * Publish all @melon-db packages in dependency order.
- * Requires NPM_TOKEN and prior `bun run build:packages`.
+ *
+ * Auth (pick one):
+ * - OIDC trusted publishing in GitHub Actions (no secret; npm CLI uses id-token)
+ * - NPM_TOKEN / NODE_AUTH_TOKEN for local or bootstrap publishes
+ *
+ * Requires prior `bun run build:packages`.
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { describeNpmPublishAuth, hasNpmPublishAuth } from "./auth.ts";
 import { publishExports } from "./export-map.ts";
 import { MELON_VERSION, PUBLISH_ORDER } from "./packages.ts";
 
@@ -13,11 +19,17 @@ const tag = process.argv.includes("--tag")
   ? process.argv[process.argv.indexOf("--tag") + 1] ?? "alpha"
   : "alpha";
 
-const authToken = process.env.NPM_TOKEN ?? process.env.NODE_AUTH_TOKEN;
-if (!authToken) {
-  console.error("NPM_TOKEN or NODE_AUTH_TOKEN is required to publish.");
+if (!hasNpmPublishAuth()) {
+  console.error(
+    "No npm publish auth available. Use one of:\n" +
+      "  • GitHub Actions Release workflow (OIDC trusted publishing)\n" +
+      "  • export NPM_TOKEN=... (Automation token for bootstrap/local)\n" +
+      "  • npm login locally",
+  );
   process.exit(1);
 }
+
+console.log(`npm publish auth: ${describeNpmPublishAuth()}`);
 
 for (const config of PUBLISH_ORDER) {
   const packageDir = join(root, config.dir);

@@ -48,6 +48,7 @@
     "build:packages": "bun tooling/release/build-all.ts",
     "pack:packages": "bun run build:packages && bun tooling/release/pack-all.ts",
     "release:smoke": "bun tooling/release/smoke-consumer.ts",
+    "release:trusted-publishers": "bun tooling/release/trusted-publisher-checklist.ts",
     "release:sync-metadata": "bun tooling/release/sync-package-json.ts && bun tooling/release/sync-readme-footers.ts && bun tooling/release/sync-docs-footers.ts"
   },
   "devDependencies": {

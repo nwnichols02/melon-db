@@ -28,7 +28,7 @@ function syncOne(config: PackageBuildConfig): void {
   pkg.repository = REPOSITORY;
   pkg.homepage = HOMEPAGE;
   pkg.bugs = { url: BUGS };
-  pkg.publishConfig = { access: "public" };
+  pkg.publishConfig = { access: "public", provenance: true };
   pkg.main = "./dist/index.js";
   pkg.types = "./dist/index.d.ts";
   pkg.files = config.native ? nativeFilesList() : defaultFilesList();
