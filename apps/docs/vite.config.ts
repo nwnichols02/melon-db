@@ -1,13 +1,17 @@
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import mdx from "fumadocs-mdx/vite";
+import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const packagesDir = path.join(rootDir, "../../packages");
+const require = createRequire(import.meta.url);
+const shikiOnigWasm = require.resolve("shiki/dist/onig.wasm");
 
 /** Vite/Rolldown does not resolve workspace `exports` subpaths reliably; alias to source. */
 const melonWorkspaceAliases = [
@@ -54,8 +58,9 @@ const melonWorkspaceAliases = [
 ];
 
 export default defineConfig({
+	assetsInclude: ["**/*.wasm"],
 	ssr: {
-		noExternal: [/^@melon\//],
+		noExternal: [/^@melon\//, "shiki", "fumadocs-core"],
 	},
 	server: {
 		port: Number(process.env.PORT ?? 3000),
@@ -69,11 +74,13 @@ export default defineConfig({
 			},
 		}),
 		react(),
+		nitro({ preset: "vercel" }),
 	],
 	resolve: {
 		conditions: ["development", "browser", "module", "import", "default"],
 		alias: [
 			...melonWorkspaceAliases,
+			{ find: "shiki/wasm", replacement: shikiOnigWasm },
 			{ find: "@", replacement: path.join(rootDir, "src") },
 			{
 				find: "collections/server",

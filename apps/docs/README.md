@@ -21,7 +21,9 @@ If you see `Cannot find module 'collections/browser'`, run `bun run dev:docs` fr
 
 Deploy from the **monorepo root** (recommended) using the root [`vercel.json`](../../vercel.json), or set the Vercel project root to `apps/docs` and use [`apps/docs/vercel.json`](./vercel.json).
 
-Both configs run `bun install` at the repo root so workspace packages resolve. The docs Vite config aliases `@melon/*` imports to `packages/*/src` because Rolldown does not resolve workspace `exports` subpaths during `vite build`.
+Both configs run `bun install` at the repo root so workspace packages resolve and use the `tanstack-start` framework preset. The Vite config includes `nitro({ preset: "vercel" })`, which emits `.vercel/output` for Vercel Functions (do not set Output Directory to `public` in the dashboard). Workspace `@melon/*` imports are aliased to `packages/*/src` because Rolldown does not resolve workspace `exports` subpaths during `vite build`.
+
+In the Vercel dashboard, set **Framework Preset** to **TanStack Start** and leave **Output Directory** empty so Nitro/Vercel auto-detection applies.
 
 ## Scripts
 
