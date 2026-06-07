@@ -1,34 +1,107 @@
+export type PublishAuthMode = "oidc" | "token" | "auto";
+
+/**
+ * Resolved publish auth mode from MELON_PUBLISH_AUTH or environment.
+ */
+export function resolvePublishAuthMode(): PublishAuthMode {
+	const explicit = process.env.MELON_PUBLISH_AUTH;
+	if (explicit === "oidc" || explicit === "token") {
+		return explicit;
+	}
+	return "auto";
+}
+
+function hasOidcContext(): boolean {
+	return (
+		process.env.GITHUB_ACTIONS === "true" &&
+		Boolean(process.env.ACTIONS_ID_TOKEN_REQUEST_URL)
+	);
+}
+
+function hasTokenAuth(): boolean {
+	const token = process.env.NPM_TOKEN ?? process.env.NODE_AUTH_TOKEN;
+	return Boolean(token && token.length > 0);
+}
+
 /**
  * Detect whether npm publish can run (OIDC trusted publishing or token).
  */
 export function hasNpmPublishAuth(): boolean {
-	if (process.env.NPM_TOKEN ?? process.env.NODE_AUTH_TOKEN) {
+	const mode = resolvePublishAuthMode();
+
+	if (mode === "oidc") {
+		return hasOidcContext();
+	}
+
+	if (mode === "token") {
+		return hasTokenAuth();
+	}
+
+	if (hasTokenAuth()) {
 		return true;
 	}
 
-	// GitHub Actions OIDC — npm CLI exchanges the job id-token at publish time.
-	if (
-		process.env.GITHUB_ACTIONS === "true" &&
-		process.env.ACTIONS_ID_TOKEN_REQUEST_URL
-	) {
-		return true;
-	}
-
-	return false;
+	return hasOidcContext();
 }
 
 /**
  * Human-readable auth mode for logs.
  */
 export function describeNpmPublishAuth(): string {
-	if (process.env.NPM_TOKEN ?? process.env.NODE_AUTH_TOKEN) {
+	const mode = resolvePublishAuthMode();
+
+	if (mode === "oidc") {
+		return hasOidcContext()
+			? "OIDC trusted publishing (GitHub Actions)"
+			: "OIDC (missing ACTIONS_ID_TOKEN_REQUEST_URL — check job permissions)";
+	}
+
+	if (mode === "token") {
+		return hasTokenAuth()
+			? "Automation token (NPM_TOKEN / NODE_AUTH_TOKEN)"
+			: "token (missing NPM_TOKEN secret)";
+	}
+
+	if (hasTokenAuth()) {
 		return "token (NPM_TOKEN / NODE_AUTH_TOKEN)";
 	}
-	if (
-		process.env.GITHUB_ACTIONS === "true" &&
-		process.env.ACTIONS_ID_TOKEN_REQUEST_URL
-	) {
+
+	if (hasOidcContext()) {
 		return "OIDC trusted publishing (GitHub Actions)";
 	}
+
 	return "none";
+}
+
+/**
+ * Environment for npm publish subprocess — strips tokens in OIDC mode so npm
+ * CLI uses GitHub id-token exchange instead of a stale .npmrc token.
+ */
+export function npmPublishEnv(): NodeJS.ProcessEnv {
+	const env = { ...process.env };
+	const mode = resolvePublishAuthMode();
+
+	if (mode === "oidc" || (mode === "auto" && !hasTokenAuth() && hasOidcContext())) {
+		delete env.NPM_TOKEN;
+		delete env.NODE_AUTH_TOKEN;
+	}
+
+	return env;
+}
+
+/**
+ * Exit message when auth is misconfigured.
+ */
+export function publishAuthHelp(): string {
+	return (
+		"No npm publish auth available.\n\n" +
+		"GitHub Actions — OIDC (after trusted publishers configured):\n" +
+		"  bootstrap_token: false\n\n" +
+		"GitHub Actions — bootstrap (first publish only):\n" +
+		"  bootstrap_token: true\n" +
+		"  NPM_TOKEN secret = npm Automation token (NOT Granular — Granular triggers EOTP/2FA)\n\n" +
+		"Local:\n" +
+		"  export NPM_TOKEN=npm_...  (Automation token)\n" +
+		"  or npm login"
+	);
 }

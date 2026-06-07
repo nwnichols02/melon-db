@@ -10,7 +10,7 @@
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { describeNpmPublishAuth, hasNpmPublishAuth } from "./auth.ts";
+import { describeNpmPublishAuth, hasNpmPublishAuth, npmPublishEnv, publishAuthHelp } from "./auth.ts";
 import { publishExports } from "./export-map.ts";
 import { MELON_VERSION, PUBLISH_ORDER } from "./packages.ts";
 
@@ -20,16 +20,17 @@ const tag = process.argv.includes("--tag")
   : "alpha";
 
 if (!hasNpmPublishAuth()) {
-  console.error(
-    "No npm publish auth available. Use one of:\n" +
-      "  • GitHub Actions Release workflow (OIDC trusted publishing)\n" +
-      "  • export NPM_TOKEN=... (Automation token for bootstrap/local)\n" +
-      "  • npm login locally",
-  );
+  console.error(publishAuthHelp());
   process.exit(1);
 }
 
 console.log(`npm publish auth: ${describeNpmPublishAuth()}`);
+if (process.env.MELON_PUBLISH_AUTH === "token" && process.env.GITHUB_ACTIONS === "true") {
+  console.log(
+    "Bootstrap mode: NPM_TOKEN must be an npm Automation token (Access Tokens → Automation). " +
+      "Granular tokens require browser 2FA and fail in CI with EOTP.",
+  );
+}
 
 for (const config of PUBLISH_ORDER) {
   const packageDir = join(root, config.dir);
@@ -58,7 +59,7 @@ for (const config of PUBLISH_ORDER) {
       cwd: packageDir,
       stdout: "inherit",
       stderr: "inherit",
-      env: { ...process.env },
+      env: npmPublishEnv(),
     },
   );
 

@@ -11,17 +11,13 @@ on:
         description: Dry run (pack only, no npm publish)
         type: boolean
         default: true
-      bootstrap_token:
-        description: Use NPM_TOKEN secret (first publish only — before trusted publishers exist)
-        type: boolean
-        default: false
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
+      id-token: write # reserved for OIDC trusted publishing later
     steps:
       - uses: actions/checkout@v4
 
@@ -32,7 +28,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -55,16 +50,18 @@ jobs:
       - name: Pack smoke
         run: bun run release:smoke
 
-      - name: Ensure npm CLI supports OIDC trusted publishing
+      - name: Ensure npm CLI is current
         if: github.event.inputs.dry_run != 'true'
         run: npm install -g npm@latest && npm --version
 
-      - name: Publish to npm (OIDC trusted publishing)
-        if: github.event.inputs.dry_run != 'true' && github.event.inputs.bootstrap_token != 'true'
-        run: bun tooling/release/publish.ts --tag "${{ github.event.inputs.dist_tag }}"
-
-      - name: Publish to npm (bootstrap Automation token)
-        if: github.event.inputs.dry_run != 'true' && github.event.inputs.bootstrap_token == 'true'
+      - name: Publish to npm
+        if: github.event.inputs.dry_run != 'true'
         env:
+          MELON_PUBLISH_AUTH: token
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: bun tooling/release/publish.ts --tag "${{ github.event.inputs.dist_tag }}"
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "::error::NPM_TOKEN secret is missing. Add it under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          bun tooling/release/publish.ts --tag "${{ github.event.inputs.dist_tag }}"

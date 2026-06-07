@@ -70,11 +70,11 @@ bun tooling/release/publish.ts --tag alpha
 1. Open **Actions → Release → Run workflow**
 2. Set `dist_tag` to `alpha`
 3. Run with `dry_run: true` first (pack + smoke only)
-4. **First publish:** `dry_run: false`, `bootstrap_token: true` (requires `NPM_TOKEN` secret)
-5. Configure **Trusted Publisher** on every package (see [OIDC setup walkthrough](#oidc-trusted-publishing-setup))
-6. **Ongoing releases:** `dry_run: false`, `bootstrap_token: false` (OIDC — no secret)
+4. Run with `dry_run: false` to publish (uses **`NPM_TOKEN`** repository secret)
 
-The workflow runs package tests, package typecheck, audit (high/critical), build, export validation, smoke consumer install, then `publish.ts`. Full monorepo typecheck (apps included) remains on the main CI workflow.
+The workflow runs package tests, package typecheck, audit (high/critical), build, export validation, smoke consumer install, then `publish.ts` with `NODE_AUTH_TOKEN` from the **`NPM_TOKEN`** secret.
+
+> **Token type:** `NPM_TOKEN` must be an npm **Automation** token (not Granular — Granular triggers `EOTP` / browser 2FA in CI). After trusted publishers are configured, switch the workflow to OIDC and remove the secret (see [OIDC trusted publishing setup](#oidc-trusted-publishing-setup)).
 
 ## OIDC trusted publishing setup
 
@@ -115,8 +115,7 @@ Trusted Publisher can only be added **after** a package exists on npm. The first
 2. Inputs:
    - `dist_tag`: `alpha`
    - `dry_run`: `false`
-   - `bootstrap_token`: **`true`**
-3. Wait for all 12 packages to publish (order is in `tooling/release/packages.ts`)
+3. Wait for all 12 packages to publish (uses the **`NPM_TOKEN`** repository secret automatically)
 
 Verify locally:
 
@@ -168,8 +167,7 @@ npm does **not** validate these fields until the first OIDC publish — double-c
 2. Inputs:
    - `dist_tag`: `alpha`
    - `dry_run`: `false`
-   - `bootstrap_token`: **`false`** ← OIDC path; do not pass `NPM_TOKEN`
-3. Confirm the log shows `npm publish auth: OIDC trusted publishing (GitHub Actions)`
+3. Confirm the log shows `npm publish auth: Automation token (NPM_TOKEN / NODE_AUTH_TOKEN)`
 4. Confirm publish succeeds for all packages
 
 If you see `ENEEDAUTH` or `Unable to authenticate`:
@@ -192,15 +190,14 @@ If you see `ENEEDAUTH` or `Unable to authenticate`:
 1. Bump version in `tooling/release/packages.ts`, run `bun run release:sync-metadata`, update `CHANGELOG.md`
 2. **Actions → Release**
    - `dry_run: true` first (smoke)
-   - `dry_run: false`, `bootstrap_token: false` to publish via OIDC
-3. No npm token in GitHub secrets required
+   - `dry_run: false` to publish (via `NPM_TOKEN` until OIDC is wired up)
 
 ### How the workflow authenticates
 
-| `bootstrap_token` | Auth method | GitHub secret needed |
-|-------------------|-------------|----------------------|
-| `false` (default) | OIDC trusted publishing | None |
-| `true` | `NPM_TOKEN` → `NODE_AUTH_TOKEN` | Automation token |
+| Phase | Auth | GitHub secret |
+|-------|------|---------------|
+| Now (bootstrap) | `NPM_TOKEN` → `NODE_AUTH_TOKEN` | **`NPM_TOKEN`** (Automation token) |
+| Later (OIDC) | Trusted publishing | None — update workflow when ready |
 
 The workflow already includes:
 
@@ -444,7 +441,7 @@ Use until every package exists on npm and Trusted Publisher is configured.
 1. npm → **Access Tokens → Generate New Token → Automation** (not Granular)
 2. Permissions: **Read and write** for `@melon-db/*`
 3. GitHub secret **`NPM_TOKEN`**
-4. Release workflow: `bootstrap_token: true`
+4. Release workflow: `dry_run: false` (uses `NPM_TOKEN` secret)
 5. Revoke token and delete secret after OIDC is verified
 
 Granular tokens and publish tokens require OTP in CI (`EOTP` error) when 2FA is enabled — use **Automation** for bootstrap only.
@@ -459,13 +456,12 @@ bun test && bun run typecheck:packages && bun run release:smoke
 # Actions → Release → dry_run: true, dist_tag: alpha
 
 # 3. Bootstrap first publish (Automation token in NPM_TOKEN secret)
-# Actions → Release → dry_run: false, bootstrap_token: true, dist_tag: alpha
+# Actions → Release → dry_run: false, dist_tag: alpha
 
 # 4. Configure Trusted Publisher on all 12 packages
 bun tooling/release/trusted-publisher-checklist.ts
 
-# 5. Verify OIDC (remove or ignore NPM_TOKEN)
-# Actions → Release → dry_run: false, bootstrap_token: false
+# 5. Verify OIDC (after workflow is switched to OIDC — see RELEASING.md)
 
 # 6. Revoke Automation token; delete NPM_TOKEN secret
 ```
