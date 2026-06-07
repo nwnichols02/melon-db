@@ -4,8 +4,8 @@ import {
 	createMelonSchema,
 	predicate,
 	queryAst,
-} from "@melon/db";
-import { createMemoryDevtoolsBridge } from "@melon/db-devtools";
+} from "@melon-db/db";
+import { createMemoryDevtoolsBridge } from "@melon-db/db-devtools";
 import { createSqliteAdapter } from "../src/adapter.ts";
 
 const schema = createMelonSchema({

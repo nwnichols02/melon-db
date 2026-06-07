@@ -2,18 +2,18 @@ import {
 	createDatabase,
 	createInMemoryAdapter,
 	createMelonSchema,
-} from "@melon/db";
+} from "@melon-db/db";
 import {
 	createMemoryCheckpointStore,
 	synchronize,
 	type PullArgs,
 	type PullResult,
 	type PushArgs,
-} from "@melon/sync";
+} from "@melon-db/sync";
 import {
 	createPostgresSyncStore,
 	createSyncHttpServer,
-} from "@melon/sync-server";
+} from "@melon-db/sync-server";
 
 const syncSchema = createMelonSchema({
 	version: 1,

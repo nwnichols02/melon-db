@@ -10,18 +10,18 @@ Melon uses an **AST-first** query architecture: every query surface compiles int
 ```mermaid
 flowchart LR
   subgraph authoring ["Query authoring"]
-    Q["@melon/db-query"]
-    M["@melon/db-query-mango"]
-    P["@melon/db-prisma"]
+    Q["@melon-db/db-query"]
+    M["@melon-db/db-query-mango"]
+    P["@melon-db/db-prisma"]
   end
-  subgraph core ["@melon/db"]
+  subgraph core ["@melon-db/db"]
     AST[QueryAst]
     DB[MelonDatabase]
   end
   subgraph adapters ["Adapters"]
     IM["In-memory"]
     EX["Bun / Node / Expo SQLite"]
-    JSI["@melon/db-sqlite-native JSI"]
+    JSI["@melon-db/db-sqlite-native JSI"]
   end
   Q --> AST
   M --> AST
@@ -40,18 +40,18 @@ See [Packages](/docs/packages/melon-db) for per-package guides and [Architectura
 
 | Package | Role |
 |---------|------|
-| `@melon/db` | Schema, AST, adapter contract, runtime engine, migrations, sync primitives |
-| `@melon/db-sqlite` | SQLite adapter (Bun, Node, Expo Go, RN `/rn` export) |
-| `@melon/db-sqlite-native` | Native TurboModule + C++ JSI for RN dev builds |
-| `@melon/db-query` | Fluent query builder → AST |
-| `@melon/db-query-mango` | Mango-style query compiler → AST |
-| `@melon/db-prisma` | Prisma schema import + local client facade |
-| `@melon/db-react` | React hooks and providers |
-| `@melon/db-devtools` | Query / SQL / sync inspector |
-| `@melon/db-testkit` | Test helpers and fixtures |
-| `@melon/db-codemods` | WatermelonDB migration codemods |
-| `@melon/sync` | Pull/push sync orchestrator |
-| `@melon/sync-server` | HTTP reference backend (in-memory + Postgres) |
+| `@melon-db/db` | Schema, AST, adapter contract, runtime engine, migrations, sync primitives |
+| `@melon-db/db-sqlite` | SQLite adapter (Bun, Node, Expo Go, RN `/rn` export) |
+| `@melon-db/db-sqlite-native` | Native TurboModule + C++ JSI for RN dev builds |
+| `@melon-db/db-query` | Fluent query builder → AST |
+| `@melon-db/db-query-mango` | Mango-style query compiler → AST |
+| `@melon-db/db-prisma` | Prisma schema import + local client facade |
+| `@melon-db/db-react` | React hooks and providers |
+| `@melon-db/db-devtools` | Query / SQL / sync inspector |
+| `@melon-db/db-testkit` | Test helpers and fixtures |
+| `@melon-db/db-codemods` | WatermelonDB migration codemods |
+| `@melon-db/sync` | Pull/push sync orchestrator |
+| `@melon-db/sync-server` | HTTP reference backend (in-memory + Postgres) |
 
 ## Query pipeline
 
@@ -85,20 +85,20 @@ Steps in code:
 
 ```mermaid
 flowchart BT
-  DB["@melon/db"]
+  DB["@melon-db/db"]
 
-  Q["@melon/db-query"]
-  Mango["@melon/db-query-mango"]
-  Prisma["@melon/db-prisma"]
-  SQLite["@melon/db-sqlite"]
+  Q["@melon-db/db-query"]
+  Mango["@melon-db/db-query-mango"]
+  Prisma["@melon-db/db-prisma"]
+  SQLite["@melon-db/db-sqlite"]
 
-  React["@melon/db-react"]
-  Devtools["@melon/db-devtools"]
-  Testkit["@melon/db-testkit"]
-  Codemods["@melon/db-codemods"]
+  React["@melon-db/db-react"]
+  Devtools["@melon-db/db-devtools"]
+  Testkit["@melon-db/db-testkit"]
+  Codemods["@melon-db/db-codemods"]
 
-  Sync["@melon/sync"]
-  SyncServer["@melon/sync-server"]
+  Sync["@melon-db/sync"]
+  SyncServer["@melon-db/sync-server"]
   Native["db-sqlite-native"]
 
   Q --> DB
@@ -118,9 +118,9 @@ flowchart BT
 
 **Rules:**
 
-- `@melon/db` is the bottom of the stack — no other melon packages
+- `@melon-db/db` is the bottom of the stack — no other melon packages
 - Query packages compile to AST only; they never touch SQLite directly
-- `@melon/sync` depends only on `@melon/db`
+- `@melon-db/sync` depends only on `@melon-db/db`
 - React bindings wire subscriptions to UI; they do not own business logic
 
 ## Writes
@@ -140,7 +140,7 @@ Collection `insert`, `update`, and `delete` throw if called outside a write cont
 
 ## Subscriptions
 
-**SQLite adapters** (`@melon/db-sqlite`) implement **`observeQuery`**: after each write, subscriptions are invalidated only when the changed row can affect the query’s WHERE clause (predicate-aware). Per-table triggers record writes to `_melon_observation_events` for future external-write polling.
+**SQLite adapters** (`@melon-db/db-sqlite`) implement **`observeQuery`**: after each write, subscriptions are invalidated only when the changed row can affect the query’s WHERE clause (predicate-aware). Per-table triggers record writes to `_melon_observation_events` for future external-write polling.
 
 **Other adapters** (in-memory, etc.) use the engine **ChangeEmitter**: any write to a collection re-fetches all active queries on that table.
 

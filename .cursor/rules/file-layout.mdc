@@ -9,22 +9,22 @@ Top-level layout
 text
 melon-monorepo/
   apps/
-    playground-rn/        # Expo Go demo app (@melon/db-sqlite/expo)
+    playground-rn/        # Expo Go demo app (@melon-db/db-sqlite/expo)
     playground-rn-dev/    # Dev client + JSI native SQLite demo
     playground-web/       # Optional web example (if/when supported)
     docs/                 # Fumadocs + TanStack Start site (apps/docs)
   packages/
-    melon-db/             # @melon/db core (schema, AST, engine)
-    melon-db-sqlite/      # @melon/db-sqlite RN/Node SQLite adapter
-    melon-db-react/       # @melon/db-react (hooks, provider)
-    melon-db-query/       # @melon/db-query fluent builder
-    melon-db-query-mango/ # @melon/db-query-mango Mango -> AST
-    melon-db-prisma/      # @melon/db-prisma schema import + client
-    melon-db-devtools/    # @melon/db-devtools devtools bridge/UI
-    melon-db-testkit/     # @melon/db-testkit in-memory, helpers
-    melon-db-codemods/    # @melon/db-codemods migration helpers
-    melon-sync/           # @melon/sync core (separate PRD)
-    melon-sync-server/    # @melon/sync-server backend helpers
+    melon-db/             # @melon-db/db core (schema, AST, engine)
+    melon-db-sqlite/      # @melon-db/db-sqlite RN/Node SQLite adapter
+    melon-db-react/       # @melon-db/db-react (hooks, provider)
+    melon-db-query/       # @melon-db/db-query fluent builder
+    melon-db-query-mango/ # @melon-db/db-query-mango Mango -> AST
+    melon-db-prisma/      # @melon-db/db-prisma schema import + client
+    melon-db-devtools/    # @melon-db/db-devtools devtools bridge/UI
+    melon-db-testkit/     # @melon-db/db-testkit in-memory, helpers
+    melon-db-codemods/    # @melon-db/db-codemods migration helpers
+    melon-sync/           # @melon-db/sync core (separate PRD)
+    melon-sync-server/    # @melon-db/sync-server backend helpers
   tooling/
     tsconfig.base.json
     eslint.config.mjs
@@ -37,7 +37,7 @@ This mirrors common monorepo practice where /apps consume /packages and shared D
 
 Package boundaries
 packages/melon-db – core engine
-Name: @melon/db
+Name: @melon-db/db
 Role: Single source of truth for schema, AST, adapter contract, transactions, and subscriptions. No React, no Prisma, no Mango here.
 
 Depends on:
@@ -61,12 +61,12 @@ Factories: createDatabase, createQueryFactory
 WatermelonDB’s Database + DatabaseAdapter + Collection live conceptually here, but with more explicit typing and AST.
 
 packages/melon-db-sqlite – SQLite adapter
-Name: @melon/db-sqlite
+Name: @melon-db/db-sqlite
 Role: Production adapter for RN new architecture (JSI/TurboModule) and possibly Node.
 
 Depends on:
 
-@melon/db (for StorageAdapter and AST)
+@melon-db/db (for StorageAdapter and AST)
 
 Native libs (react-native-sqlite/JSI, etc.)
 
@@ -77,12 +77,12 @@ createSqliteAdapter(options): StorageAdapter
 This is the concrete version of what WatermelonDB currently does with its SQLite adapter, but as a clean package that only knows about the AST and adapter interface.
 
 packages/melon-db-query – fluent query builder
-Name: @melon/db-query
+Name: @melon-db/db-query
 Role: First-party fluent query builder that outputs QueryAst.
 
 Depends on:
 
-@melon/db for AST types
+@melon-db/db for AST types
 
 Key exports:
 
@@ -93,12 +93,12 @@ createQueryFactory(schema: MelonSchema): QueryFactory
 This is your “canonical” type-safe builder, designed for pure functions and reuse.
 
 packages/melon-db-query-mango – Mango DSL
-Name: @melon/db-query-mango
+Name: @melon-db/db-query-mango
 Role: Parse and validate Mango-style selectors and compile them into QueryAst.
 
 Depends on:
 
-@melon/db (AST)
+@melon-db/db (AST)
 
 Maybe small parsing/validation utilities
 
@@ -111,14 +111,14 @@ createMangoCompiler(): MangoQueryCompiler
 The implementation follows RxDB/CouchDB-style Mango semantics for selector, sort, limit, etc., translating into your AST.
 
 packages/melon-db-react – React bindings
-Name: @melon/db-react
+Name: @melon-db/db-react
 Role: Hooks and providers around MelonDatabase and PreparedQuery.
 
 Depends on:
 
-@melon/db for runtime types
+@melon-db/db for runtime types
 
-Optionally @melon/db-query / @melon/db-query-mango for helper overloads
+Optionally @melon-db/db-query / @melon-db/db-query-mango for helper overloads
 
 Key exports:
 
@@ -133,14 +133,14 @@ useWriter (wraps db.write)
 Matches the “observable local DB + React hooks” pattern that both WatermelonDB and Prisma’s RN support are converging on.
 
 packages/melon-db-prisma – Prisma integration
-Name: @melon/db-prisma
+Name: @melon-db/db-prisma
 Role: Prisma-style schema import and generated local client facades.
 
 Depends on:
 
-@melon/db (schema + AST)
+@melon-db/db (schema + AST)
 
-Optionally @melon/db-query for building AST under the hood
+Optionally @melon-db/db-query for building AST under the hood
 
 @prisma/sdk or parser as a dev dependency for schema parsing
 
@@ -150,17 +150,17 @@ PrismaSchemaImporter, PrismaCodeGenerator
 
 createPrismaLikeClient(db: MelonDatabase): PrismaLikeClient
 
-This is “Prisma-like on top of melon,” not “melon running Prisma engine,” which matches Prisma’s messaging of early RN/Expo support and keeps @melon/db in control of local execution.
+This is “Prisma-like on top of melon,” not “melon running Prisma engine,” which matches Prisma’s messaging of early RN/Expo support and keeps @melon-db/db in control of local execution.
 
 packages/melon-db-devtools – devtools bridge
-Name: @melon/db-devtools
+Name: @melon-db/db-devtools
 Role: Debugging bridge and optional UI.
 
 Depends on:
 
-@melon/db (AST, adapter operations)
+@melon-db/db (AST, adapter operations)
 
-Possibly @melon/db-react for React devtools UI
+Possibly @melon-db/db-react for React devtools UI
 
 Key exports:
 
@@ -171,14 +171,14 @@ DevtoolsBridge
 AST + SQL inspector is especially helpful when juggling multiple query surfaces.
 
 packages/melon-db-testkit – test utilities
-Name: @melon/db-testkit
+Name: @melon-db/db-testkit
 Role: Testing helpers and in-memory adapters.
 
 Depends on:
 
-@melon/db (adapter, AST)
+@melon-db/db (adapter, AST)
 
-Optionally @melon/db-query for fluent test queries
+Optionally @melon-db/db-query for fluent test queries
 
 Key exports:
 
@@ -191,14 +191,14 @@ Jest helpers (e.g. withTestDatabase)
 WatermelonDB users have had to build a lot of this themselves; here it’s packaged.
 
 packages/melon-db-codemods – migration helpers
-Name: @melon/db-codemods
+Name: @melon-db/db-codemods
 Role: Migration tooling for existing WatermelonDB apps.
 
 Depends on:
 
 TS AST tooling (ts-morph, jscodeshift)
 
-@melon/db types for mapping
+@melon-db/db types for mapping
 
 Key exports:
 
@@ -211,27 +211,27 @@ WatermelonDB’s clear separation of Database/Collection/Adapter is what makes t
 packages/melon-sync and packages/melon-sync-server
 These follow from your earlier PRD, but at a high level:
 
-@melon/sync depends only on @melon/db and its change APIs.
+@melon-db/sync depends only on @melon-db/db and its change APIs.
 
-@melon/sync-server depends on Node adapter libraries and exports backend helpers.
+@melon-db/sync-server depends on Node adapter libraries and exports backend helpers.
 
 They do not depend on the query-layer packages (query, mango, prisma) so that sync remains orthogonal.
 
 Apps and how they depend on packages
 apps/playground-rn
-Uses: @melon/db, @melon/db-sqlite, @melon/db-react, @melon/db-query (and optionally @melon/sync).
+Uses: @melon-db/db, @melon-db/db-sqlite, @melon-db/db-react, @melon-db/db-query (and optionally @melon-db/sync).
 
 Purpose: RN New Architecture demo, perf harness, example app.
 
 This is where you validate the RN-specific setup guidance that WatermelonDB currently documents separately.
 
 apps/playground-web
-Uses: @melon/db plus a future web adapter package if/when needed.
+Uses: @melon-db/db plus a future web adapter package if/when needed.
 
 Purpose: Optional for showing web compatibility.
 
 apps/docs
-Uses: @melon/db, @melon/db-react, @melon-db-query-*, @melon-db-prisma as dependencies for live code blocks.
+Uses: @melon-db/db, @melon-db/db-react, @melon-db-query-*, @melon-db-prisma as dependencies for live code blocks.
 
 Purpose: Documentation site.
 
@@ -265,12 +265,12 @@ This is similar to how people place Prisma-based database packages inside packag
 Dependency rules summary
 To keep things clean and tree-shakeable:
 
-@melon/db – core; must not import any other melon-*.
+@melon-db/db – core; must not import any other melon-*.
 
-@melon/db-sqlite, @melon-db-query, @melon-db-query-mango, @melon-db-prisma, @melon-db-testkit – can depend on @melon/db but not on each other (unless clearly a higher-level layer).
+@melon-db/db-sqlite, @melon-db-query, @melon-db-query-mango, @melon-db-prisma, @melon-db-testkit – can depend on @melon-db/db but not on each other (unless clearly a higher-level layer).
 
-@melon/db-react, @melon/db-devtools – higher-level; can depend on @melon/db and query packages, but not on sync.
+@melon-db/db-react, @melon-db/db-devtools – higher-level; can depend on @melon-db/db and query packages, but not on sync.
 
-@melon/sync – depends on @melon/db only.
+@melon-db/sync – depends on @melon-db/db only.
 
 apps/* – can depend on any packages.

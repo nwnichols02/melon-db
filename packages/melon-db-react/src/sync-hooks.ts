@@ -1,4 +1,4 @@
-import type { SyncError, SyncStatus, SynchronizeResult } from "@melon/sync";
+import type { SyncError, SyncStatus, SynchronizeResult } from "@melon-db/sync";
 import { useMelonSyncContext } from "./sync-context.tsx";
 
 /**

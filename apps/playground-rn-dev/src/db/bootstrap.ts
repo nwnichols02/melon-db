@@ -2,8 +2,8 @@ import {
 	type MelonDatabase,
 	type StorageAdapter,
 	createDatabase,
-} from "@melon/db";
-import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
+} from "@melon-db/db";
+import { createReactiveDevtoolsBridge } from "@melon-db/db-devtools";
 import { Paths } from "expo-file-system";
 import { type Task, playgroundMigrations, taskSchema } from "./schema";
 
@@ -103,14 +103,14 @@ async function createAdapter(): Promise<StorageAdapter> {
 
 async function createExpoAdapter(): Promise<StorageAdapter> {
 	const SQLite = await import("expo-sqlite");
-	const { createExpoSqliteAdapter } = await import("@melon/db-sqlite/expo");
+	const { createExpoSqliteAdapter } = await import("@melon-db/db-sqlite/expo");
 	const database = await SQLite.openDatabaseAsync(DATABASE_FILENAME);
 	return createExpoSqliteAdapter({ database });
 }
 
 async function createNativeAdapter(): Promise<StorageAdapter> {
 	const { createJsiSqliteAdapter, isJsiSqliteAvailable } = await import(
-		"@melon/db-sqlite/rn"
+		"@melon-db/db-sqlite/rn"
 	);
 	if (!isJsiSqliteAvailable()) {
 		throw new Error(

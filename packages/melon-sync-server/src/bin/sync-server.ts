@@ -64,7 +64,7 @@ try {
 
 const { url, stop } = serverHandle;
 
-console.log(`@melon/sync-server listening at ${url}`);
+console.log(`@melon-db/sync-server listening at ${url}`);
 console.log(`Store: ${databaseUrl ? "postgres" : "in-memory"}`);
 console.log("  POST /sync/pull");
 console.log("  POST /sync/push");

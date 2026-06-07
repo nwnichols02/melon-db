@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { and, not, or, predicate } from "@melon/db";
+import { and, not, or, predicate } from "@melon-db/db";
 import { compileWhere } from "../src/sql/compile-predicate.ts";
 
 describe("compileWhere", () => {

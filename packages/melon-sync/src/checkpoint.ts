@@ -5,4 +5,4 @@ export {
 	createMemoryCheckpointStore,
 	type CheckpointStore,
 	type MetaStore,
-} from "@melon/db";
+} from "@melon-db/db";

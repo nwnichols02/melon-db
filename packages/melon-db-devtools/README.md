@@ -1,4 +1,4 @@
-# @melon/db-devtools
+# @melon-db/db-devtools
 
 Query, write, subscription, and sync inspector bridge + React panel.
 

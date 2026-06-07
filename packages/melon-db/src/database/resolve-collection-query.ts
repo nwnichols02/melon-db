@@ -1,5 +1,5 @@
 import type { QueryAst } from "../ast.ts";
-import { QueryBuilder } from "@melon/db-query";
+import { QueryBuilder } from "@melon-db/db-query";
 import type { CollectionQueryInput } from "./query-input.ts";
 
 export function resolveCollectionQueryInput<RecordShape = Record<string, unknown>>(
@@ -14,7 +14,7 @@ export function resolveCollectionQueryInput<RecordShape = Record<string, unknown
 	if (input.length === 0) return (input as () => QueryAst)();
 
 	// Fluent builder callback input: (builder) => builder
-	// (implemented by @melon/db-query QueryBuilder but typed structurally here).
+	// (implemented by @melon-db/db-query QueryBuilder but typed structurally here).
 	const builder = new QueryBuilder<RecordShape>(collection);
 	const built = (
 		input as (b: import("./query-input.ts").QueryBuilderLike<RecordShape>) => unknown

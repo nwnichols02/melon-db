@@ -5,9 +5,9 @@
     "": {
       "name": "melon-alpha-consumer-fixture",
       "dependencies": {
-        "@melon/db": "file:../artifacts/melon-db-0.1.0-alpha.0.tgz",
-        "@melon/db-query": "file:../artifacts/melon-db-query-0.1.0-alpha.0.tgz",
-        "@melon/db-sqlite": "file:../artifacts/melon-db-sqlite-0.1.0-alpha.0.tgz",
+        "@melon-db/db": "file:../artifacts/melon-db-db-0.1.0-alpha.0.tgz",
+        "@melon-db/db-query": "file:../artifacts/melon-db-db-query-0.1.0-alpha.0.tgz",
+        "@melon-db/db-sqlite": "file:../artifacts/melon-db-db-sqlite-0.1.0-alpha.0.tgz",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -17,15 +17,15 @@
     },
   },
   "overrides": {
-    "@melon/db": "file:../artifacts/melon-db-0.1.0-alpha.0.tgz",
-    "@melon/db-query": "file:../artifacts/melon-db-query-0.1.0-alpha.0.tgz",
+    "@melon-db/db": "file:../artifacts/melon-db-db-0.1.0-alpha.0.tgz",
+    "@melon-db/db-query": "file:../artifacts/melon-db-db-query-0.1.0-alpha.0.tgz",
   },
   "packages": {
-    "@melon/db": ["@melon/db@../artifacts/melon-db-0.1.0-alpha.0.tgz", { "dependencies": { "@melon/db-query": "^0.1.0-alpha.0" } }, "sha512-cqU6Qotukm8j6PqMRAnOjl9czGSK9KKhvJznavU1lzgLZ3fwc2pCiEMg1JmI8O3cKdcRTTAKCbgp8zr9ZYOtZw=="],
+    "@melon-db/db": ["@melon-db/db@../artifacts/melon-db-db-0.1.0-alpha.0.tgz", { "dependencies": { "@melon-db/db-query": "^0.1.0-alpha.0" } }, "sha512-vTlJFVAnA58NA0clMes2uqS7bYcq4uwF0yWWLuyYioPRcVd9t9snyLaC1ap2hoiAAepFhP37VW8PI4Rm71zuZg=="],
 
-    "@melon/db-query": ["@melon/db-query@../artifacts/melon-db-query-0.1.0-alpha.0.tgz", { "dependencies": { "@melon/db": "^0.1.0-alpha.0" } }, "sha512-P0dpG2Qtat1tX3vhfKsAumgJJwGXJ0dm/iiePNXbXrKjXSTfwIflxpk8Nupu38n8xLYUZFdA3gX+zlkOhTcCXw=="],
+    "@melon-db/db-query": ["@melon-db/db-query@../artifacts/melon-db-db-query-0.1.0-alpha.0.tgz", { "dependencies": { "@melon-db/db": "^0.1.0-alpha.0" } }, "sha512-jUR9IvnCsUbbVeznnOXHXCRc2b3fBZP6WaZfvh1OIHuzqd1zGq7rWZ4BBSBV1sdYjbg058wQagZEkqmiZfxGyA=="],
 
-    "@melon/db-sqlite": ["@melon/db-sqlite@../artifacts/melon-db-sqlite-0.1.0-alpha.0.tgz", { "dependencies": { "@melon/db": "^0.1.0-alpha.0" }, "peerDependencies": { "@melon/db-sqlite-native": "^0.1.0-alpha.0", "@nozbe/watermelondb": "0.27.1", "better-sqlite3": "12.10.0", "expo-sqlite": ">=15.0.0", "react-native": "*" }, "optionalPeers": ["@melon/db-sqlite-native", "@nozbe/watermelondb", "better-sqlite3", "expo-sqlite", "react-native"] }, "sha512-al+u2st5Zr3TLMc+FIZw41SH6/ZgHXT6Yg8eG+lAzROCWJxrrX70cobO03OX+yqsaIrYGfdM+ZSleG1lhtfRtg=="],
+    "@melon-db/db-sqlite": ["@melon-db/db-sqlite@../artifacts/melon-db-db-sqlite-0.1.0-alpha.0.tgz", { "dependencies": { "@melon-db/db": "^0.1.0-alpha.0" }, "peerDependencies": { "@melon-db/db-sqlite-native": "^0.1.0-alpha.0", "@nozbe/watermelondb": "0.27.1", "better-sqlite3": "12.10.0", "expo-sqlite": ">=15.0.0", "react-native": "*" }, "optionalPeers": ["@melon-db/db-sqlite-native", "@nozbe/watermelondb", "better-sqlite3", "expo-sqlite", "react-native"] }, "sha512-GzlL4yIUpl8hDhj82MvaoDB5egd5oVhjRzywB5cBrGjOUbnbqIjQKIPumLsdQUSrAOHrmCvUunqr0TTC6kdv9w=="],
 
     "@types/bun": ["@types/bun@1.3.14", "", { "dependencies": { "bun-types": "1.3.14" } }, "sha512-h1hFqFVcvAvD9j9K7ZW7vd82aSA+rTdznZa+5bwvCwqSB1jmmfLcbIWhOLx1/+boy/xmjgCs/OMUL8hRJSmnPw=="],
 

@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import type { QueryExecutionDebug } from "@melon/db";
+import type { QueryExecutionDebug } from "@melon-db/db";
 import {
 	createDatabase,
 	createMelonSchema,
 	predicate,
 	queryAst,
-} from "@melon/db";
+} from "@melon-db/db";
 import { createSqliteAdapter } from "../src/adapter.ts";
 
 const schema = createMelonSchema({

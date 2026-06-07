@@ -16,43 +16,43 @@ const shikiOnigWasm = require.resolve("shiki/dist/onig.wasm");
 /** Vite/Rolldown does not resolve workspace `exports` subpaths reliably; alias to source. */
 const melonWorkspaceAliases = [
 	{
-		find: "@melon/sync-server/in-memory",
+		find: "@melon-db/sync-server/in-memory",
 		replacement: path.join(packagesDir, "melon-sync-server/src/in-memory.ts"),
 	},
 	{
-		find: "@melon/db-devtools/react",
+		find: "@melon-db/db-devtools/react",
 		replacement: path.join(packagesDir, "melon-db-devtools/src/react/index.ts"),
 	},
 	{
-		find: "@melon/db-devtools",
+		find: "@melon-db/db-devtools",
 		replacement: path.join(packagesDir, "melon-db-devtools/src/index.ts"),
 	},
 	{
-		find: "@melon/sync-server",
+		find: "@melon-db/sync-server",
 		replacement: path.join(packagesDir, "melon-sync-server/src/index.ts"),
 	},
 	{
-		find: "@melon/db-query",
+		find: "@melon-db/db-query",
 		replacement: path.join(packagesDir, "melon-db-query/src/index.ts"),
 	},
 	{
-		find: "@melon/db-query-mango",
+		find: "@melon-db/db-query-mango",
 		replacement: path.join(packagesDir, "melon-db-query-mango/src/index.ts"),
 	},
 	{
-		find: "@melon/db-prisma",
+		find: "@melon-db/db-prisma",
 		replacement: path.join(packagesDir, "melon-db-prisma/src/index.ts"),
 	},
 	{
-		find: "@melon/db-react",
+		find: "@melon-db/db-react",
 		replacement: path.join(packagesDir, "melon-db-react/src/index.ts"),
 	},
 	{
-		find: "@melon/sync",
+		find: "@melon-db/sync",
 		replacement: path.join(packagesDir, "melon-sync/src/index.ts"),
 	},
 	{
-		find: "@melon/db",
+		find: "@melon-db/db",
 		replacement: path.join(packagesDir, "melon-db/src/index.ts"),
 	},
 ];
@@ -60,7 +60,7 @@ const melonWorkspaceAliases = [
 export default defineConfig({
 	assetsInclude: ["**/*.wasm"],
 	ssr: {
-		noExternal: [/^@melon\//, "shiki", "fumadocs-core"],
+		noExternal: [/^@melon-db\//, "shiki", "fumadocs-core"],
 	},
 	server: {
 		port: Number(process.env.PORT ?? 3000),

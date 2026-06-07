@@ -3,7 +3,7 @@ import {
 	createDatabase,
 	createInMemoryAdapter,
 	createMelonSchema,
-} from "@melon/db";
+} from "@melon-db/db";
 import { createMemoryCheckpointStore } from "../src/checkpoint.ts";
 import { SyncErrorCode } from "../src/errors.ts";
 import { createMutableNetworkMonitor } from "../src/network.ts";

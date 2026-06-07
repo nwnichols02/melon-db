@@ -3,14 +3,14 @@ title: React
 description: MelonDbProvider, useQuery, useWriter, and sync hooks.
 ---
 
-[`@melon/db-react`](/docs/packages/melon-db-react) connects `MelonDatabase` to React with context and subscription-driven hooks.
+[`@melon-db/db-react`](/docs/packages/melon-db-react) connects `MelonDatabase` to React with context and subscription-driven hooks.
 
 ## Provider
 
 Bootstrap the database once, then wrap your tree:
 
 ```tsx
-import { MelonDbProvider } from '@melon/db-react';
+import { MelonDbProvider } from '@melon-db/db-react';
 
 export function App({ db }: { db: MelonDatabase }) {
   return (
@@ -28,8 +28,8 @@ For sync, nest `MelonSyncProvider` inside `MelonDbProvider` (see [Sync frontend]
 Subscribes to a query AST or `PreparedQuery` and re-renders when underlying rows change:
 
 ```tsx
-import { createQueryFactory } from '@melon/db-query';
-import { useQuery } from '@melon/db-react';
+import { createQueryFactory } from '@melon-db/db-query';
+import { useQuery } from '@melon-db/db-react';
 import { useMemo } from 'react';
 
 function TaskList() {
@@ -67,7 +67,7 @@ const openCount = useQueryCount(openTasksCountAst);
 ## useFindMany / useFindFirst (Prisma args)
 
 ```tsx
-import { useFindMany, useFindFirst } from '@melon/db-react';
+import { useFindMany, useFindFirst } from '@melon-db/db-react';
 
 const tasks = useFindMany<Task>('tasks', {
   where: { status: 'open' },
@@ -76,14 +76,14 @@ const tasks = useFindMany<Task>('tasks', {
 });
 ```
 
-Compiles Prisma-style args via `@melon/db-prisma` under the hood.
+Compiles Prisma-style args via `@melon-db/db-prisma` under the hood.
 
 ## useFluentQuery
 
 Pass a builder callback (same shape as `collection.query((b) => …)`):
 
 ```tsx
-import { useFluentQuery } from '@melon/db-react';
+import { useFluentQuery } from '@melon-db/db-react';
 
 const tasks = useFluentQuery<Task>('tasks', (b) =>
   b.where('status', 'eq', 'open').orderBy('priority', 'desc').limit(20),
@@ -95,7 +95,7 @@ const tasks = useFluentQuery<Task>('tasks', (b) =>
 Subscribe to a single row by primary key:
 
 ```tsx
-import { useRecord } from '@melon/db-react';
+import { useRecord } from '@melon-db/db-react';
 
 function TaskDetail({ id }: { id: string }) {
   const task = useRecord<Task>('tasks', id);
@@ -109,7 +109,7 @@ function TaskDetail({ id }: { id: string }) {
 Array-returning hooks stay backward compatible. Use `*State` variants when you need loading or error UI:
 
 ```tsx
-import { useQueryState, useRecordState } from '@melon/db-react';
+import { useQueryState, useRecordState } from '@melon-db/db-react';
 
 const listState = useQueryState<Task>(openTasksAst);
 const recordState = useRecordState<Task>('tasks', taskId);
@@ -129,7 +129,7 @@ if (listState.status === 'ready') return <List data={listState.data} />;
 ## useMangoQuery
 
 ```tsx
-import { useMangoQuery } from '@melon/db-react';
+import { useMangoQuery } from '@melon-db/db-react';
 
 const urgent = useMangoQuery<Task>('tasks', {
   selector: { status: 'open', priority: { $gte: 3 } },
@@ -142,7 +142,7 @@ const urgent = useMangoQuery<Task>('tasks', {
 Stable callback wrapping `db.write` — use for mutations in components:
 
 ```tsx
-import { useWriter } from '@melon/db-react';
+import { useWriter } from '@melon-db/db-react';
 
 function AddTask() {
   const write = useWriter();

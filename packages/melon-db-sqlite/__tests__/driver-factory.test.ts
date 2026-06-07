@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createDatabase, createMelonSchema } from "@melon/db";
+import { createDatabase, createMelonSchema } from "@melon-db/db";
 import { adapterCrudSchemaDefinition } from "../../melon-db/__fixtures__/adapter-crud-vectors.ts";
 import { runAdapterCrudVectors } from "../../melon-db/__fixtures__/run-adapter-crud-vectors.ts";
 import { createSqliteAdapterFromDriver } from "../src/adapter-core.ts";

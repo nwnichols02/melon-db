@@ -1,5 +1,5 @@
-import type { SyncRecord } from "@melon/db";
-import type { PullArgs, PullResult, PushArgs, SyncBackend } from "@melon/sync";
+import type { SyncRecord } from "@melon-db/db";
+import type { PullArgs, PullResult, PushArgs, SyncBackend } from "@melon-db/sync";
 import type { SQL } from "bun";
 import { SyncServerError, SyncServerErrorCode } from "./errors.ts";
 import { runSyncServerMigrations } from "./migrate.ts";

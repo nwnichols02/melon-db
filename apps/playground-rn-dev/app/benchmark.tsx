@@ -7,8 +7,8 @@ import type {
 	BenchResult,
 	RnMelonVsWdbReport,
 	RnParityReport,
-} from "@melon/db-sqlite/bench";
-import { getMelonSQLiteNativeMode } from "@melon/db-sqlite-native";
+} from "@melon-db/db-sqlite/bench";
+import { getMelonSQLiteNativeMode } from "@melon-db/db-sqlite-native";
 import { Paths } from "expo-file-system";
 import { Redirect, useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";

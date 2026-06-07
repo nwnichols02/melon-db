@@ -15,7 +15,7 @@ bun install   # from monorepo root
 | `bun run demo` | `src/demo.ts` | SQLite CRUD on local file |
 | `bun run demo:sync` | `src/sync-demo.ts` | In-process sync smoke test |
 | `bun run demo:sync:http` | `src/sync-http-demo.ts` | Embedded HTTP sync server + client |
-| `bun run demo:sync:postgres` | `src/sync-postgres-demo.ts` | Postgres via `@melon/sync-server` |
+| `bun run demo:sync:postgres` | `src/sync-postgres-demo.ts` | Postgres via `@melon-db/sync-server` |
 
 From the **monorepo root**:
 

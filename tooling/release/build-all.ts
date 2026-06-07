@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Build all publishable @melon packages (dist/ + declarations via tsc -b).
+ * Build all publishable @melon-db/* packages (dist/ + declarations via tsc -b).
  */
 import { copyFileSync, existsSync, readFileSync, renameSync, rmSync } from "node:fs";
 import { join } from "node:path";
@@ -60,15 +60,15 @@ function buildCorePair(): void {
   }
 
   try {
-    console.log("Building @melon/db (bootstrap)...");
+    console.log("Building @melon-db/db (bootstrap)...");
     runTscProject(join(root, "packages/melon-db"));
 
-    console.log("Building @melon/db-query...");
+    console.log("Building @melon-db/db-query...");
     runTscProject(join(root, "packages/melon-db-query"));
 
     if (moved) {
       renameSync(DB_RESOLVE_BAK, DB_RESOLVE);
-      console.log("Building @melon/db (with query bridge)...");
+      console.log("Building @melon-db/db (with query bridge)...");
       runTscProject(join(root, "packages/melon-db"));
     }
   } catch (error) {
@@ -85,7 +85,7 @@ export async function buildAll(): Promise<void> {
   addBinShebangs(join(root, "packages/melon-db-query"));
 
   for (const config of PUBLISH_ORDER) {
-    if (config.name === "@melon/db" || config.name === "@melon/db-query") {
+    if (config.name === "@melon-db/db" || config.name === "@melon-db/db-query") {
       continue;
     }
     console.log(`Building ${config.name}...`);

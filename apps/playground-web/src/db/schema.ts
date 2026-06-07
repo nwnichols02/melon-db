@@ -1,4 +1,4 @@
-import { createMelonSchema } from "@melon/db";
+import { createMelonSchema } from "@melon-db/db";
 
 export interface Task extends Record<string, unknown> {
 	id: string;

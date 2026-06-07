@@ -3,7 +3,7 @@ title: Migrating from WatermelonDB
 description: Codemods and concept mapping from WatermelonDB to Melon.
 ---
 
-Use `@melon/db-codemods` for automated migration helpers.
+Use `@melon-db/db-codemods` for automated migration helpers.
 
 ## CLI codemods
 
@@ -27,7 +27,7 @@ Melon supports **`Q.on` at runtime** when the parent schema defines a matching *
 **Runtime (preferred when schema has `tasks.project` → `projects`):**
 
 ```ts
-import { translateWatermelonQuery } from '@melon/db-codemods';
+import { translateWatermelonQuery } from '@melon-db/db-codemods';
 import { taskSchema } from './schema';
 
 const ast = translateWatermelonQuery(
@@ -82,7 +82,7 @@ const Enhanced = withObservables(['tasks'], ({ database }) => ({
 }))(TaskList);
 
 // After
-import { useFindMany } from '@melon/db-react';
+import { useFindMany } from '@melon-db/db-react';
 
 function TaskList() {
   const tasks = useFindMany('tasks', /* compile query args */);
@@ -104,7 +104,7 @@ These patterns still require manual work:
 - Complex `database.batch` operation mapping
 - `Q.experimentalJoinTables` / nested join tables (use `relationFilters` or includes)
 
-See [`@melon/db-codemods`](/docs/packages/melon-db-codemods) for the full compatibility matrix.
+See [`@melon-db/db-codemods`](/docs/packages/melon-db-codemods) for the full compatibility matrix.
 
 ## Concept mapping
 
@@ -114,4 +114,4 @@ See [`@melon/db-codemods`](/docs/packages/melon-db-codemods) for the full compat
 | `database.write()` | `db.write()` |
 | `collection.query()` | `collection.query(ast)` or fluent builder |
 | `withDatabase` / provider | `MelonDbProvider` |
-| Sync pull/push | `@melon/sync` `synchronize()` |
+| Sync pull/push | `@melon-db/sync` `synchronize()` |

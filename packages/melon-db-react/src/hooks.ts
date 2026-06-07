@@ -3,13 +3,13 @@ import type {
 	PreparedQuery,
 	QueryAst,
 	WriteContext,
-} from "@melon/db";
-import { prepareQuery } from "@melon/db";
-import { compilePrismaQuery } from "@melon/db-prisma";
-import type { PrismaFindManyArgs } from "@melon/db-prisma";
-import { type QueryBuilder, resolveCollectionQuery } from "@melon/db-query";
-import { createMangoCompiler } from "@melon/db-query-mango";
-import type { MangoQuery } from "@melon/db-query-mango";
+} from "@melon-db/db";
+import { prepareQuery } from "@melon-db/db";
+import { compilePrismaQuery } from "@melon-db/db-prisma";
+import type { PrismaFindManyArgs } from "@melon-db/db-prisma";
+import { type QueryBuilder, resolveCollectionQuery } from "@melon-db/db-query";
+import { createMangoCompiler } from "@melon-db/db-query-mango";
+import type { MangoQuery } from "@melon-db/db-query-mango";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDatabase } from "./context.tsx";
 import {

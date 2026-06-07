@@ -4,8 +4,8 @@
 
 ## Packages touched
 
-- [ ] `@melon/db`
-- [ ] `@melon/db-sqlite` / native
+- [ ] `@melon-db/db`
+- [ ] `@melon-db/db-sqlite` / native
 - [ ] Query / React / sync
 - [ ] Docs / CI / release tooling
 - [ ] Other

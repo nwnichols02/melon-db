@@ -10,7 +10,7 @@ import {
 	or,
 	predicate,
 	queryAst,
-} from "@melon/db";
+} from "@melon-db/db";
 import type { WatermelonQueryClause } from "./types.ts";
 
 const UNSUPPORTED_JOIN_REMEDIATION =

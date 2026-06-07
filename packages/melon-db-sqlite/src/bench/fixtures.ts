@@ -1,4 +1,4 @@
-import { createMelonSchema, predicate, queryAst } from "@melon/db";
+import { createMelonSchema, predicate, queryAst } from "@melon-db/db";
 
 export const BATCH_CHUNK_SIZE = 500;
 

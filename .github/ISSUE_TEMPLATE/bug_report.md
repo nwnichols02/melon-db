@@ -1,15 +1,15 @@
 ---
 name: Bug report
-about: Report a problem with @melon/* packages
+about: Report a problem with @melon-db/* packages
 title: "[bug] "
 labels: bug
 ---
 
 ## Packages and version
 
-- [ ] `@melon/db` @alpha
-- [ ] `@melon/db-sqlite` @alpha
-- [ ] `@melon/db-react` @alpha
+- [ ] `@melon-db/db` @alpha
+- [ ] `@melon-db/db-sqlite` @alpha
+- [ ] `@melon-db/db-react` @alpha
 - [ ] Other: 
 
 **Environment:** (e.g. Bun 1.x, Node 22, Expo SDK, RN 0.81, iOS/Android)

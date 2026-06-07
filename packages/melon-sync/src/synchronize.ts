@@ -5,8 +5,8 @@ import type {
 	Migration,
 	SyncChanges,
 	SyncDebugSnapshot,
-} from "@melon/db";
-import { MelonErrorCode, SyncDebugPhase } from "@melon/db";
+} from "@melon-db/db";
+import { MelonErrorCode, SyncDebugPhase } from "@melon-db/db";
 import type { CheckpointStore } from "./checkpoint.ts";
 import { createMemoryCheckpointStore } from "./checkpoint.ts";
 import { SyncError, SyncErrorCode } from "./errors.ts";

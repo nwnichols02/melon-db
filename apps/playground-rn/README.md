@@ -1,10 +1,10 @@
 # Melon Playground (React Native — Expo Go)
 
-Expo Go app demonstrating `@melon/db` with `expo-sqlite`, fluent queries, reactive hooks, and sync.
+Expo Go app demonstrating `@melon-db/db` with `expo-sqlite`, fluent queries, reactive hooks, and sync.
 
 | | |
 |---|---|
-| SQLite | `@melon/db-sqlite/expo` |
+| SQLite | `@melon-db/db-sqlite/expo` |
 | DB file | `melon-playground.db` |
 | Runs in | **Expo Go only** (no custom native code) |
 

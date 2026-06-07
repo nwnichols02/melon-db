@@ -1,4 +1,4 @@
-import type { QueryExecutionDebug, StorageAdapter } from "@melon/db";
+import type { QueryExecutionDebug, StorageAdapter } from "@melon-db/db";
 import {
 	type SqliteAdapterCoreOptions,
 	createSqliteAdapterFromDriver,

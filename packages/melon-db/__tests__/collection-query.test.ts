@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createQueryFactory } from "@melon/db-query";
+import { createQueryFactory } from "@melon-db/db-query";
 import { taskSchema } from "../__fixtures__/task-schema.ts";
 import { createDatabase, createInMemoryAdapter } from "../src/index.ts";
 

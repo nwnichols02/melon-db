@@ -5,15 +5,15 @@ description: Expo Go vs dev build paths, TurboModule, and C++ JSI bindings.
 
 React Native has **two supported SQLite paths**. Choosing the wrong import is the most common setup mistake — use this page as a decision guide.
 
-See [@melon/db-sqlite-native](/docs/packages/melon-db-sqlite-native) for setup and limitations. For the dual-path rationale see [ADR-005](/docs/architecture/decisions#adr-005-dual-rn-sqlite-path-expo-go-vs-dev-build) and [ADR-006](/docs/architecture/decisions#adr-006-layered-native-stack--turbomodule-then-c-jsi).
+See [@melon-db/db-sqlite-native](/docs/packages/melon-db-sqlite-native) for setup and limitations. For the dual-path rationale see [ADR-005](/docs/architecture/decisions#adr-005-dual-rn-sqlite-path-expo-go-vs-dev-build) and [ADR-006](/docs/architecture/decisions#adr-006-layered-native-stack--turbomodule-then-c-jsi).
 
 ## Path decision
 
 ```mermaid
 flowchart TD
   Start["createSqliteAdapter on RN"] --> Expo{"Expo Go?"}
-  Expo -->|yes| ExpoPkg["@melon/db-sqlite/expo"]
-  Expo -->|"no / dev build"| RnPkg["@melon/db-sqlite/rn"]
+  Expo -->|yes| ExpoPkg["@melon-db/db-sqlite/expo"]
+  Expo -->|"no / dev build"| RnPkg["@melon-db/db-sqlite/rn"]
   RnPkg --> Auto["mode: auto"]
   Auto --> JSI["jsi-sync melonSqliteJsi"]
   RnPkg -->|JSI unavailable| Turbo["TurboModule fallback"]
@@ -21,15 +21,15 @@ flowchart TD
 
 | Environment | Package / entry | Native module |
 |-------------|-----------------|---------------|
-| Expo Go | `@melon/db-sqlite/expo` | `expo-sqlite` (async) |
-| Dev build (iOS/Android) | `@melon/db-sqlite/rn` | `@melon/db-sqlite-native` |
+| Expo Go | `@melon-db/db-sqlite/expo` | `expo-sqlite` (async) |
+| Dev build (iOS/Android) | `@melon-db/db-sqlite/rn` | `@melon-db/db-sqlite-native` |
 | Override to Expo driver in dev client | `EXPO_PUBLIC_MELON_SQLITE=expo` | `expo-sqlite` |
 | Force TurboModule only | `EXPO_PUBLIC_MELON_SQLITE=turbo` | TurboModule promises |
 
 Example apps:
 
-- [`apps/playground-rn`](https://github.com/nwnichols02/melon/tree/main/apps/playground-rn) — Expo Go
-- [`apps/playground-rn-dev`](https://github.com/nwnichols02/melon/tree/main/apps/playground-rn-dev) — native JSI dev build
+- [`apps/playground-rn`](https://github.com/nwnichols02/melon-db/tree/main/apps/playground-rn) — Expo Go
+- [`apps/playground-rn-dev`](https://github.com/nwnichols02/melon-db/tree/main/apps/playground-rn-dev) — native JSI dev build
 
 ## Native stack layers
 
@@ -38,7 +38,7 @@ Phases 20–26 built a layered native module:
 ```mermaid
 flowchart TB
   subgraph js ["JavaScript"]
-    RN["@melon/db-sqlite/rn"]
+    RN["@melon-db/db-sqlite/rn"]
     Bridge["MelonSQLiteBridge.ts"]
     JsiTs["MelonSQLiteJsi.ts"]
   end
@@ -82,7 +82,7 @@ When JSI is present, `getMelonSQLiteNativeMode()` returns `jsi-sync`; otherwise 
 ## v1 native limitations
 
 - No BLOB round-trip on the native JSI path
-- Predicate-aware `observeQuery` in `@melon/db-sqlite` (all paths including native JSI)
+- Predicate-aware `observeQuery` in `@melon-db/db-sqlite` (all paths including native JSI)
 - RN on-device benchmark harness deferred (Node `bench:compare` vs WatermelonDB ships today)
 
 ## Related

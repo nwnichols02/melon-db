@@ -27,7 +27,7 @@ Melon sync follows a Watermelon-compatible pull/push model. This page summarizes
 ## Retry and cancellation
 
 ```ts
-import { DEFAULT_RETRY_POLICY, synchronize } from '@melon/sync';
+import { DEFAULT_RETRY_POLICY, synchronize } from '@melon-db/sync';
 
 await synchronize({
   db,
@@ -52,7 +52,7 @@ await synchronize({
 Set `conflictPolicy: 'custom'` and provide `conflictResolver`. The resolver receives local row, remote payload, and outbox entry, and returns `apply` (with merged `record`) or `skip`. Use `clearOutbox: false` on `apply` to keep local changes queued for push (same as merge-by-field).
 
 ```ts
-import { mergeRemoteWithPendingFields, type ConflictResolver } from '@melon/db';
+import { mergeRemoteWithPendingFields, type ConflictResolver } from '@melon-db/db';
 
 const resolver: ConflictResolver = (ctx) => ({
   action: 'apply',
@@ -76,7 +76,7 @@ await synchronize({
 
 ## React hooks
 
-Use `@melon/db-react`:
+Use `@melon-db/db-react`:
 
 - `MelonSyncProvider`
 - `useSync()` / `useSyncStatus()`
@@ -89,6 +89,6 @@ bun run postgres:up
 bun run sync-server:postgres
 ```
 
-See [`@melon/sync-server`](/docs/packages/melon-sync-server).
+See [`@melon-db/sync-server`](/docs/packages/melon-sync-server).
 
 Try the [Sync playground](/docs/playgrounds/sync).

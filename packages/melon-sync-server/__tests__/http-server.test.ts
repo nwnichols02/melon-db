@@ -3,8 +3,8 @@ import {
 	createDatabase,
 	createInMemoryAdapter,
 	createMelonSchema,
-} from "@melon/db";
-import { createMemoryCheckpointStore, synchronize } from "@melon/sync";
+} from "@melon-db/db";
+import { createMemoryCheckpointStore, synchronize } from "@melon-db/sync";
 import { createSyncHttpServer } from "../src/http-server.ts";
 
 const syncSchema = createMelonSchema({
@@ -107,12 +107,12 @@ function createHttpBackend(baseUrl: string) {
 				throw new Error(`Pull failed: ${response.status}`);
 			}
 			return response.json() as Promise<{
-				changes: import("@melon/db").SyncChanges;
+				changes: import("@melon-db/db").SyncChanges;
 				timestamp: number;
 			}>;
 		},
 		pushChanges: async (args: {
-			changes: import("@melon/db").SyncChanges;
+			changes: import("@melon-db/db").SyncChanges;
 			lastPulledAt: number;
 		}) => {
 			const response = await fetch(`${baseUrl}/sync/push`, {

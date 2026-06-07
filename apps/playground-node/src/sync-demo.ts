@@ -2,14 +2,14 @@ import {
 	createDatabase,
 	createInMemoryAdapter,
 	createMelonSchema,
-} from "@melon/db";
+} from "@melon-db/db";
 import {
 	createMemoryCheckpointStore,
 	synchronize,
 	type PullArgs,
 	type PullResult,
 	type PushArgs,
-} from "@melon/sync";
+} from "@melon-db/sync";
 
 const syncSchema = createMelonSchema({
 	version: 1,
@@ -95,7 +95,7 @@ console.log("=== Melon sync demo ===\n");
 await clientA.db.write(async (tx) => {
 	await tx.collection("tasks").insert({
 		id: "1",
-		title: "Learn @melon/sync",
+		title: "Learn @melon-db/sync",
 		status: "open",
 	});
 });

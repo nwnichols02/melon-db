@@ -19,18 +19,18 @@ export const API_PACKAGES = [
 export type ApiPackageId = (typeof API_PACKAGES)[number];
 
 export const PACKAGE_LABELS: Record<ApiPackageId, string> = {
-	"melon-db": "@melon/db",
-	"melon-db-sqlite": "@melon/db-sqlite",
-	"melon-db-sqlite-native": "@melon/db-sqlite-native",
-	"melon-db-query": "@melon/db-query",
-	"melon-db-query-mango": "@melon/db-query-mango",
-	"melon-db-prisma": "@melon/db-prisma",
-	"melon-db-react": "@melon/db-react",
-	"melon-db-devtools": "@melon/db-devtools",
-	"melon-db-testkit": "@melon/db-testkit",
-	"melon-db-codemods": "@melon/db-codemods",
-	"melon-sync": "@melon/sync",
-	"melon-sync-server": "@melon/sync-server",
+	"melon-db": "@melon-db/db",
+	"melon-db-sqlite": "@melon-db/db-sqlite",
+	"melon-db-sqlite-native": "@melon-db/db-sqlite-native",
+	"melon-db-query": "@melon-db/db-query",
+	"melon-db-query-mango": "@melon-db/db-query-mango",
+	"melon-db-prisma": "@melon-db/db-prisma",
+	"melon-db-react": "@melon-db/db-react",
+	"melon-db-devtools": "@melon-db/db-devtools",
+	"melon-db-testkit": "@melon-db/db-testkit",
+	"melon-db-codemods": "@melon-db/db-codemods",
+	"melon-sync": "@melon-db/sync",
+	"melon-sync-server": "@melon-db/sync-server",
 };
 
 export const PACKAGE_BLURBS: Record<ApiPackageId, string> = {

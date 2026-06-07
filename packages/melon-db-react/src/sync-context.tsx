@@ -3,7 +3,7 @@ import type {
 	ConflictResolver,
 	MelonDatabase,
 	Migration,
-} from "@melon/db";
+} from "@melon-db/db";
 import {
 	type CheckpointStore,
 	DEFAULT_RETRY_POLICY,
@@ -17,7 +17,7 @@ import {
 	SyncStatusKind,
 	type SynchronizeResult,
 	synchronize,
-} from "@melon/sync";
+} from "@melon-db/sync";
 import {
 	createContext,
 	useCallback,

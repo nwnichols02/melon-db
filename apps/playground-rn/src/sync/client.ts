@@ -1,4 +1,4 @@
-import type { PullArgs, PullResult, PushArgs } from "@melon/sync";
+import type { PullArgs, PullResult, PushArgs } from "@melon-db/sync";
 import { Platform } from "react-native";
 
 const DEFAULT_PORT = 8787;

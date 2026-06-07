@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { predicate, prepareQuery, queryAst } from "@melon/db";
-import { type DatabaseSchemaDefinition, createMelonSchema } from "@melon/db";
+import { predicate, prepareQuery, queryAst } from "@melon-db/db";
+import { type DatabaseSchemaDefinition, createMelonSchema } from "@melon-db/db";
 import { taskSchema } from "../../melon-db/__fixtures__/task-schema.ts";
 import { compileQuery } from "../src/sql/compile-query.ts";
 

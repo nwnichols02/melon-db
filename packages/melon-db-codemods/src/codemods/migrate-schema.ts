@@ -3,7 +3,7 @@ import type {
 	DatabaseSchemaDefinition,
 	FieldDefinition,
 	RelationDefinition,
-} from "@melon/db";
+} from "@melon-db/db";
 import { type ClassDeclaration, Node, type SourceFile } from "ts-morph";
 import {
 	type CodemodOptions,

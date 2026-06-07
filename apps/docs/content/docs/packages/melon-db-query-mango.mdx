@@ -1,28 +1,28 @@
 ---
-title: "@melon/db-query-mango"
+title: "@melon-db/db-query-mango"
 description: Mango-style JSON queries compiled to QueryAst.
 ---
 
-**Status:** Shipped (documented subset) · **Depends on:** `@melon/db` · **API:** [Reference](/docs/api/melon-db-query-mango)
+**Status:** Shipped (documented subset) · **Depends on:** `@melon-db/db` · **API:** [Reference](/docs/api/melon-db-query-mango)
 
 Serializable CouchDB/RxDB-style selectors for configs, tests, and devtools.
 
 ## Install (alpha)
 
 ```bash
-npm install @melon/db-query-mango@alpha
+npm install @melon-db/db-query-mango@alpha
 ```
 
 Or with Bun:
 
 ```bash
-bun add @melon/db-query-mango@alpha
+bun add @melon-db/db-query-mango@alpha
 ```
 
 ## Example
 
 ```ts
-import { createMangoCompiler } from '@melon/db-query-mango';
+import { createMangoCompiler } from '@melon-db/db-query-mango';
 
 const compiler = createMangoCompiler();
 const prepared = compiler.compile(
@@ -41,4 +41,4 @@ Unsupported Mango operators fail at compile time with actionable errors.
 
 ## Author & license
 
-Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon/blob/main/LICENSE).
+Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon-db/blob/main/LICENSE).

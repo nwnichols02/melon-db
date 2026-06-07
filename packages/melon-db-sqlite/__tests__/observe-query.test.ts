@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import type { PreparedQuery, StorageAdapter } from "@melon/db";
-import { createDatabase, predicate, prepareQuery, queryAst } from "@melon/db";
+import type { PreparedQuery, StorageAdapter } from "@melon-db/db";
+import { createDatabase, predicate, prepareQuery, queryAst } from "@melon-db/db";
 import { taskSchema } from "../../melon-db/__fixtures__/task-schema.ts";
 import { createSqliteAdapter } from "../src/adapter.ts";
 import { getSqliteDriverForTests } from "../src/testing.ts";

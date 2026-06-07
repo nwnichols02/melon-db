@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the `@melon/*` packages are documented here.
+All notable changes to the `@melon-db/*` packages are documented here.
 
 ## 0.1.0-alpha.0 — 2026-06-02
 
@@ -8,26 +8,26 @@ First public **alpha** release on npm (dist-tag `alpha`). Not recommended for pr
 
 ### Packages
 
-- `@melon/db` — core engine, schema, AST, in-memory adapter, sync hooks
-- `@melon/db-query` — fluent query builder
-- `@melon/db-query-mango` — Mango compiler
-- `@melon/db-testkit` — test helpers
-- `@melon/db-sqlite` — SQLite adapters (Node, Expo, RN entrypoints)
-- `@melon/db-sqlite-native` — JSI/TurboModule native module
-- `@melon/db-prisma` — Prisma schema import + local client (`melon-prisma` CLI)
-- `@melon/db-devtools` — debug bridge + React panel
-- `@melon/sync` — pull/push sync client
-- `@melon/sync-server` — reference HTTP/Postgres backends
-- `@melon/db-react` — hooks and providers
-- `@melon/db-codemods` — WatermelonDB migration CLI
+- `@melon-db/db` — core engine, schema, AST, in-memory adapter, sync hooks
+- `@melon-db/db-query` — fluent query builder
+- `@melon-db/db-query-mango` — Mango compiler
+- `@melon-db/db-testkit` — test helpers
+- `@melon-db/db-sqlite` — SQLite adapters (Node, Expo, RN entrypoints)
+- `@melon-db/db-sqlite-native` — JSI/TurboModule native module
+- `@melon-db/db-prisma` — Prisma schema import + local client (`melon-prisma` CLI)
+- `@melon-db/db-devtools` — debug bridge + React panel
+- `@melon-db/sync` — pull/push sync client
+- `@melon-db/sync-server` — reference HTTP/Postgres backends
+- `@melon-db/db-react` — hooks and providers
+- `@melon-db/db-codemods` — WatermelonDB migration CLI
 
 ### Install
 
 ```bash
-npm install @melon/db@alpha @melon/db-sqlite@alpha @melon/db-react@alpha
+npm install @melon-db/db@alpha @melon-db/db-sqlite@alpha @melon-db/db-react@alpha
 ```
 
-See [Getting started](https://github.com/nwnichols02/melon/blob/main/apps/docs/content/docs/getting-started.mdx) and [v1 limitations](https://github.com/nwnichols02/melon/blob/main/apps/docs/content/docs/roadmap.mdx#v1-limitations).
+See [Getting started](https://github.com/nwnichols02/melon-db/blob/main/apps/docs/content/docs/getting-started.mdx) and [v1 limitations](https://github.com/nwnichols02/melon-db/blob/main/apps/docs/content/docs/roadmap.mdx#v1-limitations).
 
 ### Known limitations
 

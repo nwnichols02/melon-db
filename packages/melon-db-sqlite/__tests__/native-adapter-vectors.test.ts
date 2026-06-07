@@ -44,7 +44,7 @@ describe("native driver CRUD vectors (mocked native module)", () => {
 		db = new Database(":memory:");
 		const mockNative = createMockNativeModule(db);
 
-		mock.module("@melon/db-sqlite-native", () => ({
+		mock.module("@melon-db/db-sqlite-native", () => ({
 			getMelonSQLite: () => mockNative,
 			isMelonSQLiteNativeAvailable: () => true,
 		}));

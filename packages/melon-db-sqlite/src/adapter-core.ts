@@ -9,14 +9,14 @@ import type {
 	QueryExecutionDebug,
 	StorageAdapter,
 	SyncOutboxStore,
-} from "@melon/db";
-import { MelonError, MelonErrorCode } from "@melon/db";
+} from "@melon-db/db";
+import { MelonError, MelonErrorCode } from "@melon-db/db";
 import {
 	ensureMetaTable,
 	getStoredSchemaVersion,
 	runMigrationsWithExecutor,
-} from "@melon/db";
-import { SCHEMA_VERSION_KEY } from "@melon/db";
+} from "@melon-db/db";
+import { SCHEMA_VERSION_KEY } from "@melon-db/db";
 import type { SqliteDriver } from "./driver.ts";
 import { createSqliteMigrationExecutor } from "./migration-executor.ts";
 import {

@@ -1,4 +1,4 @@
-import { createQueryFactory } from "@melon/db-query";
+import { createQueryFactory } from "@melon-db/db-query";
 const q = createQueryFactory(schema);
 import { Q } from "@nozbe/watermelondb";
 

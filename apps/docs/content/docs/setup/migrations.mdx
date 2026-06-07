@@ -8,7 +8,7 @@ Melon migrations upgrade the on-device schema from one `version` to the next. Th
 ## Migration object
 
 ```ts
-import type { Migration } from '@melon/db';
+import type { Migration } from '@melon-db/db';
 
 export const migrations: Migration[] = [
   {
@@ -82,7 +82,7 @@ Your backend should apply equivalent DDL before returning rows for new columns/t
 Use the in-memory adapter in unit tests with the same `migrations` array you ship to production:
 
 ```ts
-import { createDatabase, createInMemoryAdapter } from '@melon/db';
+import { createDatabase, createInMemoryAdapter } from '@melon-db/db';
 
 const db = createDatabase({
   schema: schemaV2,

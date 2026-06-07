@@ -5,21 +5,21 @@ import {
 	createInMemoryAdapter,
 	createMelonSchema,
 	mergeRemoteWithPendingFields,
-} from "@melon/db";
-import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
+} from "@melon-db/db";
+import { createReactiveDevtoolsBridge } from "@melon-db/db-devtools";
 import {
 	MelonDevtoolsPanel,
 	MelonDevtoolsProvider,
-} from "@melon/db-devtools/react";
-import { MelonDbProvider } from "@melon/db-react";
+} from "@melon-db/db-devtools/react";
+import { MelonDbProvider } from "@melon-db/db-react";
 import {
 	type PullArgs,
 	type PullResult,
 	type PushArgs,
 	createMemoryCheckpointStore,
 	synchronize,
-} from "@melon/sync";
-import { InMemorySyncStore } from "@melon/sync-server/in-memory";
+} from "@melon-db/sync";
+import { InMemorySyncStore } from "@melon-db/sync-server/in-memory";
 import { type ReactElement, useCallback, useMemo, useState } from "react";
 
 const syncSchema = createMelonSchema({

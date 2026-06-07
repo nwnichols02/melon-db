@@ -12,31 +12,31 @@ Next-generation offline-first local database for React Native and TypeScript (Wa
 
 | Package | Description |
 |---------|-------------|
-| `@melon/db` | Core schema, AST, adapter contract, runtime engine |
-| `@melon/db-sqlite` | SQLite adapter (Bun `bun:sqlite` + Expo export) |
-| `@melon/db-sqlite-native` | Native TurboModule + C++ JSI for RN dev builds |
-| `@melon/db-query` | Fluent query builder |
-| `@melon/db-query-mango` | Mango-style query compiler |
-| `@melon/db-prisma` | Prisma-like local client facade |
-| `@melon/db-react` | React hooks and provider |
-| `@melon/db-devtools` | Devtools event bridge + React inspector panel |
-| `@melon/db-testkit` | Test helpers, fixtures, `withTestDatabase` |
-| `@melon/db-codemods` | WatermelonDB migration codemods and query translator |
-| `@melon/sync` | Watermelon-compatible pull/push sync orchestrator |
-| `@melon/sync-server` | HTTP reference sync backend for dev and integration tests |
+| `@melon-db/db` | Core schema, AST, adapter contract, runtime engine |
+| `@melon-db/db-sqlite` | SQLite adapter (Bun `bun:sqlite` + Expo export) |
+| `@melon-db/db-sqlite-native` | Native TurboModule + C++ JSI for RN dev builds |
+| `@melon-db/db-query` | Fluent query builder |
+| `@melon-db/db-query-mango` | Mango-style query compiler |
+| `@melon-db/db-prisma` | Prisma-like local client facade |
+| `@melon-db/db-react` | React hooks and provider |
+| `@melon-db/db-devtools` | Devtools event bridge + React inspector panel |
+| `@melon-db/db-testkit` | Test helpers, fixtures, `withTestDatabase` |
+| `@melon-db/db-codemods` | WatermelonDB migration codemods and query translator |
+| `@melon-db/sync` | Watermelon-compatible pull/push sync orchestrator |
+| `@melon-db/sync-server` | HTTP reference sync backend for dev and integration tests |
 
 ## Quick start
 
 ### Install from npm (alpha)
 
 ```bash
-npm install @melon/db@alpha @melon/db-sqlite@alpha @melon/db-react@alpha
+npm install @melon-db/db@alpha @melon-db/db-sqlite@alpha @melon-db/db-react@alpha
 ```
 
 Or with Bun:
 
 ```bash
-bun add @melon/db@alpha @melon/db-sqlite@alpha @melon/db-react@alpha
+bun add @melon-db/db@alpha @melon-db/db-sqlite@alpha @melon-db/db-react@alpha
 ```
 
 ### Develop in this monorepo
@@ -51,7 +51,7 @@ bun run check
 ### In-memory
 
 ```ts
-import { createDatabase, createInMemoryAdapter, createMelonSchema } from '@melon/db';
+import { createDatabase, createInMemoryAdapter, createMelonSchema } from '@melon-db/db';
 
 const schema = createMelonSchema({
   version: 1,
@@ -121,8 +121,8 @@ Open http://localhost:3000 — guides at `/docs`, live playgrounds, package refe
 Wire the reactive bridge and inspector panel:
 
 ```ts
-import { createReactiveDevtoolsBridge } from '@melon/db-devtools';
-import { MelonDevtoolsProvider, MelonDevtoolsPanel } from '@melon/db-devtools/react';
+import { createReactiveDevtoolsBridge } from '@melon-db/db-devtools';
+import { MelonDevtoolsProvider, MelonDevtoolsPanel } from '@melon-db/db-devtools/react';
 
 const devtools = createReactiveDevtoolsBridge();
 const db = createDatabase({ schema, adapter, devtools });
@@ -132,7 +132,7 @@ See [`packages/melon-db-devtools/README.md`](packages/melon-db-devtools/README.m
 
 ### Migrating from WatermelonDB
 
-Use the compatibility matrix and CLI codemods in [`@melon/db-codemods`](packages/melon-db-codemods/README.md):
+Use the compatibility matrix and CLI codemods in [`@melon-db/db-codemods`](packages/melon-db-codemods/README.md):
 
 ```bash
 bun run melon-codemod migrate-queries --path=./src
@@ -157,7 +157,7 @@ bun run sync-server:postgres
 See [`packages/melon-sync/README.md`](packages/melon-sync/README.md), [`packages/melon-sync-server/README.md`](packages/melon-sync-server/README.md), and [`apps/playground-node/src/sync-demo.ts`](apps/playground-node/src/sync-demo.ts).
 
 ```ts
-import { synchronize, createMemoryCheckpointStore } from '@melon/sync';
+import { synchronize, createMemoryCheckpointStore } from '@melon-db/sync';
 
 const db = createDatabase({ schema, adapter, sync: {} });
 
@@ -184,7 +184,7 @@ Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun r
 |------|----------|
 | Core engine M0–M2 | EAS Build CI |
 | SQLite SQL compiler + Bun/Node/Expo adapters | Full multi-file schema codemods |
-| `@melon/db-sqlite-native` — iOS + Android TurboModule + C++ JSI | Background sync service |
+| `@melon-db/db-sqlite-native` — iOS + Android TurboModule + C++ JSI | Background sync service |
 | Predicate-aware SQLite `observeQuery` + trigger flush / JSI `update_hook` | Per-field timestamps / three-way merge |
 | RN on-device benchmark harness (`playground-rn-dev` /benchmark) | SQL SELECT JOIN shaping |
 | Dual RN path: Expo Go + dev build (`/rn`, `mode: 'auto'`) | |
@@ -192,7 +192,7 @@ Living status: **[`/docs/roadmap`](/docs/roadmap)** on the docs site (run `bun r
 | Query / Mango / Prisma surfaces + React/sync hooks | `getChangedCollections` adapter API |
 | Schema migrations, relation includes, Q.on filters, devtools + docs site | Sliding window retention (prd-4) |
 | Full sync stack (HTTP + Postgres, retry, merge-by-field, custom resolver) | |
-| `@melon/db-codemods` v1 + v2 | |
+| `@melon-db/db-codemods` v1 + v2 | |
 | CI (test, typecheck, biome, bench-smoke, bench-compare, postgres-sync, docs, release-smoke) | |
 
 ## Author & license

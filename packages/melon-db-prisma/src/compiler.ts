@@ -9,7 +9,7 @@ import {
 	planQuery,
 	predicate,
 	validateQuery,
-} from "@melon/db";
+} from "@melon-db/db";
 import type { PrismaFindManyArgs, PrismaWhereInput } from "./types.ts";
 
 function compileSelect(

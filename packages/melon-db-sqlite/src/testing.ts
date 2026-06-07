@@ -1,4 +1,4 @@
-import type { StorageAdapter } from "@melon/db";
+import type { StorageAdapter } from "@melon-db/db";
 import type { SqliteDriver } from "./driver.ts";
 
 const adapterDrivers = new WeakMap<StorageAdapter, SqliteDriver>();

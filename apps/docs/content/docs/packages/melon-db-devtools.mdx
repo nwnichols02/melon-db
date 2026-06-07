@@ -1,27 +1,27 @@
 ---
-title: "@melon/db-devtools"
+title: "@melon-db/db-devtools"
 description: Query, write, subscription, and sync inspector.
 ---
 
-**Status:** Shipped · **Depends on:** `@melon/db` · **API:** [Reference](/docs/api/melon-db-devtools)
+**Status:** Shipped · **Depends on:** `@melon-db/db` · **API:** [Reference](/docs/api/melon-db-devtools)
 
 Zero-cost when disabled via `createNoopDevtoolsBridge()`.
 
 ## Install (alpha)
 
 ```bash
-npm install @melon/db-devtools@alpha
+npm install @melon-db/db-devtools@alpha
 ```
 
 Or with Bun:
 
 ```bash
-bun add @melon/db-devtools@alpha
+bun add @melon-db/db-devtools@alpha
 ```
 
 ```ts
-import { createReactiveDevtoolsBridge } from '@melon/db-devtools';
-import { MelonDevtoolsPanel, MelonDevtoolsProvider } from '@melon/db-devtools/react';
+import { createReactiveDevtoolsBridge } from '@melon-db/db-devtools';
+import { MelonDevtoolsPanel, MelonDevtoolsProvider } from '@melon-db/db-devtools/react';
 
 const devtools = createReactiveDevtoolsBridge();
 const db = createDatabase({ schema, adapter, devtools });
@@ -31,4 +31,4 @@ Try the [CRUD playground](/docs/playgrounds/crud) with the panel embedded.
 
 ## Author & license
 
-Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon/blob/main/LICENSE).
+Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon-db/blob/main/LICENSE).

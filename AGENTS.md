@@ -1,6 +1,6 @@
 # Melon monorepo — agent guide
 
-Offline-first local database for React Native and TypeScript (`@melon/db` family).
+Offline-first local database for React Native and TypeScript (`@melon-db/db` family).
 
 ## Quick commands
 
@@ -25,12 +25,12 @@ bun run release:smoke        # packed-tarball consumer smoke
 
 ## Package map
 
-- `@melon/db` — schema, AST, engine, in-memory adapter
-- `@melon/db-sqlite` — SQLite (Node, Expo, native JSI)
-- `@melon/db-query`, `@melon/db-query-mango`, `@melon/db-prisma` — query surfaces → AST
-- `@melon/db-react` — hooks and providers
-- `@melon/db-devtools` — bridge + inspector panel
-- `@melon/sync`, `@melon/sync-server` — pull/push sync
+- `@melon-db/db` — schema, AST, engine, in-memory adapter
+- `@melon-db/db-sqlite` — SQLite (Node, Expo, native JSI)
+- `@melon-db/db-query`, `@melon-db/db-query-mango`, `@melon-db/db-prisma` — query surfaces → AST
+- `@melon-db/db-react` — hooks and providers
+- `@melon-db/db-devtools` — bridge + inspector panel
+- `@melon-db/sync`, `@melon-db/sync-server` — pull/push sync
 
 ## Docs and compliance
 

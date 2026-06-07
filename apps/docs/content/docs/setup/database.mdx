@@ -8,7 +8,7 @@ description: createDatabase, storage adapters, and optional sync initialization.
 ## createDatabase
 
 ```ts
-import { createDatabase } from '@melon/db';
+import { createDatabase } from '@melon-db/db';
 
 const db = createDatabase({
   schema: appSchema,
@@ -25,10 +25,10 @@ The database lazy-initializes the adapter on first use (`initialize(schema, { mi
 
 | Runtime | Package / entry | Notes |
 |---------|-----------------|-------|
-| Tests, playgrounds | `@melon/db` → `createInMemoryAdapter()` | No native deps |
-| Bun / Node | `@melon/db-sqlite` → `createNodeSqliteAdapter({ filename })` | Uses better-sqlite3 when available |
-| Expo Go | `@melon/db-sqlite/expo` → `createExpoSqliteAdapter({ database })` | `expo-sqlite` async API |
-| RN dev client (new arch) | `@melon/db-sqlite` → native JSI sync path | See [Native architecture](/docs/architecture/native) |
+| Tests, playgrounds | `@melon-db/db` → `createInMemoryAdapter()` | No native deps |
+| Bun / Node | `@melon-db/db-sqlite` → `createNodeSqliteAdapter({ filename })` | Uses better-sqlite3 when available |
+| Expo Go | `@melon-db/db-sqlite/expo` → `createExpoSqliteAdapter({ database })` | `expo-sqlite` async API |
+| RN dev client (new arch) | `@melon-db/db-sqlite` → native JSI sync path | See [Native architecture](/docs/architecture/native) |
 
 ### Expo Go example
 
@@ -36,8 +36,8 @@ From `apps/playground-rn`:
 
 ```ts
 import * as SQLite from 'expo-sqlite';
-import { createExpoSqliteAdapter } from '@melon/db-sqlite/expo';
-import { createDatabase } from '@melon/db';
+import { createExpoSqliteAdapter } from '@melon-db/db-sqlite/expo';
+import { createDatabase } from '@melon-db/db';
 
 async function bootstrap() {
   const database = await SQLite.openDatabaseAsync('app.db');
@@ -46,7 +46,7 @@ async function bootstrap() {
   return createDatabase({
     schema: taskSchema,
     adapter,
-    sync: {}, // enable sync outbox when using @melon/sync
+    sync: {}, // enable sync outbox when using @melon-db/sync
   });
 }
 ```
@@ -54,7 +54,7 @@ async function bootstrap() {
 ### In-memory (tests)
 
 ```ts
-import { createDatabase, createInMemoryAdapter } from '@melon/db';
+import { createDatabase, createInMemoryAdapter } from '@melon-db/db';
 
 const db = createDatabase({
   schema: taskSchema,
@@ -75,10 +75,10 @@ Without `sync`, those methods throw `SYNC_NOT_ENABLED`. See [Sync frontend](/doc
 
 ## Devtools
 
-Pass a `DevtoolsBridge` from `@melon/db-devtools` to capture queries, writes, and timings:
+Pass a `DevtoolsBridge` from `@melon-db/db-devtools` to capture queries, writes, and timings:
 
 ```ts
-import { createReactiveDevtoolsBridge } from '@melon/db-devtools';
+import { createReactiveDevtoolsBridge } from '@melon-db/db-devtools';
 
 const db = createDatabase({
   schema,

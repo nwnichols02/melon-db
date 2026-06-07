@@ -1,8 +1,8 @@
-# @melon/db-sqlite-native
+# @melon-db/db-sqlite-native
 
 Melon-owned SQLite native module for React Native **development builds**.
 
-**Not available in Expo Go.** Use [`@melon/db-sqlite/expo`](../melon-db-sqlite/README.md) for Expo Go and managed workflows.
+**Not available in Expo Go.** Use [`@melon-db/db-sqlite/expo`](../melon-db-sqlite/README.md) for Expo Go and managed workflows.
 
 **Docs:** [Native SQLite architecture](http://localhost:3000/docs/architecture/native) · [Package guide](http://localhost:3000/docs/packages/melon-db-sqlite-native)
 
@@ -18,15 +18,15 @@ Melon-owned SQLite native module for React Native **development builds**.
 
 | Path | Export | Binding |
 |------|--------|---------|
-| Expo Go (default) | `@melon/db-sqlite/expo` | expo-sqlite async |
-| Dev build (fast) | `@melon/db-sqlite/rn` + `mode: 'auto'` | Sync C++ JSI + dedicated DB queue |
-| Dev build (legacy) | `@melon/db-sqlite/rn` + `mode: 'turbo'` | Async TurboModule promises |
+| Expo Go (default) | `@melon-db/db-sqlite/expo` | expo-sqlite async |
+| Dev build (fast) | `@melon-db/db-sqlite/rn` + `mode: 'auto'` | Sync C++ JSI + dedicated DB queue |
+| Dev build (legacy) | `@melon-db/db-sqlite/rn` + `mode: 'turbo'` | Async TurboModule promises |
 
 ## Limitations
 
 - Kotlin TurboModule `exec()` routes `PRAGMA` through `rawQuery` on the async fallback path only (C++ JSI uses `sqlite3_exec`).
 - **BLOB / `bytes` fields** are not round-tripped on the native path (returned as `null`).
-- Predicate-aware `observeQuery` ships in `@melon/db-sqlite` (shared adapter-core); native path uses the same invalidation.
+- Predicate-aware `observeQuery` ships in `@melon-db/db-sqlite` (shared adapter-core); native path uses the same invalidation.
 - Sync JSI calls block the JS thread until the native DB queue completes (intentional for throughput; keep queries bounded).
 
 ## Requirements
@@ -62,14 +62,14 @@ Gradle also generates `android/build/generated/source/codegen/java` when `newArc
 
 ## Usage
 
-Apps should not import this package directly. Use [`@melon/db-sqlite/rn`](../melon-db-sqlite/README.md):
+Apps should not import this package directly. Use [`@melon-db/db-sqlite/rn`](../melon-db-sqlite/README.md):
 
 ```ts
 import { Paths } from 'expo-file-system';
-import { createJsiSqliteAdapter, isJsiSqliteAvailable } from '@melon/db-sqlite/rn';
+import { createJsiSqliteAdapter, isJsiSqliteAvailable } from '@melon-db/db-sqlite/rn';
 
 if (!isJsiSqliteAvailable()) {
-  throw new Error('Use a development build or switch to @melon/db-sqlite/expo');
+  throw new Error('Use a development build or switch to @melon-db/db-sqlite/expo');
 }
 
 const adapter = createJsiSqliteAdapter({
@@ -82,7 +82,7 @@ const adapter = createJsiSqliteAdapter({
 Inspect binding mode:
 
 ```ts
-import { getMelonSQLiteNativeMode } from '@melon/db-sqlite-native';
+import { getMelonSQLiteNativeMode } from '@melon-db/db-sqlite-native';
 // 'jsi-sync' when C++ host object installed
 // 'turbo' when forcing async path or host object absent
 // null in Expo Go
@@ -141,7 +141,7 @@ After `expo prebuild --clean` + `bun run dev:rn:dev:android` then `bun run dev:r
 - **Fallback:** `MelonSQLite` TurboModule (`MelonSQLiteSpec` codegen) with async promises on both platforms.
 - **JS:** `MelonSQLiteJsi.ts` reads `global.melonSqliteJsi`; `MelonSQLiteBridge.ts` reports `jsi-sync` | `turbo` | `bridge`.
 
-**Observation (Phase 29):** `sqlite3_update_hook` on JSI `openSync` schedules `setObservationFlushCallback` on the JS thread (coalesced). Pair with `@melon/db-sqlite` `flushObservationQueue` to process `_melon_observation_events`. Turbo/async native path does not install the hook in v1.
+**Observation (Phase 29):** `sqlite3_update_hook` on JSI `openSync` schedules `setObservationFlushCallback` on the JS thread (coalesced). Pair with `@melon-db/db-sqlite` `flushObservationQueue` to process `_melon_observation_events`. Turbo/async native path does not install the hook in v1.
 
 ## Author & license
 

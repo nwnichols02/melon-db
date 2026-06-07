@@ -1,4 +1,4 @@
-import type { QueryAst } from "@melon/db";
+import type { QueryAst } from "@melon-db/db";
 import { QueryBuilder } from "./query-builder.ts";
 
 export type CollectionQueryInput<RecordShape = Record<string, unknown>> =

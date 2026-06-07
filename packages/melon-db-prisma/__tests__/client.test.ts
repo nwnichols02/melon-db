@@ -3,7 +3,7 @@ import {
 	createDatabase,
 	createInMemoryAdapter,
 	createMelonSchema,
-} from "@melon/db";
+} from "@melon-db/db";
 import { createPrismaLikeClient } from "../src/client.ts";
 
 const schema = createMelonSchema({

@@ -1,4 +1,4 @@
-# @melon/db-testkit
+# @melon-db/db-testkit
 
 `withTestDatabase` and fixtures for deterministic DB tests.
 

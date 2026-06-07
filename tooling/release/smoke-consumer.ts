@@ -4,16 +4,18 @@
  */
 import { existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
+import { MELON_VERSION } from "./packages.ts";
 
 const root = join(import.meta.dir, "../..");
 const fixture = join(import.meta.dir, "consumer-fixture");
 const artifacts = join(import.meta.dir, "artifacts");
 
-const required = [
-  "melon-db-0.1.0-alpha.0.tgz",
-  "melon-db-sqlite-0.1.0-alpha.0.tgz",
-  "melon-db-query-0.1.0-alpha.0.tgz",
-];
+/** npm pack filename for a scoped package, e.g. @melon-db/db → melon-db-db-0.1.0-alpha.0.tgz */
+function tarballName(packageName: string): string {
+  return `${packageName.slice(1).replace("/", "-")}-${MELON_VERSION}.tgz`;
+}
+
+const requiredPackages = ["@melon-db/db", "@melon-db/db-sqlite", "@melon-db/db-query"];
 
 async function main(): Promise<void> {
   const build = Bun.spawnSync(["bun", "run", "build:packages"], {
@@ -30,9 +32,10 @@ async function main(): Promise<void> {
   });
   if (pack.exitCode !== 0) process.exit(1);
 
-  for (const file of required) {
+  for (const packageName of requiredPackages) {
+    const file = tarballName(packageName);
     if (!existsSync(join(artifacts, file))) {
-      throw new Error(`Missing pack artifact: ${file}`);
+      throw new Error(`Missing pack artifact: ${file} (from ${packageName})`);
     }
   }
 

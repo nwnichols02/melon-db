@@ -1,4 +1,4 @@
-import type { NetworkMonitor } from "@melon/sync";
+import type { NetworkMonitor } from "@melon-db/sync";
 
 /**
  * Creates a network monitor that pings a URL and falls back to navigator.onLine on web.

@@ -1,7 +1,7 @@
 export { SyncError, SyncErrorCode } from "./errors.ts";
 export type { SyncErrorOptions } from "./errors.ts";
-export type { SyncDebugSnapshot } from "@melon/db";
-export { SyncDebugPhase } from "@melon/db";
+export type { SyncDebugSnapshot } from "@melon-db/db";
+export { SyncDebugPhase } from "@melon-db/db";
 export type {
 	PullArgs,
 	PullMigration,

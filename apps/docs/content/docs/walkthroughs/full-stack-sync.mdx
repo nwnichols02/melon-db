@@ -11,7 +11,7 @@ Melon sync follows a Watermelon-compatible pull/push protocol. See [Sync backend
 bun run demo:sync:http
 ```
 
-Uses `@melon/sync-server` HTTP helpers and `playground-node` client code.
+Uses `@melon-db/sync-server` HTTP helpers and `playground-node` client code.
 
 ## Standalone sync server
 
@@ -30,7 +30,7 @@ bun run sync-server:postgres
 bun run demo:sync:postgres
 ```
 
-`PostgresSyncStore` in `@melon/sync-server` implements the same contract against Postgres.
+`PostgresSyncStore` in `@melon-db/sync-server` implements the same contract against Postgres.
 
 ## Verify
 

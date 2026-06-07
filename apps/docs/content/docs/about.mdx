@@ -9,8 +9,8 @@ Melon is a **local-first database stack** for React Native and TypeScript — a 
 
 Melon is two modular products that work together or independently:
 
-1. **Storage and query engine** (`@melon/db` + adapters) — schema, query AST, runtime engine, reactive subscriptions, and migrations.
-2. **Sync engine** (`@melon/sync`) — Watermelon-compatible pull/push orchestration with conflict policies, retry, and checkpoints.
+1. **Storage and query engine** (`@melon-db/db` + adapters) — schema, query AST, runtime engine, reactive subscriptions, and migrations.
+2. **Sync engine** (`@melon-db/sync`) — Watermelon-compatible pull/push orchestration with conflict policies, retry, and checkpoints.
 
 Everything compiles into one internal **QueryAst** before reaching storage. Adapters translate prepared queries to SQL (SQLite) or in-memory filters. React hooks wire subscriptions to UI without owning business logic.
 
@@ -20,7 +20,7 @@ Become the default local-first data layer for React Native teams that want Water
 
 - **New Architecture ready** — TurboModule + C++ JSI native SQLite for dev builds; Expo Go via `expo-sqlite`.
 - **Multiple query surfaces** — fluent builder, Mango JSON, and Prisma-style args over one engine.
-- **Optional sync** — adopt storage first; add `@melon/sync` when you need pull/push.
+- **Optional sync** — adopt storage first; add `@melon-db/sync` when you need pull/push.
 - **Migration path** — codemods and compatibility translator for WatermelonDB teams.
 
 ## Inspiration
@@ -51,9 +51,9 @@ Melon preserves WatermelonDB's strengths (offline-first, large datasets, reactiv
 ## What Melon is not
 
 - **Not a remote ORM** — Melon executes locally; backends integrate via sync protocol, not query proxying.
-- **Not the full Prisma engine** — `@melon/db-prisma` is schema/codegen + client facade over `@melon/db`.
+- **Not the full Prisma engine** — `@melon-db/db-prisma` is schema/codegen + client facade over `@melon-db/db`.
 - **Not CRDT-first** — conflict policies are configurable (server-wins, merge-by-field, custom), not automatic merge-by-default.
-- **Not native JSI in Expo Go** — managed Expo uses `@melon/db-sqlite/expo`; native JSI requires a dev build.
+- **Not native JSI in Expo Go** — managed Expo uses `@melon-db/db-sqlite/expo`; native JSI requires a dev build.
 
 ## Learn more
 
@@ -66,6 +66,6 @@ Melon preserves WatermelonDB's strengths (offline-first, large datasets, reactiv
 
 ## Author & license
 
-Copyright (c) 2026 [Nate Nichols](https://github.com/nwnichols02). Melon is released under the [MIT License](https://github.com/nwnichols02/melon/blob/main/LICENSE).
+Copyright (c) 2026 [Nate Nichols](https://github.com/nwnichols02). Melon is released under the [MIT License](https://github.com/nwnichols02/melon-db/blob/main/LICENSE).
 
-npm packages publish under the `@melon` scope with dist-tag `alpha`. See [RELEASING.md](https://github.com/nwnichols02/melon/blob/main/RELEASING.md) for maintainer release steps.
+npm packages publish under the `@melon-db` scope with dist-tag `alpha`. See [RELEASING.md](https://github.com/nwnichols02/melon-db/blob/main/RELEASING.md) for maintainer release steps.

@@ -1,4 +1,4 @@
-import type { MelonSchema } from "@melon/db";
+import type { MelonSchema } from "@melon-db/db";
 import type { SqliteDriver } from "../driver.ts";
 import { invalidateForObservationEvents } from "./invalidate-events.ts";
 import type { QuerySubscriptionRegistry } from "./registry.ts";

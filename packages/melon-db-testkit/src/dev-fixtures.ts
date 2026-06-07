@@ -1,5 +1,5 @@
 /**
- * Workspace-only helpers (not in published dist). Import from `@melon/db-testkit/dev-fixtures` in monorepo tests.
+ * Workspace-only helpers (not in published dist). Import from `@melon-db/db-testkit/dev-fixtures` in monorepo tests.
  */
 export {
 	taskSchema,

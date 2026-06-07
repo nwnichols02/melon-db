@@ -1,4 +1,4 @@
-import { type QueryAst, predicate, queryAst } from "@melon/db";
+import { type QueryAst, predicate, queryAst } from "@melon-db/db";
 
 /**
  * Builds a query AST that finds a record by primary key.

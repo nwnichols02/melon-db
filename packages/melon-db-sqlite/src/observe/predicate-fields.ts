@@ -1,5 +1,5 @@
-import type { QueryAst, QueryBooleanNode } from "@melon/db";
-import type { MelonSchema } from "@melon/db";
+import type { QueryAst, QueryBooleanNode } from "@melon-db/db";
+import type { MelonSchema } from "@melon-db/db";
 
 function collectFieldsFromBooleanNode(
 	node: QueryBooleanNode,

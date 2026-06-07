@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { unlinkSync } from "node:fs";
-import { createDatabase, predicate, queryAst } from "@melon/db";
-import { type DatabaseSchemaDefinition, createMelonSchema } from "@melon/db";
+import { createDatabase, predicate, queryAst } from "@melon-db/db";
+import { type DatabaseSchemaDefinition, createMelonSchema } from "@melon-db/db";
 import { createSqliteAdapter } from "../src/adapter.ts";
 
 const def: DatabaseSchemaDefinition = {

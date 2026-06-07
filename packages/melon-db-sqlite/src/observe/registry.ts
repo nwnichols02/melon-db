@@ -1,4 +1,4 @@
-import type { MelonSchema, PreparedQuery } from "@melon/db";
+import type { MelonSchema, PreparedQuery } from "@melon-db/db";
 import { compileQuery } from "../sql/compile-query.ts";
 import { resolveRelatedCollections } from "./related-collections.ts";
 

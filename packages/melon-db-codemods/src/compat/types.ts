@@ -1,4 +1,4 @@
-import type { QueryOperator } from "@melon/db";
+import type { QueryOperator } from "@melon-db/db";
 
 export interface WatermelonWhereClause {
 	type: "where";

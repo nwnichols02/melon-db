@@ -41,12 +41,12 @@ bun run dev       # runs dev where defined (e.g. apps/*)
 Workspace dependency wiring
 In each package, use the "workspace:*" version syntax so Bun treats them as local links.
 
-Example for @melon/db-react:
+Example for @melon-db/db-react:
 
 text
 // packages/melon-db-react/package.json
 {
-  "name": "@melon/db-react",
+  "name": "@melon-db/db-react",
   "version": "0.1.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -58,7 +58,7 @@ text
     "typecheck": "bunx tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@melon/db": "workspace:*",
+    "@melon-db/db": "workspace:*",
     "react": "^18.0.0"
   },
   "devDependencies": {
@@ -66,12 +66,12 @@ text
     "typescript": "latest"
   }
 }
-Example for @melon/db-sqlite:
+Example for @melon-db/db-sqlite:
 
 text
 // packages/melon-db-sqlite/package.json
 {
-  "name": "@melon/db-sqlite",
+  "name": "@melon-db/db-sqlite",
   "version": "0.1.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -82,7 +82,7 @@ text
     "typecheck": "bunx tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@melon/db": "workspace:*"
+    "@melon-db/db": "workspace:*"
   },
   "devDependencies": {
     "bun-types": "latest",
@@ -105,9 +105,9 @@ text
     "test": "bun test"
   },
   "dependencies": {
-    "@melon/db": "workspace:*",
-    "@melon/db-sqlite": "workspace:*",
-    "@melon/db-react": "workspace:*",
+    "@melon-db/db": "workspace:*",
+    "@melon-db/db-sqlite": "workspace:*",
+    "@melon-db/db-react": "workspace:*",
     "react": "18.x",
     "react-native": "0.7x.x"
   },
@@ -153,6 +153,6 @@ You still install everything with bun install; Turborepo just coordinates tasks.
 Summary of boundaries with Bun
 Root: workspaces: ["apps/*", "packages/*"] and bun install per Bun’s docs.
 
-Each package: name, version, scripts, and "@melon/*": "workspace:*" dependencies.
+Each package: name, version, scripts, and "@melon-db/*": "workspace:*" dependencies.
 
 You’ll generally run bun run --filter from root to spawn dev/build/test across workspaces.

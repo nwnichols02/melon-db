@@ -4,8 +4,8 @@
     "rootDir": "src",
     "outDir": "dist",
     "paths": {
-      "@melon/db": ["../melon-db/dist/index.d.ts"],
-      "@melon/db-query": ["../melon-db-query/dist/index.d.ts"]
+      "@melon-db/db": ["../melon-db/dist/index.d.ts"],
+      "@melon-db/db-query": ["../melon-db-query/dist/index.d.ts"]
     }
   },
   "include": ["src/**/*.ts"],

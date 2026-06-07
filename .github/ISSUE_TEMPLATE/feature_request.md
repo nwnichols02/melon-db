@@ -15,9 +15,9 @@ What problem does this solve?
 
 ## Package scope
 
-- [ ] `@melon/db` (core)
-- [ ] `@melon/db-sqlite` / native
+- [ ] `@melon-db/db` (core)
+- [ ] `@melon-db/db-sqlite` / native
 - [ ] Query surfaces (fluent / Mango / Prisma)
-- [ ] `@melon/sync`
+- [ ] `@melon-db/sync`
 - [ ] Docs / tooling
 - [ ] Other

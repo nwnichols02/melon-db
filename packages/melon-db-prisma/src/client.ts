@@ -1,4 +1,4 @@
-import type { MelonDatabase } from "@melon/db";
+import type { MelonDatabase } from "@melon-db/db";
 import { compilePrismaQuery } from "./compiler.ts";
 import type {
 	PrismaFindManyArgs,

@@ -1,4 +1,4 @@
-# @melon/db-react
+# @melon-db/db-react
 
 React provider and hooks for `MelonDatabase`, queries, writes, and sync.
 

@@ -1,10 +1,10 @@
-import type { MelonSchema, PreparedQuery, QueryAst } from "@melon/db";
-import { prepareQuery } from "@melon/db";
-import type { PrismaFindManyArgs } from "@melon/db-prisma";
-import { resolveCollectionQuery } from "@melon/db-query";
-import type { QueryBuilder } from "@melon/db-query";
-import { normalizeMangoQuery } from "@melon/db-query-mango";
-import type { MangoQuery } from "@melon/db-query-mango";
+import type { MelonSchema, PreparedQuery, QueryAst } from "@melon-db/db";
+import { prepareQuery } from "@melon-db/db";
+import type { PrismaFindManyArgs } from "@melon-db/db-prisma";
+import { resolveCollectionQuery } from "@melon-db/db-query";
+import type { QueryBuilder } from "@melon-db/db-query";
+import { normalizeMangoQuery } from "@melon-db/db-query-mango";
+import type { MangoQuery } from "@melon-db/db-query-mango";
 
 /**
  * Type guard for PreparedQuery vs bare QueryAst.

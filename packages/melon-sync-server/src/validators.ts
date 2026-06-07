@@ -1,5 +1,5 @@
-import type { SyncChanges } from "@melon/db";
-import type { PullArgs, PushArgs } from "@melon/sync";
+import type { SyncChanges } from "@melon-db/db";
+import type { PullArgs, PushArgs } from "@melon-db/sync";
 import { SyncServerError, SyncServerErrorCode } from "./errors.ts";
 
 function isRecord(value: unknown): value is Record<string, unknown> {

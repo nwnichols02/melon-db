@@ -1,4 +1,4 @@
-import type { CollectionMetadata, MelonSchema } from "@melon/db";
+import type { CollectionMetadata, MelonSchema } from "@melon-db/db";
 
 function scalarToSql(kind: string): string {
 	switch (kind) {
@@ -73,7 +73,7 @@ export function generateCollectionDdl(meta: CollectionMetadata): string[] {
  */
 export function generateAddColumnDdl(
 	collection: string,
-	fields: Record<string, import("@melon/db").FieldDefinition>,
+	fields: Record<string, import("@melon-db/db").FieldDefinition>,
 ): string[] {
 	return Object.entries(fields).map(([name, field]) => {
 		const sqlType = scalarToSql(field.kind);

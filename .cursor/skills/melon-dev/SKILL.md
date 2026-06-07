@@ -1,6 +1,6 @@
 ---
 name: melon-dev
-description: Work on the Melon monorepo — packages, playgrounds, docs, and PRD compliance. Use when editing @melon/db, example apps, or apps/docs.
+description: Work on the Melon monorepo — packages, playgrounds, docs, and PRD compliance. Use when editing @melon-db/db, example apps, or apps/docs.
 ---
 
 # Melon development
@@ -9,7 +9,7 @@ Read `AGENTS.md` at the repo root first.
 
 ## Before coding
 
-1. Identify the package boundary (`@melon/db` must not import other melon-* except as documented).
+1. Identify the package boundary (`@melon-db/db` must not import other melon-* except as documented).
 2. Check [PRD compliance](apps/docs/content/docs/prd-compliance.mdx) for deferred vs gap items.
 3. For docs site work, follow `.cursor/rules/melon-tanstack.mdc`.
 
@@ -22,7 +22,7 @@ Read `AGENTS.md` at the repo root first.
 ## Typing
 
 - No new `as` casts in `packages/melon-db*` (see `apps/docs/content/docs/contributing/typescript.mdx`).
-- Use `isPreparedQuery()` from `@melon/db-react` query-deps patterns.
+- Use `isPreparedQuery()` from `@melon-db/db-react` query-deps patterns.
 
 ## Tests
 

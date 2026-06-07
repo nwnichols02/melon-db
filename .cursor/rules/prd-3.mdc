@@ -19,15 +19,15 @@ The proposal also incorporates two extensions from the previous PRD iteration: a
 
 | Package | Purpose |
 |---|---|
-| `@melon/db` | Core storage runtime, AST, schema metadata, transactions, subscriptions, execution engine |
-| `@melon/db-sqlite` | SQLite adapter for React Native and Node-capable environments |
-| `@melon/db-react` | React hooks, provider bindings, selector subscriptions |
-| `@melon/db-query` | First-party fluent query builder and typed query helpers |
-| `@melon/db-query-mango` | Mango parser, validator, and AST compiler based on open selector-style queries.[4][5] |
-| `@melon/db-prisma` | Prisma schema import, code generation, Prisma-style local client facade, hook helpers.[3][9] |
-| `@melon/db-devtools` | AST inspector, SQL inspector, query planner views, subscription diagnostics |
-| `@melon/db-testkit` | In-memory adapter, fixtures, fake clock helpers, sync-less local test tools |
-| `@melon/db-codemods` | WatermelonDB migration helpers and query codemods.[6][1] |
+| `@melon-db/db` | Core storage runtime, AST, schema metadata, transactions, subscriptions, execution engine |
+| `@melon-db/db-sqlite` | SQLite adapter for React Native and Node-capable environments |
+| `@melon-db/db-react` | React hooks, provider bindings, selector subscriptions |
+| `@melon-db/db-query` | First-party fluent query builder and typed query helpers |
+| `@melon-db/db-query-mango` | Mango parser, validator, and AST compiler based on open selector-style queries.[4][5] |
+| `@melon-db/db-prisma` | Prisma schema import, code generation, Prisma-style local client facade, hook helpers.[3][9] |
+| `@melon-db/db-devtools` | AST inspector, SQL inspector, query planner views, subscription diagnostics |
+| `@melon-db/db-testkit` | In-memory adapter, fixtures, fake clock helpers, sync-less local test tools |
+| `@melon-db/db-codemods` | WatermelonDB migration helpers and query codemods.[6][1] |
 
 ## Layered architecture
 
@@ -313,7 +313,7 @@ const query = q
 ```
 
 ## Prisma integration interfaces
-Prisma’s recent React Native messaging centers on typed client ergonomics and reactive hooks for local usage patterns.[3] `@melon/db-prisma` should provide compatibility at the schema and client facade layer, not replace the core engine.
+Prisma’s recent React Native messaging centers on typed client ergonomics and reactive hooks for local usage patterns.[3] `@melon-db/db-prisma` should provide compatibility at the schema and client facade layer, not replace the core engine.
 
 ### Schema import interfaces
 ```ts
@@ -459,9 +459,9 @@ export declare function createMangoCompiler(): MangoQueryCompiler;
 
 ## Example assembly
 ```ts
-import { createDatabase } from '@melon/db';
-import { createSqliteAdapter } from '@melon/db-sqlite';
-import { createPrismaLikeClient } from '@melon/db-prisma';
+import { createDatabase } from '@melon-db/db';
+import { createSqliteAdapter } from '@melon-db/db-sqlite';
+import { createPrismaLikeClient } from '@melon-db/db-prisma';
 
 const adapter = createSqliteAdapter({
   filename: 'app.db',
@@ -502,12 +502,12 @@ Migration guidance should include:
 - adapter configuration guidance, since WatermelonDB’s own adapter model is the architectural predecessor here.[2][6]
 
 ## Recommended implementation order
-1. Implement `@melon/db` core schema, AST, adapter, and runtime interfaces.
-2. Implement `@melon/db-sqlite` first, because WatermelonDB’s main performance story is tied to SQLite-backed local execution.[8][6]
-3. Implement `@melon/db-query` fluent builder next.
-4. Implement `@melon/db-react` hooks once observation contracts stabilize.
-5. Implement `@melon/db-query-mango` using a constrained Mango subset informed by RxDB/CouchDB semantics.[12][5]
-6. Implement `@melon/db-prisma` as schema import plus generated client facades, not a replacement runtime.[3][9]
+1. Implement `@melon-db/db` core schema, AST, adapter, and runtime interfaces.
+2. Implement `@melon-db/db-sqlite` first, because WatermelonDB’s main performance story is tied to SQLite-backed local execution.[8][6]
+3. Implement `@melon-db/db-query` fluent builder next.
+4. Implement `@melon-db/db-react` hooks once observation contracts stabilize.
+5. Implement `@melon-db/db-query-mango` using a constrained Mango subset informed by RxDB/CouchDB semantics.[12][5]
+6. Implement `@melon-db/db-prisma` as schema import plus generated client facades, not a replacement runtime.[3][9]
 7. Add devtools and codemods once the core contracts stop moving.
 
 ## Design decisions

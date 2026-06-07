@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createSqliteAdapter } from "@melon/db-sqlite";
+import { createSqliteAdapter } from "@melon-db/db-sqlite";
 import { taskSchema } from "../__fixtures__/task-schema.ts";
 import { createDatabase, queryAst } from "../src/index.ts";
 

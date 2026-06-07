@@ -1,4 +1,4 @@
-# @melon/db-query-mango
+# @melon-db/db-query-mango
 
 Mango-style JSON query compiler → `QueryAst`.
 

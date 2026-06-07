@@ -1,4 +1,4 @@
-import type { SyncOutboxEntry, SyncOutboxStore } from "@melon/db";
+import type { SyncOutboxEntry, SyncOutboxStore } from "@melon-db/db";
 import type { SqliteDriver } from "./driver.ts";
 import { toSqlParams } from "./sql/bindings.ts";
 import { SYNC_OUTBOX_TABLE } from "./sync-outbox-ddl.ts";

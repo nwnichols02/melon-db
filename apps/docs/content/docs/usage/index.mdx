@@ -33,19 +33,19 @@ All query syntaxes compile to the same [QueryAst](/docs/api/melon-db/Interface.Q
 ## Quick cross-surface example
 
 ```ts
-// Fluent (@melon/db-query)
+// Fluent (@melon-db/db-query)
 const ast = createQueryFactory(schema)
   .from('tasks')
   .where('status', 'eq', 'open')
   .toAst();
 
-// Mango (@melon/db-query-mango)
+// Mango (@melon-db/db-query-mango)
 const mangoPrepared = createMangoCompiler().compile(
   { selector: { status: 'open' }, collection: 'tasks' },
   schema,
 );
 
-// Prisma-style (@melon/db-prisma)
+// Prisma-style (@melon-db/db-prisma)
 const prisma = createPrismaLikeClient(db);
 await prisma.tasks.findMany({ where: { status: 'open' } });
 

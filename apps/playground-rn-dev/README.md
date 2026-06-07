@@ -1,11 +1,11 @@
 # Melon Playground Dev (React Native)
 
-Development-build app for dogfooding `@melon/db-sqlite-native` (native SQLite). **Not compatible with Expo Go.**
+Development-build app for dogfooding `@melon-db/db-sqlite-native` (native SQLite). **Not compatible with Expo Go.**
 
 | | |
 |---|---|
-| SQLite (default) | `@melon/db-sqlite/rn` + `@melon/db-sqlite-native` |
-| SQLite (optional) | `EXPO_PUBLIC_MELON_SQLITE=expo` → `@melon/db-sqlite/expo` |
+| SQLite (default) | `@melon-db/db-sqlite/rn` + `@melon-db/db-sqlite-native` |
+| SQLite (optional) | `EXPO_PUBLIC_MELON_SQLITE=expo` → `@melon-db/db-sqlite/expo` |
 | Benchmarks | Melon native modes + optional `@nozbe/watermelondb` on-device compare |
 | DB file | `melon-playground-dev.db` |
 | Bundle id | `com.nate.nichols.playgroundrn.devbuild` |

@@ -1,12 +1,12 @@
 # Releasing Melon (alpha)
 
-Runbook for publishing `@melon/*` packages to npm and making the GitHub repository public.
+Runbook for publishing `@melon-db/*` packages to npm and making the GitHub repository public.
 
 ## Author & license
 
 - **Author:** Nate Nichols (`nwnichols02@gmail.com`)
 - **License:** [MIT](./LICENSE)
-- **Repository:** https://github.com/nwnichols02/melon
+- **Repository:** https://github.com/nwnichols02/melon-db
 
 Publish metadata is centralized in [`tooling/release/metadata.ts`](./tooling/release/metadata.ts). Run `bun tooling/release/sync-package-json.ts` after changing version or repository fields.
 
@@ -17,13 +17,13 @@ Publish metadata is centralized in [`tooling/release/metadata.ts`](./tooling/rel
 - [ ] Confirm no secrets in git history (`git log -p` spot-check, secret scanning enabled on GitHub)
 - [ ] `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md` present at repo root
 - [ ] Root and package READMEs include **Author & license** sections
-- [ ] All `@melon/*` `package.json` files have `author`, `license`, `repository`, `homepage`, `bugs`, and `"publishConfig": { "access": "public" }`
+- [ ] All `@melon-db/*` `package.json` files have `author`, `license`, `repository`, `homepage`, `bugs`, and `"publishConfig": { "access": "public" }`
 - [ ] Repository visibility set to **public**
 - [ ] Default branch protected (require CI, no force-push to `main`)
 
 ### npm
 
-- [ ] npm org `@melon` exists; maintainers use 2FA
+- [ ] npm org `@melon-db` exists; maintainers use 2FA
 - [ ] `NPM_TOKEN` stored in GitHub Actions secrets (Automation token or trusted publish token)
 - [ ] Packages not yet published: run first publish manually or via workflow with `dry_run: false`
 
@@ -84,7 +84,7 @@ The workflow runs tests, typecheck, audit (high/critical), build, export validat
 ## Install docs (consumers)
 
 ```bash
-npm install @melon/db@alpha @melon/db-sqlite@alpha @melon/db-react@alpha
+npm install @melon-db/db@alpha @melon-db/db-sqlite@alpha @melon-db/db-react@alpha
 ```
 
 Pin exact versions in production apps during alpha. See [Alpha support policy](apps/docs/content/docs/alpha-support.mdx).
@@ -205,19 +205,19 @@ After public:
 |--------|------------------|
 | Stolen long-lived npm tokens | Prefer **npm Trusted Publishing (OIDC)**; no token in GitHub Secrets |
 | Malicious PR exfiltrating `secrets.*` | Fork PR approval; default read-only workflow token |
-| Typosquat `@melon/db` | Publish all `@melon/*` names **before** announcing; npm org scope ownership |
+| Typosquat `@melon-db/db` | Publish all `@melon-db/*` names **before** announcing; npm org scope ownership |
 | Compromised maintainer account | 2FA, branch protection, optional `npm-publish` environment approval |
 | Dependency confusion | Scoped packages, `repository` field in every `package.json`, provenance on publish |
 | Shai-Hulud-style postinstall worms | You don’t run postinstall scripts in published packages; still run `bun audit` in CI |
 
 ---
 
-## Step 3 — npm `@melon` org, tokens, and where secrets live
+## Step 3 — npm `@melon-db` org, tokens, and where secrets live
 
 ### 3a. Create the npm organization
 
 1. Log in at [npmjs.com](https://www.npmjs.com/) with the account that will **own** the org.
-2. Avatar → **Add an Organization** → name: **`melon`** (creates scope `@melon`).
+2. Avatar → **Add an Organization** → name: **`melon-db`** (creates scope `@melon-db`).
 3. Plan: **Free** is fine for public open-source packages.
 4. **Organization settings → Members:**
    - Start with just you as **Owner**
@@ -233,14 +233,14 @@ npm blocked classic tokens in late 2025; use **granular tokens** (max 90 days) o
 
 ### 3c. Claim package names (first publish)
 
-Your packages are scoped (`@melon/db`, etc.). The **first** `npm publish` of each name creates it under the org if:
+Your packages are scoped (`@melon-db/db`, etc.). The **first** `npm publish` of each name creates it under the org if:
 
 - You are logged in as an org member with publish rights, and
-- `package.json` has `"name": "@melon/..."` and `"publishConfig": { "access": "public" }`
+- `package.json` has `"name": "@melon-db/..."` and `"publishConfig": { "access": "public" }`
 
 Publish order is defined in `tooling/release/packages.ts` (`PUBLISH_ORDER`) — dependencies first.
 
-**Reserve names early:** even unpublished, run first alpha publish (or `npm publish --dry-run` locally) so squatters cannot register `@melon/db`.
+**Reserve names early:** even unpublished, run first alpha publish (or `npm publish --dry-run` locally) so squatters cannot register `@melon-db/db`.
 
 ### 3d. Where to keep credentials (do / don’t)
 
@@ -285,13 +285,13 @@ No long-lived `NPM_TOKEN` in GitHub. Short-lived tokens per workflow run.
 
 **Per package** (after first manual publish creates the package on npm):
 
-1. npm → package **@melon/db** → **Settings → Trusted Publisher**
+1. npm → package **@melon-db/db** → **Settings → Trusted Publisher**
 2. Provider: **GitHub Actions**
-3. Repository: `nwnichols02/melon`
+3. Repository: `nwnichols02/melon-db`
 4. Workflow filename: **`release.yml`** (exact, case-sensitive)
 5. Environment: leave blank unless you add `npm-publish` environment (then set `npm-publish`)
 
-Repeat for each `@melon/*` package, **or** use org-level trusted publisher if npm org plan supports it.
+Repeat for each `@melon-db/*` package, **or** use org-level trusted publisher if npm org plan supports it.
 
 **Workflow requirements** (already partially in place):
 
@@ -316,7 +316,7 @@ Consumers see a link on npm verifying the tarball came from your GitHub workflow
 Use only to **bootstrap** first publish or if OIDC is not configured yet.
 
 1. npm → **Access Tokens → Generate New Token → Granular Access Token**
-2. Permissions: **Read and write** for packages under **`@melon`** only
+2. Permissions: **Read and write** for packages under **`@melon-db`** only
 3. Expiration: **30–90 days** (set calendar reminder to rotate)
 4. Copy once → paste into GitHub secret `NPM_TOKEN`
 5. **Revoke** when OIDC is working
@@ -347,8 +347,8 @@ bun tooling/release/publish.ts --tag alpha
 Verify on npm:
 
 ```bash
-npm view @melon/db versions --json
-npm dist-tag ls @melon/db    # should list alpha -> 0.1.0-alpha.0
+npm view @melon-db/db versions --json
+npm dist-tag ls @melon-db/db    # should list alpha -> 0.1.0-alpha.0
 ```
 
 ---
@@ -357,20 +357,20 @@ npm dist-tag ls @melon/db    # should list alpha -> 0.1.0-alpha.0
 
 ### 4a. npm registry checks
 
-For **each** published package (`@melon/db`, `@melon/db-query`, …):
+For **each** published package (`@melon-db/db`, `@melon-db/db-query`, …):
 
 ```bash
-npm view @melon/db name version license author repository
-npm view @melon/db dist-tags
-npm pack @melon/db@alpha --dry-run
+npm view @melon-db/db name version license author repository
+npm view @melon-db/db dist-tags
+npm pack @melon-db/db@alpha --dry-run
 ```
 
 Confirm:
 
 - [ ] `license: MIT`
-- [ ] `author` and `repository.url` point to `nwnichols02/melon`
+- [ ] `author` and `repository.url` point to `nwnichols02/melon-db`
 - [ ] dist-tag **`alpha`** resolves to your version
-- [ ] Package page shows **public** and under **@melon** org
+- [ ] Package page shows **public** and under **@melon-db** org
 
 If using provenance/OIDC, npm package page should show **Provenance** / link to the GitHub workflow run.
 
@@ -381,8 +381,8 @@ Your repo already has a fixture; run it manually in a temp dir to mimic external
 ```bash
 mkdir /tmp/melon-consumer-test && cd /tmp/melon-consumer-test
 npm init -y
-npm install @melon/db@alpha @melon/db-sqlite@alpha @melon/db-query@alpha
-node -e "import('@melon/db').then(m => console.log('ok', typeof m.createDatabase))"
+npm install @melon-db/db@alpha @melon-db/db-sqlite@alpha @melon-db/db-query@alpha
+node -e "import('@melon-db/db').then(m => console.log('ok', typeof m.createDatabase))"
 ```
 
 Or from the monorepo:
@@ -427,7 +427,7 @@ bun run release:smoke
 
 | Problem | Response |
 |---------|----------|
-| Wrong version published | `npm deprecate @melon/db@bad-version "reason"`; publish fix with new version |
+| Wrong version published | `npm deprecate @melon-db/db@bad-version "reason"`; publish fix with new version |
 | Token leaked | Revoke on npm immediately; audit GitHub Actions logs; rotate all secrets |
 | Malicious publish | Unpublish within 72h if no dependents (npm policy); otherwise deprecate and publish patch |
-| Package squatting | Only org owners can publish `@melon/*`; publish all names before announcement |
+| Package squatting | Only org owners can publish `@melon-db/*`; publish all names before announcement |

@@ -5,13 +5,13 @@ Thank you for helping improve Melon. This monorepo uses [Bun](https://bun.sh/) w
 ## Prerequisites
 
 - [Bun](https://bun.sh/) (latest stable)
-- For React Native work: Xcode / Android SDK as in [React Native (JSI) walkthrough](https://github.com/nwnichols02/melon/blob/main/apps/docs/content/docs/walkthroughs/react-native-jsi.mdx) (paths may vary once docs are hosted)
+- For React Native work: Xcode / Android SDK as in [React Native (JSI) walkthrough](https://github.com/nwnichols02/melon-db/blob/main/apps/docs/content/docs/walkthroughs/react-native-jsi.mdx) (paths may vary once docs are hosted)
 
 ## Setup
 
 ```bash
-git clone https://github.com/nwnichols02/melon.git
-cd melon
+git clone https://github.com/nwnichols02/melon-db.git
+cd melon-db
 bun install
 ```
 
@@ -42,7 +42,7 @@ See [RELEASING.md](./RELEASING.md) for the public alpha checklist.
 
 ## Package boundaries
 
-- `@melon/db` must not import other `@melon/*` packages except `@melon/db-query` (collection query bridge).
+- `@melon-db/db` must not import other `@melon-db/*` packages except `@melon-db/db-query` (collection query bridge).
 - Query layers compile to AST; adapters only see `PreparedQuery`.
 - See `.cursor/rules/file-layout.mdc` and [PRD compliance](apps/docs/content/docs/prd-compliance.mdx).
 

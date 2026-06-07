@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Sync publish metadata on all @melon package.json files (run after build in CI).
+ * Sync publish metadata on all @melon-db package.json files (run after build in CI).
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";

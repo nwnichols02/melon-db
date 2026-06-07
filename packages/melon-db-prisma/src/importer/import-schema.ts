@@ -3,8 +3,8 @@ import type {
 	DatabaseSchemaDefinition,
 	FieldDefinition,
 	RelationDefinition,
-} from "@melon/db";
-import { MelonError, MelonErrorCode } from "@melon/db";
+} from "@melon-db/db";
+import { MelonError, MelonErrorCode } from "@melon-db/db";
 import { getDMMF } from "@prisma/internals";
 import {
 	mapPrismaScalar,

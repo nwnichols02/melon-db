@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import type { QueryAst } from "@melon/db";
-import { QueryBuilder } from "@melon/db-query";
+import type { QueryAst } from "@melon-db/db";
+import { QueryBuilder } from "@melon-db/db-query";
 import { createInMemoryAdapter } from "../src/adapters/in-memory/adapter.ts";
 import { createDatabase } from "../src/database/create-database.ts";
 import { createMelonSchema } from "../src/schema.ts";

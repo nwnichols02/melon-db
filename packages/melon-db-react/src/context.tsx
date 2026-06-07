@@ -1,4 +1,4 @@
-import type { MelonDatabase, MelonSchema } from "@melon/db";
+import type { MelonDatabase, MelonSchema } from "@melon-db/db";
 import { createContext, useContext } from "react";
 
 const DatabaseContext = createContext<MelonDatabase | null>(null);

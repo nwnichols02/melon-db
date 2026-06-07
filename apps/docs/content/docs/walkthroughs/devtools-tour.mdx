@@ -6,8 +6,8 @@ description: Inspect Plan, SQL, AST, writes, sync, and subscriptions.
 ## Setup
 
 ```ts
-import { createReactiveDevtoolsBridge } from '@melon/db-devtools';
-import { MelonDevtoolsProvider, MelonDevtoolsPanel } from '@melon/db-devtools/react';
+import { createReactiveDevtoolsBridge } from '@melon-db/db-devtools';
+import { MelonDevtoolsProvider, MelonDevtoolsPanel } from '@melon-db/db-devtools/react';
 
 const bridge = createReactiveDevtoolsBridge();
 const db = createDatabase({ schema, adapter, devtools: bridge });
@@ -34,7 +34,7 @@ Use `useMelonDevtoolsLog()` only inside the panel — not on data screens — to
 | **Errors** | Engine and adapter errors |
 | **Retention** | Placeholder for prd-4 sliding window (Phase 31+) |
 
-SQLite adapters populate SQL via `getLastQueryDebug()`. In-memory adapters show Plan + AST; SQL appears when using `@melon/db-sqlite`.
+SQLite adapters populate SQL via `getLastQueryDebug()`. In-memory adapters show Plan + AST; SQL appears when using `@melon-db/db-sqlite`.
 
 ## Try it
 

@@ -1,4 +1,4 @@
-# @melon/db-codemods
+# @melon-db/db-codemods
 
 WatermelonDB → Melon codemods and runtime query translator.
 

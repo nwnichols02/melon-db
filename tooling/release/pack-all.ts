@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * npm pack all @melon packages into tooling/release/artifacts (dist-only exports).
+ * npm pack all @melon-db packages into tooling/release/artifacts (dist-only exports).
  */
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";

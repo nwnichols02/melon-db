@@ -1,4 +1,4 @@
-import type { MelonSchema } from "@melon/db";
+import type { MelonSchema } from "@melon-db/db";
 import { QueryBuilder } from "./query-builder.ts";
 
 export interface QueryFactory {

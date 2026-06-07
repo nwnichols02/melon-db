@@ -1,28 +1,28 @@
 ---
-title: "@melon/db-query"
+title: "@melon-db/db-query"
 description: Fluent type-safe query builder → QueryAst.
 ---
 
-**Status:** Shipped · **Depends on:** `@melon/db` · **API:** [Reference](/docs/api/melon-db-query)
+**Status:** Shipped · **Depends on:** `@melon-db/db` · **API:** [Reference](/docs/api/melon-db-query)
 
 Canonical query surface: pure builders with no database I/O.
 
 ## Install (alpha)
 
 ```bash
-npm install @melon/db-query@alpha
+npm install @melon-db/db-query@alpha
 ```
 
 Or with Bun:
 
 ```bash
-bun add @melon/db-query@alpha
+bun add @melon-db/db-query@alpha
 ```
 
 ## Example
 
 ```ts
-import { createQueryFactory } from '@melon/db-query';
+import { createQueryFactory } from '@melon-db/db-query';
 
 const q = createQueryFactory(schema);
 const ast = q
@@ -42,4 +42,4 @@ const rows = await db.collection('tasks').findMany(ast);
 
 ## Author & license
 
-Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon/blob/main/LICENSE).
+Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon-db/blob/main/LICENSE).

@@ -1,6 +1,6 @@
-import { createDatabase, createMelonSchema } from "@melon/db";
-import { createQueryFactory } from "@melon/db-query";
-import { createSqliteAdapter } from "@melon/db-sqlite";
+import { createDatabase, createMelonSchema } from "@melon-db/db";
+import { createQueryFactory } from "@melon-db/db-query";
+import { createSqliteAdapter } from "@melon-db/db-sqlite";
 
 const schema = createMelonSchema({
 	version: 1,
@@ -47,7 +47,7 @@ const ast = q
 
 const rows = await db.collection("tasks").findMany(ast);
 
-console.log("Open tasks (fluent query via @melon/db-query):");
+console.log("Open tasks (fluent query via @melon-db/db-query):");
 for (const row of rows) {
 	console.log(`  - [${row.priority}] ${row.title} (${row.id})`);
 }

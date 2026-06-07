@@ -5,7 +5,7 @@ import { createDatabase } from "../src/database/create-database.ts";
 
 describe("observe with sqlite adapter", () => {
 	test("query observe fires on write", async () => {
-		const { createSqliteAdapter } = await import("@melon/db-sqlite");
+		const { createSqliteAdapter } = await import("@melon-db/db-sqlite");
 		const db = createDatabase({
 			schema: taskSchema,
 			adapter: createSqliteAdapter({ filename: ":memory:" }),
@@ -40,7 +40,7 @@ describe("observe with sqlite adapter", () => {
 	});
 
 	test("observeCollections filters by name", async () => {
-		const { createSqliteAdapter } = await import("@melon/db-sqlite");
+		const { createSqliteAdapter } = await import("@melon-db/db-sqlite");
 		const db = createDatabase({
 			schema: taskSchema,
 			adapter: createSqliteAdapter({ filename: ":memory:" }),
@@ -71,7 +71,7 @@ describe("observe with sqlite adapter", () => {
 	});
 
 	test("irrelevant write does not re-fetch filtered query", async () => {
-		const { createSqliteAdapter } = await import("@melon/db-sqlite");
+		const { createSqliteAdapter } = await import("@melon-db/db-sqlite");
 		const db = createDatabase({
 			schema: taskSchema,
 			adapter: createSqliteAdapter({ filename: ":memory:" }),

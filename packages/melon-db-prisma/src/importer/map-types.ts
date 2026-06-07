@@ -1,4 +1,4 @@
-import type { MelonScalar } from "@melon/db";
+import type { MelonScalar } from "@melon-db/db";
 
 const PRISMA_SCALAR_MAP: Record<string, MelonScalar> = {
 	String: "string",

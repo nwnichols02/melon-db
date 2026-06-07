@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { MelonError, MelonErrorCode } from "@melon/db";
+import { MelonError, MelonErrorCode } from "@melon-db/db";
 import {
 	taskSchema,
 	taskSchemaDefinition,
 } from "../../melon-db/__fixtures__/task-schema.ts";
-import { withTestDatabase } from "@melon/db-testkit";
+import { withTestDatabase } from "@melon-db/db-testkit";
 import {
 	queryDescriptionToAst,
 	translateWatermelonQuery,

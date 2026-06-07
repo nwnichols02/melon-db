@@ -492,12 +492,12 @@ export function applyMigrateQueriesTransform(
 		const hasImport = sourceFile
 			.getImportDeclarations()
 			.some((decl) =>
-				decl.getModuleSpecifierValue().includes("@melon/db-query"),
+				decl.getModuleSpecifierValue().includes("@melon-db/db-query"),
 			);
 		if (!hasImport) {
 			sourceFile.insertStatements(0, ["const q = createQueryFactory(schema);"]);
 			sourceFile.insertStatements(0, [
-				'import { createQueryFactory } from "@melon/db-query";',
+				'import { createQueryFactory } from "@melon-db/db-query";',
 			]);
 		}
 	}

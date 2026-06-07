@@ -1,4 +1,4 @@
-# @melon/db-query
+# @melon-db/db-query
 
 Fluent type-safe query builder → `QueryAst`.
 

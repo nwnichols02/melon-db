@@ -1,24 +1,24 @@
 ---
-title: "@melon/sync"
+title: "@melon-db/sync"
 description: Watermelon-compatible pull/push orchestrator.
 ---
 
-**Status:** Shipped · **Depends on:** `@melon/db` only · **API:** [Reference](/docs/api/melon-sync)
+**Status:** Shipped · **Depends on:** `@melon-db/db` only · **API:** [Reference](/docs/api/melon-sync)
 
 ## Install (alpha)
 
 ```bash
-npm install @melon/sync@alpha
+npm install @melon-db/sync@alpha
 ```
 
 Or with Bun:
 
 ```bash
-bun add @melon/sync@alpha
+bun add @melon-db/sync@alpha
 ```
 
 ```ts
-import { synchronize, createMemoryCheckpointStore } from '@melon/sync';
+import { synchronize, createMemoryCheckpointStore } from '@melon-db/sync';
 
 await synchronize({
   db,
@@ -34,4 +34,4 @@ Full guide: [Sync](/docs/sync).
 
 ## Author & license
 
-Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon/blob/main/LICENSE).
+Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon-db/blob/main/LICENSE).

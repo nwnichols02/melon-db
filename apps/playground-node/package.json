@@ -3,11 +3,11 @@
 	"private": true,
 	"type": "module",
 	"dependencies": {
-		"@melon/db": "workspace:*",
-		"@melon/db-sqlite": "workspace:*",
-		"@melon/db-query": "workspace:*",
-		"@melon/sync": "workspace:*",
-		"@melon/sync-server": "workspace:*"
+		"@melon-db/db": "workspace:*",
+		"@melon-db/db-sqlite": "workspace:*",
+		"@melon-db/db-query": "workspace:*",
+		"@melon-db/sync": "workspace:*",
+		"@melon-db/sync-server": "workspace:*"
 	},
 	"scripts": {
 		"demo": "bun run src/demo.ts",

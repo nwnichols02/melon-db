@@ -1,4 +1,4 @@
-# @melon/sync-server
+# @melon-db/sync-server
 
 HTTP reference sync backend (in-memory and Postgres).
 

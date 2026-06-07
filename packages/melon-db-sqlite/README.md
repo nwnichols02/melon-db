@@ -1,4 +1,4 @@
-# @melon/db-sqlite
+# @melon-db/db-sqlite
 
 SQLite `StorageAdapter` for Bun, Node (`better-sqlite3`), Expo, and optional JSI native.
 
@@ -8,16 +8,16 @@ SQLite `StorageAdapter` for Bun, Node (`better-sqlite3`), Expo, and optional JSI
 
 | Entry | Runtime | Expo Go |
 |-------|---------|---------|
-| `@melon/db-sqlite` | Bun (`bun:sqlite`) | — |
-| `@melon/db-sqlite/node` | Node + `better-sqlite3` | — |
-| `@melon/db-sqlite/expo` | React Native + `expo-sqlite` | **Yes** |
-| `@melon/db-sqlite/rn` | RN + `@melon/db-sqlite-native` | **No** (dev build only) |
-| `@melon/db-sqlite/bench` | Shared benchmark scenarios (Node + RN) | — |
+| `@melon-db/db-sqlite` | Bun (`bun:sqlite`) | — |
+| `@melon-db/db-sqlite/node` | Node + `better-sqlite3` | — |
+| `@melon-db/db-sqlite/expo` | React Native + `expo-sqlite` | **Yes** |
+| `@melon-db/db-sqlite/rn` | RN + `@melon-db/db-sqlite-native` | **No** (dev build only) |
+| `@melon-db/db-sqlite/bench` | Shared benchmark scenarios (Node + RN) | — |
 
 ## Expo Go (default)
 
 ```ts
-import { createExpoSqliteAdapter } from '@melon/db-sqlite/expo';
+import { createExpoSqliteAdapter } from '@melon-db/db-sqlite/expo';
 import * as SQLite from 'expo-sqlite';
 
 const database = await SQLite.openDatabaseAsync('app.db');
@@ -27,7 +27,7 @@ const adapter = createExpoSqliteAdapter({ database });
 ## JSI native (development build)
 
 ```ts
-import { createJsiSqliteAdapter, isJsiSqliteAvailable } from '@melon/db-sqlite/rn';
+import { createJsiSqliteAdapter, isJsiSqliteAvailable } from '@melon-db/db-sqlite/rn';
 
 if (isJsiSqliteAvailable()) {
   const adapter = createJsiSqliteAdapter({
@@ -37,7 +37,7 @@ if (isJsiSqliteAvailable()) {
 }
 ```
 
-Requires [`@melon/db-sqlite-native`](../melon-db-sqlite-native/README.md) linked via `expo prebuild` / `expo run:ios`.
+Requires [`@melon-db/db-sqlite-native`](../melon-db-sqlite-native/README.md) linked via `expo prebuild` / `expo run:ios`.
 
 ## Scripts
 

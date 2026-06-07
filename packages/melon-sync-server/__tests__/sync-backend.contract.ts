@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { SyncBackend } from "@melon/sync";
+import type { SyncBackend } from "@melon-db/sync";
 import { SyncServerError, SyncServerErrorCode } from "../src/errors.ts";
 
 /**

@@ -1,4 +1,4 @@
-import type { Migration } from "@melon/db";
+import type { Migration } from "@melon-db/db";
 import type { PullMigration } from "./protocol.ts";
 
 /**

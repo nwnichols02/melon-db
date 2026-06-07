@@ -162,11 +162,11 @@ WatermelonDB already has an existing query language that gets encoded per adapte
 ### Package additions
 | Package | Responsibility |
 |---|---|
-| `@melon/db` | Storage core, AST, execution engine, subscriptions |
-| `@melon/db-query-melon` | First-party fluent query builder |
-| `@melon/db-query-mango` | Mango parser and compiler to AST |
-| `@melon/db-prisma` | Prisma schema import, codegen, Prisma-inspired client layer |
-| `@melon/db-devtools` | Query inspection, AST views, SQL inspection |
+| `@melon-db/db` | Storage core, AST, execution engine, subscriptions |
+| `@melon-db/db-query-melon` | First-party fluent query builder |
+| `@melon-db/db-query-mango` | Mango parser and compiler to AST |
+| `@melon-db/db-prisma` | Prisma schema import, codegen, Prisma-inspired client layer |
+| `@melon-db/db-devtools` | Query inspection, AST views, SQL inspection |
 
 ### Boundary rules
 - Storage execution depends only on AST and adapter interfaces.
@@ -192,7 +192,7 @@ WatermelonDB already has an existing query language that gets encoded per adapte
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Prisma branding or compatibility expectations become misleading | Users may assume full Prisma runtime parity | Position `@melon/db-prisma` as schema/codegen and ergonomic compatibility, not runtime identity.[3] |
+| Prisma branding or compatibility expectations become misleading | Users may assume full Prisma runtime parity | Position `@melon-db/db-prisma` as schema/codegen and ergonomic compatibility, not runtime identity.[3] |
 | Mango support balloons in scope | Delivery slows and edge-case support becomes expensive | Launch a documented subset and expand based on usage.[4] |
 | Multiple query surfaces fragment the product | Harder docs and maintenance | Enforce a single AST and common execution model. |
 | WatermelonDB parity becomes too costly | Migration work delays innovation | Prioritize high-frequency query patterns and codemod the common path.[2] |
@@ -224,7 +224,7 @@ Scope:
 - Prove local SQLite execution path.
 
 Deliverables:
-- `@melon/db-prisma` alpha
+- `@melon-db/db-prisma` alpha
 - Codegen CLI
 - Example app with generated local client
 
@@ -240,7 +240,7 @@ Scope:
 - Add SQLite encoding tests.
 
 Deliverables:
-- `@melon/db-query-mango` alpha
+- `@melon-db/db-query-mango` alpha
 - Operator compatibility docs
 - Parser test suite
 

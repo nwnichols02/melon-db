@@ -3,7 +3,7 @@ import {
 	createDatabase,
 	createInMemoryAdapter,
 	createMelonSchema,
-} from "@melon/db";
+} from "@melon-db/db";
 
 const schema = createMelonSchema({
 	version: 1,

@@ -1,4 +1,4 @@
-import type { QueryBooleanNode, QueryPredicate } from "@melon/db";
+import type { QueryBooleanNode, QueryPredicate } from "@melon-db/db";
 
 export interface SqlFragment {
 	sql: string;

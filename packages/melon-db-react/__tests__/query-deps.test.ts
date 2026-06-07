@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createMelonSchema, prepareQuery, queryAst } from "@melon/db";
+import { createMelonSchema, prepareQuery, queryAst } from "@melon-db/db";
 import {
 	isPreparedQuery,
 	mangoQueryKey,

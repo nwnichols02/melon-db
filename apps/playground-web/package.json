@@ -9,10 +9,10 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@melon/db": "workspace:*",
-		"@melon/db-devtools": "workspace:*",
-		"@melon/db-query": "workspace:*",
-		"@melon/db-react": "workspace:*",
+		"@melon-db/db": "workspace:*",
+		"@melon-db/db-devtools": "workspace:*",
+		"@melon-db/db-query": "workspace:*",
+		"@melon-db/db-react": "workspace:*",
 		"react": "^19.2.0",
 		"react-dom": "^19.2.0"
 	},

@@ -1,4 +1,4 @@
-import type { QueryDebugSnapshot } from "@melon/db";
+import type { QueryDebugSnapshot } from "@melon-db/db";
 import { type ReactElement, useState } from "react";
 import { formatJson } from "../format-json.ts";
 import {

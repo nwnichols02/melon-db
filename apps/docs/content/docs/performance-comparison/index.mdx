@@ -3,7 +3,7 @@ title: Overview
 description: Melon vs WatermelonDB benchmark methodology and limitations.
 ---
 
-Melon ships an optional **WatermelonDB baseline** in the `@melon/db-sqlite` benchmark harness. This is a measurement tool only — not a performance guarantee or optimization target.
+Melon ships an optional **WatermelonDB baseline** in the `@melon-db/db-sqlite` benchmark harness. This is a measurement tool only — not a performance guarantee or optimization target.
 
 See **[Latest results](/docs/performance-comparison/latest-results)** for timings from the most recent committed benchmark run.
 
@@ -55,7 +55,7 @@ Dependencies install with **Bun** (`better-sqlite3@12.10.0`, root `trustedDepend
 
 ## On-device (React Native)
 
-Phase 28 adds a **dev-only benchmark screen** in `apps/playground-rn-dev` that reuses the same scenarios via [`@melon/db-sqlite/bench`](../../packages/melon-db-sqlite/src/bench/index.ts).
+Phase 28 adds a **dev-only benchmark screen** in `apps/playground-rn-dev` that reuses the same scenarios via [`@melon-db/db-sqlite/bench`](../../packages/melon-db-sqlite/src/bench/index.ts).
 
 ### How to run
 

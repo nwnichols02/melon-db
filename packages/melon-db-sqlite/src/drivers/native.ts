@@ -36,7 +36,7 @@ function normalizeRow(row: Record<string, unknown>): Record<string, unknown> {
 
 async function loadNativeModule(): Promise<NativeMelonModule> {
 	const { getMelonSQLite, isMelonSQLiteNativeAvailable } = await import(
-		"@melon/db-sqlite-native"
+		"@melon-db/db-sqlite-native"
 	);
 	if (!isMelonSQLiteNativeAvailable()) {
 		throw new Error(JSI_SQLITE_DEV_BUILD_MESSAGE);
@@ -49,7 +49,7 @@ async function loadNativeModule(): Promise<NativeMelonModule> {
 }
 
 /**
- * Creates a SqliteDriver backed by @melon/db-sqlite-native (development build only).
+ * Creates a SqliteDriver backed by @melon-db/db-sqlite-native (development build only).
  */
 export async function createNativeDriver(options: {
 	path: string;

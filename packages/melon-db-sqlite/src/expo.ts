@@ -1,4 +1,4 @@
-import type { StorageAdapter } from "@melon/db";
+import type { StorageAdapter } from "@melon-db/db";
 import { createSqliteAdapterFromDriver } from "./adapter-core.ts";
 import { type ExpoSqliteDatabase, createExpoDriver } from "./drivers/expo.ts";
 

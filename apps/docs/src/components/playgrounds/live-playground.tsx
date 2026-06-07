@@ -2,14 +2,14 @@ import {
 	createDatabase,
 	createInMemoryAdapter,
 	createMelonSchema,
-} from "@melon/db";
-import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
+} from "@melon-db/db";
+import { createReactiveDevtoolsBridge } from "@melon-db/db-devtools";
 import {
 	MelonDevtoolsPanel,
 	MelonDevtoolsProvider,
-} from "@melon/db-devtools/react";
-import { createQueryFactory } from "@melon/db-query";
-import { MelonDbProvider, useQuery, useWriter } from "@melon/db-react";
+} from "@melon-db/db-devtools/react";
+import { createQueryFactory } from "@melon-db/db-query";
+import { MelonDbProvider, useQuery, useWriter } from "@melon-db/db-react";
 import { type ReactElement, useCallback, useMemo, useState } from "react";
 
 const demoSchema = createMelonSchema({

@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Publish all @melon packages in dependency order.
+ * Publish all @melon-db packages in dependency order.
  * Requires NPM_TOKEN and prior `bun run build:packages`.
  */
 import { readFileSync, writeFileSync } from "node:fs";

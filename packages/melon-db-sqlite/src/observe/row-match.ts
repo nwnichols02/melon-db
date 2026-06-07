@@ -1,5 +1,5 @@
-import type { QueryAst, QueryBooleanNode } from "@melon/db";
-import { evaluateQuery } from "@melon/db";
+import type { QueryAst, QueryBooleanNode } from "@melon-db/db";
+import { evaluateQuery } from "@melon-db/db";
 
 /**
  * Returns whether a row satisfies a query WHERE clause (in-memory, matches SQL compiler semantics).

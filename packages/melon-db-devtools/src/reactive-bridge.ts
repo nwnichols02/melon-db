@@ -3,7 +3,7 @@ import type {
 	DevtoolsBridge,
 	QueryDebugSnapshot,
 	SyncDebugSnapshot,
-} from "@melon/db";
+} from "@melon-db/db";
 import type { DevtoolsEventLog } from "./bridge.ts";
 
 export type { DevtoolsEventLog };

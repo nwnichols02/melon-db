@@ -10,12 +10,12 @@
 		"typecheck": "bunx tsc -p tsconfig.json --noEmit"
 	},
 	"dependencies": {
-		"@melon/db": "workspace:*",
-		"@melon/db-devtools": "workspace:*",
-		"@melon/db-query": "workspace:*",
-		"@melon/db-react": "workspace:*",
-		"@melon/db-sqlite": "workspace:*",
-		"@melon/sync": "workspace:*",
+		"@melon-db/db": "workspace:*",
+		"@melon-db/db-devtools": "workspace:*",
+		"@melon-db/db-query": "workspace:*",
+		"@melon-db/db-react": "workspace:*",
+		"@melon-db/db-sqlite": "workspace:*",
+		"@melon-db/sync": "workspace:*",
 		"@shopify/flash-list": "2.0.2",
 		"babel-preset-expo": "~54.0.10",
 		"expo": "~54.0.5",

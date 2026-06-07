@@ -2,8 +2,8 @@ import {
   createDatabase,
   createInMemoryAdapter,
   createMelonSchema,
-} from "@melon/db";
-import { createSqliteAdapter } from "@melon/db-sqlite";
+} from "@melon-db/db";
+import { createSqliteAdapter } from "@melon-db/db-sqlite";
 
 const schema = createMelonSchema({
   version: 1,

@@ -25,13 +25,13 @@ These ADRs capture the main architectural choices made during Phases 0–26. Eac
 
 **Context:** Teams want offline CRUD without sync; sync has its own release cadence and backend contracts.
 
-**Decision:** `@melon/db` owns storage, outbox primitives, and `applyRemoteChanges`. `@melon/sync` owns pull/push orchestration and depends only on `@melon/db`.
+**Decision:** `@melon-db/db` owns storage, outbox primitives, and `applyRemoteChanges`. `@melon-db/sync` owns pull/push orchestration and depends only on `@melon-db/db`.
 
 **Pros:** Tree-shakeable; local-only apps skip sync; sync can evolve without breaking query APIs.
 
 **Cons:** Two packages to install for full-stack offline apps; some sync types live on the engine for outbox access.
 
-**Alternatives:** Monolithic `@melon/db` with sync built-in (rejected — coupling and bundle size).
+**Alternatives:** Monolithic `@melon-db/db` with sync built-in (rejected — coupling and bundle size).
 
 ---
 
@@ -39,7 +39,7 @@ These ADRs capture the main architectural choices made during Phases 0–26. Eac
 
 **Context:** Teams prefer fluent TS, JSON Mango, or Prisma-style args depending on background.
 
-**Decision:** Ship `@melon/db-query`, `@melon/db-query-mango`, and `@melon/db-prisma` as separate compilers to the same AST.
+**Decision:** Ship `@melon-db/db-query`, `@melon-db/db-query-mango`, and `@melon-db/db-prisma` as separate compilers to the same AST.
 
 **Pros:** Familiar APIs; Mango is serializable for tests/config; Prisma schema reuse for RN teams.
 
@@ -55,7 +55,7 @@ These ADRs capture the main architectural choices made during Phases 0–26. Eac
 
 **Decision:** `StorageAdapter.find/count` accept `PreparedQuery`; write ops use `AdapterWriteOperation` structs.
 
-**Pros:** Clear boundary for new backends (IndexedDB, etc.); pure SQL layer in `@melon/db-sqlite`.
+**Pros:** Clear boundary for new backends (IndexedDB, etc.); pure SQL layer in `@melon-db/db-sqlite`.
 
 **Cons:** Include/join semantics must be resolved in engine or SQL layer with explicit v1 limits.
 
@@ -67,7 +67,7 @@ These ADRs capture the main architectural choices made during Phases 0–26. Eac
 
 **Context:** Expo Go cannot load custom native modules; production RN apps use dev/client builds.
 
-**Decision:** `@melon/db-sqlite/expo` for Expo Go; `@melon/db-sqlite/rn` + `@melon/db-sqlite-native` for dev builds with `mode: 'auto'`.
+**Decision:** `@melon-db/db-sqlite/expo` for Expo Go; `@melon-db/db-sqlite/rn` + `@melon-db/db-sqlite-native` for dev builds with `mode: 'auto'`.
 
 **Pros:** Expo Go demo works out of the box; native path available when teams need JSI throughput.
 
@@ -97,7 +97,7 @@ These ADRs capture the main architectural choices made during Phases 0–26. Eac
 
 **Decision (Phase 0–26):** Engine **ChangeEmitter** re-runs queries on collection changes when the adapter has no `observeQuery`.
 
-**Amendment (Phase 27):** `@melon/db-sqlite` implements **`observeQuery`** with predicate-aware post-write invalidation (`rowMatchesWhere` + subscription registry). Per-table SQLite triggers append to `_melon_observation_events`. In-memory and other adapters still use ChangeEmitter.
+**Amendment (Phase 27):** `@melon-db/db-sqlite` implements **`observeQuery`** with predicate-aware post-write invalidation (`rowMatchesWhere` + subscription registry). Per-table SQLite triggers append to `_melon_observation_events`. In-memory and other adapters still use ChangeEmitter.
 
 **Amendment (Phase 29):** `flushObservationQueue()` drains trigger events into the same invalidation path (covers raw SQL / external writes). Native **jsi-sync** installs `sqlite3_update_hook` → `setObservationFlushCallback` on the JS thread (CallInvoker on iOS, RuntimeExecutor on Android). External delete events without a fetchable row conservatively invalidate affected subscriptions.
 
@@ -115,7 +115,7 @@ These ADRs capture the main architectural choices made during Phases 0–26. Eac
 
 **Context:** Prisma RN support is Early Access; teams still want Prisma schema and client ergonomics locally.
 
-**Decision:** `@melon/db-prisma` imports schema, generates types/client stubs, and compiles Prisma-like args to AST. Runtime is always `MelonDatabase`.
+**Decision:** `@melon-db/db-prisma` imports schema, generates types/client stubs, and compiles Prisma-like args to AST. Runtime is always `MelonDatabase`.
 
 **Pros:** No Prisma engine in the app; honest positioning; Bun workspace codegen fits monorepo.
 
@@ -139,15 +139,15 @@ These ADRs capture the main architectural choices made during Phases 0–26. Eac
 
 ---
 
-## ADR-010: `@melon/db` depends on `@melon/db-query` for fluent collection queries
+## ADR-010: `@melon-db/db` depends on `@melon-db/db-query` for fluent collection queries
 
 **Context:** `MelonCollection.query((b) => …)` needs `QueryBuilder` and `resolveCollectionQuery`. Strict package boundaries would duplicate builder logic in core or force every app to compile AST manually.
 
-**Decision:** `@melon/db` lists `@melon/db-query` as a runtime dependency. `resolveCollectionQueryInput` delegates builder callbacks to `@melon/db-query`.
+**Decision:** `@melon-db/db` lists `@melon-db/db-query` as a runtime dependency. `resolveCollectionQueryInput` delegates builder callbacks to `@melon-db/db-query`.
 
 **Pros:** One builder implementation; Watermelon-style `collection.query(Q => Q.where(...))` works out of the box in monorepo apps.
 
-**Cons:** Core is no longer free of other `melon-*` packages; tree-shaking cannot drop `@melon/db-query` if you use fluent collection APIs.
+**Cons:** Core is no longer free of other `melon-*` packages; tree-shaking cannot drop `@melon-db/db-query` if you use fluent collection APIs.
 
 **Alternatives:** Optional peer dependency with runtime error (rejected — poor DX in the common case).
 

@@ -1,4 +1,4 @@
-import type { MelonSchema, PreparedQuery, QueryAst } from "@melon/db";
+import type { MelonSchema, PreparedQuery, QueryAst } from "@melon-db/db";
 import { compileWhere } from "./compile-predicate.ts";
 
 export interface CompiledSql {

@@ -1,4 +1,4 @@
-import type { QueryOperator } from "@melon/db";
+import type { QueryOperator } from "@melon-db/db";
 
 const SQL_OPERATOR_MAP: Record<QueryOperator, string> = {
 	eq: "=",

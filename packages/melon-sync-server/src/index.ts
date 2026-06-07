@@ -27,4 +27,4 @@ export {
 	type CreatePostgresSyncStoreOptions,
 	type PostgresSyncStoreOptions,
 } from "./postgres-store.ts";
-export type { SyncBackend } from "@melon/sync";
+export type { SyncBackend } from "@melon-db/sync";

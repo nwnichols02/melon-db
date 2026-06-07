@@ -1,15 +1,15 @@
 ---
 title: "MelonSQLiteNativeModule"
-description: "@melon/db-sqlite-native — MelonSQLiteNativeModule"
+description: "@melon-db/db-sqlite-native — MelonSQLiteNativeModule"
 ---
 
-[**@melon/db-sqlite-native API Reference**](/docs/api/melon-db-sqlite-native)
+[**@melon-db/db-sqlite-native API Reference**](/docs/api/melon-db-sqlite-native)
 
 ***
 
 # Interface: MelonSQLiteNativeModule
 
-Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:10](https://github.com/nwnichols02/melon/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts#L10)
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:10](https://github.com/nwnichols02/melon-db/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts#L10)
 
 Native SQLite module contract (TurboModule on iOS/Android when New Architecture is enabled).
 
@@ -19,7 +19,7 @@ Native SQLite module contract (TurboModule on iOS/Android when New Architecture 
 
 > **close**(): `Promise`\<`void`\>
 
-Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:12](https://github.com/nwnichols02/melon/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts#L12)
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:12](https://github.com/nwnichols02/melon-db/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts#L12)
 
 #### Returns
 
@@ -31,7 +31,7 @@ Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:12](https:
 
 > **exec**(`sql`): `Promise`\<`void`\>
 
-Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:13](https://github.com/nwnichols02/melon/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts#L13)
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:13](https://github.com/nwnichols02/melon-db/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts#L13)
 
 #### Parameters
 
@@ -49,7 +49,7 @@ Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:13](https:
 
 > **open**(`path`): `Promise`\<`void`\>
 
-Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:11](https://github.com/nwnichols02/melon/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts#L11)
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:11](https://github.com/nwnichols02/melon-db/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts#L11)
 
 #### Parameters
 
@@ -67,7 +67,7 @@ Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:11](https:
 
 > **queryAll**(`sql`, `params`): `Promise`\<readonly `Record`\<`string`, `unknown`\>[]\>
 
-Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:14](https://github.com/nwnichols02/melon/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts#L14)
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:14](https://github.com/nwnichols02/melon-db/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts#L14)
 
 #### Parameters
 
@@ -86,7 +86,7 @@ Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:14](https:
 
 > **queryFirst**(`sql`, `params`): `Promise`\<`Record`\<`string`, `unknown`\> \| `null`\>
 
-Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:18](https://github.com/nwnichols02/melon/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts#L18)
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:18](https://github.com/nwnichols02/melon-db/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts#L18)
 
 #### Parameters
 
@@ -105,7 +105,7 @@ Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:18](https:
 
 > **run**(`sql`, `params`): `Promise`\<`void`\>
 
-Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:22](https://github.com/nwnichols02/melon/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts#L22)
+Defined in: [packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts:22](https://github.com/nwnichols02/melon-db/blob/85c51e94faa38f0595a58e84892f947942476e85/packages/melon-db-sqlite-native/src/MelonSQLiteBridge.ts#L22)
 
 #### Parameters
 

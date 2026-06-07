@@ -2,8 +2,8 @@ import {
 	type MelonDatabase,
 	type StorageAdapter,
 	createDatabase,
-} from "@melon/db";
-import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
+} from "@melon-db/db";
+import { createReactiveDevtoolsBridge } from "@melon-db/db-devtools";
 import { type Task, taskSchema } from "./schema";
 
 const DATABASE_FILENAME = "melon-playground.db";
@@ -23,11 +23,11 @@ export async function getDatabase(): Promise<MelonDatabase<typeof taskSchema>> {
 }
 
 /**
- * Expo Go: expo-sqlite via @melon/db-sqlite/expo.
+ * Expo Go: expo-sqlite via @melon-db/db-sqlite/expo.
  */
 async function createAdapter(): Promise<StorageAdapter> {
 	const SQLite = await import("expo-sqlite");
-	const { createExpoSqliteAdapter } = await import("@melon/db-sqlite/expo");
+	const { createExpoSqliteAdapter } = await import("@melon-db/db-sqlite/expo");
 	const database = await SQLite.openDatabaseAsync(DATABASE_FILENAME);
 	return createExpoSqliteAdapter({ database });
 }

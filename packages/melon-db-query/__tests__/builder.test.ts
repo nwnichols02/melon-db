@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { type DatabaseSchemaDefinition, createMelonSchema } from "@melon/db";
+import { type DatabaseSchemaDefinition, createMelonSchema } from "@melon-db/db";
 import { createQueryFactory } from "../src/query-factory.ts";
 
 const schema = createMelonSchema({

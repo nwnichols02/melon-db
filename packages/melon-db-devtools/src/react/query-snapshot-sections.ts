@@ -1,4 +1,4 @@
-import type { QueryDebugSnapshot } from "@melon/db";
+import type { QueryDebugSnapshot } from "@melon-db/db";
 import { formatJson } from "./format-json.ts";
 
 /**

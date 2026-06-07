@@ -5,7 +5,7 @@ You’re at the point where each package needs its own mini‑PRD: scope, goals,
 
 Below I’ll keep them concise but concrete so you can implement or RFC them package by package.
 
-1. @melon/db – core engine
+1. @melon-db/db – core engine
 Scope
 Schema/model metadata.
 
@@ -61,11 +61,11 @@ Unit tests and simple benchmarks.
 
 M2 – SQLite adapter integration contract (2 weeks)
 
-Finalize hooks for @melon/db-sqlite (e.g., SQL generation inputs).
+Finalize hooks for @melon-db/db-sqlite (e.g., SQL generation inputs).
 
 Stabilize AST for v1.
 
-2. @melon/db-sqlite – SQLite adapter
+2. @melon-db/db-sqlite – SQLite adapter
 Scope
 Production StorageAdapter implementation for SQLite on RN (JSI / new arch) and Node.
 
@@ -81,7 +81,7 @@ Support basic observability (query timing, change subscriptions).
 Non‑goals
 No query parsing.
 
-No schema migration planner (schema comes from @melon/db).
+No schema migration planner (schema comes from @melon-db/db).
 
 Requirements
 createSqliteAdapter({ filename, jsi, debug }): StorageAdapter.
@@ -111,7 +111,7 @@ Benchmarks on realistic datasets.
 
 Stress tests for transactions and subscriptions.
 
-3. @melon/db-query – fluent query builder
+3. @melon-db/db-query – fluent query builder
 Scope
 Type-safe fluent query builder → QueryAst.
 
@@ -125,7 +125,7 @@ Keep APIs functional and composable (pure builders, no side effects).
 Non‑goals
 No direct DB access; returns AST only.
 
-No schema import (schema comes from @melon/db).
+No schema import (schema comes from @melon-db/db).
 
 Requirements
 QueryBuilder<Record> with where, and, or, orderBy, limit, skip, include, toAst.
@@ -147,7 +147,7 @@ Implement builder + tests for AST output.
 
 Docs with examples.
 
-4. @melon/db-query-mango – Mango query language
+4. @melon-db/db-query-mango – Mango query language
 Scope
 Mango-style JSON query language parser/validator → AST.
 
@@ -183,7 +183,7 @@ Implement normalization + compilation to AST.
 
 Tests using sample RxDB-like queries.
 
-5. @melon/db-prisma – Prisma schema & client
+5. @melon-db/db-prisma – Prisma schema & client
 Scope
 Prisma schema import → DatabaseSchemaDefinition.
 
@@ -219,7 +219,7 @@ Parse schema → DatabaseSchemaDefinition.
 
 Generate type-safe clients and basic queries mapping to AST.
 
-6. @melon/db-react – React bindings
+6. @melon-db/db-react – React bindings
 Scope
 React context + hooks around MelonDatabase and PreparedQuery.
 
@@ -253,7 +253,7 @@ Use in apps/playground-rn.
 
 Document patterns.
 
-7. @melon/db-devtools – devtools
+7. @melon-db/db-devtools – devtools
 Scope
 Bridge to capture AST, SQL, timings, errors.
 
@@ -277,7 +277,7 @@ M0 – Debug event design (1 week)
 
 M1 – Bridge + minimal panel (2–3 weeks)
 
-8. @melon/db-testkit – test utilities
+8. @melon-db/db-testkit – test utilities
 Scope
 In-memory adapter.
 
@@ -301,7 +301,7 @@ M0 – In-memory adapter (1–2 weeks)
 
 M1 – Helpers and examples (1–2 weeks)
 
-9. @melon/db-codemods – migration
+9. @melon-db/db-codemods – migration
 Scope
 Codemods and compatibility helpers to move from WatermelonDB.
 

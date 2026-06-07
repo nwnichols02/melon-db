@@ -1,9 +1,9 @@
 ---
 alwaysApply: true
 ---
-PRD: @melon/db-query – fluent query builder
+PRD: @melon-db/db-query – fluent query builder
 1. Scope
-@melon/db-query provides the first-party, type-safe, fluent query API that compiles to the QueryAst defined in @melon/db. It has no knowledge of SQLite or React.
+@melon-db/db-query provides the first-party, type-safe, fluent query API that compiles to the QueryAst defined in @melon-db/db. It has no knowledge of SQLite or React.
 
 2. Goals
 Offer a modern, composable query DSL that’s easy to use in services, hooks, and tests.
@@ -86,7 +86,7 @@ Nested boolean groups
 
 Order/limit/skip
 
-M2 – Integration with @melon/db (1 week)
+M2 – Integration with @melon-db/db (1 week)
 
 Wire builder into MelonCollection.query convenience overloads:
 
@@ -94,9 +94,9 @@ collection.query(builder => builder.where(...))
 
 Add examples in docs and playground.
 
-PRD: @melon/db-react – React bindings
+PRD: @melon-db/db-react – React bindings
 1. Scope
-@melon/db-react provides React bindings for MelonDatabase and queries:
+@melon-db/db-react provides React bindings for MelonDatabase and queries:
 
 Context provider to inject a MelonDatabase.
 
@@ -107,7 +107,7 @@ Hooks to run writes in a safe, Watermelon-like “writer” context.
 It plays a similar role to WatermelonDB’s “database passed into React components” patterns and Prisma’s React Native reactive hooks.
 
 2. Goals
-Make it trivial to plug @melon/db into React Native and React.
+Make it trivial to plug @melon-db/db into React Native and React.
 
 Provide a hooks-first API:
 
@@ -122,11 +122,11 @@ useWriter
 Combine reactive subscriptions from the adapter with React renders.
 
 3. Non-goals
-No schema or adapter logic (those live in @melon/db / @melon/db-sqlite).
+No schema or adapter logic (those live in @melon-db/db / @melon-db/db-sqlite).
 
 No devtools UI (bridge only, or keep devtools in its own package).
 
-No direct sync control (sync hooks belong in @melon/sync).
+No direct sync control (sync hooks belong in @melon-db/sync).
 
 4. Functional requirements
 <MelonDbProvider db={MelonDatabase}>:
@@ -151,7 +151,7 @@ Works with fluent builder or Prisma-like args.
 
 useMangoQuery<T>(collection, mangoQuery):
 
-On top of @melon/db-query-mango.
+On top of @melon-db/db-query-mango.
 
 useWriter() => (fn) => Promise<T>:
 
@@ -200,16 +200,16 @@ Add memoization/select logic.
 Example: filtered list, searching, etc.
 
 Suggested order from here
-Given you’re starting with @melon/db + @melon/db-sqlite:
+Given you’re starting with @melon-db/db + @melon-db/db-sqlite:
 
-Implement @melon/db M0/M1 (with an in-memory adapter).
+Implement @melon-db/db M0/M1 (with an in-memory adapter).
 
-Implement @melon/db-sqlite SQL generator + Node adapter.
+Implement @melon-db/db-sqlite SQL generator + Node adapter.
 
-Implement @melon/db-query (so you can author nice queries).
+Implement @melon-db/db-query (so you can author nice queries).
 
-Implement @melon/db-react (so you can dogfood this in RN).
+Implement @melon-db/db-react (so you can dogfood this in RN).
 
-Then tackle Mango (@melon/db-query-mango) and/or Prisma (@melon/db-prisma).
+Then tackle Mango (@melon-db/db-query-mango) and/or Prisma (@melon-db/db-prisma).
 
 Which one would you like to PRD next: Mango query package or Prisma integration package?

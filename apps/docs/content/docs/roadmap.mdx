@@ -27,12 +27,12 @@ Each phase was executed as a focused delivery increment. Phases 0–7 establishe
 
 | Phase | Title | Packages | Key deliverables | Status |
 |-------|-------|----------|------------------|--------|
-| 0 | Monorepo bootstrap | workspace | Bun workspaces, tooling, `@melon/db` skeleton | Shipped |
-| 1 | `@melon/db` M0 | `@melon/db` | Schema, AST, adapter types, query pipeline stubs | Shipped |
-| 2 | `@melon/db` M1 | `@melon/db` | In-memory adapter, CRUD, serialized write queue | Shipped |
-| 3 | `@melon/db` M2 | `@melon/db` | ChangeEmitter, `observe`, collection subscriptions | Shipped |
-| 4 | `@melon/db-sqlite` M0 | `@melon/db-sqlite` | AST → SQL compiler, predicate tests | Shipped |
-| 5 | `@melon/db-sqlite` M1 | `@melon/db-sqlite` | Bun SQLite adapter, DDL, integration tests | Shipped |
+| 0 | Monorepo bootstrap | workspace | Bun workspaces, tooling, `@melon-db/db` skeleton | Shipped |
+| 1 | `@melon-db/db` M0 | `@melon-db/db` | Schema, AST, adapter types, query pipeline stubs | Shipped |
+| 2 | `@melon-db/db` M1 | `@melon-db/db` | In-memory adapter, CRUD, serialized write queue | Shipped |
+| 3 | `@melon-db/db` M2 | `@melon-db/db` | ChangeEmitter, `observe`, collection subscriptions | Shipped |
+| 4 | `@melon-db/db-sqlite` M0 | `@melon-db/db-sqlite` | AST → SQL compiler, predicate tests | Shipped |
+| 5 | `@melon-db/db-sqlite` M1 | `@melon-db/db-sqlite` | Bun SQLite adapter, DDL, integration tests | Shipped |
 | 6 | Planned M2/M3 | — | RN native + perf milestones from db-core RFC | Superseded by Phases 8–10, 20–26 |
 | 7 | Downstream packages | query, react, mango, prisma, devtools, testkit | Fluent/Mango/Prisma surfaces, hooks, testkit | Shipped |
 | — | Hardening (post-7) | CI, playground-node | GitHub Actions, adapter CRUD vectors, initial benchmarks, devtools SQL snapshots | Shipped |
@@ -41,47 +41,47 @@ Each phase was executed as a focused delivery increment. Phases 0–7 establishe
 
 | Phase | Title | Packages | Key deliverables | Status |
 |-------|-------|----------|------------------|--------|
-| 8 | RN / Expo integration | `@melon/db-sqlite`, `@melon/db-react` | `expo-sqlite` adapter, SQLite change notifications, `playground-rn` | Shipped |
+| 8 | RN / Expo integration | `@melon-db/db-sqlite`, `@melon-db/db-react` | `expo-sqlite` adapter, SQLite change notifications, `playground-rn` | Shipped |
 | 9 | API completeness | db, react, prisma | `useFindMany`/`useMangoQuery`, migrations, belongsTo includes, Prisma CLI | Shipped |
-| 10 | Perf & hardening | `@melon/db-sqlite` | SQL test coverage, debug flag, 10k/50k/100k benchmarks, Node driver | Shipped |
+| 10 | Perf & hardening | `@melon-db/db-sqlite` | SQL test coverage, debug flag, 10k/50k/100k benchmarks, Node driver | Shipped |
 
 ### Migration tooling (Phases 11, 19)
 
 | Phase | Title | Packages | Key deliverables | Status |
 |-------|-------|----------|------------------|--------|
-| 11 | Codemods v1 | `@melon/db-codemods` | Query translator, `migrate-queries`/`writes`/`react` CLI | Shipped |
-| 19 | Codemods v2 | `@melon/db-codemods` | Nested Q.and/or, fetch/observe handles, delete, `migrate-schema` spike, Q.on recipes | Shipped |
+| 11 | Codemods v1 | `@melon-db/db-codemods` | Query translator, `migrate-queries`/`writes`/`react` CLI | Shipped |
+| 19 | Codemods v2 | `@melon-db/db-codemods` | Nested Q.and/or, fetch/observe handles, delete, `migrate-schema` spike, Q.on recipes | Shipped |
 
 ### Sync (Phases 12–18)
 
 | Phase | Title | Packages | Key deliverables | Status |
 |-------|-------|----------|------------------|--------|
-| 12 | Sync foundation | `@melon/db`, `@melon/sync` | Outbox, `getLocalChanges`/`applyRemoteChanges`, `synchronize()` alpha | Shipped |
+| 12 | Sync foundation | `@melon-db/db`, `@melon-db/sync` | Outbox, `getLocalChanges`/`applyRemoteChanges`, `synchronize()` alpha | Shipped |
 | 13 | Sync integration | sync, sync-server, react | Persistent checkpoints, HTTP server, `useSync`/`useSyncStatus`, RN sync demo | Shipped |
 | 14 | Devtools + docs site | devtools, docs | Reactive bridge, inspector panel, Fumadocs + TanStack Start, CRUD/sync playgrounds | Shipped |
 | 15 | Sync reliability | sync, db | Retry/cancellation, network monitor, conflict policies, migration-aware sync | Shipped |
-| 16 | Postgres backend | `@melon/sync-server` | `PostgresSyncStore`, SQL migrations, Docker compose | Shipped |
-| 17 | Merge-by-field | `@melon/db`, sync | `pendingFields` outbox, field-level merge on apply | Shipped |
-| 18 | Custom conflict resolver | `@melon/db`, sync, react | `conflictPolicy: 'custom'` + `conflictResolver` hook | Shipped |
+| 16 | Postgres backend | `@melon-db/sync-server` | `PostgresSyncStore`, SQL migrations, Docker compose | Shipped |
+| 17 | Merge-by-field | `@melon-db/db`, sync | `pendingFields` outbox, field-level merge on apply | Shipped |
+| 18 | Custom conflict resolver | `@melon-db/db`, sync, react | `conflictPolicy: 'custom'` + `conflictResolver` hook | Shipped |
 
 ### Native SQLite performance (Phases 20–26)
 
 | Phase | Title | Packages | Key deliverables | Status |
 |-------|-------|----------|------------------|--------|
-| 20 | Native SQLite spike | `@melon/db-sqlite-native`, `/rn` | iOS bridge module, native driver factory, initial spike | Shipped |
+| 20 | Native SQLite spike | `@melon-db/db-sqlite-native`, `/rn` | iOS bridge module, native driver factory, initial spike | Shipped |
 | 21 | Android + hardening | native, playground-rn-dev | Real Android SQLite, iOS busy timeout/basePath, dev build app split | Shipped |
 | 22 | TurboModule (iOS) | native | Codegen `MelonSQLiteSpec`, iOS TurboModule | Shipped |
 | 23 | TurboModule (Android) | native | Android codegen parity with iOS | Shipped |
-| 24 | WDB benchmarks | `@melon/db-sqlite`, docs | `bench:compare`, CI `bench-compare`, performance comparison docs | Shipped |
+| 24 | WDB benchmarks | `@melon-db/db-sqlite`, docs | `bench:compare`, CI `bench-compare`, performance comparison docs | Shipped |
 | 25 | C++ JSI (iOS) | native | `MelonSQLiteHostObject`, native DB thread, `global.melonSqliteJsi` | Shipped |
 | 26 | C++ JSI (Android) | native | NDK/JNI, `libmelon_sqlite`, Android worker thread parity | Shipped |
-| 27 | Native `observeQuery` | `@melon/db-sqlite` | Predicate-aware invalidation, SQLite triggers foundation, `reactiveSubscriptions: true` | Shipped |
-| 28 | RN on-device benchmarks | `@melon/db-sqlite/bench`, `playground-rn-dev` | Dev benchmark screen, jsi-sync vs turbo JSON report, shared scenario lib | Shipped |
-| 29 | Trigger-driven observation | `@melon/db-sqlite`, `@melon/db-sqlite-native` | Process `_melon_observation_events`, `flushObservationQueue`, native `sqlite3_update_hook` on JSI | Shipped |
-| 30 | Query + React DX | `@melon/db`, `@melon/db-query`, `@melon/db-react` | `collection.query(builder)`, `findMany`/`count` builder input, `QueryBuilder.not()`, `useRecord`, `*State` hooks, ADR-010 | Shipped |
+| 27 | Native `observeQuery` | `@melon-db/db-sqlite` | Predicate-aware invalidation, SQLite triggers foundation, `reactiveSubscriptions: true` | Shipped |
+| 28 | RN on-device benchmarks | `@melon-db/db-sqlite/bench`, `playground-rn-dev` | Dev benchmark screen, jsi-sync vs turbo JSON report, shared scenario lib | Shipped |
+| 29 | Trigger-driven observation | `@melon-db/db-sqlite`, `@melon-db/db-sqlite-native` | Process `_melon_observation_events`, `flushObservationQueue`, native `sqlite3_update_hook` on JSI | Shipped |
+| 30 | Query + React DX | `@melon-db/db`, `@melon-db/db-query`, `@melon-db/db-react` | `collection.query(builder)`, `findMany`/`count` builder input, `QueryBuilder.not()`, `useRecord`, `*State` hooks, ADR-010 | Shipped |
 | 31 | PRD compliance + DX | docs, devtools, `playground-web` | prd-4 matrix, walkthroughs, devtools Plan/SQL params, `AGENTS.md` + melon-dev skill, typing pass | Shipped |
-| 32 | Query engine — relations | `@melon/db`, `@melon/db-sqlite`, codemods | `hasMany` includes (post-fetch), `relationFilters` / Q.on via SQL `IN` subquery, Prisma include parity | Shipped |
-| 33 | observeQuery precision | `@melon/db`, `@melon/db-sqlite` | Cross-collection `relationFilters` invalidation, field-aware updates, trigger delete fix, schema-aware subscription fingerprint | Shipped |
+| 32 | Query engine — relations | `@melon-db/db`, `@melon-db/db-sqlite`, codemods | `hasMany` includes (post-fetch), `relationFilters` / Q.on via SQL `IN` subquery, Prisma include parity | Shipped |
+| 33 | observeQuery precision | `@melon-db/db`, `@melon-db/db-sqlite` | Cross-collection `relationFilters` invalidation, field-aware updates, trigger delete fix, schema-aware subscription fingerprint | Shipped |
 | 34 | Alpha / open-source release | all publishable packages | Publishable tarballs, CI smoke from packed tarballs, release workflow + docs/support policy | Shipped |
 
 ### Out-of-cycle: Documentation
@@ -114,7 +114,7 @@ See [PRD compliance — Phase 29+ decisions](/docs/prd-compliance#phase-29-decis
 | Sync `merging` state | Apply is synchronous in v1 |
 | `playground-web` SQLite | In-memory Vite app shipped; web SQLite adapter still deferred |
 | Sliding window (prd-4) | Org-aware retention, prune ledger, pressure modes — see prd-4.mdc |
-| **Alpha / open-source release** | npm `@melon` org, public GitHub, LICENSE/SECURITY, publish CI — see [PRD compliance — Alpha release](/docs/prd-compliance#alpha-release-and-open-source-prd-1) |
+| **Alpha / open-source release** | npm `@melon-db` org, public GitHub, LICENSE/SECURITY, publish CI — see [PRD compliance — Alpha release](/docs/prd-compliance#alpha-release-and-open-source-prd-1) |
 
 ---
 

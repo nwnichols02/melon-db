@@ -1,26 +1,26 @@
 ---
-title: "@melon/db-testkit"
+title: "@melon-db/db-testkit"
 description: Test helpers and withTestDatabase fixtures.
 ---
 
-**Status:** Shipped · **Depends on:** `@melon/db` · **API:** [Reference](/docs/api/melon-db-testkit)
+**Status:** Shipped · **Depends on:** `@melon-db/db` · **API:** [Reference](/docs/api/melon-db-testkit)
 
 Deterministic in-memory testing without native SQLite.
 
 ## Install (alpha)
 
 ```bash
-npm install @melon/db-testkit@alpha
+npm install @melon-db/db-testkit@alpha
 ```
 
 Or with Bun:
 
 ```bash
-bun add @melon/db-testkit@alpha
+bun add @melon-db/db-testkit@alpha
 ```
 
 ```ts
-import { withTestDatabase } from '@melon/db-testkit';
+import { withTestDatabase } from '@melon-db/db-testkit';
 
 await withTestDatabase(schema, async (db) => {
   await db.write(async (tx) => {
@@ -29,8 +29,8 @@ await withTestDatabase(schema, async (db) => {
 });
 ```
 
-Re-exports in-memory adapter helpers aligned with `@melon/db` test patterns.
+Re-exports in-memory adapter helpers aligned with `@melon-db/db` test patterns.
 
 ## Author & license
 
-Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon/blob/main/LICENSE).
+Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon-db/blob/main/LICENSE).

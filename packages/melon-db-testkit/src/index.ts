@@ -1,4 +1,4 @@
-export { createInMemoryAdapter } from "@melon/db";
+export { createInMemoryAdapter } from "@melon-db/db";
 export {
 	withTestDatabase,
 	type TestDatabaseContext,

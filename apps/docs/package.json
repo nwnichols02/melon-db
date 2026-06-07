@@ -11,12 +11,12 @@
 		"docs:api": "bun run scripts/generate-api.ts && bun run scripts/fix-typedoc-links.ts && bun run scripts/verify-search-index.ts"
 	},
 	"dependencies": {
-		"@melon/db": "workspace:*",
-		"@melon/db-devtools": "workspace:*",
-		"@melon/db-query": "workspace:*",
-		"@melon/db-react": "workspace:*",
-		"@melon/sync": "workspace:*",
-		"@melon/sync-server": "workspace:*",
+		"@melon-db/db": "workspace:*",
+		"@melon-db/db-devtools": "workspace:*",
+		"@melon-db/db-query": "workspace:*",
+		"@melon-db/db-react": "workspace:*",
+		"@melon-db/sync": "workspace:*",
+		"@melon-db/sync-server": "workspace:*",
 		"@tanstack/react-router": "1.170.8",
 		"@tanstack/react-start": "1.168.13",
 		"fumadocs-core": "^16.9.3",

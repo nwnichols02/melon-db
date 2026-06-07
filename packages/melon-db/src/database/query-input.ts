@@ -1,7 +1,7 @@
 import type { QueryAst } from "../ast.ts";
 
 /**
- * Fluent builder callback shape (implemented by @melon/db-query QueryBuilder).
+ * Fluent builder callback shape (implemented by @melon-db/db-query QueryBuilder).
  */
 export type CollectionQueryInput<RecordShape = Record<string, unknown>> =
 	| QueryAst

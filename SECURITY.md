@@ -13,11 +13,11 @@ Melon alpha releases have **no production SLA**. Do not use alpha builds for reg
 
 **Please do not open a public GitHub issue for security vulnerabilities.**
 
-Report privately by emailing **nwnichols02@gmail.com** or using [GitHub private vulnerability reporting](https://github.com/nwnichols02/melon/security/advisories/new) once the repository is public. Include:
+Report privately by emailing **nwnichols02@gmail.com** or using [GitHub private vulnerability reporting](https://github.com/nwnichols02/melon-db/security/advisories/new) once the repository is public. Include:
 
 - A description of the issue and impact
 - Steps to reproduce
-- Affected packages and versions (`@melon/db`, `@melon/db-sqlite`, etc.)
+- Affected packages and versions (`@melon-db/db`, `@melon-db/db-sqlite`, etc.)
 - Any suggested fix or mitigation
 
 We aim to acknowledge reports within **5 business days** and will coordinate disclosure after a fix or documented mitigation is available.
@@ -26,9 +26,9 @@ We aim to acknowledge reports within **5 business days** and will coordinate dis
 
 In scope:
 
-- `@melon/*` packages published from this repository
-- Reference sync server (`@melon/sync-server`) when used as documented
-- Native SQLite modules (`@melon/db-sqlite-native`) and JSI bindings
+- `@melon-db/*` packages published from this repository
+- Reference sync server (`@melon-db/sync-server`) when used as documented
+- Native SQLite modules (`@melon-db/db-sqlite-native`) and JSI bindings
 
 Out of scope:
 
@@ -37,6 +37,6 @@ Out of scope:
 
 ## Safe defaults
 
-- Keep `@melon/*` updated to the latest alpha you have validated.
+- Keep `@melon-db/*` updated to the latest alpha you have validated.
 - Run `bun audit` / `npm audit` in your app CI.
 - Do not commit database files, API keys, or `.env` secrets to version control.

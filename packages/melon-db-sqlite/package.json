@@ -1,5 +1,5 @@
 {
-	"name": "@melon/db-sqlite",
+	"name": "@melon-db/db-sqlite",
 	"version": "0.1.0-alpha.0",
 	"type": "module",
 	"exports": {
@@ -52,10 +52,10 @@
 		"build": "bun build ./src/index.ts --outdir ./dist --target node"
 	},
 	"dependencies": {
-		"@melon/db": "workspace:*"
+		"@melon-db/db": "workspace:*"
 	},
 	"peerDependencies": {
-		"@melon/db-sqlite-native": "workspace:*",
+		"@melon-db/db-sqlite-native": "workspace:*",
 		"@nozbe/watermelondb": "0.27.1",
 		"better-sqlite3": "12.10.0",
 		"expo-sqlite": ">=15.0.0",
@@ -65,7 +65,7 @@
 		"@nozbe/watermelondb": {
 			"optional": true
 		},
-		"@melon/db-sqlite-native": {
+		"@melon-db/db-sqlite-native": {
 			"optional": true
 		},
 		"better-sqlite3": {
@@ -79,8 +79,8 @@
 		}
 	},
 	"devDependencies": {
-		"@melon/db-devtools": "workspace:*",
-		"@melon/db-sqlite-native": "workspace:*",
+		"@melon-db/db-devtools": "workspace:*",
+		"@melon-db/db-sqlite-native": "workspace:*",
 		"@nozbe/watermelondb": "0.27.1",
 		"better-sqlite3": "12.10.0",
 		"@types/better-sqlite3": "^7.6.13",
@@ -91,7 +91,7 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/nwnichols02/melon.git"
+		"url": "git+https://github.com/nwnichols02/melon-db.git"
 	},
 	"publishConfig": {
 		"access": "public"
@@ -103,8 +103,8 @@
 		"README.md"
 	],
 	"author": "Nate Nichols <nwnichols02@gmail.com>",
-	"homepage": "https://github.com/nwnichols02/melon#readme",
+	"homepage": "https://github.com/nwnichols02/melon-db#readme",
 	"bugs": {
-		"url": "https://github.com/nwnichols02/melon/issues"
+		"url": "https://github.com/nwnichols02/melon-db/issues"
 	}
 }

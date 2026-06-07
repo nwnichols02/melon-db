@@ -5,7 +5,7 @@
     "outDir": "dist",
     "jsx": "react-jsx",
     "paths": {
-      "@melon/db": ["../melon-db/dist/index.d.ts"]
+      "@melon-db/db": ["../melon-db/dist/index.d.ts"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],

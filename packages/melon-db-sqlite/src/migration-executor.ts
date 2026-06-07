@@ -2,7 +2,7 @@ import type {
 	MelonSchema,
 	MigrationStep,
 	MigrationStepExecutor,
-} from "@melon/db";
+} from "@melon-db/db";
 import type { SqliteDriver } from "./driver.ts";
 import { generateAddColumnDdl, generateCollectionDdl } from "./schema-ddl.ts";
 

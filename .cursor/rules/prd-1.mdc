@@ -135,14 +135,14 @@ Functional requirements:
 - Provide troubleshooting guides, error reference docs, and interactive examples.
 
 ### 8. Open source and npm distribution
-The library stack is developed in a private monorepo today; adoption requires a deliberate path to **public GitHub**, **npm packages under `@melon/*`**, and a documented **alpha** channel before GA.
+The library stack is developed in a private monorepo today; adoption requires a deliberate path to **public GitHub**, **npm packages under `@melon-db/*`**, and a documented **alpha** channel before GA.
 
 Functional requirements:
 - Move the GitHub repository from private to public only after LICENSE, community files, and secret/history hygiene are complete.
-- Create and operate an npm organization (`@melon`) with maintainer 2FA and least-privilege publish credentials (automation token or OIDC; provenance where supported).
+- Create and operate an npm organization (`@melon-db`) with maintainer 2FA and least-privilege publish credentials (automation token or OIDC; provenance where supported).
 - Publish each core package with correct `name`, `version`, `files`/`exports`, `repository`, `license`, and `"publishConfig": { "access": "public" }`.
 - Ship an **alpha** dist-tag first (e.g. `0.x` semver, `@alpha`), with release notes and explicit “no production SLA” support policy.
-- Provide non-workspace install documentation (`npm install @melon/db@alpha` or Bun equivalent).
+- Provide non-workspace install documentation (`npm install @melon-db/db@alpha` or Bun equivalent).
 - Maintain supply-chain checks in CI (audit) and a `SECURITY.md` disclosure process before and after going public.
 - Automate or script monorepo releases so packages publish in dependency order after build + test + pack smoke checks.
 
@@ -246,7 +246,7 @@ Required backend assets:
 - As a platform engineer, the sync engine should be configurable without rewriting the local database layer.[2][3]
 - As a maintainer, the codebase should be split into testable, versioned modules with clear responsibilities.
 - As an enterprise team, conflicts and retries should be observable and policy-driven instead of ad hoc.[3]
-- As an external adopter, I should be able to install `@melon/db` from npm on an alpha dist-tag with clear security and support boundaries before GA.[1]
+- As an external adopter, I should be able to install `@melon-db/db` from npm on an alpha dist-tag with clear security and support boundaries before GA.[1]
 
 ## Acceptance criteria
 
@@ -261,8 +261,8 @@ Required backend assets:
 
 ### Alpha / open-source release acceptance
 - GitHub repository is public with LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, and SECURITY.md.
-- npm org `@melon` exists; all published maintainers use 2FA.
-- At least `@melon/db`, `@melon/db-sqlite`, and `@melon/db-react` are published on the `alpha` dist-tag with install docs outside the monorepo.
+- npm org `@melon-db` exists; all published maintainers use 2FA.
+- At least `@melon-db/db`, `@melon-db/db-sqlite`, and `@melon-db/db-react` are published on the `alpha` dist-tag with install docs outside the monorepo.
 - CI runs dependency audit before publish; release notes document known v1 limitations.
 - Packaged tarballs (not workspace links) pass smoke tests on a clean install.
 
@@ -373,13 +373,13 @@ Exit criteria:
 ### Milestone 4.5: Open source and npm alpha (3-4 weeks)
 Scope:
 - Prepare repository for public GitHub (LICENSE, community files, branch protection, secret scanning).
-- Create npm org `@melon`; configure publish metadata on all publishable packages.
+- Create npm org `@melon-db`; configure publish metadata on all publishable packages.
 - Implement release workflow (manual or CI) with `alpha` dist-tag and GitHub Releases.
 - Document external install, alpha support policy, and security reporting.
 
 Deliverables:
 - Public GitHub repository
-- `@melon/*` packages on npm (`alpha` tag)
+- `@melon-db/*` packages on npm (`alpha` tag)
 - Release automation or documented publish runbook
 - SECURITY.md and audit gate in CI
 

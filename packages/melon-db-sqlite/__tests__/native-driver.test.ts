@@ -42,7 +42,7 @@ describe("createNativeDriver with mocked native module", () => {
 	});
 
 	test("transaction uses BEGIN/COMMIT", async () => {
-		mock.module("@melon/db-sqlite-native", () => ({
+		mock.module("@melon-db/db-sqlite-native", () => ({
 			getMelonSQLite: () => mockNative,
 			isMelonSQLiteNativeAvailable: () => true,
 		}));

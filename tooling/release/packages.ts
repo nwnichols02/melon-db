@@ -1,5 +1,5 @@
 /**
- * Publish order and build entrypoints for @melon/* packages.
+ * Publish order and build entrypoints for @melon-db/* packages.
  */
 import {
   MELON_AUTHOR,
@@ -30,27 +30,27 @@ export interface PackageBuildConfig {
 
 export const PUBLISH_ORDER: readonly PackageBuildConfig[] = [
   {
-    name: "@melon/db-query",
+    name: "@melon-db/db-query",
     dir: "packages/melon-db-query",
     entries: [{ export: ".", src: "src/index.ts" }],
   },
   {
-    name: "@melon/db",
+    name: "@melon-db/db",
     dir: "packages/melon-db",
     entries: [{ export: ".", src: "src/index.ts" }],
   },
   {
-    name: "@melon/db-query-mango",
+    name: "@melon-db/db-query-mango",
     dir: "packages/melon-db-query-mango",
     entries: [{ export: ".", src: "src/index.ts" }],
   },
   {
-    name: "@melon/db-testkit",
+    name: "@melon-db/db-testkit",
     dir: "packages/melon-db-testkit",
     entries: [{ export: ".", src: "src/index.ts" }],
   },
   {
-    name: "@melon/db-sqlite-native",
+    name: "@melon-db/db-sqlite-native",
     dir: "packages/melon-db-sqlite-native",
     entries: [{ export: ".", src: "src/index.ts" }],
     copy: [
@@ -63,7 +63,7 @@ export const PUBLISH_ORDER: readonly PackageBuildConfig[] = [
     native: true,
   },
   {
-    name: "@melon/db-sqlite",
+    name: "@melon-db/db-sqlite",
     dir: "packages/melon-db-sqlite",
     entries: [
       { export: ".", src: "src/index.ts" },
@@ -75,7 +75,7 @@ export const PUBLISH_ORDER: readonly PackageBuildConfig[] = [
     ],
   },
   {
-    name: "@melon/db-prisma",
+    name: "@melon-db/db-prisma",
     dir: "packages/melon-db-prisma",
     entries: [
       { export: ".", src: "src/index.ts" },
@@ -83,7 +83,7 @@ export const PUBLISH_ORDER: readonly PackageBuildConfig[] = [
     ],
   },
   {
-    name: "@melon/db-devtools",
+    name: "@melon-db/db-devtools",
     dir: "packages/melon-db-devtools",
     entries: [
       { export: ".", src: "src/index.ts" },
@@ -91,12 +91,12 @@ export const PUBLISH_ORDER: readonly PackageBuildConfig[] = [
     ],
   },
   {
-    name: "@melon/sync",
+    name: "@melon-db/sync",
     dir: "packages/melon-sync",
     entries: [{ export: ".", src: "src/index.ts" }],
   },
   {
-    name: "@melon/sync-server",
+    name: "@melon-db/sync-server",
     dir: "packages/melon-sync-server",
     entries: [
       { export: ".", src: "src/index.ts" },
@@ -104,12 +104,12 @@ export const PUBLISH_ORDER: readonly PackageBuildConfig[] = [
     ],
   },
   {
-    name: "@melon/db-react",
+    name: "@melon-db/db-react",
     dir: "packages/melon-db-react",
     entries: [{ export: ".", src: "src/index.ts" }],
   },
   {
-    name: "@melon/db-codemods",
+    name: "@melon-db/db-codemods",
     dir: "packages/melon-db-codemods",
     entries: [{ export: ".", src: "src/index.ts" }],
   },

@@ -1,5 +1,5 @@
 ---
-title: "@melon/db"
+title: "@melon-db/db"
 description: Core schema, AST, adapter contract, and runtime engine.
 ---
 
@@ -10,19 +10,19 @@ Core storage engine: schema metadata, query AST, `StorageAdapter`, `MelonDatabas
 ## Install (alpha)
 
 ```bash
-npm install @melon/db@alpha
+npm install @melon-db/db@alpha
 ```
 
 Or with Bun:
 
 ```bash
-bun add @melon/db@alpha
+bun add @melon-db/db@alpha
 ```
 
 ## Quick example
 
 ```ts
-import { createDatabase, createInMemoryAdapter, createMelonSchema } from '@melon/db';
+import { createDatabase, createInMemoryAdapter, createMelonSchema } from '@melon-db/db';
 
 const db = createDatabase({
   schema: createMelonSchema({ version: 1, collections: { /* ... */ } }),
@@ -48,4 +48,4 @@ Enable with `sync: {}` on `createDatabase` for `getLocalChanges`, `applyRemoteCh
 
 ## Author & license
 
-Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon/blob/main/LICENSE).
+Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon-db/blob/main/LICENSE).

@@ -14,7 +14,7 @@ import {
 } from "./runner.ts";
 
 const REACT_IMPORT_SOURCE = "@nozbe/watermelondb/react";
-const MELON_REACT_IMPORT = "@melon/db-react";
+const MELON_REACT_IMPORT = "@melon-db/db-react";
 
 const IMPORT_REPLACEMENTS: Record<string, string> = {
 	DatabaseProvider: "MelonDbProvider",
@@ -178,7 +178,7 @@ function transformWithObservables(
 			"/* @melon-codemod withObservables → hooks",
 			" * Replace HOC with hooks inside the component body:",
 			...hookLines.map((line) => ` * ${line}`),
-			" * import { useFindMany } from '@melon/db-react';",
+			" * import { useFindMany } from '@melon-db/db-react';",
 			" * See /docs/migration#withobservables",
 			" */",
 			`export default ${componentName};`,

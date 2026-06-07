@@ -8,7 +8,7 @@ Every read path compiles to a **QueryAst** — collection, optional `where` bool
 ## QueryAst (canonical)
 
 ```ts
-import { predicate, and, type QueryAst } from '@melon/db';
+import { predicate, and, type QueryAst } from '@melon-db/db';
 
 const ast: QueryAst = {
   collection: 'tasks',
@@ -30,14 +30,14 @@ Boolean nodes: `and`, `or`, `not`.
 await db.collection('tasks').findMany(ast);
 ```
 
-Use `planQuery` + `validateQuery` from `@melon/db` when building tooling; collection methods validate automatically.
+Use `planQuery` + `validateQuery` from `@melon-db/db` when building tooling; collection methods validate automatically.
 
-## Fluent builder (@melon/db-query)
+## Fluent builder (@melon-db/db-query)
 
 Recommended for app code — type-safe fields via generics:
 
 ```ts
-import { createQueryFactory } from '@melon/db-query';
+import { createQueryFactory } from '@melon-db/db-query';
 
 const q = createQueryFactory(taskSchema);
 
@@ -53,7 +53,7 @@ const openHighPriority = q
 const countAst = q.from('tasks').where('status', 'eq', 'open').toAst('count');
 ```
 
-Utilities like `byId` live in `@melon/db-query` — see package API reference.
+Utilities like `byId` live in `@melon-db/db-query` — see package API reference.
 
 ### Builder on `MelonCollection`
 
@@ -72,12 +72,12 @@ handle.observe((rows) => { /* reactive */ });
 
 You can also pass a plain `QueryAst` or `() => QueryAst` thunk.
 
-## Mango (@melon/db-query-mango)
+## Mango (@melon-db/db-query-mango)
 
 JSON-serializable selectors for configs, tests, and devtools:
 
 ```ts
-import { createMangoCompiler } from '@melon/db-query-mango';
+import { createMangoCompiler } from '@melon-db/db-query-mango';
 
 const compiler = createMangoCompiler();
 const prepared = compiler.compile(
@@ -109,12 +109,12 @@ await db.collection('tasks').findMany(prepared.ast);
 
 Unsupported operators fail at compile time with `QUERY_INVALID`.
 
-## Prisma-style (@melon/db-prisma)
+## Prisma-style (@melon-db/db-prisma)
 
 Local client facade — **not** the Prisma engine:
 
 ```ts
-import { createPrismaLikeClient } from '@melon/db-prisma';
+import { createPrismaLikeClient } from '@melon-db/db-prisma';
 
 const prisma = createPrismaLikeClient(db);
 
@@ -141,7 +141,7 @@ await prisma.tasks.create({
 });
 ```
 
-Import a Prisma schema file for codegen with the `@melon/db-prisma` CLI — see package docs.
+Import a Prisma schema file for codegen with the `@melon-db/db-prisma` CLI — see package docs.
 
 ## PreparedQuery and observation
 

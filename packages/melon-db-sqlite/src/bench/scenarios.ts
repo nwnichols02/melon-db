@@ -1,9 +1,9 @@
-import type { AdapterWriteOperation } from "@melon/db";
+import type { AdapterWriteOperation } from "@melon-db/db";
 import {
 	type MelonDatabase,
 	type StorageAdapter,
 	createDatabase,
-} from "@melon/db";
+} from "@melon-db/db";
 import {
 	BATCH_CHUNK_SIZE,
 	benchSchema,

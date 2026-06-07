@@ -1,6 +1,6 @@
-# @melon/sync
+# @melon-db/sync
 
-Watermelon-compatible pull/push sync orchestrator (depends on `@melon/db` only).
+Watermelon-compatible pull/push sync orchestrator (depends on `@melon-db/db` only).
 
 Supports built-in conflict policies plus `conflictPolicy: 'custom'` with a `conflictResolver` hook (see [sync guide](http://localhost:3000/docs/sync)).
 

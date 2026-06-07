@@ -1,6 +1,6 @@
 import { type Project, type Task, taskSchema } from "@/db/schema";
-import { type QueryBuilder, createQueryFactory } from "@melon/db-query";
-import { createMangoCompiler } from "@melon/db-query-mango";
+import { type QueryBuilder, createQueryFactory } from "@melon-db/db-query";
+import { createMangoCompiler } from "@melon-db/db-query-mango";
 import {
 	useDatabase,
 	useFindMany,
@@ -8,7 +8,7 @@ import {
 	useMangoQuery,
 	useQueryCount,
 	useRecordState,
-} from "@melon/db-react";
+} from "@melon-db/db-react";
 import { useCallback, useMemo, useState } from "react";
 import { Pressable } from "react-native";
 import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";

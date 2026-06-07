@@ -12,7 +12,7 @@ const marker = "## Author & license";
 const footer = `
 ## Author & license
 
-${MELON_COPYRIGHT}. [MIT License](https://github.com/nwnichols02/melon/blob/main/LICENSE).
+${MELON_COPYRIGHT}. [MIT License](https://github.com/nwnichols02/melon-db/blob/main/LICENSE).
 `;
 
 for (const file of readdirSync(packagesDir).filter((name) => name.endsWith(".mdx"))) {

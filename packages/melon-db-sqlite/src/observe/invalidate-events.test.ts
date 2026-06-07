@@ -4,7 +4,7 @@ import {
 	predicate,
 	prepareQuery,
 	queryAst,
-} from "@melon/db";
+} from "@melon-db/db";
 import { taskSchemaDefinition } from "../../../melon-db/__fixtures__/task-schema.ts";
 import type { SqliteDriver } from "../driver.ts";
 import { invalidateForObservationEvents } from "./invalidate-events.ts";

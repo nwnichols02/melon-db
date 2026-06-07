@@ -1,28 +1,28 @@
 ---
-title: "@melon/db-prisma"
+title: "@melon-db/db-prisma"
 description: Prisma schema import and Prisma-like local client.
 ---
 
-**Status:** Shipped (subset) · **Depends on:** `@melon/db` · **API:** [Reference](/docs/api/melon-db-prisma)
+**Status:** Shipped (subset) · **Depends on:** `@melon-db/db` · **API:** [Reference](/docs/api/melon-db-prisma)
 
 Schema/codegen layer — **not** the Prisma remote engine. Executes on `MelonDatabase` locally.
 
 ## Install (alpha)
 
 ```bash
-npm install @melon/db-prisma@alpha
+npm install @melon-db/db-prisma@alpha
 ```
 
 Or with Bun:
 
 ```bash
-bun add @melon/db-prisma@alpha
+bun add @melon-db/db-prisma@alpha
 ```
 
 ## Client
 
 ```ts
-import { createPrismaLikeClient } from '@melon/db-prisma';
+import { createPrismaLikeClient } from '@melon-db/db-prisma';
 
 const client = createPrismaLikeClient(db);
 await client.tasks.findMany({ where: { status: 'open' } });
@@ -38,4 +38,4 @@ Supports SQLite datasource, scalar fields, relations, and a constrained `where` 
 
 ## Author & license
 
-Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon/blob/main/LICENSE).
+Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon-db/blob/main/LICENSE).

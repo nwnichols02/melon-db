@@ -5,8 +5,8 @@
     "outDir": "dist",
     "types": ["node", "bun"],
     "paths": {
-      "@melon/db": ["../melon-db/dist/index.d.ts"],
-      "@melon/db-sqlite-native": ["../melon-db-sqlite-native/dist/index.d.ts"]
+      "@melon-db/db": ["../melon-db/dist/index.d.ts"],
+      "@melon-db/db-sqlite-native": ["../melon-db-sqlite-native/dist/index.d.ts"]
     }
   },
   "include": ["src/**/*.ts"],

@@ -8,7 +8,7 @@ import {
 	type QueryOperator,
 	planQuery,
 	validateQuery,
-} from "@melon/db";
+} from "@melon-db/db";
 import { normalizeMangoQuery } from "./normalizer.ts";
 import type { MangoQuery, MangoSelector } from "./types.ts";
 

@@ -6,7 +6,7 @@ import {
 	createDatabase,
 	createInMemoryAdapter,
 	createMelonSchema,
-} from "@melon/db";
+} from "@melon-db/db";
 
 export interface TestDatabaseContext {
 	db: MelonDatabase;

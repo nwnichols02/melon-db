@@ -12,16 +12,16 @@ Melon is an offline-first local database for React Native and TypeScript — a m
 Melon publishes alpha builds under the `alpha` dist-tag.
 
 ```bash
-npm install @melon/db@alpha @melon/db-sqlite@alpha @melon/db-react@alpha
+npm install @melon-db/db@alpha @melon-db/db-sqlite@alpha @melon-db/db-react@alpha
 ```
 
 Or with Bun:
 
 ```bash
-bun add @melon/db@alpha @melon/db-sqlite@alpha @melon/db-react@alpha
+bun add @melon-db/db@alpha @melon-db/db-sqlite@alpha @melon-db/db-react@alpha
 ```
 
-For Node/Bun SQLite, `@melon/db-sqlite` uses `bun:sqlite` by default. For React Native native JSI, install `@melon/db-sqlite-native@alpha` and follow the RN walkthrough.
+For Node/Bun SQLite, `@melon-db/db-sqlite` uses `bun:sqlite` by default. For React Native native JSI, install `@melon-db/db-sqlite-native@alpha` and follow the RN walkthrough.
 
 ### Install from this monorepo
 
@@ -35,7 +35,7 @@ bun test
 ## In-memory quick start
 
 ```ts
-import { createDatabase, createInMemoryAdapter, createMelonSchema } from '@melon/db';
+import { createDatabase, createInMemoryAdapter, createMelonSchema } from '@melon-db/db';
 
 const schema = createMelonSchema({
   version: 1,
@@ -119,7 +119,7 @@ See [Full-stack sync walkthrough](/docs/walkthroughs/full-stack-sync).
 ## Devtools
 
 ```ts
-import { createReactiveDevtoolsBridge } from '@melon/db-devtools';
+import { createReactiveDevtoolsBridge } from '@melon-db/db-devtools';
 
 const devtools = createReactiveDevtoolsBridge();
 const db = createDatabase({ schema, adapter, devtools });
@@ -129,4 +129,4 @@ Try the [CRUD playground](/docs/playgrounds/crud) or [Devtools tour](/docs/walkt
 
 ## Author & license
 
-Copyright (c) 2026 Nate Nichols. Melon is [MIT licensed](https://github.com/nwnichols02/melon/blob/main/LICENSE). Alpha support expectations: [Alpha support policy](/docs/alpha-support).
+Copyright (c) 2026 Nate Nichols. Melon is [MIT licensed](https://github.com/nwnichols02/melon-db/blob/main/LICENSE). Alpha support expectations: [Alpha support policy](/docs/alpha-support).

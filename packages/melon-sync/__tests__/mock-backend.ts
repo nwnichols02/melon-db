@@ -1,1 +1,1 @@
-export { InMemorySyncStore as MockSyncServer } from "@melon/sync-server";
+export { InMemorySyncStore as MockSyncServer } from "@melon-db/sync-server";

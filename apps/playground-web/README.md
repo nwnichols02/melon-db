@@ -17,7 +17,7 @@ Open http://localhost:5174
 
 - CRUD inside `db.write()`
 - Fluent query via `useFluentQuery`
-- `@melon/db-devtools` panel (Plan, AST; SQL when using SQLite adapters)
+- `@melon-db/db-devtools` panel (Plan, AST; SQL when using SQLite adapters)
 
 See [Web walkthrough](/docs/walkthroughs/web-local) on the docs site (`bun run dev:docs`).
 

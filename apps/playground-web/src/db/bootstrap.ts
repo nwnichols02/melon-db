@@ -1,5 +1,5 @@
-import { createDatabase, createInMemoryAdapter } from "@melon/db";
-import { createReactiveDevtoolsBridge } from "@melon/db-devtools";
+import { createDatabase, createInMemoryAdapter } from "@melon-db/db";
+import { createReactiveDevtoolsBridge } from "@melon-db/db-devtools";
 import { taskSchema } from "./schema.ts";
 
 export const devtoolsBridge = createReactiveDevtoolsBridge();

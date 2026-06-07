@@ -2,13 +2,13 @@ import { devtoolsBridge, getDatabase } from "@/db/bootstrap";
 import type { taskSchema } from "@/db/schema";
 import { createHttpSyncBackend } from "@/sync/client";
 import { devNetworkMonitor } from "@/sync/network-monitor";
-import type { MelonDatabase } from "@melon/db";
+import type { MelonDatabase } from "@melon-db/db";
 import {
 	MelonDevtoolsPanel,
 	MelonDevtoolsProvider,
-} from "@melon/db-devtools/react";
-import { MelonDbProvider, MelonSyncProvider } from "@melon/db-react";
-import { DEFAULT_RETRY_POLICY } from "@melon/sync";
+} from "@melon-db/db-devtools/react";
+import { MelonDbProvider, MelonSyncProvider } from "@melon-db/db-react";
+import { DEFAULT_RETRY_POLICY } from "@melon-db/sync";
 import { Stack } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";

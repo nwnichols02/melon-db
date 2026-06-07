@@ -4,7 +4,7 @@ import {
 	createInMemoryAdapter,
 	createMelonSchema,
 	mergeRemoteWithPendingFields,
-} from "@melon/db";
+} from "@melon-db/db";
 import { createMemoryCheckpointStore } from "../src/checkpoint.ts";
 import { synchronize } from "../src/synchronize.ts";
 import { MockSyncServer } from "./mock-backend.ts";

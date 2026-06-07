@@ -2,8 +2,8 @@ import type {
 	DevtoolsBridge,
 	QueryDebugSnapshot,
 	SyncDebugSnapshot,
-} from "@melon/db";
-import type { AdapterWriteOperation } from "@melon/db";
+} from "@melon-db/db";
+import type { AdapterWriteOperation } from "@melon-db/db";
 
 export interface DevtoolsEventLog {
 	queries: QueryDebugSnapshot[];

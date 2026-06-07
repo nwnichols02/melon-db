@@ -1,4 +1,4 @@
-import type { SyncDebugSnapshot } from "@melon/db";
+import type { SyncDebugSnapshot } from "@melon-db/db";
 import { type ReactElement, useState } from "react";
 import { formatJson } from "../format-json.ts";
 

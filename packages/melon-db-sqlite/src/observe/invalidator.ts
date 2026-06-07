@@ -1,4 +1,4 @@
-import type { AdapterWriteOperation, MelonSchema } from "@melon/db";
+import type { AdapterWriteOperation, MelonSchema } from "@melon-db/db";
 import type { SqliteDriver } from "../driver.ts";
 import {
 	type InvalidationEvent,

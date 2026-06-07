@@ -1,28 +1,28 @@
 ---
-title: "@melon/db-sqlite"
+title: "@melon-db/db-sqlite"
 description: SQLite StorageAdapter for Bun, Node, and Expo.
 ---
 
-**Status:** Shipped · **Depends on:** `@melon/db` · **API:** [Reference](/docs/api/melon-db-sqlite)
+**Status:** Shipped · **Depends on:** `@melon-db/db` · **API:** [Reference](/docs/api/melon-db-sqlite)
 
 Compiles `QueryAst` to parameterized SQL and implements `StorageAdapter` for production local storage. Includes **predicate-aware `observeQuery`** (Phase 27): reactive queries re-fetch only when a write can affect their WHERE clause.
 
 ## Install (alpha)
 
 ```bash
-npm install @melon/db-sqlite@alpha
+npm install @melon-db/db-sqlite@alpha
 ```
 
 Or with Bun:
 
 ```bash
-bun add @melon/db-sqlite@alpha
+bun add @melon-db/db-sqlite@alpha
 ```
 
 ## Bun / Node
 
 ```ts
-import { createSqliteAdapter } from '@melon/db-sqlite';
+import { createSqliteAdapter } from '@melon-db/db-sqlite';
 
 const adapter = createSqliteAdapter({ filename: 'app.db' });
 ```
@@ -31,13 +31,13 @@ const adapter = createSqliteAdapter({ filename: 'app.db' });
 
 | Path | Import | Expo Go |
 |------|--------|---------|
-| **Default** | `@melon/db-sqlite/expo` + `expo-sqlite` | Yes |
-| **Native** | `@melon/db-sqlite/rn` + `@melon/db-sqlite-native` | No — requires `expo prebuild` + dev build (iOS + Android) |
+| **Default** | `@melon-db/db-sqlite/expo` + `expo-sqlite` | Yes |
+| **Native** | `@melon-db/db-sqlite/rn` + `@melon-db/db-sqlite-native` | No — requires `expo prebuild` + dev build (iOS + Android) |
 
 ### Expo Go
 
 ```ts
-import { createExpoSqliteAdapter } from '@melon/db-sqlite/expo';
+import { createExpoSqliteAdapter } from '@melon-db/db-sqlite/expo';
 import * as SQLite from 'expo-sqlite';
 
 const database = await SQLite.openDatabaseAsync('app.db');
@@ -48,7 +48,7 @@ const adapter = createExpoSqliteAdapter({ database });
 
 ```ts
 import { Paths } from 'expo-file-system';
-import { createJsiSqliteAdapter, isJsiSqliteAvailable } from '@melon/db-sqlite/rn';
+import { createJsiSqliteAdapter, isJsiSqliteAvailable } from '@melon-db/db-sqlite/rn';
 
 if (!isJsiSqliteAvailable()) {
   throw new Error('Use expo-sqlite or run a development build');
@@ -60,12 +60,12 @@ const adapter = createJsiSqliteAdapter({
 });
 ```
 
-See [`@melon/db-sqlite-native`](/docs/packages/melon-db-sqlite-native) for native setup.
+See [`@melon-db/db-sqlite-native`](/docs/packages/melon-db-sqlite-native) for native setup.
 
 ## Node (better-sqlite3)
 
 ```ts
-import { createNodeSqliteAdapter } from '@melon/db-sqlite/node';
+import { createNodeSqliteAdapter } from '@melon-db/db-sqlite/node';
 ```
 
 ## Benchmarks
@@ -77,4 +77,4 @@ bun run bench:compare
 
 ## Author & license
 
-Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon/blob/main/LICENSE).
+Copyright (c) 2026 Nate Nichols. [MIT License](https://github.com/nwnichols02/melon-db/blob/main/LICENSE).

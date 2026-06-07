@@ -11,7 +11,7 @@ import {
 	resumeDatabaseAfterNativeBench,
 	suspendDatabaseForNativeBench,
 } from "@/db/bootstrap";
-import type { StorageAdapter } from "@melon/db";
+import type { StorageAdapter } from "@melon-db/db";
 import {
 	type BenchResult,
 	type RnMelonVsWdbReport,
@@ -20,11 +20,11 @@ import {
 	buildRnParityReport,
 	runScenariosForAdapter,
 	runWdbScenarios,
-} from "@melon/db-sqlite/bench";
+} from "@melon-db/db-sqlite/bench";
 import {
 	createJsiSqliteAdapter,
 	isJsiSqliteAvailable,
-} from "@melon/db-sqlite/rn";
+} from "@melon-db/db-sqlite/rn";
 import { Platform } from "react-native";
 
 export type DeviceBenchMode = "jsi-sync" | "turbo" | "expo" | "watermelon";
@@ -72,7 +72,7 @@ function createNativeAdapter(
 
 async function createExpoBenchAdapter(filename: string): Promise<StorageAdapter> {
 	const SQLite = await import("expo-sqlite");
-	const { createExpoSqliteAdapter } = await import("@melon/db-sqlite/expo");
+	const { createExpoSqliteAdapter } = await import("@melon-db/db-sqlite/expo");
 	const database = await SQLite.openDatabaseAsync(filename);
 	return createExpoSqliteAdapter({ database });
 }

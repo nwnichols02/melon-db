@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { Migration } from "@melon/db";
+import type { Migration } from "@melon-db/db";
 import { buildPullMigration } from "../src/migration-sync.ts";
 
 describe("buildPullMigration", () => {

@@ -1,4 +1,4 @@
-import { createInMemoryAdapter } from "@melon/db";
+import { createInMemoryAdapter } from "@melon-db/db";
 import { createSqliteAdapter } from "../../src/adapter.ts";
 import { runScenariosForAdapter } from "../../src/bench/scenarios.ts";
 import type { BenchEngine, BenchResult } from "./bench-runner.ts";

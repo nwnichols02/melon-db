@@ -1,4 +1,4 @@
-import type { QueryOperator } from "@melon/db";
+import type { QueryOperator } from "@melon-db/db";
 
 /** Maps WatermelonDB Q operator names to Melon QueryOperator values. */
 export const WATERMELON_OPERATOR_MAP = {

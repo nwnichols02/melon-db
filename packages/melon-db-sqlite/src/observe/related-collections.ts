@@ -1,5 +1,5 @@
-import type { QueryAst } from "@melon/db";
-import type { MelonSchema } from "@melon/db";
+import type { QueryAst } from "@melon-db/db";
+import type { MelonSchema } from "@melon-db/db";
 
 /**
  * Target collections referenced by belongsTo relationFilters on a query.

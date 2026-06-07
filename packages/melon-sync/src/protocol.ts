@@ -1,4 +1,4 @@
-import type { SyncChanges } from "@melon/db";
+import type { SyncChanges } from "@melon-db/db";
 
 export interface PullMigration {
 	from: number;

@@ -1,8 +1,8 @@
 import {
 	MelonDevtoolsPanel,
 	MelonDevtoolsProvider,
-} from "@melon/db-devtools/react";
-import { MelonDbProvider, useFluentQuery, useWriter } from "@melon/db-react";
+} from "@melon-db/db-devtools/react";
+import { MelonDbProvider, useFluentQuery, useWriter } from "@melon-db/db-react";
 import { type ReactElement, useCallback, useMemo, useState } from "react";
 import { db, devtoolsBridge } from "./db/bootstrap.ts";
 import type { Task } from "./db/schema.ts";

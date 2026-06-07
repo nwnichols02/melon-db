@@ -1,13 +1,13 @@
 ---
 alwaysApply: true
 ---
-Starting with @melon/db and @melon/db-sqlite is the right call: everything else is just sugar on top of these two.
+Starting with @melon-db/db and @melon-db/db-sqlite is the right call: everything else is just sugar on top of these two.
 
 Below is a focused, implementation-ready PRD/RFC for those two packages only.
 
-@melon/db – core engine RFC
+@melon-db/db – core engine RFC
 1. Scope
-@melon/db is the core runtime for the “next WatermelonDB”:
+@melon-db/db is the core runtime for the “next WatermelonDB”:
 
 Schema + metadata
 
@@ -35,7 +35,7 @@ No React dependency or hooks here.
 
 No Prisma schema parsing, no Mango parsing; only the AST.
 
-No sync protocol or remote concepts; that goes into @melon/sync.
+No sync protocol or remote concepts; that goes into @melon-db/sync.
 
 4. Functional requirements
 4.1 Schema and metadata
@@ -164,7 +164,7 @@ Validate design against WatermelonDB’s Architecture + DatabaseAdapters docs.
 Exit: Type-safe interfaces compiling, basic createDatabase signature in place.
 
 M1 – In-memory adapter & core behavior (2–3 weeks)
-Implement createInMemoryAdapter() inside @melon/db (or in testkit if you want to split later).
+Implement createInMemoryAdapter() inside @melon-db/db (or in testkit if you want to split later).
 
 Implement MelonDatabase and MelonCollection backed by in-memory adapter.
 
@@ -191,9 +191,9 @@ Tests around observe semantics.
 
 Exit: Query handle can be observed and emits value changes consistently.
 
-@melon/db-sqlite – SQLite adapter RFC
+@melon-db/db-sqlite – SQLite adapter RFC
 1. Scope
-@melon/db-sqlite provides a production StorageAdapter backed by SQLite:
+@melon-db/db-sqlite provides a production StorageAdapter backed by SQLite:
 
 React Native (new architecture, JSI/TurboModule)
 
@@ -213,7 +213,7 @@ Be identical in behavior across RN and Node where feasible.
 3. Non-goals
 No query building/parsing (AST is input).
 
-No schema migration planning (schema is in @melon/db).
+No schema migration planning (schema is in @melon-db/db).
 
 No sync; change tracking hooks are an optional interface for sync to consume later.
 
@@ -298,7 +298,7 @@ Implement initialize(schema) to create tables/indexes from DatabaseSchemaDefinit
 
 Implement find, count, write, transaction.
 
-Exit: In apps/playground-node or tests, you can use @melon/db + @melon/db-sqlite for CRUD and queries.
+Exit: In apps/playground-node or tests, you can use @melon-db/db + @melon-db/db-sqlite for CRUD and queries.
 
 M2 – RN new architecture adapter (3–4 weeks)
 Wrap SQLite in a JSI/TurboModule module for RN.
@@ -325,9 +325,9 @@ Compare with a baseline (WatermelonDB where possible).
 Coordination between the two
 To keep you moving efficiently:
 
-Do @melon/db M0/M1 first using the in-memory adapter.
+Do @melon-db/db M0/M1 first using the in-memory adapter.
 
-Then implement @melon/db-sqlite M0/M1:
+Then implement @melon-db/db-sqlite M0/M1:
 
 SQL generator and Node adapter can use the same tests as in-memory, just with different adapters.
 
@@ -335,4 +335,4 @@ Once both are stable:
 
 Wire RN new-arch integration and the first playground app.
 
-Only after that, start @melon/db-query and @melon/db-react.
+Only after that, start @melon-db/db-query and @melon-db/db-react.

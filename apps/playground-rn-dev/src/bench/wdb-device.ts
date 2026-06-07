@@ -1,4 +1,4 @@
-import { BenchTask, wdbAppSchema } from "@melon/db-sqlite/bench";
+import { BenchTask, wdbAppSchema } from "@melon-db/db-sqlite/bench";
 import type { Database as WdbDatabase } from "@nozbe/watermelondb";
 import { File, Paths } from "expo-file-system";
 

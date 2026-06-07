@@ -3,7 +3,7 @@ title: Sync architecture
 description: Outbox, checkpoints, pull/push flow, and conflict resolution.
 ---
 
-Sync is split across the engine and orchestrator: **`@melon/db`** owns change extraction and remote apply; **`@melon/sync`** owns the pull/push loop, retry, and status machine.
+Sync is split across the engine and orchestrator: **`@melon-db/db`** owns change extraction and remote apply; **`@melon-db/sync`** owns the pull/push loop, retry, and status machine.
 
 For usage examples see the [Sync guide](/docs/sync). For the split-package rationale see [ADR-002](/docs/architecture/decisions#adr-002-split-storage-and-sync-packages).
 
@@ -14,7 +14,7 @@ flowchart LR
   subgraph clientApp ["Client app"]
     MDB["MelonDatabase sync"]
     Outbox["_melon_sync_outbox"]
-    Sync["@melon/sync"]
+    Sync["@melon-db/sync"]
     Hooks["useSync hooks"]
     MDB --> Sync
     Outbox --> Sync
@@ -22,7 +22,7 @@ flowchart LR
   end
 
   subgraph backend ["Backend"]
-    Server["@melon/sync-server"]
+    Server["@melon-db/sync-server"]
     PG["PostgresSyncStore"]
     Server --> PG
   end
@@ -33,11 +33,11 @@ flowchart LR
 | Piece | Owner | Role |
 |-------|-------|------|
 | Outbox table | SQLite adapter + engine | Queues local creates/updates/deletes with optional `pendingFields` |
-| `getLocalChanges()` | `@melon/db` | Watermelon-compatible change payloads for push |
-| `applyRemoteChanges()` | `@melon/db` | Applies pull results with conflict policy |
-| `synchronize()` | `@melon/sync` | Pull → apply → push → ack → checkpoint |
-| Checkpoint store | `@melon/sync` | Persists `lastPulledAt` and schema version |
-| Reference server | `@melon/sync-server` | In-memory or Postgres HTTP backend for dev |
+| `getLocalChanges()` | `@melon-db/db` | Watermelon-compatible change payloads for push |
+| `applyRemoteChanges()` | `@melon-db/db` | Applies pull results with conflict policy |
+| `synchronize()` | `@melon-db/sync` | Pull → apply → push → ack → checkpoint |
+| Checkpoint store | `@melon-db/sync` | Persists `lastPulledAt` and schema version |
+| Reference server | `@melon-db/sync-server` | In-memory or Postgres HTTP backend for dev |
 
 ## Pull/push sequence
 
@@ -93,5 +93,5 @@ Schema version travels with checkpoints. On pull, `buildPullMigration()` can des
 ## Related
 
 - [Sync guide](/docs/sync) — API examples and React hooks
-- [@melon/sync package](/docs/packages/melon-sync)
-- [@melon/sync-server package](/docs/packages/melon-sync-server)
+- [@melon-db/sync package](/docs/packages/melon-sync)
+- [@melon-db/sync-server package](/docs/packages/melon-sync-server)

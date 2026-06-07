@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createMelonSchema } from "@melon/db";
+import { createMelonSchema } from "@melon-db/db";
 import { createMangoCompiler } from "../src/compiler.ts";
 
 const schema = createMelonSchema({

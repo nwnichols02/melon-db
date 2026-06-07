@@ -1,4 +1,4 @@
-import type { SyncBackend } from "@melon/sync";
+import type { SyncBackend } from "@melon-db/sync";
 import { SyncServerError, SyncServerErrorCode } from "./errors.ts";
 import { InMemorySyncStore as StoreClass } from "./store.ts";
 import {

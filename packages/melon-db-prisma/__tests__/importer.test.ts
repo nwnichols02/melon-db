@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { rm } from "node:fs/promises";
 import { join } from "node:path";
-import { createMelonSchema } from "@melon/db";
+import { createMelonSchema } from "@melon-db/db";
 import { generateClient } from "../src/codegen/generate-client.ts";
 import { importPrismaSchema } from "../src/importer/import-schema.ts";
 

@@ -6,15 +6,15 @@ import {
 	predicate,
 	prepareQuery,
 	queryAst,
-} from "@melon/db";
-import { compilePrismaQuery } from "@melon/db-prisma";
-import { createMangoCompiler } from "@melon/db-query-mango";
+} from "@melon-db/db";
+import { compilePrismaQuery } from "@melon-db/db-prisma";
+import { createMangoCompiler } from "@melon-db/db-query-mango";
 import {
 	SyncStatusKind,
 	createMemoryCheckpointStore,
 	synchronize,
-} from "@melon/sync";
-import { InMemorySyncStore } from "@melon/sync-server";
+} from "@melon-db/sync";
+import { InMemorySyncStore } from "@melon-db/sync-server";
 
 const mangoCompiler = createMangoCompiler();
 
@@ -402,7 +402,7 @@ describe("db-react exports", () => {
 			adapter: createInMemoryAdapter(),
 			sync: {},
 		});
-		const { createMutableNetworkMonitor } = await import("@melon/sync");
+		const { createMutableNetworkMonitor } = await import("@melon-db/sync");
 		const monitor = createMutableNetworkMonitor(false);
 		const statuses: string[] = [];
 

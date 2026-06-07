@@ -4,7 +4,7 @@ import type {
 	QueryOperator,
 	QueryRelationInclude,
 	QuerySort,
-} from "@melon/db";
+} from "@melon-db/db";
 
 /**
  * Fluent query builder that produces QueryAst.

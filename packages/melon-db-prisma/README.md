@@ -1,6 +1,6 @@
-# @melon/db-prisma
+# @melon-db/db-prisma
 
-Prisma schema import and Prisma-like local client over `@melon/db`.
+Prisma schema import and Prisma-like local client over `@melon-db/db`.
 
 **Docs:** [/docs/packages/melon-db-prisma](http://localhost:3000/docs/packages/melon-db-prisma) · [API](http://localhost:3000/docs/api/melon-db-prisma)
 

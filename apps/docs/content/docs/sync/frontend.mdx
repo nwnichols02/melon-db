@@ -3,7 +3,7 @@ title: Sync frontend
 description: Enable sync on the client, providers, hooks, and local change APIs.
 ---
 
-The frontend owns local CRUD, outbox tracking, checkpoint storage, and calling your backend’s pull/push endpoints through `@melon/sync`.
+The frontend owns local CRUD, outbox tracking, checkpoint storage, and calling your backend’s pull/push endpoints through `@melon-db/sync`.
 
 ## Enable sync on the database
 
@@ -27,8 +27,8 @@ sync: { respectLocalOnly: true }, // skip collections with localOnly: true
 Wrap the app inside `MelonDbProvider`:
 
 ```tsx
-import { MelonDbProvider, MelonSyncProvider } from '@melon/db-react';
-import { DEFAULT_RETRY_POLICY } from '@melon/sync';
+import { MelonDbProvider, MelonSyncProvider } from '@melon-db/db-react';
+import { DEFAULT_RETRY_POLICY } from '@melon-db/sync';
 
 <MelonDbProvider db={db}>
   <MelonSyncProvider
@@ -58,7 +58,7 @@ await sync();
 Or headless:
 
 ```ts
-import { synchronize } from '@melon/sync';
+import { synchronize } from '@melon-db/sync';
 
 await synchronize({
   db,

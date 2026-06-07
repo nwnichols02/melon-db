@@ -1,4 +1,4 @@
-# @melon/db
+# @melon-db/db
 
 Core storage engine: schema, AST, adapter contract, runtime, migrations, in-memory adapter.
 

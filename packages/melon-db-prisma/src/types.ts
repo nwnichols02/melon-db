@@ -1,4 +1,4 @@
-import type { InsertInput, UpdateInput } from "@melon/db";
+import type { InsertInput, UpdateInput } from "@melon-db/db";
 
 export type PrismaWhereInput = Record<string, unknown>;
 

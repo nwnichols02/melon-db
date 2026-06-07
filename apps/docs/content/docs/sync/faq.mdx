@@ -15,7 +15,7 @@ The pull/push **shape** is Watermelon-compatible (`changes` grouped by table, `l
 
 ### Can I use Supabase / Postgres / REST?
 
-Yes. Implement `SyncBackend` against any API that can return `SyncChanges` and accept pushes. Reference implementations: `@melon/sync-server` (in-memory + Postgres).
+Yes. Implement `SyncBackend` against any API that can return `SyncChanges` and accept pushes. Reference implementations: `@melon-db/sync-server` (in-memory + Postgres).
 
 ## Frontend
 
@@ -75,8 +75,8 @@ See [Supported data types](/docs/sync/data-types). Use `string`, `number`, `bool
 |------|------------|
 | Query includes | `belongsTo` only — no `hasMany` include in AST |
 | Server merge | No built-in server-side CRDT; client conflict policies on apply |
-| Protocol | No official paginated pull in `@melon/sync` — custom backends only |
-| Prisma sync | `@melon/db-prisma` is local-only — no Prisma Cloud sync |
+| Protocol | No official paginated pull in `@melon-db/sync` — custom backends only |
+| Prisma sync | `@melon-db/db-prisma` is local-only — no Prisma Cloud sync |
 | Expo Go vs JSI | Performance differs; sync protocol is the same |
 
 ## Troubleshooting

@@ -20,7 +20,7 @@ This page tracks how Melon implementation compares to the product requirements i
 
 ---
 
-## `@melon/db`
+## `@melon-db/db`
 
 | Requirement | Status | Notes |
 |-------------|--------|-------|
@@ -34,14 +34,14 @@ This page tracks how Melon implementation compares to the product requirements i
 | `hasMany` includes (engine) | Done | Post-fetch batch load; global `limit` on child query |
 | `relationFilters` / Q.on filters | Done | SQLite `IN` subquery; in-memory `applyRelationFilters` |
 | Sync APIs on DB | Done | Beyond minimal db-core |
-| `collection.query(builder => …)` | Done | Via `@melon/db-query` bridge |
+| `collection.query(builder => …)` | Done | Via `@melon-db/db-query` bridge |
 | `observeQuery` on in-memory | Partial | Engine `ChangeEmitter` fallback |
 | `getChangedCollections` | Gap | Not on any adapter; outbox used for sync |
 | Read blocked during write | Gap | Writes serialized; reads do not wait on queue |
 
 ---
 
-## `@melon/db-sqlite` + `@melon/db-sqlite-native`
+## `@melon-db/db-sqlite` + `@melon-db/db-sqlite-native`
 
 | Requirement | Status | Notes |
 |-------------|--------|-------|
@@ -57,7 +57,7 @@ This page tracks how Melon implementation compares to the product requirements i
 
 ---
 
-## `@melon/db-query`
+## `@melon-db/db-query`
 
 | Requirement | Status | Notes |
 |-------------|--------|-------|
@@ -71,7 +71,7 @@ This page tracks how Melon implementation compares to the product requirements i
 
 ---
 
-## `@melon/db-query-mango`
+## `@melon-db/db-query-mango`
 
 | Requirement | Status | Notes |
 |-------------|--------|-------|
@@ -84,7 +84,7 @@ This page tracks how Melon implementation compares to the product requirements i
 
 ---
 
-## `@melon/db-react`
+## `@melon-db/db-react`
 
 | Requirement | Status | Notes |
 |-------------|--------|-------|
@@ -98,7 +98,7 @@ This page tracks how Melon implementation compares to the product requirements i
 
 ---
 
-## `@melon/db-prisma`
+## `@melon-db/db-prisma`
 
 | Requirement | Status | Notes |
 |-------------|--------|-------|
@@ -111,7 +111,7 @@ This page tracks how Melon implementation compares to the product requirements i
 
 ---
 
-## `@melon/db-devtools`, `@melon/db-testkit`, `@melon/db-codemods`
+## `@melon-db/db-devtools`, `@melon-db/db-testkit`, `@melon-db/db-codemods`
 
 | Package | Status | Main gap |
 |---------|--------|----------|
@@ -121,7 +121,7 @@ This page tracks how Melon implementation compares to the product requirements i
 
 ---
 
-## `@melon/sync` + `@melon/sync-server`
+## `@melon-db/sync` + `@melon-db/sync-server`
 
 | Requirement | Status | Notes |
 |-------------|--------|-------|
@@ -131,7 +131,7 @@ This page tracks how Melon implementation compares to the product requirements i
 | Persistent multi-job queue | Deferred | |
 | Supabase / REST recipes | Gap | |
 | Sliding window / local prune (prd-4) | Gap | Builds on pull/push + outbox; not a sync-server replacement |
-| React hooks | N/A | In `@melon/db-react` |
+| React hooks | N/A | In `@melon-db/db-react` |
 
 ---
 
@@ -151,7 +151,7 @@ Future retention subsystem from `prd-4.mdc` — org-aware download windows, safe
 | Retention observability (devtools / support UI) | Gap | Devtools Retention tab stub only |
 | Devtools integration | Partial | Placeholder tab; full UI with Phase 31+ |
 
-**Package home (TBD):** `@melon/sync` extension or `@melon/sync-retention` — sync packages must not depend on query-layer packages per package-roles.
+**Package home (TBD):** `@melon-db/sync` extension or `@melon-db/sync-retention` — sync packages must not depend on query-layer packages per package-roles.
 
 ---
 
@@ -171,14 +171,14 @@ Future retention subsystem from `prd-4.mdc` — org-aware download windows, safe
 
 ## Alpha release and open source (prd-1)
 
-Pre-GA work required before publishing `@melon/*` to npm and opening the GitHub repository. Phase 34 implements the release engineering and adoption plumbing; a couple items remain **manual** (npm org creation + flipping GitHub public).
+Pre-GA work required before publishing `@melon-db/*` to npm and opening the GitHub repository. Phase 34 implements the release engineering and adoption plumbing; a couple items remain **manual** (npm org creation + flipping GitHub public).
 
 | Requirement | Status | Notes |
 |-------------|--------|-------|
 | GitHub: private → public | Gap | Manual: flip visibility, enable branch protection + secret scanning |
 | Community files | Done | Root `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, templates |
 | Secret / history hygiene | Done | `.gitignore` tightened for local artifacts; manual scan recommended before public |
-| npm org `@melon` | Gap | Manual: create org, invite maintainers, enforce **2FA** |
+| npm org `@melon-db` | Gap | Manual: create org, invite maintainers, enforce **2FA** |
 | Per-package publish metadata | Done | `files`, `exports`, `publishConfig.access: public`, `license`, `repository`, aligned versions |
 | Monorepo publish workflow | Done | `release.yml` + `tooling/release/publish.ts` (topological order, `--tag alpha`) |
 | Alpha versioning policy | Done | Lockstep `0.1.0-alpha.0` + `alpha` dist-tag |
@@ -198,12 +198,12 @@ Pre-GA work required before publishing `@melon/*` to npm and opening the GitHub 
    - Confirm no credentials in git history, `.env` examples, or CI logs.
 
 2. **npm organization & package prep**
-   - Create npm org **`@melon`**; add maintainers with 2FA.
+   - Create npm org **`@melon-db`**; add maintainers with 2FA.
    - For each publishable package under `packages/*`: verify `name`, `version`, `description`, `repository`, `license`, `files` / `exports`, and `"publishConfig": { "access": "public" }`.
    - Run `bun run build` and smoke tests from **packed tarballs** (`npm pack` / `bun pm pack`) — not only workspace links.
 
 3. **Alpha release**
-   - Publish with dist-tag **`alpha`** (e.g. `@melon/db@0.1.0-alpha.0`).
+   - Publish with dist-tag **`alpha`** (e.g. `@melon-db/db@0.1.0-alpha.0`).
    - Tag monorepo release in GitHub; attach release notes listing packages and known limitations ([v1 limitations](/docs/roadmap#v1-limitations)).
    - Update [Getting started](/docs/getting-started) and package pages with **non-workspace** install instructions.
 
@@ -230,11 +230,11 @@ Product decisions recorded here (not blockers for phases 0–28):
 | SQL `SELECT` JOIN / partial select | **Defer** | Includes remain post-fetch; see ADR-011 |
 | Per-parent nested `take` on includes | **Defer** | Global child `limit` only in v1 |
 | Sync `merging` state | **Defer** | Apply path is synchronous; add when merge UI needs distinct phase |
-| `@melon/db-react` → `@melon/sync` dep | **Accept** | DX for `useSync`; split only if publishing react without sync |
+| `@melon-db/db-react` → `@melon-db/sync` dep | **Accept** | DX for `useSync`; split only if publishing react without sync |
 | `playground-web` | **Partial** | In-memory Vite app; full web SQLite adapter still deferred |
 | Read-during-write blocking | **Defer** | Serialized writes sufficient for v1; revisit if readers observe torn state |
 | Sliding window subsystem (prd-4) | **Defer** | Phase 31+; policy foundation before prune executor |
-| Alpha / open-source release | **Next (Phase 34)** | Public GitHub + npm `@melon` alpha; see [Alpha release and open source](/docs/prd-compliance#alpha-release-and-open-source-prd-1) |
+| Alpha / open-source release | **Next (Phase 34)** | Public GitHub + npm `@melon-db` alpha; see [Alpha release and open source](/docs/prd-compliance#alpha-release-and-open-source-prd-1) |
 
 ---
 
@@ -246,7 +246,7 @@ Product decisions recorded here (not blockers for phases 0–28):
 | `prd-2.mdc` | AST-first multi-surface queries |
 | `prd-3.mdc` | TypeScript interface contracts |
 | `prd-4.mdc` | **Future** sliding-window retention, prune ledger, org-aware scope |
-| `db-core.mdc` | `@melon/db` + `@melon/db-sqlite` |
+| `db-core.mdc` | `@melon-db/db` + `@melon-db/db-sqlite` |
 | `db-query.mdc` | Fluent builder + React |
 | `db-prisma.mdc` | Prisma layer |
 | `package-roles.mdc` | Per-package milestones |

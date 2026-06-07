@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createDatabase, createMelonSchema } from "@melon/db";
+import { createDatabase, createMelonSchema } from "@melon-db/db";
 import { createSqliteAdapter } from "../src/adapter.ts";
 
 const schema = createMelonSchema({
