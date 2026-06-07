@@ -4,7 +4,7 @@ alwaysApply: true
 # `melon/db` package architecture and TypeScript interfaces
 
 ## Overview
-This document defines a concrete package architecture and TypeScript-first interface proposal for `melon/db`, the storage and query layer of the next-generation WatermelonDB successor. The design follows WatermelonDB’s documented architecture, where `Database` owns an adapter and collections, the adapter bridges high-level reactive APIs to low-level database operations, and most logic is kept minimal and implemented as pure functions around query descriptions.[1][2]
+This document defines a concrete package architecture and TypeScript-first interface proposal for `melon/db`, the storage and query layer of the next-generation WatermelonDB successor. The design follows WatermelonDB’s documented architecture, where `Database` owns an adapter and collections, the adapter bridges high-level reactive APIs to low-level database operations, and most logic is kept minimal and implemented as pure functions around query descriptions.[1][2] New update. 
 
 The proposal also incorporates two extensions from the previous PRD iteration: a Prisma-oriented schema and client layer, and an alternate open-source query language layer based on Mango-style selectors as documented by RxDB and CouchDB.[3][4][5] The result is a package family with one execution core, one internal query AST, and multiple query authoring surfaces that compile into the same runtime contracts.[6][7]
 
