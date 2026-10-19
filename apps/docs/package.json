@@ -18,7 +18,7 @@
 		"@melon-db/sync": "workspace:*",
 		"@melon-db/sync-server": "workspace:*",
 		"@tanstack/react-router": "1.170.8",
-		"@tanstack/react-start": "1.168.13",
+		"@tanstack/react-start": "1.168.60",
 		"fumadocs-core": "^16.9.3",
 		"fumadocs-mdx": "^15.0.10",
 		"fumadocs-typescript": "^5.2.6",
